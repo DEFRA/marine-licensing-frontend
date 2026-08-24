@@ -13,9 +13,6 @@ import {
   DEFAULT_GEO_PARSER_ERROR_MESSAGE
 } from '#src/server/common/helpers/file-upload/error-messages.js'
 
-export const CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE =
-  '.pdf,.bmp,.gif,.jpg,.jpeg,.png,.tif'
-
 export const KML_SITE_NAME_GUIDANCE = [
   "We'll use a site name for each area in your file if one is included.",
   'In a KML file, use the name of each place.'

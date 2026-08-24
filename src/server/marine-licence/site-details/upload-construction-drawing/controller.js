@@ -8,15 +8,15 @@ import {
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { validateSiteAndDrawingParams } from '#src/server/common/helpers/marine-licence/session-cache/site-utils.js'
 import { getConstructionDrawingBackLink } from '#src/server/marine-licence/site-details/utils/back-link.js'
+import { createFileUploadErrorDisplay } from '#src/server/common/helpers/file-upload/file-upload.js'
 import {
   CONSTRUCTION_DRAWING_ACCEPT_ATTRIBUTE,
-  createFileUploadErrorDisplay
-} from '#src/server/common/helpers/file-upload/file-upload.js'
+  CONSTRUCTION_DRAWING_S3_PATH
+} from '#src/server/common/constants/construction-drawing.js'
 
 export const UPLOAD_CONSTRUCTION_DRAWING_VIEW_ROUTE =
   'marine-licence/site-details/upload-construction-drawing/index'
 
-const CONSTRUCTION_DRAWING_S3_PATH = 'marine-licence/construction-drawings'
 const TEN_MB = 10 * 1024 * 1024
 
 export const uploadConstructionDrawingController = {

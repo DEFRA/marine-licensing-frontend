@@ -81,7 +81,7 @@ describe('#isInvoiceAddressUkOrInternational', () => {
         }
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
+        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
       )
       expect(h.view).not.toHaveBeenCalled()
     })

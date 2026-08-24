@@ -125,7 +125,7 @@ describe('Is invoice address UK or international', () => {
     })
   })
 
-  test('should stay on the same page on valid submission', async () => {
+  test('should redirect to the postcode search page on UK submission', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
 
     const { response } = await submitForm({
@@ -139,7 +139,7 @@ describe('Is invoice address UK or international', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
     )
   })
 

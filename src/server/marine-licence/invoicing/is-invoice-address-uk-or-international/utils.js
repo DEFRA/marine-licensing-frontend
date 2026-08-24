@@ -9,7 +9,7 @@ export const getBackLink = (action, invoicing) =>
 
 export const getAddressRouteForType = (invoiceAddressType) =>
   invoiceAddressType === INVOICE_TYPE_OPTIONS.UK
-    ? marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
+    ? marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
     : marineLicenceRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
 
 export const isAddressTypeUnchangedSinceEnteringChangeFlow = (

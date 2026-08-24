@@ -2,50 +2,70 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 describe('isCdpProductionLikeEnvironment', () => {
   test('should return true for prod environment', async () => {
-    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    const { isCdpProductionLikeEnvironment } =
+      await import('./required-from-env-in-cdp.js')
     expect(isCdpProductionLikeEnvironment('prod')).toBe(true)
   })
 
   test('should return true for perf-test environment', async () => {
-    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    const { isCdpProductionLikeEnvironment } =
+      await import('./required-from-env-in-cdp.js')
     expect(isCdpProductionLikeEnvironment('perf-test')).toBe(true)
   })
 
   test('should return true for test environment', async () => {
-    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    const { isCdpProductionLikeEnvironment } =
+      await import('./required-from-env-in-cdp.js')
     expect(isCdpProductionLikeEnvironment('test')).toBe(true)
   })
 
   test('should return false for local environment', async () => {
-    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    const { isCdpProductionLikeEnvironment } =
+      await import('./required-from-env-in-cdp.js')
     expect(isCdpProductionLikeEnvironment('local')).toBe(false)
   })
 
   test('should return false for dev environment', async () => {
-    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    const { isCdpProductionLikeEnvironment } =
+      await import('./required-from-env-in-cdp.js')
     expect(isCdpProductionLikeEnvironment('dev')).toBe(false)
   })
 
   test('should return false for ext-test environment', async () => {
-    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    const { isCdpProductionLikeEnvironment } =
+      await import('./required-from-env-in-cdp.js')
     expect(isCdpProductionLikeEnvironment('ext-test')).toBe(false)
   })
 
   test('should return false for undefined environment', async () => {
-    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    const { isCdpProductionLikeEnvironment } =
+      await import('./required-from-env-in-cdp.js')
     expect(isCdpProductionLikeEnvironment(undefined)).toBe(false)
   })
 
   test('should return false for null environment', async () => {
-    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    const { isCdpProductionLikeEnvironment } =
+      await import('./required-from-env-in-cdp.js')
     expect(isCdpProductionLikeEnvironment(null)).toBe(false)
   })
 
   test('should return false for unknown environment', async () => {
-    const { isCdpProductionLikeEnvironment } = await import('./config.js')
+    const { isCdpProductionLikeEnvironment } =
+      await import('./required-from-env-in-cdp.js')
     expect(isCdpProductionLikeEnvironment('unknown')).toBe(false)
   })
 })
+
+const setAddressLookupEnv = () => {
+  process.env.MARINE_LICENSING_ADDRESS_LOOKUP_API_URL =
+    'https://gateway.example.com/api/address-lookup/v2.1/addresses'
+  process.env.MARINE_LICENSING_ADDRESS_LOOKUP_OAUTH_TOKEN_URL =
+    'https://login.example.com/a-tenant/oauth2/v2.0/token'
+  process.env.MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_ID = 'lookup-client-id'
+  process.env.MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_SECRET = 'lookup-secret'
+  process.env.MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_SCOPE =
+    'api://lookup/.default'
+}
 
 describe('config validation', () => {
   let originalEnv
@@ -149,6 +169,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOAD_BUCKET = 'perf-bucket'
       process.env.APP_BASE_URL =
         'https://marine-licensing-frontend.perf-test.cdp-int.defra.cloud'
+      setAddressLookupEnv()
 
       const { config } = await import('./config.js')
 
@@ -187,6 +208,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
+      setAddressLookupEnv()
       const { config } = await import('./config.js')
 
       expect(config.get('appBaseUrl')).toBe('https://app.example.com')
@@ -218,7 +240,35 @@ describe('config validation', () => {
         expect(errorMessage).toContain('ENTRA_ID_CLIENT_SECRET')
         expect(errorMessage).toContain('CDP_UPLOADER_BASE_URL')
         expect(errorMessage).toContain('APP_BASE_URL')
+        expect(errorMessage).toContain(
+          'MARINE_LICENSING_ADDRESS_LOOKUP_API_URL'
+        )
+        expect(errorMessage).toContain(
+          'MARINE_LICENSING_ADDRESS_LOOKUP_OAUTH_TOKEN_URL'
+        )
+        expect(errorMessage).toContain(
+          'MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_ID'
+        )
+        expect(errorMessage).toContain(
+          'MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_SECRET'
+        )
+        expect(errorMessage).toContain(
+          'MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_SCOPE'
+        )
       }
+    })
+  })
+
+  describe('address lookup configuration', () => {
+    test('should allow the local stub defaults outside production-like environments', async () => {
+      process.env.ENVIRONMENT = 'dev'
+
+      const { config } = await import('./config.js')
+      const addressLookup = config.get('addressLookup')
+
+      expect(addressLookup.apiUrl).toContain('/api/address-lookup/v2.1/')
+      expect(addressLookup.oauthTokenUrl).toContain('/oauth2/v2.0/token')
+      expect(addressLookup.timeout).toBeGreaterThan(0)
     })
   })
 
@@ -247,6 +297,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
+      setAddressLookupEnv()
       await import('./config.js')
 
       expect(warnSpy).toHaveBeenCalledWith(
@@ -284,6 +335,7 @@ describe('config validation', () => {
       process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
       process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
       process.env.APP_BASE_URL = 'https://app.example.com'
+      setAddressLookupEnv()
       await import('./config.js')
 
       expect(warnSpy).not.toHaveBeenCalled()

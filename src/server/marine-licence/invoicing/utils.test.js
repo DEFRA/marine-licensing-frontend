@@ -5,6 +5,7 @@ import {
   isInAddressChangeFlow,
   isInChangeFlow,
   getInvoiceAddressBackLink,
+  getUkInvoiceAddressBackLink,
   getInvoiceCancelLink,
   getInvoiceAddressButtonText,
   redirectAfterInvoiceAddressSubmit
@@ -63,6 +64,20 @@ describe('getInvoiceAddressBackLink', () => {
   test('returns correct page in all other scenarios', () => {
     expect(getInvoiceAddressBackLink()).toBe(
       marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+    )
+  })
+})
+
+describe('getUkInvoiceAddressBackLink', () => {
+  test('returns review page when action link is active', () => {
+    expect(getUkInvoiceAddressBackLink('change')).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+    )
+  })
+
+  test('returns the postcode search page in all other scenarios', () => {
+    expect(getUkInvoiceAddressBackLink()).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
     )
   })
 })

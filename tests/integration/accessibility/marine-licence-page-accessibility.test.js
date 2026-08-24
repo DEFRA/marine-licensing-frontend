@@ -18,6 +18,9 @@ import { agentSession } from '../shared/session-fixtures.js'
 import { selectActivityVariants } from '~/src/server/common/constants/activity-variants.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 import { runPageAccessibilityTests } from './page-accessibility-tests.js'
+import { submitForm } from '../shared/app-server.js'
+import { runAxeChecks } from '~/.vite/axe-helper.js'
+import * as addressLookup from '~/src/server/common/helpers/marine-licence/invoicing/address-lookup.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
@@ -64,6 +67,10 @@ const marineLicencePages = [
   {
     url: marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
     title: "Is the invoice contact's address in the UK or international?"
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
+    title: "What is the invoice contact's UK address?"
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,
@@ -324,5 +331,27 @@ describe('Marine licence page accessibility checks (Axe)', () => {
     setupMocks: ({ marineLicence = mockMarineLicenceApplication }) => {
       mockMarineLicence(marineLicence)
     }
+  })
+
+  // The page list above only covers GET. A lookup outcome is the error state worth checking
+  // here: it anchors an error summary to a field that passed validation, which is where the
+  // summary-link / aria-describedby relationship is most likely to break. An ordinary
+  // validation error renders the same structure through the standard GOV.UK macros.
+  describe('"What is the invoice contact\'s UK address?" page in an error state', () => {
+    test('has no accessibility violations when no addresses are found', async () => {
+      mockMarineLicence(mockMarineLicenceApplication)
+      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+        results: []
+      })
+
+      const { document } = await submitForm({
+        requestUrl:
+          marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
+        server: getServer(),
+        formData: { postcode: 'ZZ1 1ZZ', propertyNameOrNumber: '' }
+      })
+
+      await runAxeChecks(document.documentElement)
+    })
   })
 })

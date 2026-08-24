@@ -11,12 +11,23 @@ export const isInChangeFlow = (action, invoicing) => {
   return isInAddressTypeChangeFlow(invoicing) || isInAddressChangeFlow(action)
 }
 
-export const getInvoiceAddressBackLink = (action) => {
+// In the change flow every invoice address page goes back to check-answers;
+// otherwise it goes back to whichever page precedes it in the journey.
+export const getInvoiceAddressBackLink = (
+  action,
+  previousRoute = marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+) => {
   if (isInAddressChangeFlow(action)) {
     return marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
   }
-  return marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+  return previousRoute
 }
+
+export const getUkInvoiceAddressBackLink = (action) =>
+  getInvoiceAddressBackLink(
+    action,
+    marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+  )
 
 export const getInvoiceCancelLink = (action, invoicing) =>
   isInChangeFlow(action, invoicing)

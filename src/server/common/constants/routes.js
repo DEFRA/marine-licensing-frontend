@@ -43,6 +43,8 @@ export const exemptionRoutes = {
 export const marineLicenceInvoicingRoutes = {
   MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL:
     '/marine-licence/is-invoice-address-uk-or-international',
+  MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH:
+    '/marine-licence/invoice-address-postcode-search',
   MARINE_LICENCE_UK_INVOICE_ADDRESS: '/marine-licence/uk-invoice-address',
   MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS:
     '/marine-licence/international-invoice-address',

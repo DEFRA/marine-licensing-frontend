@@ -35,7 +35,7 @@ describe('UK invoice address', () => {
     ).toBeInTheDocument()
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
     )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       ukInvoiceAddressSettings.heading
@@ -239,7 +239,7 @@ describe('UK invoice address', () => {
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
     )
   })
 

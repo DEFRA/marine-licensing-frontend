@@ -18,8 +18,8 @@ describe('#buildApplicationDetailsCardData', () => {
 
     expect(result.applicationReference).toBe('ML-2026-001')
     expect(result.isTransferred).toBe(true)
-    expect(result.submittedAt).toBe('15 Jan 2026')
-    expect(result.transferredDate).toBe('20 Feb 2026')
+    expect(result.submittedAt).toBe('15 January 2026')
+    expect(result.transferredDate).toBe('20 February 2026')
     expect(result.statusTag).toContain('govuk-tag--magenta')
     expect(result.statusTag).toContain(PROJECT_STATUS.TRANSFERRED)
   })
@@ -38,8 +38,8 @@ describe('#buildApplicationDetailsCardData', () => {
 
     expect(result.applicationReference).toBe('ML-2026-001')
     expect(result.isRejected).toBe(true)
-    expect(result.submittedAt).toBe('15 Jan 2026')
-    expect(result.rejectedDate).toBe('20 Mar 2026')
+    expect(result.submittedAt).toBe('15 January 2026')
+    expect(result.rejectedDate).toBe('20 March 2026')
     expect(result.rejectedReasons).toEqual(['Reason 1', 'Reason 2'])
     expect(result.statusTag).toContain('govuk-tag--orange')
     expect(result.statusTag).toContain(UNABLE_TO_PROGRESS)
@@ -71,8 +71,8 @@ describe('#buildApplicationDetailsCardData', () => {
 
     expect(result.isWithdrawn).toBe(true)
     expect(result.isTransferred).toBe(false)
-    expect(result.submittedAt).toBe('15 Dec 2025')
-    expect(result.withdrawnAt).toBe('19 Jan 2026')
+    expect(result.submittedAt).toBe('15 December 2025')
+    expect(result.withdrawnAt).toBe('19 January 2026')
     expect(result.transferredDate).toBe('')
     expect(result.statusTag).toContain('govuk-tag--grey')
     expect(result.statusTag).toContain(PROJECT_STATUS.WITHDRAWN)

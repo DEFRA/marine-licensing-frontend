@@ -56,15 +56,15 @@ describe('Marine Licence Application Details Card Component', () => {
         statusTag:
           '<strong class="govuk-tag govuk-tag--grey">Withdrawn</strong>',
         applicationReference: 'MLA/2025/10018',
-        submittedAt: '15 Dec 2025',
-        withdrawnAt: '19 Jan 2026'
+        submittedAt: '15 December 2025',
+        withdrawnAt: '19 January 2026'
       }
     )
 
     const htmlContent = $withdrawn.html()
 
     expect(htmlContent).toContain('Date withdrawn')
-    expect(htmlContent).toContain('19 Jan 2026')
+    expect(htmlContent).toContain('19 January 2026')
     expect(htmlContent).toContain('Withdrawn')
 
     expect(htmlContent).not.toContain('Date of transfer')

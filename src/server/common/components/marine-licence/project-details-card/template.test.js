@@ -19,10 +19,13 @@ describe('Marine Licence Project Details Card Component', () => {
   })
 
   test('Should not display project name row when not present', () => {
-    const htmlContent = $component.html()
+    const $componentNoProjectName = renderComponent(
+      'marine-licence/project-details-card'
+    )
+    const htmlContent = $componentNoProjectName.html()
 
-    expect(htmlContent).toContain('Project name')
-    expect(htmlContent).toContain('Test Marine Project')
+    expect(htmlContent).not.toContain('Project name')
+    expect(htmlContent).not.toContain('Test Marine Project')
   })
 
   test('Should have correct card title', () => {

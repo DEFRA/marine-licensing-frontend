@@ -45,7 +45,7 @@ export const expectedTransferredApplicationDetailsCard = {
     },
     {
       key: 'Date of transfer',
-      value: '26 Jun 2026'
+      value: '26 June 2026'
     }
   ]
 }
@@ -60,7 +60,7 @@ export const expectedRejectedApplicationDetailsCard = {
     },
     {
       key: 'Date marked as unable to progress',
-      value: '26 Jul 2026'
+      value: '26 July 2026'
     },
     {
       key: 'Reasons marked as unable to progress',

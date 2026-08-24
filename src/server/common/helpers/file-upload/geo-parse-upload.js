@@ -7,6 +7,7 @@ import {
 } from '#src/server/common/helpers/file-upload/upload-logging.js'
 import { getFileValidationService } from '#src/services/file-validation/index.js'
 import { getAllowedExtensions } from '#src/server/common/helpers/file-upload/file-upload.js'
+import { FILE_TYPE_ERROR_MESSAGES } from '#src/server/common/helpers/file-upload/error-messages.js'
 
 const buildCoordinateResult = (geoJSON, extractedCoordinates) => ({
   geoJSON,
@@ -107,5 +108,16 @@ export const validateUploadedFile = async (status, uploadConfig, request) => {
     allowedExtensions
   )
 
-  return validation
+  if (validation.isValid) {
+    return validation
+  }
+
+  // The service builds a message by joining the extensions ("a PDF or BMP or GIF ..."),
+  // which is not the wording the designs use. Prefer the curated per-file-type copy, so
+  // this path matches what a CDP rejection shows via getCdpErrorMessageFromCode.
+  return {
+    ...validation,
+    errorMessage:
+      FILE_TYPE_ERROR_MESSAGES[uploadConfig.fileType] ?? validation.errorMessage
+  }
 }

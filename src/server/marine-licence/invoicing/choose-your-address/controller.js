@@ -146,8 +146,7 @@ export const chooseYourAddressSubmitController = {
       )
     }
 
-    // The selection is cached for the confirm-address page (ML-1501) to read.
-    // Navigating on from here is out of scope, so the user stays on this page.
+    // The selection is cached for the confirm-address page to read.
     await setMarineLicenceCache(request, h, {
       ...marineLicence,
       invoicing: {
@@ -156,10 +155,8 @@ export const chooseYourAddressSubmitController = {
       }
     })
 
-    return h.view(CHOOSE_YOUR_ADDRESS_VIEW_ROUTE, {
-      ...getPageParams(action, invoicing),
-      projectName: marineLicence.projectName,
-      payload: { selectedAddress }
-    })
+    return h.redirect(
+      withAction(marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS, action)
+    )
   }
 }

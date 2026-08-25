@@ -1,0 +1,51 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+      {% endif %}
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      <p class="govuk-body" id="confirm-address">
+        {% for line in addressLines %}
+          {{ line }}{% if not loop.last %}<br>{% endif %}
+        {% endfor %}
+      </p>
+
+      <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ editAddressLink }}">Edit address</a>
+      </p>
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: buttonText,
+            classes: "govuk-button--primary"
+          }) }}
+          {{ appCancelButton({
+            cancelLink: cancelLink
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

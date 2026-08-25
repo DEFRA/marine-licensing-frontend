@@ -8,6 +8,8 @@ export const getSearchResults = (invoicing) =>
 export const hasPickableResults = (results) =>
   results.length >= MINIMUM_RESULTS_FOR_PICKER
 
+export const hasSingleResult = (results) => results.length === 1
+
 export const buildAddressItems = (results) => [
   ...results.map((result, index) => ({
     value: String(index),

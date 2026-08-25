@@ -152,6 +152,26 @@ describe('#invoiceAddressPostcodeSearch', () => {
       expect(logged).not.toContain(anAddress.addressLine)
     })
 
+    test('Should not select an address when the lookup fails', async () => {
+      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+        results: [anAddress],
+        error: true
+      })
+
+      await submit({ postcode: 'NE4 7AR' })
+
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.anything(),
+        h,
+        expect.objectContaining({
+          invoicing: expect.not.objectContaining({
+            selectedInvoiceAddress: expect.anything()
+          })
+        })
+      )
+      expect(h.redirect).not.toHaveBeenCalled()
+    })
+
     test('Should keep previously cached results when the lookup fails', async () => {
       vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
         ...mockMarineLicenceApplication,
@@ -178,18 +198,47 @@ describe('#invoiceAddressPostcodeSearch', () => {
       )
     })
 
-    test('Should stay on the page without an error when there is one result', async () => {
+    test('Should redirect to the confirm address page when there is one result', async () => {
       vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
         results: [anAddress]
       })
 
       await submit({ postcode: 'NE4 7AR' })
 
-      expect(h.view).toHaveBeenCalledWith(
-        INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE,
-        expect.not.objectContaining({ errorSummary: expect.anything() })
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS
       )
-      expect(h.redirect).not.toHaveBeenCalled()
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
+    test('Should cache the only result as the selected address', async () => {
+      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+        results: [anAddress]
+      })
+
+      await submit({ postcode: 'NE4 7AR' })
+
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.anything(),
+        h,
+        expect.objectContaining({
+          invoicing: expect.objectContaining({
+            selectedInvoiceAddress: anAddress
+          })
+        })
+      )
+    })
+
+    test('Should keep the change flow when redirecting to the confirm address page', async () => {
+      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+        results: [anAddress]
+      })
+
+      await submit({ postcode: 'NE4 7AR' }, { action: 'change' })
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS}?action=change`
+      )
     })
 
     test('Should not show the truncation error when the filter still matched something', async () => {
@@ -200,10 +249,10 @@ describe('#invoiceAddressPostcodeSearch', () => {
 
       await submit({ postcode: 'NE4 7AR', propertyNameOrNumber: 'Tyneside' })
 
-      expect(h.view).toHaveBeenCalledWith(
-        INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE,
-        expect.not.objectContaining({ errorSummary: expect.anything() })
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS
       )
+      expect(h.view).not.toHaveBeenCalled()
     })
 
     test('Should redirect to the choose your address page when there are many results', async () => {

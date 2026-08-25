@@ -151,15 +151,20 @@ describe('#chooseYourAddress', () => {
         h
       )
 
-    test('Should stay on the page with the selection kept when an address is chosen', async () => {
+    test('Should go to the confirm address page when an address is chosen', async () => {
       await submit('1')
 
-      expect(h.redirect).not.toHaveBeenCalled()
-      expect(h.view).toHaveBeenCalledWith(
-        CHOOSE_YOUR_ADDRESS_VIEW_ROUTE,
-        expect.objectContaining({
-          payload: { selectedAddress: '1' }
-        })
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS
+      )
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
+    test('Should keep the change flow on the way to the confirm address page', async () => {
+      await submit('1', { action: 'change' })
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS}?action=change`
       )
     })
 

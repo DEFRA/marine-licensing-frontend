@@ -53,6 +53,13 @@ export const chooseYourAddressErrorMessages = {
   SELECTED_ADDRESS_REQUIRED: 'Select an address, or select "None of these"'
 }
 
+const CONFIRM_ADDRESS_TITLE = 'Review and confirm'
+
+export const confirmAddressSettings = {
+  pageTitle: CONFIRM_ADDRESS_TITLE,
+  heading: CONFIRM_ADDRESS_TITLE
+}
+
 const UK_INVOICE_ADDRESS_TITLE = 'UK invoice address'
 
 export const ukInvoiceAddressSettings = {

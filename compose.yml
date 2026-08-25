@@ -44,6 +44,11 @@ services:
       NODE_ENV: development
       USE_SINGLE_INSTANCE_CACHE: true
       MARINE_LICENSING_BACKEND_API_URL: http://marine-licensing-backend:3001
+      MARINE_LICENSING_ADDRESS_LOOKUP_API_URL: http://marine-licensing-api-stub:3002/api/address-lookup/v2.1/addresses
+      MARINE_LICENSING_ADDRESS_LOOKUP_OAUTH_TOKEN_URL: http://marine-licensing-api-stub:3002/oauth2/v2.0/token
+      MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_ID: local-stub-client-id
+      MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_SECRET: local-stub-client-secret
+      MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_SCOPE: api://stub/.default
       ENABLE_MARINE_LICENCE: true
     volumes:
       - ./compose/users:/users

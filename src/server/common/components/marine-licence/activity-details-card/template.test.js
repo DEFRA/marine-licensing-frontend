@@ -92,4 +92,43 @@ describe('Marine Licence Activity Details Card', () => {
       'Proposed working hours'
     ])
   })
+
+  describe('activity heading text by viewer type', () => {
+    const paramsWithHeadings = {
+      ...baseParams,
+      activityDetails: {
+        ...baseParams.activityDetails,
+        activitySubType: 'Construction of new marine works',
+        activityHeading: "What you're constructing",
+        activityHeadingExternalUser: 'What the applicant is constructing'
+      }
+    }
+
+    test('Should show the non-applicant heading when isApplicant is false', () => {
+      const $c = renderComponent('marine-licence/activity-details-card', {
+        ...paramsWithHeadings,
+        isApplicant: false
+      })
+      expect($c.html()).toContain('What the applicant is constructing')
+      expect($c.html()).not.toContain("What you're constructing")
+    })
+
+    test('Should show the original heading when isApplicant is omitted', () => {
+      const $c = renderComponent(
+        'marine-licence/activity-details-card',
+        paramsWithHeadings
+      )
+      expect($c.html()).toContain("What you're constructing")
+      expect($c.html()).not.toContain('What the applicant is constructing')
+    })
+
+    test('Should show the original heading when isApplicant is true', () => {
+      const $c = renderComponent('marine-licence/activity-details-card', {
+        ...paramsWithHeadings,
+        isApplicant: true
+      })
+      expect($c.html()).toContain("What you're constructing")
+      expect($c.html()).not.toContain('What the applicant is constructing')
+    })
+  })
 })

@@ -2,6 +2,8 @@ import convict from 'convict'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { configDotenv } from 'dotenv'
+import { requiredFromEnvInCdp } from './required-from-env-in-cdp.js'
+import { addressLookupSchema } from './address-lookup.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -15,52 +17,9 @@ const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
-// Custom convict format that requires an env var override for vars that have non-prod default values set.
-// Applied to sensitive configs like API URLs, credentials, and service endpoints.
-const requiredFromEnvInCdp = 'required-from-env-in-cdp'
-
 if (isDevelopment) {
   configDotenv()
 }
-
-export const isCdpProductionLikeEnvironment = (env) =>
-  ['prod', 'perf-test', 'test'].includes(env)
-
-export const isNotCdpProductionLikeEnvironment = (env) =>
-  !isCdpProductionLikeEnvironment(env)
-
-/**
- * 'required-from-env-in-cdp' format: When you must have an env var override the default value.
- * This is used for sensitive vars that take local-config default values and the prod values MUST come from the
- * environment.
- *
- * This is concerned with cdpEnvironments: prod (which is production), and perf-test (which is the equivalent of
- * pre-production), and test.
- */
-convict.addFormat({
-  name: requiredFromEnvInCdp,
-  validate: function (val, schema) {
-    const env = process.env.ENVIRONMENT ?? 'local'
-    // Validate that `requiredFromEnvInCdp` env vars are set from the environment on these CDP environments
-    if (isNotCdpProductionLikeEnvironment(env)) {
-      return
-    }
-
-    // cdp-defra-id-stub uses test_value; allow it in non-prod CDP envs (perf-test, test)
-    if (schema.env === 'DEFRA_ID_CLIENT_SECRET' && env !== 'prod') {
-      return
-    }
-
-    const invalidValues = schema.default === undefined ? [] : [schema.default] // never allow the default
-    invalidValues.push('') // dont allow empty strings
-
-    if (invalidValues.includes(val)) {
-      throw new Error(
-        `${schema.env || 'Configuration value'} must be set for ${env} environment (current value is invalid for production)`
-      )
-    }
-  }
-})
 
 export const config = convict({
   serviceVersion: {
@@ -334,6 +293,7 @@ export const config = convict({
       env: 'MARINE_LICENSING_BACKEND_API_URL'
     }
   },
+  addressLookup: addressLookupSchema,
   marineLicence: {
     enabled: {
       doc: 'Enable the Marine Licence journey',

@@ -45,7 +45,7 @@ export const expectedTransferredApplicationDetailsCard = {
     },
     {
       key: 'Date of transfer',
-      value: '26 Jun 2026'
+      value: '26 June 2026'
     }
   ]
 }
@@ -60,7 +60,7 @@ export const expectedRejectedApplicationDetailsCard = {
     },
     {
       key: 'Date marked as unable to progress',
-      value: '26 Jul 2026'
+      value: '26 July 2026'
     },
     {
       key: 'Reasons marked as unable to progress',
@@ -70,13 +70,63 @@ export const expectedRejectedApplicationDetailsCard = {
   ]
 }
 
+export const expectedApplicantActivityCards = [
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Construction of new marine works'
+      },
+      {
+        key: "What you're constructing",
+        value: 'Aquaculture trestles or fixed walkways'
+      }
+    ]
+  },
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Continuation of existing deposit activity'
+      },
+      {
+        key: "What deposit activity you're continuing",
+        value: 'Alternative use of dredged material – beach management'
+      }
+    ]
+  }
+]
+
+export const expectedExternalActivityCards = [
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Construction of new marine works'
+      },
+      {
+        key: 'What is being constructed',
+        value: 'Aquaculture trestles or fixed walkways'
+      }
+    ]
+  },
+  {
+    rows: [
+      {
+        key: 'Type of activity',
+        value: 'Continuation of existing deposit activity'
+      },
+      {
+        key: 'What deposit activity is being continued',
+        value: 'Alternative use of dredged material – beach management'
+      }
+    ]
+  }
+]
+
 export const expectedProjectDetailsCard = {
   cardTitle: 'Project details',
   rows: [
-    {
-      key: 'Project name',
-      value: mockSubmittedMarineLicenceApplication.projectName
-    },
     {
       key: 'Project background',
       value: mockSubmittedMarineLicenceApplication.projectBackground
@@ -105,6 +155,16 @@ export const expectedFeeEstimateCard = {
       key: 'Maximum application fee estimate accepted',
       value:
         '£1,400 (Does not include potential post-consent monitoring of up to £750)'
+    }
+  ]
+}
+
+export const expectedPublicRegisterCard = {
+  cardTitle: 'Public register card',
+  rows: [
+    {
+      key: 'Consent to publish project information',
+      value: 'No'
     }
   ]
 }

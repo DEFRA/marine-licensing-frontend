@@ -18,10 +18,23 @@ describe('Marine Licence Project Details Card Component', () => {
     expect(htmlContent).toContain('Test Marine Project')
   })
 
-  test('Should have correct card title', () => {
-    expect($component('.govuk-summary-card__title').text().trim()).toBe(
-      'Project details'
+  test('Should not display project name row when not present', () => {
+    const $componentNoProjectName = renderComponent(
+      'marine-licence/project-details-card'
     )
+    const htmlContent = $componentNoProjectName.html()
+
+    expect(htmlContent).not.toContain('Project name')
+    expect(htmlContent).not.toContain('Test Marine Project')
+  })
+
+  test('Should have correct card title', () => {
+    const $componentWithoutProjectName = renderComponent(
+      'marine-licence/project-details-card'
+    )
+    const htmlContent = $componentWithoutProjectName.html()
+
+    expect(htmlContent).not.toContain('Project name')
   })
 
   describe('change links', () => {

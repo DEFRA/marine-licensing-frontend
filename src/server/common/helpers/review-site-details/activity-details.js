@@ -5,45 +5,56 @@ import { SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING } from '#src/server/marine-lice
 const ACTIVITY_SUB_TYPE_MAP = {
   'construction-type-1': {
     label: 'Construction of new marine works',
-    heading: "What you're constructing"
+    heading: "What you're constructing",
+    externalUserHeading: 'What is being constructed'
   },
   'construction-type-2': {
     label: 'Maintenance of existing marine works',
-    heading: "What you're maintaining"
+    heading: "What you're maintaining",
+    externalUserHeading: 'What is being maintained'
   },
   'construction-type-3': {
     label:
       'Alteration or improvement, including extending, of existing marine works',
-    heading: "What you're altering or improving"
+    heading: "What you're altering or improving",
+    externalUserHeading: 'What is being altered or improved'
   },
   'deposit-type-1': {
     label: 'Continuation of existing deposit activity',
-    heading: "What deposit activity you're continuing"
+    heading: "What deposit activity you're continuing",
+    externalUserHeading: 'What deposit activity is being continued'
   },
   'deposit-type-2': {
     label: 'Deposit of something new',
-    heading: "What new deposit activity you're doing"
+    heading: "What new deposit activity you're doing",
+    externalUserHeading: 'What new deposit activity is being done'
   },
   'deposit-type-3': {
     label: 'Replacing existing object',
     heading:
-      "What deposit activity you're doing that replaces an existing object"
+      "What deposit activity you're doing that replaces an existing object",
+    externalUserHeading:
+      'What deposit activity is being done that replace an existing object'
   },
   'removal-type-1': {
     label: 'One off first time removal',
-    heading: "What you're removing for the first time on a one off basis"
+    heading: "What you're removing for the first time on a one off basis",
+    externalUserHeading: 'What is being removed for the first time'
   },
   'removal-type-2': {
     label: 'Removal as part of an ongoing or routine activity',
-    heading: "What you're removing on an ongoing basis"
+    heading: "What you're removing on an ongoing basis",
+    externalUserHeading: 'What is being removed on an ongoing basis'
   },
   'removal-type-3': {
     label: 'Removal for replacement',
-    heading: "What you're removing as part of replacement activity"
+    heading: "What you're removing as part of replacement activity",
+    externalUserHeading: 'What is being removed as part of replacement activity'
   },
   'removal-type-4': {
     label: 'Removal for relocation',
-    heading: "What you're removing for relocation"
+    heading: "What you're removing for relocation",
+    externalUserHeading: 'What is being removed for relocation'
   }
 }
 
@@ -55,6 +66,9 @@ const OTHER_ACTIVITY_PREFIXES = {
 
 export const formatActivitySubTypeHeading = (activitySubType) =>
   ACTIVITY_SUB_TYPE_MAP[activitySubType]?.heading ?? null
+
+export const formatActivitySubTypeExternalUserHeading = (activitySubType) =>
+  ACTIVITY_SUB_TYPE_MAP[activitySubType]?.externalUserHeading ?? null
 
 export const formatActivitySubTypeLabel = (activitySubType) =>
   ACTIVITY_SUB_TYPE_MAP[activitySubType]?.label ?? null
@@ -117,6 +131,9 @@ export const parseActivityDetails = (siteDetails) => {
     activityDuration: formatActivityDuration(activity.activityDuration),
     activitySubType: formatActivitySubTypeLabel(activity.activitySubType),
     activityHeading: formatActivitySubTypeHeading(activity.activitySubType),
+    activityHeadingExternalUser: formatActivitySubTypeExternalUserHeading(
+      activity.activitySubType
+    ),
     activityLink: `/marine-licence/activity-details/${getActivityVariantFromSubType(activity.activitySubType)}`,
     requiresConstructionDrawing:
       SUBTYPES_REQUIRING_CONSTRUCTION_DRAWING.includes(

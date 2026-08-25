@@ -230,7 +230,7 @@ describe('Type of activity (marine licence)', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      '/marine-licence/activity-details/what-new-deposit-activity-are-you-doing?site=1&activity=1'
+      '/marine-licence/confirm-change-activity-type?site=1&activity=1&activityType=deposit&activitySubType=deposit-type-2'
     )
   })
 })

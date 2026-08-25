@@ -22,9 +22,9 @@ describe('getBackLink', () => {
 })
 
 describe('getAddressRouteForType', () => {
-  test('returns the uk invoice address route for uk', () => {
+  test('returns the postcode search route for uk', () => {
     expect(getAddressRouteForType(INVOICE_TYPE_OPTIONS.UK)).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
     )
   })
 

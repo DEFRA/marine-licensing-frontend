@@ -123,6 +123,10 @@ describe('Confirm change activity type', () => {
       siteDetails: [
         {
           ...mockMarineLicenceApplication.siteDetails[0],
+          activityDetails: [
+            mockMarineLicenceApplication.siteDetails[0].activityDetails[0],
+            mockMarineLicenceApplication.siteDetails[0].activityDetails[0]
+          ],
           constructionDrawings: [{ filename: 'drawing-1.pdf' }]
         }
       ]

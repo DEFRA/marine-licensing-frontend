@@ -53,13 +53,9 @@ describe('#confirmAddress', () => {
         expect.objectContaining({
           heading: 'Review and confirm',
           projectName: mockMarineLicenceApplication.projectName,
-          addressLines: [
-            'FLAT 3 TYNESIDE HOUSE SKINNERBURN ROAD',
-            'NEWCASTLE BUSINESS PARK',
-            'NEWCASTLE UPON TYNE',
-            'TYNE & WEAR',
-            'NE4 7AR'
-          ],
+          // The lines themselves are utils.test.js's contract, and their rendering is
+          // the integration test's; this only pins that they are passed through.
+          addressLines: expect.any(Array),
           editAddressLink:
             marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
           backLink:

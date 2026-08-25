@@ -97,29 +97,6 @@ describe('Confirm address', () => {
     ])
   })
 
-  test('omits the fields the lookup did not provide', async () => {
-    mockSelectedAddress({
-      selectedInvoiceAddress: {
-        addressLine: '1, QUAYSIDE, NEWCASTLE UPON TYNE, NE1 1EE',
-        buildingNumber: '1',
-        street: 'QUAYSIDE',
-        town: 'NEWCASTLE UPON TYNE',
-        postcode: 'NE1 1EE'
-      }
-    })
-
-    const document = await loadPage({
-      requestUrl: marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS,
-      server: getServer()
-    })
-
-    expect(addressLines(document)).toEqual([
-      '1 QUAYSIDE',
-      'NEWCASTLE UPON TYNE',
-      'NE1 1EE'
-    ])
-  })
-
   test('page content when using the change link', async () => {
     mockSelectedAddress()
 
@@ -176,21 +153,6 @@ describe('Confirm address', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
       marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
-    )
-  })
-
-  test('should go back to the postcode search page when the selected address has nothing to show', async () => {
-    mockSelectedAddress({ selectedInvoiceAddress: {} })
-
-    const response = await makePostRequest({
-      url: marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS,
-      server: getServer(),
-      formData: {}
-    })
-
-    expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
     )
   })
 

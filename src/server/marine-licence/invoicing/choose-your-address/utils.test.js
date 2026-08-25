@@ -3,8 +3,7 @@ import {
   getSearchResults,
   getSelectedAddressValue,
   getSelectedResult,
-  hasPickableResults,
-  hasSingleResult
+  hasPickableResults
 } from '#src/server/marine-licence/invoicing/choose-your-address/utils.js'
 
 const results = [
@@ -38,19 +37,6 @@ describe('#chooseYourAddress utils', () => {
 
     test('Should be true when there is more than one result', () => {
       expect(hasPickableResults(results)).toBe(true)
-    })
-  })
-
-  describe('#hasSingleResult', () => {
-    test.each([
-      ['there are no results', []],
-      ['there is more than one result', results]
-    ])('Should be false when %s', (_name, searchResults) => {
-      expect(hasSingleResult(searchResults)).toBe(false)
-    })
-
-    test('Should be true when there is exactly one result', () => {
-      expect(hasSingleResult([results[0]])).toBe(true)
     })
   })
 

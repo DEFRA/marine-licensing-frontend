@@ -358,6 +358,34 @@ describe('Marine licence page accessibility checks (Axe)', () => {
     })
   })
 
+  // Also not in the page list: the confirm page only renders with a selected address
+  // cached, which the shared mock application does not have.
+  describe('"Review and confirm" page', () => {
+    test('has no accessibility violations', async () => {
+      mockMarineLicence({
+        ...mockMarineLicenceApplication,
+        invoicing: {
+          invoiceAddressType: 'uk',
+          invoiceAddressSearch: { postcode: 'SW1 2AA' },
+          selectedInvoiceAddress: {
+            addressLine: '1 HIGH STREET, LONDON, SW1 2AA',
+            buildingNumber: '1',
+            street: 'HIGH STREET',
+            town: 'LONDON',
+            postcode: 'SW1 2AA'
+          }
+        }
+      })
+
+      const document = await loadPage({
+        requestUrl: marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS,
+        server: getServer()
+      })
+
+      await runAxeChecks(document.documentElement)
+    })
+  })
+
   // The page list above only covers GET. A lookup outcome is the error state worth checking
   // here: it anchors an error summary to a field that passed validation, which is where the
   // summary-link / aria-describedby relationship is most likely to break. An ordinary

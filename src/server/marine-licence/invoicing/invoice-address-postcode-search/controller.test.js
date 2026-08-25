@@ -152,26 +152,6 @@ describe('#invoiceAddressPostcodeSearch', () => {
       expect(logged).not.toContain(anAddress.addressLine)
     })
 
-    test('Should not select an address when the lookup fails', async () => {
-      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
-        results: [anAddress],
-        error: true
-      })
-
-      await submit({ postcode: 'NE4 7AR' })
-
-      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-        expect.anything(),
-        h,
-        expect.objectContaining({
-          invoicing: expect.not.objectContaining({
-            selectedInvoiceAddress: expect.anything()
-          })
-        })
-      )
-      expect(h.redirect).not.toHaveBeenCalled()
-    })
-
     test('Should keep previously cached results when the lookup fails', async () => {
       vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
         ...mockMarineLicenceApplication,
@@ -209,24 +189,6 @@ describe('#invoiceAddressPostcodeSearch', () => {
         marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS
       )
       expect(h.view).not.toHaveBeenCalled()
-    })
-
-    test('Should cache the only result as the selected address', async () => {
-      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
-        results: [anAddress]
-      })
-
-      await submit({ postcode: 'NE4 7AR' })
-
-      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-        expect.anything(),
-        h,
-        expect.objectContaining({
-          invoicing: expect.objectContaining({
-            selectedInvoiceAddress: anAddress
-          })
-        })
-      )
     })
 
     test('Should keep the change flow when redirecting to the confirm address page', async () => {
@@ -288,31 +250,38 @@ describe('#invoiceAddressPostcodeSearch', () => {
       }
     )
 
-    test('Should keep a previous selection when the lookup fails', async () => {
-      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
-        ...mockMarineLicenceApplication,
-        invoicing: {
-          ...mockMarineLicenceApplication.invoicing,
-          selectedInvoiceAddress: anAddress
-        }
-      })
-      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
-        results: [],
-        error: true
-      })
-
-      await submit({ postcode: 'NE1 1EE' })
-
-      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-        expect.anything(),
-        h,
-        expect.objectContaining({
-          invoicing: expect.objectContaining({
-            selectedInvoiceAddress: anAddress
-          })
+    // A failed lookup must not disturb the selection either way: it neither invents one
+    // nor discards the one a good earlier search produced.
+    test.each([
+      ['there was no previous selection', undefined],
+      ['a previous selection exists', anAddress]
+    ])(
+      'Should leave the selection untouched when the lookup fails and %s',
+      async (_name, selectedInvoiceAddress) => {
+        vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+          ...mockMarineLicenceApplication,
+          invoicing: {
+            ...mockMarineLicenceApplication.invoicing,
+            selectedInvoiceAddress
+          }
         })
-      )
-    })
+        vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+          results: [anAddress],
+          error: true
+        })
+
+        await submit({ postcode: 'NE1 1EE' })
+
+        expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+          expect.anything(),
+          h,
+          expect.objectContaining({
+            invoicing: expect.objectContaining({ selectedInvoiceAddress })
+          })
+        )
+        expect(h.redirect).not.toHaveBeenCalled()
+      }
+    )
 
     test('Should redirect to the choose your address page when there are many results', async () => {
       vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
@@ -380,7 +349,8 @@ describe('#invoiceAddressPostcodeSearch', () => {
               postcode: 'NE4 7AR',
               propertyNameOrNumber: 'Tyneside House'
             },
-            invoiceAddressSearchResults: [anAddress]
+            invoiceAddressSearchResults: [anAddress],
+            selectedInvoiceAddress: anAddress
           })
         })
       )

@@ -56,6 +56,20 @@ describe('#ukInvoiceAddress', () => {
       )
     })
 
+    test('Should keep the change flow in the postcode lookup link', async () => {
+      await ukInvoiceAddressController.handler(
+        { query: { action: 'change' } },
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        UK_INVOICE_ADDRESS_VIEW_ROUTE,
+        expect.objectContaining({
+          postcodeLookupLink: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}?action=change`
+        })
+      )
+    })
+
     test('Should default the searched postcode in when no address has been entered', async () => {
       vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
         ...mockMarineLicenceApplication,

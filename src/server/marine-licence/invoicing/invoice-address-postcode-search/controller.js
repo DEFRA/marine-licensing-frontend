@@ -13,16 +13,16 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getInvoiceAddressBackLink,
   getInvoiceCancelLink,
-  getInvoiceAddressButtonText
+  getInvoiceAddressButtonText,
+  withAction
 } from '#src/server/marine-licence/invoicing/utils.js'
+import { hasPickableResults } from '#src/server/marine-licence/invoicing/choose-your-address/utils.js'
 import { lookupAddresses } from '#src/server/common/helpers/marine-licence/invoicing/address-lookup.js'
 import {
   buildNoAddressesFoundError,
   buildLookupUnavailableError,
   buildTooManyAddressesError
 } from '#src/server/marine-licence/invoicing/invoice-address-postcode-search/utils.js'
-
-const MULTIPLE_RESULTS_THRESHOLD = 1
 
 export const INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE =
   'marine-licence/invoicing/invoice-address-postcode-search/index'
@@ -123,8 +123,13 @@ export const invoiceAddressPostcodeSearchSubmitController = {
 
     // A single result goes to the confirm-address page (ML-1501), which does not
     // exist yet, so for now it keeps ML-1413's behaviour of staying on this page.
-    if (!error && results.length > MULTIPLE_RESULTS_THRESHOLD) {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS)
+    if (!error && hasPickableResults(results)) {
+      return h.redirect(
+        withAction(
+          marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS,
+          action
+        )
+      )
     }
 
     return h.view(INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE, {

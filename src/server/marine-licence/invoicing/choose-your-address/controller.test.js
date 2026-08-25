@@ -5,12 +5,13 @@ import {
   CHOOSE_YOUR_ADDRESS_VIEW_ROUTE
 } from '#src/server/marine-licence/invoicing/choose-your-address/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js')
 
 const anAddress = {
   addressLine: 'TYNESIDE HOUSE, SKINNERBURN ROAD, NEWCASTLE UPON TYNE, NE4 7AR',
@@ -37,7 +38,6 @@ describe('#chooseYourAddress', () => {
   beforeEach(() => {
     vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(withResults())
     vi.spyOn(cacheUtils, 'setMarineLicenceCache').mockResolvedValue()
-    vi.spyOn(authRequests, 'authenticatedPatchRequest')
   })
 
   afterEach(() => {
@@ -74,6 +74,53 @@ describe('#chooseYourAddress', () => {
             { value: 'none', text: 'None of these' }
           ]
         })
+      )
+    })
+
+    test('Should pre-select the address chosen last time', async () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+        cacheWith({
+          invoiceAddressSearchResults: [anAddress, anotherAddress],
+          selectedInvoiceAddress: anotherAddress
+        })
+      )
+
+      await chooseYourAddressController.handler({ query: {} }, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        CHOOSE_YOUR_ADDRESS_VIEW_ROUTE,
+        expect.objectContaining({ payload: { selectedAddress: '1' } })
+      )
+    })
+
+    test('Should select nothing when the cached address is no longer in the results', async () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+        cacheWith({
+          invoiceAddressSearchResults: [anAddress, anotherAddress],
+          selectedInvoiceAddress: { addressLine: 'SOMEWHERE ELSE' }
+        })
+      )
+
+      await chooseYourAddressController.handler({ query: {} }, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        CHOOSE_YOUR_ADDRESS_VIEW_ROUTE,
+        expect.objectContaining({ payload: {} })
+      )
+    })
+
+    test('Should keep the change flow when a guard sends the user back', async () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+        cacheWith({ invoiceAddressSearchResults: [anAddress] })
+      )
+
+      await chooseYourAddressController.handler(
+        { query: { action: 'change' } },
+        h
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}?action=change`
       )
     })
 
@@ -144,7 +191,7 @@ describe('#chooseYourAddress', () => {
           })
         })
       )
-      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
+      expect(saveInvoicingToBackend).not.toHaveBeenCalled()
     })
 
     test('Should go to the UK invoice address page when "None of these" is chosen', async () => {
@@ -154,6 +201,14 @@ describe('#chooseYourAddress', () => {
         marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
       )
       expect(cacheUtils.setMarineLicenceCache).not.toHaveBeenCalled()
+    })
+
+    test('Should keep the change flow when "None of these" is chosen', async () => {
+      await submit('none', { action: 'change' })
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS}?action=change`
+      )
     })
 
     test('Should redirect back to the postcode search page for a selection outside the results', async () => {
@@ -181,6 +236,19 @@ describe('#chooseYourAddress', () => {
   describe('#failAction', () => {
     const failAction =
       chooseYourAddressSubmitController.options.validate.failAction
+
+    test('Should redirect instead of re-rendering an empty picker when the results are gone', () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+        cacheWith({ invoiceAddressSearchResults: undefined })
+      )
+
+      failAction({ query: {}, payload: {} }, h, { details: [] })
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+      )
+      expect(h.view).not.toHaveBeenCalled()
+    })
 
     test('Should show the selection error and keep the address list', () => {
       const err = {

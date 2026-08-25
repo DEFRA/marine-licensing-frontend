@@ -219,6 +219,18 @@ describe('#invoiceAddressPostcodeSearch', () => {
       expect(h.view).not.toHaveBeenCalled()
     })
 
+    test('Should keep the change flow when redirecting to the choose your address page', async () => {
+      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+        results: [anAddress, anotherAddress]
+      })
+
+      await submit({ postcode: 'NE4 7AR' }, { action: 'change' })
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS}?action=change`
+      )
+    })
+
     test('Should cache the results before redirecting to the choose your address page', async () => {
       vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
         results: [anAddress, anotherAddress]

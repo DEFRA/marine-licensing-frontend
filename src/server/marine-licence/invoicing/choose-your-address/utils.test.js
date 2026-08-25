@@ -1,11 +1,10 @@
 import {
   buildAddressItems,
-  getChooseYourAddressBackLink,
   getSearchResults,
+  getSelectedAddressValue,
   getSelectedResult,
   hasPickableResults
 } from '#src/server/marine-licence/invoicing/choose-your-address/utils.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 const results = [
   { addressLine: '1 HIGH STREET, LONDON, SW1 2AA' },
@@ -32,28 +31,12 @@ describe('#chooseYourAddress utils', () => {
     test.each([
       ['there are no results', []],
       ['there is a single result', [results[0]]]
-    ])('Should be false when %s', (_name, invoiceAddressSearchResults) => {
-      expect(hasPickableResults({ invoiceAddressSearchResults })).toBe(false)
+    ])('Should be false when %s', (_name, searchResults) => {
+      expect(hasPickableResults(searchResults)).toBe(false)
     })
 
     test('Should be true when there is more than one result', () => {
-      expect(hasPickableResults({ invoiceAddressSearchResults: results })).toBe(
-        true
-      )
-    })
-  })
-
-  describe('#getChooseYourAddressBackLink', () => {
-    test('Should go back to the postcode search page', () => {
-      expect(getChooseYourAddressBackLink(undefined)).toBe(
-        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
-      )
-    })
-
-    test('Should go back to check answers in the change flow', () => {
-      expect(getChooseYourAddressBackLink('change')).toBe(
-        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
-      )
+      expect(hasPickableResults(results)).toBe(true)
     })
   })
 
@@ -77,9 +60,30 @@ describe('#chooseYourAddress utils', () => {
       ['the index is out of range', '2'],
       ['the value is not an index', 'none'],
       ['the value is negative', '-1'],
+      ['the index is not canonical', '01'],
+      ['the value is padded', ' 1'],
+      ['the value is empty', ''],
       ['the value is missing', undefined]
     ])('Should return null when %s', (_name, selectedAddress) => {
       expect(getSelectedResult(results, selectedAddress)).toBeNull()
+    })
+  })
+
+  describe('#getSelectedAddressValue', () => {
+    test('Should return the index of the cached selection', () => {
+      expect(getSelectedAddressValue(results, results[1])).toBe('1')
+    })
+
+    test.each([
+      ['nothing has been selected yet', undefined],
+      [
+        'the cached selection is not in the current results',
+        { addressLine: '3 HIGH STREET, LONDON, SW1 2AA' }
+      ]
+    ])('Should return null when %s', (_name, selectedInvoiceAddress) => {
+      expect(
+        getSelectedAddressValue(results, selectedInvoiceAddress)
+      ).toBeNull()
     })
   })
 })

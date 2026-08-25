@@ -14,11 +14,18 @@ import {
   getUkInvoiceAddressBackLink,
   getInvoiceCancelLink,
   getInvoiceAddressButtonText,
-  redirectAfterInvoiceAddressSubmit
+  redirectAfterInvoiceAddressSubmit,
+  withAction
 } from '#src/server/marine-licence/invoicing/utils.js'
 
 export const UK_INVOICE_ADDRESS_VIEW_ROUTE =
   'marine-licence/invoicing/uk-invoice-address/index'
+
+const getPostcodeLookupLink = (action) =>
+  withAction(
+    marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
+    action
+  )
 
 // Only used when no address has been entered yet, so a saved address is never
 // overwritten by the postcode of a later search.
@@ -47,8 +54,7 @@ export const ukInvoiceAddressController = {
       backLink: getUkInvoiceAddressBackLink(action),
       cancelLink: getInvoiceCancelLink(action, invoicing),
       buttonText: getInvoiceAddressButtonText(action, invoicing),
-      postcodeLookupLink:
-        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+      postcodeLookupLink: getPostcodeLookupLink(action)
     })
   }
 }
@@ -71,8 +77,7 @@ export const ukInvoiceAddressSubmitController = {
           params: {
             cancelLink: getInvoiceCancelLink(action, invoicing),
             buttonText: getInvoiceAddressButtonText(action, invoicing),
-            postcodeLookupLink:
-              marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+            postcodeLookupLink: getPostcodeLookupLink(action)
           }
         })(request, h, err)
       }

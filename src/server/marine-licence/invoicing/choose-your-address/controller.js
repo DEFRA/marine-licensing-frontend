@@ -11,14 +11,16 @@ import {
 } from '#src/server/common/validation/invoicing/constants.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
+  getInvoiceAddressBackLink,
   getInvoiceCancelLink,
-  getInvoiceAddressButtonText
+  getInvoiceAddressButtonText,
+  withAction
 } from '#src/server/marine-licence/invoicing/utils.js'
 import {
   NONE_OF_THESE,
   buildAddressItems,
-  getChooseYourAddressBackLink,
   getSearchResults,
+  getSelectedAddressValue,
   getSelectedResult,
   hasPickableResults
 } from '#src/server/marine-licence/invoicing/choose-your-address/utils.js'
@@ -28,7 +30,10 @@ export const CHOOSE_YOUR_ADDRESS_VIEW_ROUTE =
 
 const getPageParams = (action, invoicing) => ({
   ...chooseYourAddressSettings,
-  backLink: getChooseYourAddressBackLink(action),
+  backLink: getInvoiceAddressBackLink(
+    action,
+    marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+  ),
   cancelLink: getInvoiceCancelLink(action, invoicing),
   buttonText: getInvoiceAddressButtonText(action, invoicing),
   items: buildAddressItems(getSearchResults(invoicing))
@@ -36,13 +41,19 @@ const getPageParams = (action, invoicing) => ({
 
 // The page only means anything with a multi-result search behind it, so a deep
 // link without one goes back to the search rather than rendering an empty list.
-const getGuardRedirect = (invoicing) => {
+const getGuardRedirect = (invoicing, action) => {
   if (invoicing.invoiceAddressType !== INVOICE_TYPE_OPTIONS.UK) {
-    return marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+    return withAction(
+      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
+      action
+    )
   }
 
-  if (!hasPickableResults(invoicing)) {
-    return marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+  if (!hasPickableResults(getSearchResults(invoicing))) {
+    return withAction(
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
+      action
+    )
   }
 
   return null
@@ -52,18 +63,22 @@ export const chooseYourAddressController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const { invoicing } = marineLicence
+    const action = request.query.action
 
-    const guardRedirect = getGuardRedirect(invoicing)
+    const guardRedirect = getGuardRedirect(invoicing, action)
     if (guardRedirect) {
       return h.redirect(guardRedirect)
     }
 
-    const action = request.query.action
+    const selectedAddress = getSelectedAddressValue(
+      getSearchResults(invoicing),
+      invoicing.selectedInvoiceAddress
+    )
 
     return h.view(CHOOSE_YOUR_ADDRESS_VIEW_ROUTE, {
       ...getPageParams(action, invoicing),
       projectName: marineLicence.projectName,
-      payload: {}
+      payload: selectedAddress ? { selectedAddress } : {}
     })
   }
 }
@@ -75,6 +90,14 @@ export const chooseYourAddressSubmitController = {
       failAction: (request, h, err) => {
         const { projectName, invoicing } = getMarineLicenceCache(request)
         const action = request.query.action
+
+        // The results can go while the form is on screen; re-rendering then would
+        // show a picker with nothing in it, so the guard applies here too.
+        const guardRedirect = getGuardRedirect(invoicing, action)
+        if (guardRedirect) {
+          return h.redirect(guardRedirect).takeover()
+        }
+
         const { backLink, ...params } = getPageParams(action, invoicing)
 
         return createFailAction({
@@ -95,13 +118,18 @@ export const chooseYourAddressSubmitController = {
     const action = request.query.action
     const { selectedAddress } = request.payload
 
-    const guardRedirect = getGuardRedirect(invoicing)
+    const guardRedirect = getGuardRedirect(invoicing, action)
     if (guardRedirect) {
       return h.redirect(guardRedirect)
     }
 
     if (selectedAddress === NONE_OF_THESE) {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS)
+      return h.redirect(
+        withAction(
+          marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,
+          action
+        )
+      )
     }
 
     const selectedResult = getSelectedResult(
@@ -111,7 +139,10 @@ export const chooseYourAddressSubmitController = {
 
     if (!selectedResult) {
       return h.redirect(
-        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+        withAction(
+          marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
+          action
+        )
       )
     }
 

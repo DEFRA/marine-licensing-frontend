@@ -23,6 +23,13 @@ export const getInvoiceAddressBackLink = (
   return previousRoute
 }
 
+// Links and redirects between the invoice address pages have to carry the action
+// through, or a user part-way into the change flow silently drops out of it.
+export const withAction = (route, action) =>
+  isInAddressChangeFlow(action)
+    ? `${route}?action=${encodeURIComponent(action)}`
+    : route
+
 export const getUkInvoiceAddressBackLink = (action) =>
   getInvoiceAddressBackLink(
     action,

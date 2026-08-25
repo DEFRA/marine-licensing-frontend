@@ -1,6 +1,3 @@
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { getInvoiceAddressBackLink } from '#src/server/marine-licence/invoicing/utils.js'
-
 export const NONE_OF_THESE = 'none'
 
 const MINIMUM_RESULTS_FOR_PICKER = 2
@@ -8,14 +5,8 @@ const MINIMUM_RESULTS_FOR_PICKER = 2
 export const getSearchResults = (invoicing) =>
   invoicing?.invoiceAddressSearchResults ?? []
 
-export const hasPickableResults = (invoicing) =>
-  getSearchResults(invoicing).length >= MINIMUM_RESULTS_FOR_PICKER
-
-export const getChooseYourAddressBackLink = (action) =>
-  getInvoiceAddressBackLink(
-    action,
-    marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
-  )
+export const hasPickableResults = (results) =>
+  results.length >= MINIMUM_RESULTS_FOR_PICKER
 
 export const buildAddressItems = (results) => [
   ...results.map((result, index) => ({
@@ -26,12 +17,29 @@ export const buildAddressItems = (results) => [
   { value: NONE_OF_THESE, text: 'None of these' }
 ]
 
-// Returns the selected result, or null when the value is not an index this
-// result set has - a stale or tampered payload rather than a real choice.
+// Returns the selected result, or null when the value is not an index this result
+// set has. A canonical index is required so that the value round-trips back into
+// the rendered radios - a stale or tampered payload is not a real choice.
 export const getSelectedResult = (results, selectedAddress) => {
-  if (!/^\d+$/.test(selectedAddress ?? '')) {
+  const index = Number(selectedAddress)
+
+  if (!Number.isInteger(index) || String(index) !== selectedAddress) {
     return null
   }
 
-  return results[Number(selectedAddress)] ?? null
+  return results[index] ?? null
+}
+
+// The cached selection is matched back to its position in the current results so
+// the radio the user picked last time is still the one that is pre-selected.
+export const getSelectedAddressValue = (results, selectedInvoiceAddress) => {
+  if (!selectedInvoiceAddress) {
+    return null
+  }
+
+  const index = results.findIndex(
+    (result) => result.addressLine === selectedInvoiceAddress.addressLine
+  )
+
+  return index === -1 ? null : String(index)
 }

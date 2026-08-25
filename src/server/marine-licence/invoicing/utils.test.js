@@ -8,7 +8,8 @@ import {
   getUkInvoiceAddressBackLink,
   getInvoiceCancelLink,
   getInvoiceAddressButtonText,
-  redirectAfterInvoiceAddressSubmit
+  redirectAfterInvoiceAddressSubmit,
+  withAction
 } from '#src/server/marine-licence/invoicing/utils.js'
 import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
@@ -128,5 +129,26 @@ describe('redirectAfterInvoiceAddressSubmit', () => {
     expect(h.redirect).toHaveBeenCalledWith(
       marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
+  })
+})
+
+describe('withAction', () => {
+  const route = marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+
+  test('carries the action through so the change flow survives the hop', () => {
+    expect(withAction(route, 'change')).toBe(`${route}?action=change`)
+  })
+
+  test('escapes the action rather than injecting it into the query string', () => {
+    expect(withAction(route, 'change&foo=bar')).toBe(
+      `${route}?action=change%26foo%3Dbar`
+    )
+  })
+
+  test.each([
+    ['there is no action', undefined],
+    ['the action is empty', '']
+  ])('leaves the route alone when %s', (_name, action) => {
+    expect(withAction(route, action)).toBe(route)
   })
 })

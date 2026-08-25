@@ -58,6 +58,22 @@ describe('UK invoice address', () => {
     )
   })
 
+  test('the "Back to postcode lookup" link keeps the user in the change flow', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS}?action=change`,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(document, 'link', { name: 'Back to postcode lookup' })
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}?action=change`
+    )
+  })
+
   test('should default the searched postcode in when no address has been entered', async () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,

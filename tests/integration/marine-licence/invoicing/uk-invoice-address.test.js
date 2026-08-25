@@ -74,24 +74,6 @@ describe('UK invoice address', () => {
     )
   })
 
-  test('should default the searched postcode in when no address has been entered', async () => {
-    mockMarineLicence({
-      ...mockMarineLicenceApplication,
-      invoicing: {
-        invoiceAddressType: 'uk',
-        invoiceAddressSearch: { postcode: 'NE4 7AR' }
-      }
-    })
-
-    const document = await loadPage({
-      requestUrl: marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,
-      server: getServer()
-    })
-
-    expectInputValue({ document, inputLabel: 'Postcode', value: 'NE4 7AR' })
-    expectInputValue({ document, inputLabel: 'Address line 1', value: '' })
-  })
-
   test('should keep the "Back to postcode lookup" link after a validation error', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
 

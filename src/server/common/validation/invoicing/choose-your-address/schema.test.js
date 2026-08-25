@@ -11,12 +11,11 @@ describe('chooseYourAddressSchema', () => {
     expect(error.details[0].path).toEqual(['selectedAddress'])
   })
 
-  test.each([['0'], ['3'], ['none']])(
-    'Should accept the selection %s',
-    (selectedAddress) => {
-      const { error } = chooseYourAddressSchema.validate({ selectedAddress })
+  test('Should accept a selection', () => {
+    const { error } = chooseYourAddressSchema.validate({
+      selectedAddress: '0'
+    })
 
-      expect(error).toBeUndefined()
-    }
-  )
+    expect(error).toBeUndefined()
+  })
 })

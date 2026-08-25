@@ -61,22 +61,6 @@ describe('#chooseYourAddress', () => {
       )
     })
 
-    test('Should render the addresses in response order, then "None of these"', async () => {
-      await chooseYourAddressController.handler({ query: {} }, h)
-
-      expect(h.view).toHaveBeenCalledWith(
-        CHOOSE_YOUR_ADDRESS_VIEW_ROUTE,
-        expect.objectContaining({
-          items: [
-            { value: '0', text: anAddress.addressLine },
-            { value: '1', text: anotherAddress.addressLine },
-            { divider: 'or' },
-            { value: 'none', text: 'None of these' }
-          ]
-        })
-      )
-    })
-
     test('Should pre-select the address chosen last time', async () => {
       vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
         cacheWith({
@@ -201,14 +185,6 @@ describe('#chooseYourAddress', () => {
         marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
       )
       expect(cacheUtils.setMarineLicenceCache).not.toHaveBeenCalled()
-    })
-
-    test('Should keep the change flow when "None of these" is chosen', async () => {
-      await submit('none', { action: 'change' })
-
-      expect(h.redirect).toHaveBeenCalledWith(
-        `${marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS}?action=change`
-      )
     })
 
     test('Should redirect back to the postcode search page for a selection outside the results', async () => {

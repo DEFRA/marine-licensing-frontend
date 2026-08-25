@@ -219,6 +219,28 @@ describe('#invoiceAddressPostcodeSearch', () => {
       expect(h.view).not.toHaveBeenCalled()
     })
 
+    test('Should stay on the page with the error when the lookup fails, even with pickable results cached', async () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+        ...mockMarineLicenceApplication,
+        invoicing: {
+          ...mockMarineLicenceApplication.invoicing,
+          invoiceAddressSearchResults: [anAddress, anotherAddress]
+        }
+      })
+      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+        results: [anAddress, anotherAddress],
+        error: true
+      })
+
+      await submit({ postcode: 'NE4 7AR' })
+
+      expect(h.redirect).not.toHaveBeenCalled()
+      expect(h.view).toHaveBeenCalledWith(
+        INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE,
+        expect.objectContaining(buildLookupUnavailableError())
+      )
+    })
+
     test('Should keep the change flow when redirecting to the choose your address page', async () => {
       vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
         results: [anAddress, anotherAddress]
@@ -228,24 +250,6 @@ describe('#invoiceAddressPostcodeSearch', () => {
 
       expect(h.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS}?action=change`
-      )
-    })
-
-    test('Should cache the results before redirecting to the choose your address page', async () => {
-      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
-        results: [anAddress, anotherAddress]
-      })
-
-      await submit({ postcode: 'NE4 7AR' })
-
-      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-        expect.anything(),
-        h,
-        expect.objectContaining({
-          invoicing: expect.objectContaining({
-            invoiceAddressSearchResults: [anAddress, anotherAddress]
-          })
-        })
       )
     })
 

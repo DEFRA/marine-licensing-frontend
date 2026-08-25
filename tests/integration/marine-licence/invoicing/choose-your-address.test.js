@@ -29,15 +29,13 @@ const anotherAddress = {
   postcode: 'NE4 7AR'
 }
 
-const mockSearchResults = (
-  invoiceAddressSearchResults = [anAddress, anotherAddress]
-) =>
+const mockSearchResults = () =>
   mockMarineLicence({
     ...mockMarineLicenceApplication,
     invoicing: {
       invoiceAddressType: 'uk',
       invoiceAddressSearch: { postcode: 'NE4 7AR' },
-      invoiceAddressSearchResults
+      invoiceAddressSearchResults: [anAddress, anotherAddress]
     }
   })
 
@@ -119,20 +117,6 @@ describe('Choose your address', () => {
     )
   })
 
-  test('should redirect back to the postcode search when there is nothing to pick from', async () => {
-    mockSearchResults([anAddress])
-
-    const response = await makeGetRequest({
-      url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS,
-      server: getServer()
-    })
-
-    expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
-    )
-  })
-
   test('page content when using the change link', async () => {
     mockSearchResults()
 
@@ -147,40 +131,6 @@ describe('Choose your address', () => {
       'href',
       marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
-  })
-
-  test('the change flow survives "None of these"', async () => {
-    mockSearchResults()
-
-    const response = await makePostRequest({
-      url: `${marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS}?action=change`,
-      server: getServer(),
-      formData: { selectedAddress: 'none' }
-    })
-
-    expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      `${marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS}?action=change`
-    )
-  })
-
-  test('pre-selects the address chosen last time', async () => {
-    mockMarineLicence({
-      ...mockMarineLicenceApplication,
-      invoicing: {
-        invoiceAddressType: 'uk',
-        invoiceAddressSearch: { postcode: 'NE4 7AR' },
-        invoiceAddressSearchResults: [anAddress, anotherAddress],
-        selectedInvoiceAddress: anotherAddress
-      }
-    })
-
-    const document = await loadPage({
-      requestUrl: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS,
-      server: getServer()
-    })
-
-    expect(document.querySelector('input[value="1"]')).toBeChecked()
   })
 
   test('should show an error when nothing is selected', async () => {

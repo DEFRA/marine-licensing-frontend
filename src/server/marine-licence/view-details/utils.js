@@ -3,7 +3,7 @@ import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { getStatusLabelText } from '#src/server/dashboard/utils.js'
 
-const APPLICATION_DATE_FORMAT = 'd MMM yyyy'
+const APPLICATION_DATE_FORMAT = 'd MMMM yyyy'
 
 export const buildApplicationDetailsCardData = (marineLicence) => {
   const {

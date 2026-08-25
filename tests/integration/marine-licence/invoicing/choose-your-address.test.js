@@ -152,20 +152,19 @@ describe('Choose your address', () => {
     expect(getAllByRole(document, 'radio')).toHaveLength(3)
   })
 
-  test('should stay on the page when an address is selected', async () => {
+  test('should go to the confirm address page when an address is selected', async () => {
     mockSearchResults()
 
-    const { document, response } = await submitForm({
-      requestUrl: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS,
+    const response = await makePostRequest({
+      url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS,
       server: getServer(),
       formData: { selectedAddress: '1' }
     })
 
-    expect(response.statusCode).toBe(statusCodes.ok)
-    expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      chooseYourAddressSettings.heading
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS
     )
-    expect(document.querySelector('input[value="1"]')).toBeChecked()
   })
 
   test('should go to the UK invoice address page when "None of these" is selected', async () => {

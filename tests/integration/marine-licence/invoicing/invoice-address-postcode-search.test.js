@@ -239,21 +239,18 @@ describe('Invoice address postcode search', () => {
     })
   })
 
-  // A single result belongs on the confirm-address page (ML-1501); until that exists
-  // it keeps ML-1413's behaviour of staying here.
-  test('should stay on the page when the lookup returns a single result', async () => {
+  test('should go to the confirm address page when the lookup returns a single result', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
 
-    const { document, response } = await submitForm({
-      requestUrl:
-        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
+    const response = await makePostRequest({
+      url: marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
       server: getServer(),
       formData: { postcode: 'NE4 7AR', propertyNameOrNumber: '' }
     })
 
-    expect(response.statusCode).toBe(statusCodes.ok)
-    expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      invoiceAddressPostcodeSearchSettings.heading
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS
     )
   })
 

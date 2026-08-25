@@ -100,18 +100,24 @@ describe('#confirmAddress', () => {
       expect(h.view).not.toHaveBeenCalled()
     })
 
-    test('Should redirect back to the postcode search page when no address has been selected', async () => {
-      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
-        cacheWith({ selectedInvoiceAddress: undefined })
-      )
+    test.each([
+      ['no address has been selected', undefined],
+      ['the selected address has nothing to show', {}]
+    ])(
+      'Should redirect back to the postcode search page when %s',
+      async (_name, selected) => {
+        vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+          cacheWith({ selectedInvoiceAddress: selected })
+        )
 
-      await confirmAddressController.handler({ query: {} }, h)
+        await confirmAddressController.handler({ query: {} }, h)
 
-      expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
-      )
-      expect(h.view).not.toHaveBeenCalled()
-    })
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+        )
+        expect(h.view).not.toHaveBeenCalled()
+      }
+    )
 
     test('Should keep the change flow when a guard sends the user back', async () => {
       vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
@@ -161,6 +167,88 @@ describe('#confirmAddress', () => {
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
       )
+    })
+
+    // An address that cannot pass the manual entry rules would be rejected by the backend
+    // at the end of the journey, so it is sent to the manual entry page to be corrected.
+    test.each([
+      [
+        'the first line is longer than the manual entry page allows',
+        {
+          street: `${'A'.repeat(101)} STREET`,
+          town: 'NEWCASTLE',
+          postcode: 'NE1 1EE'
+        }
+      ],
+      [
+        'the town is longer than the manual entry page allows',
+        { street: 'QUAYSIDE', town: 'B'.repeat(31), postcode: 'NE1 1EE' }
+      ],
+      [
+        'the lookup gave no street fields at all',
+        { town: 'NEWCASTLE', postcode: 'NE1 1EE' }
+      ],
+      [
+        'the postcode is not a valid UK postcode',
+        { street: 'QUAYSIDE', town: 'NEWCASTLE', postcode: 'NOT A POSTCODE' }
+      ]
+    ])(
+      'Should go to the UK invoice address page to be corrected when %s',
+      async (_name, selected) => {
+        vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+          cacheWith({ selectedInvoiceAddress: selected })
+        )
+
+        await submit()
+
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
+        )
+        expect(saveInvoicingToBackend).not.toHaveBeenCalled()
+      }
+    )
+
+    test('Should pre-populate the manual entry page with the address that needs correcting', async () => {
+      const tooLongTown = 'B'.repeat(31)
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+        cacheWith({
+          selectedInvoiceAddress: {
+            street: 'QUAYSIDE',
+            town: tooLongTown,
+            postcode: 'NE1 1EE'
+          }
+        })
+      )
+
+      await submit()
+
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.anything(),
+        h,
+        expect.objectContaining({
+          invoicing: expect.objectContaining({
+            invoiceAddress: expect.objectContaining({
+              addressLine1: 'QUAYSIDE',
+              addressTown: tooLongTown
+            })
+          })
+        })
+      )
+    })
+
+    test('Should keep the change flow when sending the user to be corrected', async () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+        cacheWith({
+          selectedInvoiceAddress: { town: 'NEWCASTLE', postcode: 'NE1 1EE' }
+        })
+      )
+
+      await submit({ action: 'change' })
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS}?action=change`
+      )
+      expect(saveInvoicingToBackend).not.toHaveBeenCalled()
     })
 
     test('Should redirect back to the postcode search page without saving when no address has been selected', async () => {

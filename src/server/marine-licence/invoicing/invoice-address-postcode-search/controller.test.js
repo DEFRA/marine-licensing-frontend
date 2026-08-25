@@ -241,7 +241,7 @@ describe('#invoiceAddressPostcodeSearch', () => {
       )
     })
 
-    test('Should not show the truncation error when the filter still matched something', async () => {
+    test('Should go to the confirm address page rather than warn about truncation when the filter matched a single address', async () => {
       vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
         results: [anAddress],
         truncated: true
@@ -253,6 +253,65 @@ describe('#invoiceAddressPostcodeSearch', () => {
         marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS
       )
       expect(h.view).not.toHaveBeenCalled()
+    })
+
+    // A selection left over from an earlier postcode would still be confirmable on the
+    // confirm-address page, showing an address the current search never returned.
+    test.each([
+      ['returns nothing', []],
+      ['returns more than one address', [anAddress, anotherAddress]]
+    ])(
+      'Should clear a previous selection when a new search %s',
+      async (_name, results) => {
+        vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+          ...mockMarineLicenceApplication,
+          invoicing: {
+            ...mockMarineLicenceApplication.invoicing,
+            selectedInvoiceAddress: anAddress
+          }
+        })
+        vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+          results
+        })
+
+        await submit({ postcode: 'NE1 1EE' })
+
+        expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+          expect.anything(),
+          h,
+          expect.objectContaining({
+            invoicing: expect.objectContaining({
+              selectedInvoiceAddress: null
+            })
+          })
+        )
+      }
+    )
+
+    test('Should keep a previous selection when the lookup fails', async () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+        ...mockMarineLicenceApplication,
+        invoicing: {
+          ...mockMarineLicenceApplication.invoicing,
+          selectedInvoiceAddress: anAddress
+        }
+      })
+      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+        results: [],
+        error: true
+      })
+
+      await submit({ postcode: 'NE1 1EE' })
+
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.anything(),
+        h,
+        expect.objectContaining({
+          invoicing: expect.objectContaining({
+            selectedInvoiceAddress: anAddress
+          })
+        })
+      )
     })
 
     test('Should redirect to the choose your address page when there are many results', async () => {

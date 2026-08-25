@@ -157,6 +157,43 @@ describe('Confirm address', () => {
     )
   })
 
+  test('should go to the UK invoice address page when the looked up address cannot pass the address rules', async () => {
+    mockSelectedAddress({
+      selectedInvoiceAddress: {
+        addressLine: 'A VERY LONG ADDRESS, NEWCASTLE UPON TYNE, NE1 1EE',
+        street: `${'A'.repeat(101)} STREET`,
+        town: 'NEWCASTLE UPON TYNE',
+        postcode: 'NE1 1EE'
+      }
+    })
+
+    const response = await makePostRequest({
+      url: marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS,
+      server: getServer(),
+      formData: {}
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
+    )
+  })
+
+  test('should go back to the postcode search page when the selected address has nothing to show', async () => {
+    mockSelectedAddress({ selectedInvoiceAddress: {} })
+
+    const response = await makePostRequest({
+      url: marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS,
+      server: getServer(),
+      formData: {}
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+    )
+  })
+
   test('should go back to the postcode search page when no address has been selected', async () => {
     mockSelectedAddress({ selectedInvoiceAddress: undefined })
 

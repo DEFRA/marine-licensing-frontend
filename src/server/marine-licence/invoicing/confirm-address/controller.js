@@ -16,8 +16,10 @@ import {
 } from '#src/server/marine-licence/invoicing/utils.js'
 import {
   buildAddressLines,
+  hasRenderableAddress,
   toInvoiceAddress
 } from '#src/server/marine-licence/invoicing/confirm-address/utils.js'
+import { ukInvoiceAddressSchema } from '#src/server/common/validation/invoicing/uk-invoice-address/schema.js'
 
 export const CONFIRM_ADDRESS_VIEW_ROUTE =
   'marine-licence/invoicing/confirm-address/index'
@@ -39,7 +41,7 @@ const getGuardRedirect = (invoicing, action) => {
     )
   }
 
-  if (!invoicing.selectedInvoiceAddress) {
+  if (!hasRenderableAddress(invoicing.selectedInvoiceAddress)) {
     return withAction(
       marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
       action
@@ -89,13 +91,28 @@ export const confirmAddressSubmitController = {
       return h.redirect(guardRedirect)
     }
 
+    const invoiceAddress = toInvoiceAddress(invoicing.selectedInvoiceAddress)
+
     await setMarineLicenceCache(request, h, {
       ...marineLicence,
       invoicing: {
         ...invoicing,
-        invoiceAddress: toInvoiceAddress(invoicing.selectedInvoiceAddress)
+        invoiceAddress
       }
     })
+
+    // The looked-up address has to satisfy the same rules as a typed one, or it is
+    // rejected by the backend at the end of the journey, far from anything the user
+    // can act on. Hand it to the manual entry page instead, pre-populated, so the
+    // offending field can be edited and the usual error messages apply.
+    if (ukInvoiceAddressSchema.validate(invoiceAddress).error) {
+      return h.redirect(
+        withAction(
+          marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,
+          action
+        )
+      )
+    }
 
     return redirectAfterInvoiceAddressSubmit(request, h, action, invoicing)
   }

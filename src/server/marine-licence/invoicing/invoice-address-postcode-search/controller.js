@@ -112,20 +112,26 @@ export const invoiceAddressPostcodeSearchSubmitController = {
     const lookup = await lookupAddresses(request, invoiceAddressSearch)
     const { results, error } = lookup
 
+    const onlyResult = !error && hasSingleResult(results) ? results[0] : null
+
     // Results are cached for the choose-your-address page to read, and a lone result
     // is cached as the selection for the confirm-address page, which is where the
-    // user goes next in both cases.
-    // On a lookup failure the previous results are kept rather than overwritten
-    // with an empty list, so a transient outage doesn't discard a good search.
+    // user goes next in both cases. The selection is always rewritten on a successful
+    // search - left in place, a selection from an earlier postcode would outlive the
+    // results it came from and still be confirmable.
+    // On a lookup failure the previous results and selection are kept rather than
+    // discarded, so a transient outage doesn't throw away a good search.
     await setMarineLicenceCache(request, h, {
       ...marineLicence,
       invoicing: {
         ...invoicing,
         invoiceAddressSearch,
-        ...(error ? {} : { invoiceAddressSearchResults: results }),
-        ...(!error && hasSingleResult(results)
-          ? { selectedInvoiceAddress: results[0] }
-          : {})
+        ...(error
+          ? {}
+          : {
+              invoiceAddressSearchResults: results,
+              selectedInvoiceAddress: onlyResult
+            })
       }
     })
 
@@ -138,7 +144,7 @@ export const invoiceAddressPostcodeSearchSubmitController = {
       )
     }
 
-    if (!error && hasSingleResult(results)) {
+    if (onlyResult) {
       return h.redirect(
         withAction(marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS, action)
       )

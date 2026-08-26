@@ -183,21 +183,20 @@ export const mockMarineLicenceApplication = {
 export const mockSubmittedMarineLicenceApplication = {
   ...mockMarineLicenceApplication,
   status: 'Submitted',
-  applicationReference: 'MLA/2026/10264'
+  applicationReference: 'MLA/2026/10264',
+  submittedAt: '2026-05-26T10:00:00Z'
 }
 
 export const mockTransferredMarineLicenceApplication = {
   ...mockSubmittedMarineLicenceApplication,
   status: PROJECT_STATUS.TRANSFERRED,
   applicationReference: 'MLA/2026/10264',
-  submittedAt: '2026-05-26T10:00:00Z',
   transferredDate: '2026-06-26T10:00:00Z'
 }
 
 export const mockWithdrawnMarineLicenceApplication = {
   ...mockSubmittedMarineLicenceApplication,
   status: PROJECT_STATUS.WITHDRAWN,
-  submittedAt: '2026-05-26T10:00:00Z',
   withdrawnAt: '2026-06-26T10:00:00Z'
 }
 
@@ -205,7 +204,6 @@ export const mockRejectedMarineLicenceApplication = {
   ...mockSubmittedMarineLicenceApplication,
   status: PROJECT_STATUS.REJECTED,
   applicationReference: 'MLA/2026/10264',
-  submittedAt: '2026-05-26T10:00:00Z',
   rejectedDate: '2026-07-26T10:00:00Z',
   rejectedReasons: 'Site location,Water Framework Directive',
   rejectedInformation:

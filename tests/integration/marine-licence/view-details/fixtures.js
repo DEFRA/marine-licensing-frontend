@@ -35,6 +35,17 @@ export const expectedApplicationDetailsCard = {
   ]
 }
 
+export const expectedSubmittedApplicationDetailsCard = {
+  ...expectedApplicationDetailsCard,
+  rows: [
+    ...expectedApplicationDetailsCard.rows,
+    {
+      key: 'Status',
+      value: 'Submitted'
+    }
+  ]
+}
+
 export const expectedTransferredApplicationDetailsCard = {
   ...expectedApplicationDetailsCard,
   rows: [

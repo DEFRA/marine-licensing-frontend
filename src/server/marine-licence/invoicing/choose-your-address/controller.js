@@ -41,7 +41,7 @@ const getPageParams = (action, invoicing) => ({
 
 // The page only means anything with a multi-result search behind it, so a deep
 // link without one goes back to the search rather than rendering an empty list.
-const getGuardRedirect = (invoicing, action) => {
+const getIncompleteJourneyRedirect = (invoicing, action) => {
   if (invoicing.invoiceAddressType !== INVOICE_TYPE_OPTIONS.UK) {
     return withAction(
       marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
@@ -65,9 +65,12 @@ export const chooseYourAddressController = {
     const { invoicing } = marineLicence
     const action = request.query.action
 
-    const guardRedirect = getGuardRedirect(invoicing, action)
-    if (guardRedirect) {
-      return h.redirect(guardRedirect)
+    const incompleteJourneyRedirect = getIncompleteJourneyRedirect(
+      invoicing,
+      action
+    )
+    if (incompleteJourneyRedirect) {
+      return h.redirect(incompleteJourneyRedirect)
     }
 
     const selectedAddress = getSelectedAddressValue(
@@ -93,9 +96,12 @@ export const chooseYourAddressSubmitController = {
 
         // The results can go while the form is on screen; re-rendering then would
         // show a picker with nothing in it, so the guard applies here too.
-        const guardRedirect = getGuardRedirect(invoicing, action)
-        if (guardRedirect) {
-          return h.redirect(guardRedirect).takeover()
+        const incompleteJourneyRedirect = getIncompleteJourneyRedirect(
+          invoicing,
+          action
+        )
+        if (incompleteJourneyRedirect) {
+          return h.redirect(incompleteJourneyRedirect).takeover()
         }
 
         const { backLink, ...params } = getPageParams(action, invoicing)
@@ -118,9 +124,12 @@ export const chooseYourAddressSubmitController = {
     const action = request.query.action
     const { selectedAddress } = request.payload
 
-    const guardRedirect = getGuardRedirect(invoicing, action)
-    if (guardRedirect) {
-      return h.redirect(guardRedirect)
+    const incompleteJourneyRedirect = getIncompleteJourneyRedirect(
+      invoicing,
+      action
+    )
+    if (incompleteJourneyRedirect) {
+      return h.redirect(incompleteJourneyRedirect)
     }
 
     if (selectedAddress === NONE_OF_THESE) {

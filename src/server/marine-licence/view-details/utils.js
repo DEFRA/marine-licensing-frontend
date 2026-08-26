@@ -34,7 +34,6 @@ export const buildApplicationDetailsCardData = (marineLicence) => {
     isTransferred,
     isRejected,
     isWithdrawn,
-    showApplicationDetailsCard: isTransferred || isRejected || isWithdrawn,
     status,
     statusTag: `<strong class="govuk-tag ${getTagStyle(status)}">${getStatusLabelText(status)}</strong>`
   }

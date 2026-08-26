@@ -33,7 +33,7 @@ const getButtonText = (action, invoicing) =>
 
 // The page only means anything with a looked-up address behind it, so a deep link
 // without one goes back to the search rather than confirming an empty address.
-const getGuardRedirect = (invoicing, action) => {
+const getIncompleteJourneyRedirect = (invoicing, action) => {
   if (invoicing.invoiceAddressType !== INVOICE_TYPE_OPTIONS.UK) {
     return withAction(
       marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
@@ -57,9 +57,12 @@ export const confirmAddressController = {
     const { invoicing } = marineLicence
     const action = request.query.action
 
-    const guardRedirect = getGuardRedirect(invoicing, action)
-    if (guardRedirect) {
-      return h.redirect(guardRedirect)
+    const incompleteJourneyRedirect = getIncompleteJourneyRedirect(
+      invoicing,
+      action
+    )
+    if (incompleteJourneyRedirect) {
+      return h.redirect(incompleteJourneyRedirect)
     }
 
     return h.view(CONFIRM_ADDRESS_VIEW_ROUTE, {
@@ -86,9 +89,12 @@ export const confirmAddressSubmitController = {
     const { invoicing } = marineLicence
     const action = request.query.action
 
-    const guardRedirect = getGuardRedirect(invoicing, action)
-    if (guardRedirect) {
-      return h.redirect(guardRedirect)
+    const incompleteJourneyRedirect = getIncompleteJourneyRedirect(
+      invoicing,
+      action
+    )
+    if (incompleteJourneyRedirect) {
+      return h.redirect(incompleteJourneyRedirect)
     }
 
     const invoiceAddress = toInvoiceAddress(invoicing.selectedInvoiceAddress)

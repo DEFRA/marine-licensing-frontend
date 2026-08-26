@@ -49,19 +49,17 @@
       {% endif %}
       <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
 
-      {% if showApplicationDetailsCard %}
-        {{ appMarineLicenceApplicationDetailsCard({
-          statusTag: statusTag,
-          isTransferred: isTransferred,
-          isRejected: isRejected,
-          applicationReference: applicationReference,
-          rejectedDate: rejectedDate,
-          rejectedReasons: rejectedReasonsOutput,
-          transferredDate: transferredDate,
-          withdrawnAt: withdrawnAt,
-          submittedAt: submittedAt
-        }) }}
-      {% endif %}
+      {{ appMarineLicenceApplicationDetailsCard({
+        statusTag: statusTag,
+        isTransferred: isTransferred,
+        isRejected: isRejected,
+        applicationReference: applicationReference,
+        rejectedDate: rejectedDate,
+        rejectedReasons: rejectedReasonsOutput,
+        transferredDate: transferredDate,
+        withdrawnAt: withdrawnAt,
+        submittedAt: submittedAt
+      }) }}
 
       {{ appMarineLicenceProjectDetailsCard({
         projectBackground: projectBackground,

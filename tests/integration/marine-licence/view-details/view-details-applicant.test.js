@@ -19,6 +19,7 @@ import {
   expectedWaterFrameworkDirectiveCard,
   expectedInvocingCardIndividualUser,
   expectedInvocingCardOrgUser,
+  expectedSubmittedApplicationDetailsCard,
   expectedTransferredApplicationDetailsCard,
   expectedRejectedApplicationDetailsCard,
   expectedFeeEstimateCard,
@@ -85,6 +86,33 @@ describe('Marine Licence View Details', () => {
     )
   })
 
+  describe('application details card (submitted)', () => {
+    let document
+
+    beforeEach(async () => {
+      document = await loadViewDetailsPage(getServer())
+    })
+
+    test('renders for submitted applications', async () => {
+      expect(
+        document.querySelector('#application-overview-card')
+      ).toBeInTheDocument()
+    })
+
+    test.each(expectedSubmittedApplicationDetailsCard.rows)(
+      'renders "$key" row with correct value',
+      ({ key, value }) => {
+        const card = document.querySelector('#application-overview-card')
+        const row = getCardRow(card, key)
+
+        expect(row).toBeTruthy()
+        expect(
+          row.querySelector('.govuk-summary-list__value').textContent.trim()
+        ).toBe(value)
+      }
+    )
+  })
+
   describe('application details card (transferred)', () => {
     let document
 
@@ -93,12 +121,6 @@ describe('Marine Licence View Details', () => {
         getServer(),
         mockTransferredMarineLicenceApplication
       )
-    })
-
-    test('does not render for submitted applications', async () => {
-      document = await loadViewDetailsPage(getServer())
-
-      expect(document.querySelector('#application-overview-card')).toBeNull()
     })
 
     test('renders for transferred applications', async () => {
@@ -129,12 +151,6 @@ describe('Marine Licence View Details', () => {
         getServer(),
         mockRejectedMarineLicenceApplication
       )
-    })
-
-    test('does not render for submitted applications', async () => {
-      document = await loadViewDetailsPage(getServer())
-
-      expect(document.querySelector('#application-overview-card')).toBeNull()
     })
 
     test('renders for rejected applications', async () => {

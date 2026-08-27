@@ -177,22 +177,6 @@ describe('#chooseYourAddress', () => {
         marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
       )
     })
-
-    test('Should record itself as the page behind the confirm address page', async () => {
-      const request = createMockRequest({
-        payload: { selectedAddress: '1' },
-        query: {}
-      })
-
-      await chooseYourAddressSubmitController.handler(request, h)
-
-      expect(entryPoints.setInvoicingPageEntryPoint).toHaveBeenCalledWith(
-        request,
-        h,
-        entryPoints.INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
-        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
-      )
-    })
   })
 
   describe('#chooseYourAddressSubmitController', () => {

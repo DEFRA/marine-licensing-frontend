@@ -159,13 +159,6 @@ export const chooseYourAddressSubmitController = {
       }
     })
 
-    await setInvoicingPageEntryPoint(
-      request,
-      h,
-      INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
-      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
-    )
-
     return h.redirect(
       withAction(marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS, action)
     )

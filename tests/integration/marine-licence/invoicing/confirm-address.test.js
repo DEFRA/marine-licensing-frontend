@@ -109,7 +109,7 @@ describe('Confirm address', () => {
     getByRole(document, 'button', { name: 'Save and continue' })
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+      `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}?action=change`
     )
     expect(
       getByRole(document, 'link', { name: 'Edit address' })

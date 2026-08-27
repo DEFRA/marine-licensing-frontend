@@ -120,18 +120,10 @@ const requestWithEntryPoint = (pageKey, entryPoint) => {
   return request
 }
 
-describe.each([
-  [
-    'getUkInvoiceAddressBackLink',
-    getUkInvoiceAddressBackLink,
-    INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS
-  ],
-  [
-    'getConfirmAddressBackLink',
-    getConfirmAddressBackLink,
-    INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS
-  ]
-])('%s', (_name, getBackLink, pageKey) => {
+describe('getUkInvoiceAddressBackLink', () => {
+  const getBackLink = getUkInvoiceAddressBackLink
+  const pageKey = INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS
+
   test('returns the page the user came from', () => {
     const request = requestWithEntryPoint(
       pageKey,
@@ -174,6 +166,20 @@ describe.each([
   test('falls back to the postcode search when no entry point was recorded', () => {
     expect(getBackLink(createMockRequest())).toBe(
       marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+    )
+  })
+})
+
+describe('getConfirmAddressBackLink', () => {
+  test('always goes back to the postcode search', () => {
+    expect(getConfirmAddressBackLink()).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+    )
+  })
+
+  test('keeps the change flow when going back to the postcode search', () => {
+    expect(getConfirmAddressBackLink('change')).toBe(
+      `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}?action=change`
     )
   })
 })

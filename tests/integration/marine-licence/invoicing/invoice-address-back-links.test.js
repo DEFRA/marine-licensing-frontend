@@ -145,7 +145,7 @@ describe('Invoice address back links', () => {
   })
 
   describe('the confirm address page', () => {
-    test('goes back to the address picker when an address was chosen there', async () => {
+    test('goes back to the postcode search when an address was chosen from the picker', async () => {
       invoicingCache({
         invoiceAddressSearchResults: [anAddress, anotherAddress],
         selectedInvoiceAddress: anAddress
@@ -162,7 +162,7 @@ describe('Invoice address back links', () => {
           marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS,
           sessionCookie(chosen)
         )
-      ).toBe(marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS)
+      ).toBe(marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH)
     })
 
     test('goes back to the postcode search when a single result led there', async () => {

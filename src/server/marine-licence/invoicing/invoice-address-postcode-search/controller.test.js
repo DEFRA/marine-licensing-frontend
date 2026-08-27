@@ -318,21 +318,6 @@ describe('#invoiceAddressPostcodeSearch', () => {
       }
     )
 
-    test('Should record itself as the page behind the confirm address page for a single result', async () => {
-      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
-        results: [anAddress]
-      })
-
-      await submit({ postcode: 'NE4 7AR' })
-
-      expect(entryPoints.setInvoicingPageEntryPoint).toHaveBeenCalledWith(
-        expect.anything(),
-        h,
-        entryPoints.INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
-        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
-      )
-    })
-
     test('Should redirect to the choose your address page when there are many results', async () => {
       vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
         results: [anAddress, anotherAddress]

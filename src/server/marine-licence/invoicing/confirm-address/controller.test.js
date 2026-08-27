@@ -84,7 +84,7 @@ describe('#confirmAddress', () => {
         CONFIRM_ADDRESS_VIEW_ROUTE,
         expect.objectContaining({
           editAddressLink: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}?action=change`,
-          backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}?action=change`,
           cancelLink: undefined,
           buttonText: 'Save and continue'
         })
@@ -149,7 +149,7 @@ describe('#confirmAddress', () => {
   })
 
   describe('#confirmAddressBackLink', () => {
-    test('Should go back to the page the user came from', async () => {
+    test('Should go back to the postcode search even when the address was chosen from the picker', async () => {
       const request = createMockRequest({ query: {} })
       vi.spyOn(entryPoints, 'getInvoicingPageEntryPoint').mockReturnValue(
         marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
@@ -160,23 +160,8 @@ describe('#confirmAddress', () => {
       expect(h.view).toHaveBeenCalledWith(
         CONFIRM_ADDRESS_VIEW_ROUTE,
         expect.objectContaining({
-          backLink: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
-        })
-      )
-    })
-
-    test('Should keep the change flow when going back to the address picker', async () => {
-      const request = createMockRequest({ query: { action: 'change' } })
-      vi.spyOn(entryPoints, 'getInvoicingPageEntryPoint').mockReturnValue(
-        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
-      )
-
-      await confirmAddressController.handler(request, h)
-
-      expect(h.view).toHaveBeenCalledWith(
-        CONFIRM_ADDRESS_VIEW_ROUTE,
-        expect.objectContaining({
-          backLink: `${marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS}?action=change`
+          backLink:
+            marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
         })
       )
     })

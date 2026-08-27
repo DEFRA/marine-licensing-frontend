@@ -75,12 +75,12 @@ export const getUkInvoiceAddressBackLink = (request, action) =>
     marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
   )
 
-export const getConfirmAddressBackLink = (request, action) =>
-  resolveInvoiceAddressBackLink(
-    request,
-    INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
-    action,
-    marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+// The confirm page is only reachable from a postcode search - straight from a single
+// result, or through the picker - so back always returns to the search itself.
+export const getConfirmAddressBackLink = (action) =>
+  withAction(
+    marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
+    action
   )
 
 // The invoice address pages only mean anything for a UK address that has been looked

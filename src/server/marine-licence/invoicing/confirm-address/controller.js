@@ -56,7 +56,7 @@ export const confirmAddressController = {
         marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
         action
       ),
-      backLink: getConfirmAddressBackLink(request, action),
+      backLink: getConfirmAddressBackLink(action),
       cancelLink: getInvoiceCancelLink(action, invoicing),
       buttonText: getButtonText(action, invoicing)
     })

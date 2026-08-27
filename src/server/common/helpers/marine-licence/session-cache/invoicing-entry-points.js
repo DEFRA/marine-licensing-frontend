@@ -6,8 +6,7 @@ import { INVOICING_ENTRY_POINTS_KEY } from '#src/server/common/constants/cache.j
  * page behind. Each page that leads to one of these records itself here.
  */
 export const INVOICING_ENTRY_POINT_PAGES = {
-  UK_INVOICE_ADDRESS: 'ukInvoiceAddress',
-  CONFIRM_ADDRESS: 'confirmAddress'
+  UK_INVOICE_ADDRESS: 'ukInvoiceAddress'
 }
 
 export const setInvoicingPageEntryPoint = async (

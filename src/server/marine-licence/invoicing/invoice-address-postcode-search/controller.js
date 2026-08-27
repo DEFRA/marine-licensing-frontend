@@ -158,13 +158,6 @@ export const invoiceAddressPostcodeSearchSubmitController = {
     }
 
     if (onlyResult) {
-      await setInvoicingPageEntryPoint(
-        request,
-        h,
-        INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
-        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
-      )
-
       return h.redirect(
         withAction(marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS, action)
       )

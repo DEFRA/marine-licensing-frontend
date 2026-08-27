@@ -27,48 +27,48 @@ describe('invoicing entry points', () => {
       await setInvoicingPageEntryPoint(
         request,
         h,
-        INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
+        INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
         '/marine-licence/choose-your-address'
       )
 
       expect(request.yar.set).toHaveBeenCalledWith(INVOICING_ENTRY_POINTS_KEY, {
-        confirmAddress: '/marine-licence/choose-your-address'
+        ukInvoiceAddress: '/marine-licence/choose-your-address'
       })
       expect(request.yar.commit).toHaveBeenCalledWith(h)
     })
 
     test('Should keep the entry points of other pages', async () => {
       request.yar.get.mockReturnValue({
-        ukInvoiceAddress: '/marine-licence/check-invoicing-details'
+        someOtherPage: '/marine-licence/check-invoicing-details'
       })
 
       await setInvoicingPageEntryPoint(
         request,
         h,
-        INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
+        INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
         '/marine-licence/choose-your-address'
       )
 
       expect(request.yar.set).toHaveBeenCalledWith(INVOICING_ENTRY_POINTS_KEY, {
-        ukInvoiceAddress: '/marine-licence/check-invoicing-details',
-        confirmAddress: '/marine-licence/choose-your-address'
+        someOtherPage: '/marine-licence/check-invoicing-details',
+        ukInvoiceAddress: '/marine-licence/choose-your-address'
       })
     })
 
     test('Should overwrite the entry point of the same page', async () => {
       request.yar.get.mockReturnValue({
-        confirmAddress: '/marine-licence/invoice-address-postcode-search'
+        ukInvoiceAddress: '/marine-licence/invoice-address-postcode-search'
       })
 
       await setInvoicingPageEntryPoint(
         request,
         h,
-        INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
+        INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
         '/marine-licence/choose-your-address'
       )
 
       expect(request.yar.set).toHaveBeenCalledWith(INVOICING_ENTRY_POINTS_KEY, {
-        confirmAddress: '/marine-licence/choose-your-address'
+        ukInvoiceAddress: '/marine-licence/choose-your-address'
       })
     })
   })
@@ -76,24 +76,24 @@ describe('invoicing entry points', () => {
   describe('#getInvoicingPageEntryPoint', () => {
     test('Should return the entry point stored for the page', () => {
       request.yar.get.mockReturnValue({
-        confirmAddress: '/marine-licence/choose-your-address'
+        ukInvoiceAddress: '/marine-licence/choose-your-address'
       })
 
       expect(
         getInvoicingPageEntryPoint(
           request,
-          INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS
+          INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS
         )
       ).toBe('/marine-licence/choose-your-address')
     })
 
     test('Should return undefined when nothing is stored for the page', () => {
-      request.yar.get.mockReturnValue({ ukInvoiceAddress: '/somewhere' })
+      request.yar.get.mockReturnValue({ someOtherPage: '/somewhere' })
 
       expect(
         getInvoicingPageEntryPoint(
           request,
-          INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS
+          INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS
         )
       ).toBeUndefined()
     })
@@ -102,7 +102,7 @@ describe('invoicing entry points', () => {
       expect(
         getInvoicingPageEntryPoint(
           {},
-          INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS
+          INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS
         )
       ).toBeUndefined()
     })

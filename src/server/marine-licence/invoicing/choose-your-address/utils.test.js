@@ -2,8 +2,7 @@ import {
   buildAddressItems,
   getSearchResults,
   getSelectedAddressValue,
-  getSelectedResult,
-  hasPickableResults
+  getSelectedResult
 } from '#src/server/marine-licence/invoicing/choose-your-address/utils.js'
 
 const results = [
@@ -24,19 +23,6 @@ describe('#chooseYourAddress utils', () => {
       expect(
         getSearchResults({ invoiceAddressSearchResults: results })
       ).toEqual(results)
-    })
-  })
-
-  describe('#hasPickableResults', () => {
-    test.each([
-      ['there are no results', []],
-      ['there is a single result', [results[0]]]
-    ])('Should be false when %s', (_name, searchResults) => {
-      expect(hasPickableResults(searchResults)).toBe(false)
-    })
-
-    test('Should be true when there is more than one result', () => {
-      expect(hasPickableResults(results)).toBe(true)
     })
   })
 

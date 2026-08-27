@@ -7,6 +7,7 @@ import {
 } from '#src/server/marine-licence/invoicing/check-invoicing-details/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import * as entryPoints from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import * as userSessionUtils from '#src/server/common/helpers/user-session-utils.js'
@@ -77,6 +78,29 @@ describe('#checkInvoicingDetails', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_INVOICE_CONTACT_DETAILS,
           isIndividual: true
         })
+      )
+    })
+  })
+
+  describe('invoice address entry point', () => {
+    test('records itself as the page behind the address page, for the change link', async () => {
+      vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValue({
+        id: 'test-id',
+        projectName: 'Test Project'
+      })
+      const setEntryPoint = vi
+        .spyOn(entryPoints, 'setInvoicingPageEntryPoint')
+        .mockResolvedValue()
+
+      const h = createMockHandler()
+
+      await checkInvoicingDetailsController.handler(mockRequest, h)
+
+      expect(setEntryPoint).toHaveBeenCalledWith(
+        mockRequest,
+        h,
+        entryPoints.INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
       )
     })
   })

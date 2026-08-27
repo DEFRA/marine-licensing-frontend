@@ -8,7 +8,7 @@ import {
 } from '#src/server/common/validation/invoicing/constants.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
-  getInvoiceAddressBackLink,
+  getConfirmAddressBackLink,
   getInvoiceCancelLink,
   isInChangeFlow,
   redirectAfterInvoiceAddressSubmit,
@@ -19,6 +19,10 @@ import {
   hasRenderableAddress,
   toInvoiceAddress
 } from '#src/server/marine-licence/invoicing/confirm-address/utils.js'
+import {
+  INVOICING_ENTRY_POINT_PAGES,
+  setInvoicingPageEntryPoint
+} from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 import { ukInvoiceAddressSchema } from '#src/server/common/validation/invoicing/uk-invoice-address/schema.js'
 
 export const CONFIRM_ADDRESS_VIEW_ROUTE =
@@ -73,10 +77,7 @@ export const confirmAddressController = {
         marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
         action
       ),
-      backLink: getInvoiceAddressBackLink(
-        action,
-        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
-      ),
+      backLink: getConfirmAddressBackLink(request, action),
       cancelLink: getInvoiceCancelLink(action, invoicing),
       buttonText: getButtonText(action, invoicing)
     })
@@ -112,6 +113,15 @@ export const confirmAddressSubmitController = {
     // can act on. Hand it to the manual entry page instead, pre-populated, so the
     // offending field can be edited and the usual error messages apply.
     if (ukInvoiceAddressSchema.validate(invoiceAddress).error) {
+      // Back from there returns to the search rather than here: this page would only
+      // offer the same rejected address again.
+      await setInvoicingPageEntryPoint(
+        request,
+        h,
+        INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
+        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+      )
+
       return h.redirect(
         withAction(
           marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,

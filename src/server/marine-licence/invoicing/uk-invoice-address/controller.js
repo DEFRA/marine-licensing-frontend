@@ -51,7 +51,7 @@ export const ukInvoiceAddressController = {
       ...ukInvoiceAddressSettings,
       projectName: marineLicence.projectName,
       payload: getInitialPayload(invoicing),
-      backLink: getUkInvoiceAddressBackLink(action),
+      backLink: getUkInvoiceAddressBackLink(request, action),
       cancelLink: getInvoiceCancelLink(action, invoicing),
       buttonText: getInvoiceAddressButtonText(action, invoicing),
       postcodeLookupLink: getPostcodeLookupLink(action)
@@ -72,7 +72,7 @@ export const ukInvoiceAddressSubmitController = {
           settings: ukInvoiceAddressSettings,
           errorMessages: ukInvoiceAddressErrorMessages,
           projectName,
-          backLink: getUkInvoiceAddressBackLink(action),
+          backLink: getUkInvoiceAddressBackLink(request, action),
           payload: request.payload,
           params: {
             cancelLink: getInvoiceCancelLink(action, invoicing),

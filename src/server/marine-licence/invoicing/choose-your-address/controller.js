@@ -14,15 +14,19 @@ import {
   getInvoiceAddressBackLink,
   getInvoiceCancelLink,
   getInvoiceAddressButtonText,
-  withAction
+  withAction,
+  hasPickableResults
 } from '#src/server/marine-licence/invoicing/utils.js'
+import {
+  INVOICING_ENTRY_POINT_PAGES,
+  setInvoicingPageEntryPoint
+} from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 import {
   NONE_OF_THESE,
   buildAddressItems,
   getSearchResults,
   getSelectedAddressValue,
-  getSelectedResult,
-  hasPickableResults
+  getSelectedResult
 } from '#src/server/marine-licence/invoicing/choose-your-address/utils.js'
 
 export const CHOOSE_YOUR_ADDRESS_VIEW_ROUTE =
@@ -76,6 +80,14 @@ export const chooseYourAddressController = {
     const selectedAddress = getSelectedAddressValue(
       getSearchResults(invoicing),
       invoicing.selectedInvoiceAddress
+    )
+
+    // "None of these" leads to the UK address page from here.
+    await setInvoicingPageEntryPoint(
+      request,
+      h,
+      INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
+      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
     )
 
     return h.view(CHOOSE_YOUR_ADDRESS_VIEW_ROUTE, {
@@ -163,6 +175,13 @@ export const chooseYourAddressSubmitController = {
         selectedInvoiceAddress: selectedResult
       }
     })
+
+    await setInvoicingPageEntryPoint(
+      request,
+      h,
+      INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
+      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+    )
 
     return h.redirect(
       withAction(marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS, action)

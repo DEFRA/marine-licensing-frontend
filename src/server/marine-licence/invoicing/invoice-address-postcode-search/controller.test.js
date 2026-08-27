@@ -8,15 +8,19 @@ import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-c
 import * as addressLookup from '#src/server/common/helpers/marine-licence/invoicing/address-lookup.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import * as entryPoints from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
 import {
   buildNoAddressesFoundError,
   buildLookupUnavailableError,
   buildTooManyAddressesError
 } from '#src/server/marine-licence/invoicing/invoice-address-postcode-search/utils.js'
 
-vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 
 const anAddress = {
   addressLine: 'TYNESIDE HOUSE, SKINNERBURN ROAD, NEWCASTLE UPON TYNE, NE4 7AR',
@@ -38,6 +42,7 @@ describe('#invoiceAddressPostcodeSearch', () => {
       mockMarineLicenceApplication
     )
     vi.spyOn(cacheUtils, 'setMarineLicenceCache').mockResolvedValue()
+    vi.spyOn(entryPoints, 'setInvoicingPageEntryPoint').mockResolvedValue()
     vi.spyOn(authRequests, 'authenticatedPatchRequest')
     vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
       results: []
@@ -50,7 +55,10 @@ describe('#invoiceAddressPostcodeSearch', () => {
 
   describe('#invoiceAddressPostcodeSearchController', () => {
     test('Should render the page with the project name caption and the correct links', async () => {
-      await invoiceAddressPostcodeSearchController.handler({ query: {} }, h)
+      await invoiceAddressPostcodeSearchController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE,
@@ -67,6 +75,33 @@ describe('#invoiceAddressPostcodeSearch', () => {
       )
     })
 
+    test('Should keep the change flow in the manual entry link', async () => {
+      await invoiceAddressPostcodeSearchController.handler(
+        createMockRequest({ query: { action: 'change' } }),
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE,
+        expect.objectContaining({
+          manualEntryLink: `${marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS}?action=change`
+        })
+      )
+    })
+
+    test('Should record itself as the page behind the UK address page, for the manual entry link', async () => {
+      const request = createMockRequest({ query: {} })
+
+      await invoiceAddressPostcodeSearchController.handler(request, h)
+
+      expect(entryPoints.setInvoicingPageEntryPoint).toHaveBeenCalledWith(
+        request,
+        h,
+        entryPoints.INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
+        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+      )
+    })
+
     // Prefill from the cache, the change-flow links and the non-UK redirect are asserted
     // through the rendered page in
     // tests/integration/marine-licence/invoicing/invoice-address-postcode-search.test.js
@@ -79,7 +114,7 @@ describe('#invoiceAddressPostcodeSearch', () => {
       logger = { error: vi.fn(), info: vi.fn() }
 
       return invoiceAddressPostcodeSearchSubmitController.handler(
-        { payload, query, logger },
+        createMockRequest({ payload, query, logger }),
         h
       )
     }
@@ -283,6 +318,21 @@ describe('#invoiceAddressPostcodeSearch', () => {
       }
     )
 
+    test('Should record itself as the page behind the confirm address page for a single result', async () => {
+      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+        results: [anAddress]
+      })
+
+      await submit({ postcode: 'NE4 7AR' })
+
+      expect(entryPoints.setInvoicingPageEntryPoint).toHaveBeenCalledWith(
+        expect.anything(),
+        h,
+        entryPoints.INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
+        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+      )
+    })
+
     test('Should redirect to the choose your address page when there are many results', async () => {
       vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
         results: [anAddress, anotherAddress]
@@ -367,7 +417,11 @@ describe('#invoiceAddressPostcodeSearch', () => {
         details: [{ path: ['postcode'], message: 'POSTCODE_REQUIRED' }]
       }
 
-      failAction({ query: {}, payload: { postcode: '' } }, h, err)
+      failAction(
+        createMockRequest({ query: {}, payload: { postcode: '' } }),
+        h,
+        err
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE,

@@ -7,8 +7,12 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import * as entryPoints from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js')
@@ -38,6 +42,7 @@ describe('#confirmAddress', () => {
       cacheWith({ selectedInvoiceAddress })
     )
     vi.spyOn(cacheUtils, 'setMarineLicenceCache').mockResolvedValue()
+    vi.spyOn(entryPoints, 'setInvoicingPageEntryPoint').mockResolvedValue()
   })
 
   afterEach(() => {
@@ -46,7 +51,10 @@ describe('#confirmAddress', () => {
 
   describe('#confirmAddressController', () => {
     test('Should render the selected address with the project name caption and the correct links', async () => {
-      await confirmAddressController.handler({ query: {} }, h)
+      await confirmAddressController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         CONFIRM_ADDRESS_VIEW_ROUTE,
@@ -67,7 +75,10 @@ describe('#confirmAddress', () => {
     })
 
     test('Should go back to check answers and drop the cancel link in the change flow', async () => {
-      await confirmAddressController.handler({ query: { action: 'change' } }, h)
+      await confirmAddressController.handler(
+        createMockRequest({ query: { action: 'change' } }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         CONFIRM_ADDRESS_VIEW_ROUTE,
@@ -88,7 +99,10 @@ describe('#confirmAddress', () => {
         })
       )
 
-      await confirmAddressController.handler({ query: {} }, h)
+      await confirmAddressController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
 
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
@@ -106,7 +120,10 @@ describe('#confirmAddress', () => {
           cacheWith({ selectedInvoiceAddress: selected })
         )
 
-        await confirmAddressController.handler({ query: {} }, h)
+        await confirmAddressController.handler(
+          createMockRequest({ query: {} }),
+          h
+        )
 
         expect(h.redirect).toHaveBeenCalledWith(
           marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
@@ -120,7 +137,10 @@ describe('#confirmAddress', () => {
         cacheWith({ selectedInvoiceAddress: undefined })
       )
 
-      await confirmAddressController.handler({ query: { action: 'change' } }, h)
+      await confirmAddressController.handler(
+        createMockRequest({ query: { action: 'change' } }),
+        h
+      )
 
       expect(h.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}?action=change`
@@ -128,9 +148,46 @@ describe('#confirmAddress', () => {
     })
   })
 
+  describe('#confirmAddressBackLink', () => {
+    test('Should go back to the page the user came from', async () => {
+      const request = createMockRequest({ query: {} })
+      vi.spyOn(entryPoints, 'getInvoicingPageEntryPoint').mockReturnValue(
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+      )
+
+      await confirmAddressController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        CONFIRM_ADDRESS_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+        })
+      )
+    })
+
+    test('Should keep the change flow when going back to the address picker', async () => {
+      const request = createMockRequest({ query: { action: 'change' } })
+      vi.spyOn(entryPoints, 'getInvoicingPageEntryPoint').mockReturnValue(
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+      )
+
+      await confirmAddressController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        CONFIRM_ADDRESS_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS}?action=change`
+        })
+      )
+    })
+  })
+
   describe('#confirmAddressSubmitController', () => {
     const submit = (query = {}) =>
-      confirmAddressSubmitController.handler({ query, payload: {} }, h)
+      confirmAddressSubmitController.handler(
+        createMockRequest({ query, payload: {} }),
+        h
+      )
 
     test('Should save the address in the manual entry structure and continue to contact details', async () => {
       await submit()
@@ -229,6 +286,23 @@ describe('#confirmAddress', () => {
             })
           })
         })
+      )
+    })
+
+    test('Should send the user back to the search, not here, from the corrected address page', async () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+        cacheWith({
+          selectedInvoiceAddress: { town: 'NEWCASTLE', postcode: 'NE1 1EE' }
+        })
+      )
+
+      await submit()
+
+      expect(entryPoints.setInvoicingPageEntryPoint).toHaveBeenCalledWith(
+        expect.anything(),
+        h,
+        entryPoints.INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
+        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
       )
     })
 

@@ -14,13 +14,15 @@ import {
   getInvoiceAddressBackLink,
   getInvoiceCancelLink,
   getInvoiceAddressButtonText,
-  withAction
-} from '#src/server/marine-licence/invoicing/utils.js'
-import {
+  withAction,
   hasPickableResults,
   hasSingleResult
-} from '#src/server/marine-licence/invoicing/choose-your-address/utils.js'
+} from '#src/server/marine-licence/invoicing/utils.js'
 import { lookupAddresses } from '#src/server/common/helpers/marine-licence/invoicing/address-lookup.js'
+import {
+  INVOICING_ENTRY_POINT_PAGES,
+  setInvoicingPageEntryPoint
+} from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 import {
   buildNoAddressesFoundError,
   buildLookupUnavailableError,
@@ -35,7 +37,10 @@ const getPageParams = (action, invoicing) => ({
   backLink: getInvoiceAddressBackLink(action),
   cancelLink: getInvoiceCancelLink(action, invoicing),
   buttonText: getInvoiceAddressButtonText(action, invoicing),
-  manualEntryLink: marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
+  manualEntryLink: withAction(
+    marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,
+    action
+  )
 })
 
 const getLookupErrorViewParams = ({ results, error, truncated }) => {
@@ -68,6 +73,14 @@ export const invoiceAddressPostcodeSearchController = {
     }
 
     const action = request.query.action
+
+    // "Enter the address manually" leads to the UK address page from here.
+    await setInvoicingPageEntryPoint(
+      request,
+      h,
+      INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+    )
 
     return h.view(INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE, {
       ...getPageParams(action, invoicing),
@@ -145,6 +158,13 @@ export const invoiceAddressPostcodeSearchSubmitController = {
     }
 
     if (onlyResult) {
+      await setInvoicingPageEntryPoint(
+        request,
+        h,
+        INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
+        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+      )
+
       return h.redirect(
         withAction(marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS, action)
       )

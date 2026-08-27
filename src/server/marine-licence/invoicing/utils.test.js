@@ -6,15 +6,54 @@ import {
   isInChangeFlow,
   getInvoiceAddressBackLink,
   getUkInvoiceAddressBackLink,
+  getConfirmAddressBackLink,
   getInvoiceCancelLink,
   getInvoiceAddressButtonText,
   redirectAfterInvoiceAddressSubmit,
-  withAction
+  withAction,
+  hasPickableResults,
+  hasSingleResult
 } from '#src/server/marine-licence/invoicing/utils.js'
 import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
-import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
+import { INVOICING_ENTRY_POINTS_KEY } from '#src/server/common/constants/cache.js'
+import { INVOICING_ENTRY_POINT_PAGES } from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js')
+
+const searchResults = [
+  { addressLine: '1 HIGH STREET, LONDON, SW1 2AA' },
+  { addressLine: '2 HIGH STREET, LONDON, SW1 2AA' }
+]
+
+describe('#hasPickableResults', () => {
+  test.each([
+    ['there are no results', []],
+    ['there is a single result', [searchResults[0]]]
+  ])('Should be false when %s', (_name, results) => {
+    expect(hasPickableResults(results)).toBe(false)
+  })
+
+  test('Should be true when there is more than one result', () => {
+    expect(hasPickableResults(searchResults)).toBe(true)
+  })
+})
+
+describe('#hasSingleResult', () => {
+  test.each([
+    ['there are no results', []],
+    ['there is more than one result', searchResults]
+  ])('Should be false when %s', (_name, results) => {
+    expect(hasSingleResult(results)).toBe(false)
+  })
+
+  test('Should be true when there is exactly one result', () => {
+    expect(hasSingleResult([searchResults[0]])).toBe(true)
+  })
+})
 
 describe('isInAddressTypeChangeFlow', () => {
   test('returns true when an original address type is present', () => {
@@ -69,15 +108,69 @@ describe('getInvoiceAddressBackLink', () => {
   })
 })
 
-describe('getUkInvoiceAddressBackLink', () => {
-  test('returns review page when action link is active', () => {
-    expect(getUkInvoiceAddressBackLink('change')).toBe(
+const requestWithEntryPoint = (pageKey, entryPoint) => {
+  const request = createMockRequest()
+
+  request.yar.get.mockImplementation((key) =>
+    key === INVOICING_ENTRY_POINTS_KEY ? { [pageKey]: entryPoint } : undefined
+  )
+
+  return request
+}
+
+describe.each([
+  [
+    'getUkInvoiceAddressBackLink',
+    getUkInvoiceAddressBackLink,
+    INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS
+  ],
+  [
+    'getConfirmAddressBackLink',
+    getConfirmAddressBackLink,
+    INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS
+  ]
+])('%s', (_name, getBackLink, pageKey) => {
+  test('returns the page the user came from', () => {
+    const request = requestWithEntryPoint(
+      pageKey,
+      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+    )
+
+    expect(getBackLink(request)).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+    )
+  })
+
+  test('keeps the change flow when going back to a page mid-journey', () => {
+    const request = requestWithEntryPoint(
+      pageKey,
+      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+    )
+
+    expect(getBackLink(request, 'change')).toBe(
+      `${marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS}?action=change`
+    )
+  })
+
+  test('links to check answers bare, as going back there ends the change flow', () => {
+    const request = requestWithEntryPoint(
+      pageKey,
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+    )
+
+    expect(getBackLink(request, 'change')).toBe(
       marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
     )
   })
 
-  test('returns the postcode search page in all other scenarios', () => {
-    expect(getUkInvoiceAddressBackLink()).toBe(
+  test('falls back to review in the change flow when no entry point was recorded', () => {
+    expect(getBackLink(createMockRequest(), 'change')).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+    )
+  })
+
+  test('falls back to the postcode search when no entry point was recorded', () => {
+    expect(getBackLink(createMockRequest())).toBe(
       marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
     )
   })

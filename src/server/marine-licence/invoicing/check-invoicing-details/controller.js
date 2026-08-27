@@ -9,6 +9,10 @@ import {
 import { invoicingReviewData } from '#src/server/common/helpers/marine-licence/invoicing/invoicing-review-data.js'
 import { getBackLink } from '#src/server/marine-licence/invoicing/check-invoicing-details/utils.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
+import {
+  INVOICING_ENTRY_POINT_PAGES,
+  setInvoicingPageEntryPoint
+} from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 import { isIndividualUser } from '#src/server/common/helpers/user-session-utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { INVOICE_TYPE_OPTIONS } from '#src/server/common/validation/invoicing/constants.js'
@@ -46,6 +50,14 @@ export const checkInvoicingDetailsController = {
       invoicing.invoiceAddressType === INVOICE_TYPE_OPTIONS.UK
         ? marineLicenceInvoicingRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS
         : marineLicenceInvoicingRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
+
+    // The "Change" link leads to the address page from here.
+    await setInvoicingPageEntryPoint(
+      request,
+      h,
+      INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
+      marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+    )
 
     return h.view(CHECK_INVOICING_DETAILS_VIEW_ROUTE, {
       ...checkInvoicingDetailsPageData,

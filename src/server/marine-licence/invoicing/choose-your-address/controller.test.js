@@ -7,8 +7,12 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import * as entryPoints from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js')
@@ -38,6 +42,7 @@ describe('#chooseYourAddress', () => {
   beforeEach(() => {
     vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(withResults())
     vi.spyOn(cacheUtils, 'setMarineLicenceCache').mockResolvedValue()
+    vi.spyOn(entryPoints, 'setInvoicingPageEntryPoint').mockResolvedValue()
   })
 
   afterEach(() => {
@@ -46,7 +51,10 @@ describe('#chooseYourAddress', () => {
 
   describe('#chooseYourAddressController', () => {
     test('Should render the page with the project name caption and the correct links', async () => {
-      await chooseYourAddressController.handler({ query: {} }, h)
+      await chooseYourAddressController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         CHOOSE_YOUR_ADDRESS_VIEW_ROUTE,
@@ -69,7 +77,10 @@ describe('#chooseYourAddress', () => {
         })
       )
 
-      await chooseYourAddressController.handler({ query: {} }, h)
+      await chooseYourAddressController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         CHOOSE_YOUR_ADDRESS_VIEW_ROUTE,
@@ -85,7 +96,10 @@ describe('#chooseYourAddress', () => {
         })
       )
 
-      await chooseYourAddressController.handler({ query: {} }, h)
+      await chooseYourAddressController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         CHOOSE_YOUR_ADDRESS_VIEW_ROUTE,
@@ -116,7 +130,10 @@ describe('#chooseYourAddress', () => {
         })
       )
 
-      await chooseYourAddressController.handler({ query: {} }, h)
+      await chooseYourAddressController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
 
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
@@ -134,7 +151,10 @@ describe('#chooseYourAddress', () => {
           cacheWith({ invoiceAddressSearchResults })
         )
 
-        await chooseYourAddressController.handler({ query: {} }, h)
+        await chooseYourAddressController.handler(
+          createMockRequest({ query: {} }),
+          h
+        )
 
         expect(h.redirect).toHaveBeenCalledWith(
           marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
@@ -144,10 +164,41 @@ describe('#chooseYourAddress', () => {
     )
   })
 
+  describe('#chooseYourAddressEntryPoints', () => {
+    test('Should record itself as the page behind the UK address page, for "None of these"', async () => {
+      const request = createMockRequest({ query: {} })
+
+      await chooseYourAddressController.handler(request, h)
+
+      expect(entryPoints.setInvoicingPageEntryPoint).toHaveBeenCalledWith(
+        request,
+        h,
+        entryPoints.INVOICING_ENTRY_POINT_PAGES.UK_INVOICE_ADDRESS,
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+      )
+    })
+
+    test('Should record itself as the page behind the confirm address page', async () => {
+      const request = createMockRequest({
+        payload: { selectedAddress: '1' },
+        query: {}
+      })
+
+      await chooseYourAddressSubmitController.handler(request, h)
+
+      expect(entryPoints.setInvoicingPageEntryPoint).toHaveBeenCalledWith(
+        request,
+        h,
+        entryPoints.INVOICING_ENTRY_POINT_PAGES.CONFIRM_ADDRESS,
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+      )
+    })
+  })
+
   describe('#chooseYourAddressSubmitController', () => {
     const submit = (selectedAddress, query = {}) =>
       chooseYourAddressSubmitController.handler(
-        { payload: { selectedAddress }, query },
+        createMockRequest({ payload: { selectedAddress }, query }),
         h
       )
 
@@ -223,7 +274,9 @@ describe('#chooseYourAddress', () => {
         cacheWith({ invoiceAddressSearchResults: undefined })
       )
 
-      failAction({ query: {}, payload: {} }, h, { details: [] })
+      failAction(createMockRequest({ query: {}, payload: {} }), h, {
+        details: []
+      })
 
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
@@ -238,7 +291,7 @@ describe('#chooseYourAddress', () => {
         ]
       }
 
-      failAction({ query: {}, payload: {} }, h, err)
+      failAction(createMockRequest({ query: {}, payload: {} }), h, err)
 
       expect(h.view).toHaveBeenCalledWith(
         CHOOSE_YOUR_ADDRESS_VIEW_ROUTE,

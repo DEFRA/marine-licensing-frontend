@@ -7,8 +7,12 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import * as entryPoints from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
@@ -45,7 +49,10 @@ describe('#ukInvoiceAddress', () => {
     })
 
     test('Should link back to the postcode lookup', async () => {
-      await ukInvoiceAddressController.handler({ query: {} }, h)
+      await ukInvoiceAddressController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         UK_INVOICE_ADDRESS_VIEW_ROUTE,
@@ -79,7 +86,10 @@ describe('#ukInvoiceAddress', () => {
         }
       })
 
-      await ukInvoiceAddressController.handler({ query: {} }, h)
+      await ukInvoiceAddressController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         UK_INVOICE_ADDRESS_VIEW_ROUTE,
@@ -98,12 +108,90 @@ describe('#ukInvoiceAddress', () => {
         }
       })
 
-      await ukInvoiceAddressController.handler({ query: {} }, h)
+      await ukInvoiceAddressController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
 
       expect(h.view).toHaveBeenCalledWith(
         UK_INVOICE_ADDRESS_VIEW_ROUTE,
         expect.objectContaining({
           payload: mockMarineLicenceApplication.invoicing.invoiceAddress
+        })
+      )
+    })
+  })
+
+  describe('#ukInvoiceAddressBackLink', () => {
+    const h = createMockH()
+
+    beforeEach(() => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(
+        mockMarineLicenceApplication
+      )
+    })
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    test.each([
+      [
+        'the address picker, reached through "None of these"',
+        'MARINE_LICENCE_CHOOSE_YOUR_ADDRESS'
+      ],
+      [
+        'the postcode search, reached through "Enter the address manually"',
+        'MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH'
+      ]
+    ])('Should go back to %s', async (_name, route) => {
+      vi.spyOn(entryPoints, 'getInvoicingPageEntryPoint').mockReturnValue(
+        marineLicenceRoutes[route]
+      )
+
+      await ukInvoiceAddressController.handler(
+        createMockRequest({ query: {} }),
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        UK_INVOICE_ADDRESS_VIEW_ROUTE,
+        expect.objectContaining({ backLink: marineLicenceRoutes[route] })
+      )
+    })
+
+    test('Should keep the change flow when going back mid-journey', async () => {
+      vi.spyOn(entryPoints, 'getInvoicingPageEntryPoint').mockReturnValue(
+        marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
+      )
+
+      await ukInvoiceAddressController.handler(
+        createMockRequest({ query: { action: 'change' } }),
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        UK_INVOICE_ADDRESS_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS}?action=change`
+        })
+      )
+    })
+
+    test('Should go back to check answers when the change link led here', async () => {
+      vi.spyOn(entryPoints, 'getInvoicingPageEntryPoint').mockReturnValue(
+        marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
+      )
+
+      await ukInvoiceAddressController.handler(
+        createMockRequest({ query: { action: 'change' } }),
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        UK_INVOICE_ADDRESS_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS
         })
       )
     })

@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { INVOICE_TYPE_OPTIONS } from '#src/server/common/validation/invoicing/constants.js'
 import {
   isInAddressTypeChangeFlow,
   isInAddressChangeFlow,
@@ -11,6 +12,7 @@ import {
   getInvoiceAddressButtonText,
   redirectAfterInvoiceAddressSubmit,
   withAction,
+  getMissingPrerequisiteRedirect,
   hasPickableResults,
   hasSingleResult
 } from '#src/server/marine-licence/invoicing/utils.js'
@@ -243,5 +245,54 @@ describe('withAction', () => {
     ['the action is empty', '']
   ])('leaves the route alone when %s', (_name, action) => {
     expect(withAction(route, action)).toBe(route)
+  })
+})
+
+describe('getMissingPrerequisiteRedirect', () => {
+  test.each([
+    ['the address type is international', INVOICE_TYPE_OPTIONS.INTERNATIONAL],
+    ['the address type has not been answered', undefined]
+  ])('sends the user back to the UK question when %s', (_name, type) => {
+    expect(
+      getMissingPrerequisiteRedirect(
+        { invoiceAddressType: type },
+        undefined,
+        true
+      )
+    ).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+    )
+  })
+
+  test('sends the user back to the postcode search when the page has nothing to show', () => {
+    expect(
+      getMissingPrerequisiteRedirect(
+        { invoiceAddressType: INVOICE_TYPE_OPTIONS.UK },
+        undefined,
+        false
+      )
+    ).toBe(marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH)
+  })
+
+  test('keeps the user in the change flow when redirecting', () => {
+    expect(
+      getMissingPrerequisiteRedirect(
+        { invoiceAddressType: INVOICE_TYPE_OPTIONS.UK },
+        'change',
+        false
+      )
+    ).toBe(
+      `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}?action=change`
+    )
+  })
+
+  test('allows the page to render when the journey is complete', () => {
+    expect(
+      getMissingPrerequisiteRedirect(
+        { invoiceAddressType: INVOICE_TYPE_OPTIONS.UK },
+        undefined,
+        true
+      )
+    ).toBeNull()
   })
 })

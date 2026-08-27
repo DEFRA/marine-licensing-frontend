@@ -2,14 +2,12 @@ import {
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import {
-  INVOICE_TYPE_OPTIONS,
-  confirmAddressSettings
-} from '#src/server/common/validation/invoicing/constants.js'
+import { confirmAddressSettings } from '#src/server/common/validation/invoicing/constants.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getConfirmAddressBackLink,
   getInvoiceCancelLink,
+  getMissingPrerequisiteRedirect,
   isInChangeFlow,
   redirectAfterInvoiceAddressSubmit,
   withAction
@@ -35,38 +33,19 @@ const getButtonText = (action, invoicing) =>
     ? 'Save and continue'
     : CONFIRM_ADDRESS_BUTTON_TEXT
 
-// The page only means anything with a looked-up address behind it, so a deep link
-// without one goes back to the search rather than confirming an empty address.
-const getIncompleteJourneyRedirect = (invoicing, action) => {
-  if (invoicing.invoiceAddressType !== INVOICE_TYPE_OPTIONS.UK) {
-    return withAction(
-      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
-      action
-    )
-  }
-
-  if (!hasRenderableAddress(invoicing.selectedInvoiceAddress)) {
-    return withAction(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
-      action
-    )
-  }
-
-  return null
-}
-
 export const confirmAddressController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const { invoicing } = marineLicence
     const action = request.query.action
 
-    const incompleteJourneyRedirect = getIncompleteJourneyRedirect(
+    const missingPrerequisiteRedirect = getMissingPrerequisiteRedirect(
       invoicing,
-      action
+      action,
+      hasRenderableAddress(invoicing.selectedInvoiceAddress)
     )
-    if (incompleteJourneyRedirect) {
-      return h.redirect(incompleteJourneyRedirect)
+    if (missingPrerequisiteRedirect) {
+      return h.redirect(missingPrerequisiteRedirect)
     }
 
     return h.view(CONFIRM_ADDRESS_VIEW_ROUTE, {
@@ -90,12 +69,13 @@ export const confirmAddressSubmitController = {
     const { invoicing } = marineLicence
     const action = request.query.action
 
-    const incompleteJourneyRedirect = getIncompleteJourneyRedirect(
+    const missingPrerequisiteRedirect = getMissingPrerequisiteRedirect(
       invoicing,
-      action
+      action,
+      hasRenderableAddress(invoicing.selectedInvoiceAddress)
     )
-    if (incompleteJourneyRedirect) {
-      return h.redirect(incompleteJourneyRedirect)
+    if (missingPrerequisiteRedirect) {
+      return h.redirect(missingPrerequisiteRedirect)
     }
 
     const invoiceAddress = toInvoiceAddress(invoicing.selectedInvoiceAddress)

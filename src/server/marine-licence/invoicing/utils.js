@@ -1,4 +1,5 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { INVOICE_TYPE_OPTIONS } from '#src/server/common/validation/invoicing/constants.js'
 import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
 import {
   INVOICING_ENTRY_POINT_PAGES,
@@ -81,6 +82,31 @@ export const getConfirmAddressBackLink = (request, action) =>
     action,
     marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
   )
+
+// The invoice address pages only mean anything for a UK address that has been looked
+// up, so a deep link or stale session lands back at the earliest step still missing:
+// the UK/international question, or the postcode search.
+export const getMissingPrerequisiteRedirect = (
+  invoicing,
+  action,
+  hasPageData
+) => {
+  if (invoicing.invoiceAddressType !== INVOICE_TYPE_OPTIONS.UK) {
+    return withAction(
+      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
+      action
+    )
+  }
+
+  if (!hasPageData) {
+    return withAction(
+      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
+      action
+    )
+  }
+
+  return null
+}
 
 export const getInvoiceCancelLink = (action, invoicing) =>
   isInChangeFlow(action, invoicing)

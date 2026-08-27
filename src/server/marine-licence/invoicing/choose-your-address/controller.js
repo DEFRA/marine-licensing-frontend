@@ -5,7 +5,6 @@ import {
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { chooseYourAddressSchema } from '#src/server/common/validation/invoicing/choose-your-address/schema.js'
 import {
-  INVOICE_TYPE_OPTIONS,
   chooseYourAddressErrorMessages,
   chooseYourAddressSettings
 } from '#src/server/common/validation/invoicing/constants.js'
@@ -14,6 +13,7 @@ import {
   getInvoiceAddressBackLink,
   getInvoiceCancelLink,
   getInvoiceAddressButtonText,
+  getMissingPrerequisiteRedirect,
   withAction,
   hasPickableResults
 } from '#src/server/marine-licence/invoicing/utils.js'
@@ -43,38 +43,19 @@ const getPageParams = (action, invoicing) => ({
   items: buildAddressItems(getSearchResults(invoicing))
 })
 
-// The page only means anything with a multi-result search behind it, so a deep
-// link without one goes back to the search rather than rendering an empty list.
-const getIncompleteJourneyRedirect = (invoicing, action) => {
-  if (invoicing.invoiceAddressType !== INVOICE_TYPE_OPTIONS.UK) {
-    return withAction(
-      marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
-      action
-    )
-  }
-
-  if (!hasPickableResults(getSearchResults(invoicing))) {
-    return withAction(
-      marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
-      action
-    )
-  }
-
-  return null
-}
-
 export const chooseYourAddressController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
     const { invoicing } = marineLicence
     const action = request.query.action
 
-    const incompleteJourneyRedirect = getIncompleteJourneyRedirect(
+    const missingPrerequisiteRedirect = getMissingPrerequisiteRedirect(
       invoicing,
-      action
+      action,
+      hasPickableResults(getSearchResults(invoicing))
     )
-    if (incompleteJourneyRedirect) {
-      return h.redirect(incompleteJourneyRedirect)
+    if (missingPrerequisiteRedirect) {
+      return h.redirect(missingPrerequisiteRedirect)
     }
 
     const selectedAddress = getSelectedAddressValue(
@@ -108,12 +89,13 @@ export const chooseYourAddressSubmitController = {
 
         // The results can go while the form is on screen; re-rendering then would
         // show a picker with nothing in it, so the guard applies here too.
-        const incompleteJourneyRedirect = getIncompleteJourneyRedirect(
+        const missingPrerequisiteRedirect = getMissingPrerequisiteRedirect(
           invoicing,
-          action
+          action,
+          hasPickableResults(getSearchResults(invoicing))
         )
-        if (incompleteJourneyRedirect) {
-          return h.redirect(incompleteJourneyRedirect).takeover()
+        if (missingPrerequisiteRedirect) {
+          return h.redirect(missingPrerequisiteRedirect).takeover()
         }
 
         const { backLink, ...params } = getPageParams(action, invoicing)
@@ -136,12 +118,13 @@ export const chooseYourAddressSubmitController = {
     const action = request.query.action
     const { selectedAddress } = request.payload
 
-    const incompleteJourneyRedirect = getIncompleteJourneyRedirect(
+    const missingPrerequisiteRedirect = getMissingPrerequisiteRedirect(
       invoicing,
-      action
+      action,
+      hasPickableResults(getSearchResults(invoicing))
     )
-    if (incompleteJourneyRedirect) {
-      return h.redirect(incompleteJourneyRedirect)
+    if (missingPrerequisiteRedirect) {
+      return h.redirect(missingPrerequisiteRedirect)
     }
 
     if (selectedAddress === NONE_OF_THESE) {

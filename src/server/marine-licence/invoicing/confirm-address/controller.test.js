@@ -14,7 +14,7 @@ import {
   createMockRequest
 } from '#src/server/test-helpers/mocks/helpers.js'
 
-vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
+vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js')
 
 const selectedInvoiceAddress = {

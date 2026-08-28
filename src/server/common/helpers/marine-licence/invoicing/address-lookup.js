@@ -13,23 +13,64 @@ export const normalisePostcode = (postcode = '') =>
 // matching against it makes a search for "7" or a street name match every result.
 const MATCHABLE_FIELDS = ['subBuildingName', 'buildingName', 'buildingNumber']
 
-const matchesPropertyNameOrNumber = (result, searchTerm) =>
+const tokenise = (value) =>
+  String(value ?? '')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+
+const containsDigit = (token) => /\d/.test(token)
+
+// A number has to match whole, or a search for "1" also finds 10, 11 and 21. A
+// name may be partially typed, so its final token is allowed to match a prefix.
+const lastTokenMatches = (fieldToken, termToken) =>
+  containsDigit(termToken)
+    ? fieldToken === termToken
+    : fieldToken.startsWith(termToken)
+
+const tokensMatchAt = (fieldTokens, termTokens, offset) => {
+  const lastIndex = termTokens.length - 1
+
+  for (let index = 0; index < lastIndex; index++) {
+    if (fieldTokens[offset + index] !== termTokens[index]) {
+      return false
+    }
+  }
+
+  return lastTokenMatches(
+    fieldTokens[offset + lastIndex],
+    termTokens[lastIndex]
+  )
+}
+
+const fieldMatchesTokens = (value, termTokens) => {
+  const fieldTokens = tokenise(value)
+  const lastOffset = fieldTokens.length - termTokens.length
+
+  for (let offset = 0; offset <= lastOffset; offset++) {
+    if (tokensMatchAt(fieldTokens, termTokens, offset)) {
+      return true
+    }
+  }
+
+  return false
+}
+
+const matchesPropertyNameOrNumber = (result, termTokens) =>
   MATCHABLE_FIELDS.some((field) =>
-    String(result?.[field] ?? '')
-      .toLowerCase()
-      .includes(searchTerm)
+    fieldMatchesTokens(result?.[field], termTokens)
   )
 
 export const filterByPropertyNameOrNumber = (results, propertyNameOrNumber) => {
   const addresses = results ?? []
-  const searchTerm = (propertyNameOrNumber ?? '').trim().toLowerCase()
+  const termTokens = tokenise(propertyNameOrNumber)
 
-  if (!searchTerm) {
+  if (termTokens.length === 0) {
     return addresses
   }
 
   return addresses.filter((result) =>
-    matchesPropertyNameOrNumber(result, searchTerm)
+    matchesPropertyNameOrNumber(result, termTokens)
   )
 }
 

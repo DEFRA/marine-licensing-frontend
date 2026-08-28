@@ -116,6 +116,56 @@ describe('#addressLookup', () => {
         expect(filterByPropertyNameOrNumber(results, searchTerm)).toEqual([])
       }
     )
+
+    describe('building numbers', () => {
+      const numberedStreet = ['1', '10', '11', '21'].map((buildingNumber) => ({
+        addressLine: `${buildingNumber}, TREVELYAN CLOSE, SHIREMOOR, NE27 0FJ`,
+        buildingNumber,
+        street: 'TREVELYAN CLOSE',
+        postcode: 'NE27 0FJ'
+      }))
+
+      test('should match a number in full rather than as a substring', () => {
+        expect(filterByPropertyNameOrNumber(numberedStreet, '1')).toEqual([
+          numberedStreet[0]
+        ])
+      })
+
+      test('should not match a longer number containing the search term', () => {
+        expect(
+          filterByPropertyNameOrNumber([...numberedStreet, quaysideHouse], '11')
+        ).toEqual([numberedStreet[2]])
+      })
+
+      test('should match a number with a letter suffix', () => {
+        const oneA = { buildingNumber: '1A' }
+
+        expect(
+          filterByPropertyNameOrNumber([...numberedStreet, oneA], '1a')
+        ).toEqual([oneA])
+      })
+    })
+
+    describe('sub building names', () => {
+      const flatOne = { subBuildingName: 'FLAT 1', buildingName: 'THE QUAY' }
+      const flatTen = { subBuildingName: 'FLAT 10', buildingName: 'THE QUAY' }
+
+      test('should match the flat number in full', () => {
+        expect(
+          filterByPropertyNameOrNumber([flatOne, flatTen], 'flat 1')
+        ).toEqual([flatOne])
+      })
+    })
+
+    test('should match a partially typed name', () => {
+      expect(filterByPropertyNameOrNumber(results, 'tynes')).toEqual([
+        tynesideHouse
+      ])
+    })
+
+    test('should match a name from a token other than the first', () => {
+      expect(filterByPropertyNameOrNumber(results, 'house')).toEqual(results)
+    })
   })
 
   describe('#lookupAddresses', () => {

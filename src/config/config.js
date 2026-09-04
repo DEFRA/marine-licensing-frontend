@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { configDotenv } from 'dotenv'
 import { requiredFromEnvInCdp } from './required-from-env-in-cdp.js'
 import { addressLookupSchema } from './address-lookup.js'
+import { publicRegisterSchema } from './public-register.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -294,6 +295,7 @@ export const config = convict({
     }
   },
   addressLookup: addressLookupSchema,
+  publicRegister: publicRegisterSchema,
   marineLicence: {
     enabled: {
       doc: 'Enable the Marine Licence journey',

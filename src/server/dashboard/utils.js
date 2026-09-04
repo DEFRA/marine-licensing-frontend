@@ -1,8 +1,10 @@
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
 import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import {
   routes,
-  marineLicenceRoutes
+  marineLicenceRoutes,
+  apiRoutes
 } from '#src/server/common/constants/routes.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 import {
@@ -28,7 +30,7 @@ const getDraftActions = (id, escapedProjectName, projectType) => {
       ? marineLicenceRoutes.MARINE_LICENCE_DELETE
       : routes.DELETE_EXEMPTION
 
-  return `<a href="${taskListRoute}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${deleteRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
+  return `<a href="${taskListRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${deleteRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
 }
 
 const getViewDetailsRoute = (projectType, status) => {
@@ -52,9 +54,7 @@ const getViewDetailsRoute = (projectType, status) => {
 }
 
 const getActiveActions = (id, escapedProjectName, viewRoute, withdrawRoute) => {
-  const marginClass = withdrawRoute ? ' govuk-!-margin-right-4' : ''
-
-  let buttons = `<a href="${viewRoute}/${id}" class="govuk-link${marginClass} govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
+  let buttons = `<a href="${viewRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 
   if (withdrawRoute) {
     buttons += `<a href="${withdrawRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw ${escapedProjectName}">Withdraw</a>`
@@ -83,8 +83,74 @@ const getMarineLicenceActions = ({
   )
 }
 
-export const fetchProjects = async (request, payload = {}) =>
-  authenticatedPostRequest(request, '/projects', payload)
+const findMissingContactIds = (projects, users) => [
+  ...new Set(
+    projects
+      .map((project) => project.contactId)
+      .filter((contactId) => contactId && !(contactId in users))
+  )
+]
+
+const resolveMissingUsers = async (request, missingContactIds) => {
+  try {
+    const { payload } = await authenticatedPostRequest(
+      request,
+      apiRoutes.GET_USER_NAMES,
+      { contactIds: missingContactIds }
+    )
+    return payload?.value ?? {}
+  } catch (error) {
+    request.logger.error(
+      { err: error },
+      'Failed to resolve missing dashboard user names'
+    )
+    return {}
+  }
+}
+
+export const fetchProjects = async (request, payload = {}) => {
+  const userSession = await getUserSession(request, request.state?.userSession)
+  const organisationId = userSession?.organisationId
+  const cache = request.server?.app.dashboardUsersCache
+
+  const cachedUsers = organisationId ? await cache.get(organisationId) : null
+  const requestPayload = cachedUsers ? { ...payload, skipUsers: true } : payload
+
+  const result = await authenticatedPostRequest(
+    request,
+    '/projects',
+    requestPayload
+  )
+
+  const setCachedUsers = (usersToCache) =>
+    organisationId ? cache.set(organisationId, usersToCache) : null
+
+  let users = cachedUsers ?? result.payload?.value?.users ?? {}
+
+  if (!cachedUsers) {
+    await setCachedUsers(users)
+    return result
+  }
+
+  const projects = result.payload?.value?.projects ?? []
+  const missingContactIds = findMissingContactIds(projects, users)
+
+  if (missingContactIds.length) {
+    const resolvedUsers = await resolveMissingUsers(request, missingContactIds)
+
+    if (Object.keys(resolvedUsers).length) {
+      users = { ...users, ...resolvedUsers }
+      await setCachedUsers(users)
+    }
+  }
+
+  result.payload.value = {
+    ...result.payload?.value,
+    users
+  }
+
+  return result
+}
 
 export const sortProjectsByStatus = (projects) => {
   return [...projects].sort((a, b) => {
@@ -151,7 +217,8 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
         html: `<strong class="govuk-tag ${getTagStyle(status)}">${getStatusLabelText(project.status)}</strong>`,
         attributes: {
           'data-sort-value': project.status
-        }
+        },
+        classes: 'govuk-table__cell--nowrap'
       },
       {
         text: project.submittedAt
@@ -271,3 +338,42 @@ export const getTypeOptions = (type) => {
     }
   ]
 }
+
+export const getUserOptions = (userSession, users, searchParams = {}) => {
+  if (!userSession) {
+    return []
+  }
+
+  const { show, user: userSearchParam = [] } = searchParams
+
+  const { contactId, displayName } = userSession
+
+  const ownOption = [
+    {
+      value: contactId,
+      text: `Mine (${displayName})`,
+      checked: show === 'specific-user' && userSearchParam.includes(contactId)
+    }
+  ]
+
+  const hasUsers = users && Object.keys(users).length > 0
+
+  const userOptions = hasUsers
+    ? Object.entries(users)
+        .filter(([userContactId]) => userContactId !== contactId)
+        .map(([userContactId, userDisplayName]) => ({
+          value: userContactId,
+          text: userDisplayName,
+          checked:
+            show === 'specific-user' && userSearchParam.includes(userContactId)
+        }))
+    : []
+
+  return [...ownOption, ...userOptions]
+}
+
+export const addUsersToProjects = (projects, users) =>
+  projects.map((project) => ({
+    ...project,
+    ownerName: users[project.contactId] || '-'
+  }))

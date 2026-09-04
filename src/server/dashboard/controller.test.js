@@ -63,7 +63,9 @@ describe('#dashboard', () => {
         searchParams: [],
         statusOptions: expect.any(Array),
         typeOptions: expect.any(Array),
-        marineLicenceEnabled: expect.any(Boolean)
+        userOptions: expect.any(Array),
+        marineLicenceEnabled: expect.any(Boolean),
+        showSpecificUser: false
       })
     })
 
@@ -99,7 +101,9 @@ describe('#dashboard', () => {
         searchParams: flashedsearchParams,
         statusOptions: expect.any(Array),
         typeOptions: expect.any(Array),
-        marineLicenceEnabled: expect.any(Boolean)
+        userOptions: expect.any(Array),
+        marineLicenceEnabled: expect.any(Boolean),
+        showSpecificUser: false
       })
     })
 
@@ -132,21 +136,22 @@ describe('#dashboard', () => {
             { text: '-' },
             {
               html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>',
-              attributes: { 'data-sort-value': 'Draft' }
+              attributes: { 'data-sort-value': 'Draft' },
+              classes: 'govuk-table__cell--nowrap'
             },
             {
               text: '-',
               attributes: { 'data-sort-value': 0 }
             },
             {
-              html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
+              html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
             }
           ]
         }
       ])
 
       authenticatedPostRequestMock.mockResolvedValueOnce({
-        payload: { value: projects }
+        payload: { value: { projects } }
       })
 
       await dashboardController.handler(request, h)
@@ -161,7 +166,9 @@ describe('#dashboard', () => {
         searchParams: [],
         statusOptions: expect.any(Array),
         typeOptions: expect.any(Array),
-        marineLicenceEnabled: expect.any(Boolean)
+        userOptions: expect.any(Array),
+        marineLicenceEnabled: expect.any(Boolean),
+        showSpecificUser: false
       })
     })
 
@@ -215,7 +222,9 @@ describe('#dashboard', () => {
         searchParams: [],
         statusOptions: expect.any(Array),
         typeOptions: expect.any(Array),
-        marineLicenceEnabled: expect.any(Boolean)
+        userOptions: expect.any(Array),
+        marineLicenceEnabled: expect.any(Boolean),
+        showSpecificUser: false
       })
     })
   })
@@ -273,17 +282,19 @@ describe('#dashboard', () => {
 
     describe('client side request)', () => {
       test('Should fetch with the submitted payload and render the results partial', async () => {
-        const projects = [
-          {
-            projectName: 'Test Project',
-            reference: 'ML-2024-001',
-            status: 'Draft',
-            submittedAt: null
-          }
-        ]
+        const serverResponse = {
+          projects: [
+            {
+              projectName: 'Test Project',
+              reference: 'ML-2024-001',
+              status: 'Draft',
+              submittedAt: null
+            }
+          ]
+        }
 
         authenticatedPostRequestMock.mockResolvedValueOnce({
-          payload: { value: projects, isEmployee: true }
+          payload: { value: serverResponse, isEmployee: true }
         })
 
         const h = { view: vi.fn() }
@@ -305,14 +316,16 @@ describe('#dashboard', () => {
         expect(request.yar.flash).not.toHaveBeenCalled()
         expect(h.view).toHaveBeenCalledWith(DASHBOARD_RESULTS_VIEW_ROUTE, {
           heading: 'Projects',
-          projects: formatProjectsForDisplay(projects, true),
+          projects: formatProjectsForDisplay(serverResponse.projects, true),
           isEmployee: true,
           organisationName: '',
           filterCategories: expect.any(Object),
           searchParams: request.payload,
           statusOptions: expect.any(Array),
           typeOptions: expect.any(Array),
-          marineLicenceEnabled: expect.any(Boolean)
+          userOptions: expect.any(Array),
+          marineLicenceEnabled: expect.any(Boolean),
+          showSpecificUser: false
         })
       })
 

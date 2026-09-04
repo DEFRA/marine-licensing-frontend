@@ -8,6 +8,15 @@
 
 {% set bodyClasses = "govuk-wide-template" %}
 
+{%- set userChoiceHtml %}
+  {{ govukCheckboxes({
+    idPrefix: "user",
+    name: "user",
+    classes: "govuk-checkboxes--small",
+    items: userOptions
+  }) }}
+{% endset -%}
+
 {%- set filterOptionsHtml %}
   {% if isEmployee %}
 
@@ -30,7 +39,15 @@
           value: "my-projects",
           text: "My submissions",
           checked: searchParams.show == "my-projects" or not searchParams.show
-        }
+        },
+        {
+          value: "specific-user",
+          text: "Submissions by owner",
+          checked: searchParams.show == "specific-user",
+          conditional: {
+            html: userChoiceHtml
+          }
+        } if showSpecificUser
       ]
     }) }}
     

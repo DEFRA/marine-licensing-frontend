@@ -1,11 +1,13 @@
 // reference: https://design-patterns.service.justice.gov.uk/patterns/filter-a-list
 
-// prevent flicker on loading page with js enabled
+// Hidden by default under js-enabled (before the JS bundle has loaded). Only revealed
+// once moj-filter/index.js sets .app-filter-ready - ".moj-js-hidden absent" alone can't
+// be trusted, since that's also true pre-init.
 .js-enabled [data-module='moj-filter'] {
   display: none;
 }
 
-.js-enabled [data-module='moj-filter']:not(.moj-js-hidden) {
+.js-enabled [data-module='moj-filter'].app-filter-ready:not(.moj-js-hidden) {
   display: block;
 }
 

@@ -66,6 +66,12 @@ export async function createServer() {
     segment: 'session'
   })
 
+  server.app.dashboardUsersCache = server.cache({
+    cache: 'session',
+    expiresIn: config.get('dashboard.userCacheTtl'),
+    segment: 'dashboard-users'
+  })
+
   await server.register([
     requestLogger,
     requestTracing,

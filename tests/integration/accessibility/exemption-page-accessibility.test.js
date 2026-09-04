@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { vi } from 'vitest'
 import { routes } from '~/src/server/common/constants/routes.js'
+import { PROJECT_STATUS } from '~/src/server/common/constants/projects.js'
 import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import {
   mockExemption as mockExemptionData,
@@ -129,7 +130,8 @@ const exemptionPages = [
   },
   {
     url: routes.WITHDRAW_EXEMPTION,
-    title: 'Are you sure you want to withdraw this project?'
+    title: 'Are you sure you want to withdraw this project?',
+    exemption: { ...mockExemptionSubmitted, status: PROJECT_STATUS.ACTIVE }
   },
   {
     url: routes.SERVICE_HOME,

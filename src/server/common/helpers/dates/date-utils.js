@@ -3,6 +3,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat.js'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter.js'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore.js'
 import utc from 'dayjs/plugin/utc.js'
+import { londonToday } from './london-today.js'
 
 dayjs.extend(utc)
 dayjs.extend(customParseFormat)
@@ -56,9 +57,8 @@ export function isValidDateComponents(year, month, day) {
 
 export function isTodayOrFuture(date) {
   const inputDate = dayjs.utc(date)
-  const today = dayjs.utc().startOf('day')
 
-  return inputDate.isSameOrAfter(today, 'day')
+  return inputDate.isSameOrAfter(londonToday(), 'day')
 }
 
 export function compareDates(date1, date2) {

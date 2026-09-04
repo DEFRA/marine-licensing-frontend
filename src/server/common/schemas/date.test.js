@@ -302,6 +302,42 @@ describe('activityDatesSchema', () => {
     })
   })
 
+  describe('British Summer Time day boundary', () => {
+    // 00:30 on 26 August by the London clock, still 25 August by UTC.
+    const LATE_SUMMER_EVENING = new Date('2026-08-25T23:30:00.000Z')
+
+    const datesOn = (day) => ({
+      'activity-start-date-day': day,
+      'activity-start-date-month': 8,
+      'activity-start-date-year': 2026,
+      'activity-end-date-day': day,
+      'activity-end-date-month': 8,
+      'activity-end-date-year': 2026
+    })
+
+    beforeEach(() => {
+      vi.setSystemTime(LATE_SUMMER_EVENING)
+    })
+
+    afterEach(() => {
+      vi.setSystemTime(MOCK_DATE)
+    })
+
+    test('should reject dates on the UTC day once London has moved on', () => {
+      const result = activityDatesSchema.validate(datesOn(25))
+
+      expect(result.error).toBeDefined()
+      const errorTypes = result.error.details.map((d) => d.type)
+      expect(errorTypes).toContain('custom.endDate.todayOrFuture')
+    })
+
+    test('should accept dates on the London day', () => {
+      const result = activityDatesSchema.validate(datesOn(26))
+
+      expect(result.error).toBeUndefined()
+    })
+  })
+
   describe('Date order validation', () => {
     test('should reject end date before start date (same year)', () => {
       const endBeforeStartData = {

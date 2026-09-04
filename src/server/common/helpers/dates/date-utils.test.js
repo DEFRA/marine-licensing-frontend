@@ -187,6 +187,14 @@ describe('date-utils', () => {
       const result = isTodayOrFuture('2025-06-16T00:00:00.000Z')
       expect(result).toBe(true)
     })
+
+    test('treats the London day as today during British Summer Time', () => {
+      // 00:30 on 26 August by the London clock, still 25 August by UTC.
+      vi.setSystemTime(new Date('2026-08-25T23:30:00.000Z'))
+
+      expect(isTodayOrFuture('2026-08-25T00:00:00.000Z')).toBe(false)
+      expect(isTodayOrFuture('2026-08-26T00:00:00.000Z')).toBe(true)
+    })
   })
 
   describe('isMonthInPast', () => {

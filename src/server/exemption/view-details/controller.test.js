@@ -311,7 +311,7 @@ describe('view details controller', () => {
         expect(mockH.view).toHaveBeenCalledWith(
           VIEW_DETAILS_VIEW_ROUTE,
           expect.objectContaining({
-            statusTagClass: 'govuk-tag--green'
+            statusTagClass: 'govuk-tag--teal'
           })
         )
       })

@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
 import customParseFormat from 'dayjs/plugin/customParseFormat.js'
 import { JOI_ERRORS } from '#src/server/common/constants/joi.js'
+import { londonToday } from '#src/server/common/helpers/dates/london-today.js'
 import {
   validateYearWithinAllowedRange,
   validateDateTooFarApart,
@@ -115,7 +116,7 @@ export const activityDatesSchema = joi
       `${endYear}-${endMonth.toString().padStart(2, '0')}-${endDay.toString().padStart(2, '0')}`,
       DATE_FORMAT_ISO
     )
-    const today = dayjs.utc().startOf('day')
+    const today = londonToday()
 
     // Check date order first - if end date is before start date, show that error
     if (endDate.isBefore(startDate, 'day')) {

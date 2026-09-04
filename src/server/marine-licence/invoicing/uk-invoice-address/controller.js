@@ -5,6 +5,7 @@ import {
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { ukInvoiceAddressSchema } from '#src/server/common/validation/invoicing/uk-invoice-address/schema.js'
 import {
+  ADDRESS_SOURCE,
   INVOICE_TYPE_OPTIONS,
   ukInvoiceAddressErrorMessages,
   ukInvoiceAddressSettings
@@ -99,7 +100,8 @@ export const ukInvoiceAddressSubmitController = {
           addressTown: payload.addressTown,
           addressCounty: payload.addressCounty,
           addressPostcode: payload.addressPostcode
-        }
+        },
+        invoiceAddressSource: ADDRESS_SOURCE.MANUAL
       }
     })
 

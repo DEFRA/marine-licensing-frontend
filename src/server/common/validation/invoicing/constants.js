@@ -3,6 +3,13 @@ export const INVOICE_TYPE_OPTIONS = {
   INTERNATIONAL: 'international'
 }
 
+// How the stored invoice address was provided, which decides where the "Change" link
+// on the check-invoicing-details page goes: back to the postcode search, or to manual entry.
+export const ADDRESS_SOURCE = {
+  LOOKUP: 'lookup',
+  MANUAL: 'manual'
+}
+
 export const INVOICE_TYPE_LABELS = {
   UK: 'UK',
   INTERNATIONAL: 'International'

@@ -108,6 +108,7 @@ describe('MojFilter', () => {
       init()
 
       expect(FilterToggleButton).toHaveBeenCalledWith($root, expect.any(Object))
+      expect($root.classList.contains('app-filter-ready')).toBe(true)
     })
   })
 

@@ -114,4 +114,3 @@ describe('public register utils', () => {
     })
   })
 })
-

@@ -34,9 +34,7 @@ export const publicRegisterBrowseController = {
         request,
         '/application-submissions'
       )
-      const entries = sortByReferenceNewestFirst(
-        getEntriesFromPayload(payload)
-      )
+      const entries = sortByReferenceNewestFirst(getEntriesFromPayload(payload))
 
       return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
         pageTitle: `${PAGE_TITLE} - Get permission for marine work`,

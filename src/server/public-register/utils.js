@@ -49,7 +49,10 @@ const formatMarinePlanArea = (entry) => {
     return String(entry.marinePlanArea)
   }
 
-  if (Array.isArray(entry.marinePlanAreas) && entry.marinePlanAreas.length > 0) {
+  if (
+    Array.isArray(entry.marinePlanAreas) &&
+    entry.marinePlanAreas.length > 0
+  ) {
     return entry.marinePlanAreas.join(', ')
   }
 
@@ -70,7 +73,11 @@ export const formatEntriesForDisplay = (entries) =>
     )
 
     return [
-      { text: entry.applicationReference ? String(entry.applicationReference) : '-' },
+      {
+        text: entry.applicationReference
+          ? String(entry.applicationReference)
+          : '-'
+      },
       { text: projectName },
       { text: getApplicationTypeLabel(String(entry.applicationType)) },
       { text: formatMarinePlanArea(entry) },

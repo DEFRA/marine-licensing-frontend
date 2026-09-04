@@ -1,4 +1,8 @@
-import { publicRegisterBrowseRoutes } from '#src/server/public-register/index.js'
+import { vi } from 'vitest'
+import {
+  publicRegisterBrowse,
+  publicRegisterBrowseRoutes
+} from '#src/server/public-register/index.js'
 import { routes } from '#src/server/common/constants/routes.js'
 
 describe('publicRegisterBrowseRoutes', () => {
@@ -12,5 +16,15 @@ describe('publicRegisterBrowseRoutes', () => {
         }
       })
     ])
+  })
+
+  test('plugin registers the browse routes', () => {
+    const server = {
+      route: vi.fn()
+    }
+
+    publicRegisterBrowse.plugin.register(server)
+
+    expect(server.route).toHaveBeenCalledWith(publicRegisterBrowseRoutes)
   })
 })

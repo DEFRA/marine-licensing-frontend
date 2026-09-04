@@ -80,5 +80,38 @@ describe('public register utils', () => {
       expect(row[5].html).toContain('govuk-tag--grey')
       expect(row[5].html).toContain('Withdrawn')
     })
+
+    test('uses marinePlanArea when present', () => {
+      const [row] = formatEntriesForDisplay([
+        {
+          applicationId: 'abc123',
+          applicationType: PROJECT_TYPE.EXEMPTION,
+          applicationReference: 'EXE/2026/00001',
+          projectName: 'Single area project',
+          marinePlanArea: 'North',
+          dateSubmitted: '2026-01-02',
+          status: 'Active'
+        }
+      ])
+
+      expect(row[3]).toEqual({ text: 'North' })
+    })
+
+    test('falls back to defaults when optional fields are missing', () => {
+      const [row] = formatEntriesForDisplay([
+        {
+          applicationId: 'abc123',
+          applicationType: PROJECT_TYPE.EXEMPTION,
+          marinePlanAreas: []
+        }
+      ])
+
+      expect(row[0]).toEqual({ text: '-' })
+      expect(row[1]).toEqual({ text: '-' })
+      expect(row[3]).toEqual({ text: '-' })
+      expect(row[4]).toEqual({ text: '-' })
+      expect(row[5].html).toContain('Active')
+    })
   })
 })
+

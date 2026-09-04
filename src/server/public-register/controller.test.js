@@ -1,22 +1,39 @@
 import { vi } from 'vitest'
+import Wreck from '@hapi/wreck'
+import { getTraceId } from '@defra/hapi-tracing'
+import { config } from '#src/config/config.js'
 import {
   publicRegisterBrowseController,
   PUBLIC_REGISTER_VIEW_ROUTE
 } from './controller.js'
-import { publicRegisterGetRequest } from '#src/server/common/helpers/public-register-requests.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { formatEntriesForDisplay } from './utils.js'
 
-vi.mock('#src/server/common/helpers/public-register-requests.js')
+vi.mock('@hapi/wreck')
+vi.mock('@defra/hapi-tracing')
 
 describe('#publicRegisterBrowseController', () => {
-  const publicRegisterGetRequestMock = vi.mocked(publicRegisterGetRequest)
+  const wreckGetMock = vi.mocked(Wreck.get)
+  const getTraceIdMock = vi.mocked(getTraceId)
 
   const createRequest = () => ({
     h: { view: vi.fn() },
     request: {
       logger: { error: vi.fn() }
     }
+  })
+
+  beforeEach(() => {
+    getTraceIdMock.mockReturnValue(undefined)
+    vi.spyOn(config, 'get').mockImplementation((key) => {
+      if (key === 'publicRegister') {
+        return { apiUrl: 'http://localhost:3003' }
+      }
+      if (key === 'tracing.header') {
+        return 'x-cdp-request-id'
+      }
+      return undefined
+    })
   })
 
   test('renders the public register with sorted entries', async () => {
@@ -32,7 +49,7 @@ describe('#publicRegisterBrowseController', () => {
       }
     ]
 
-    publicRegisterGetRequestMock.mockResolvedValueOnce({
+    wreckGetMock.mockResolvedValueOnce({
       payload: entries
     })
 
@@ -40,9 +57,14 @@ describe('#publicRegisterBrowseController', () => {
 
     await publicRegisterBrowseController.handler(request, h)
 
-    expect(publicRegisterGetRequestMock).toHaveBeenCalledWith(
-      request,
-      '/application-submissions'
+    expect(wreckGetMock).toHaveBeenCalledWith(
+      'http://localhost:3003/application-submissions',
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        json: true
+      }
     )
     expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
       pageTitle: 'Public register - Get permission for marine work',
@@ -53,8 +75,28 @@ describe('#publicRegisterBrowseController', () => {
     })
   })
 
+  test('includes the tracing header when a trace id is present', async () => {
+    getTraceIdMock.mockReturnValue('trace-123')
+    wreckGetMock.mockResolvedValueOnce({ payload: [] })
+
+    const { h, request } = createRequest()
+
+    await publicRegisterBrowseController.handler(request, h)
+
+    expect(wreckGetMock).toHaveBeenCalledWith(
+      'http://localhost:3003/application-submissions',
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-cdp-request-id': 'trace-123'
+        },
+        json: true
+      }
+    )
+  })
+
   test('supports wrapped API responses', async () => {
-    publicRegisterGetRequestMock.mockResolvedValueOnce({
+    wreckGetMock.mockResolvedValueOnce({
       payload: {
         value: [
           {
@@ -78,8 +120,26 @@ describe('#publicRegisterBrowseController', () => {
     )
   })
 
+  test('renders an empty table when the payload shape is unexpected', async () => {
+    wreckGetMock.mockResolvedValueOnce({
+      payload: { unexpected: true }
+    })
+
+    const { h, request } = createRequest()
+
+    await publicRegisterBrowseController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      PUBLIC_REGISTER_VIEW_ROUTE,
+      expect.objectContaining({
+        resultCount: 0,
+        rows: []
+      })
+    )
+  })
+
   test('renders an empty state when the API call fails', async () => {
-    publicRegisterGetRequestMock.mockRejectedValueOnce(new Error('network'))
+    wreckGetMock.mockRejectedValueOnce(new Error('network'))
 
     const { h, request } = createRequest()
 

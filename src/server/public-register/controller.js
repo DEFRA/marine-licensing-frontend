@@ -1,4 +1,6 @@
-import { publicRegisterGetRequest } from '#src/server/common/helpers/public-register-requests.js'
+import Wreck from '@hapi/wreck'
+import { getTraceId } from '@defra/hapi-tracing'
+import { config } from '#src/config/config.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import {
   formatEntriesForDisplay,
@@ -7,6 +9,7 @@ import {
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'public-register/index'
 const PAGE_TITLE = 'Public register'
+const APPLICATION_SUBMISSIONS_ENDPOINT = '/application-submissions'
 
 /**
  * @param {unknown} payload
@@ -24,16 +27,36 @@ const getEntriesFromPayload = (payload) => {
   return []
 }
 
+/**
+ * @returns {Promise<{ payload: unknown }>}
+ */
+const fetchApplicationSubmissions = async () => {
+  const headers = {
+    'Content-Type': 'application/json'
+  }
+
+  const tracingHeader = config.get('tracing.header')
+  const traceId = getTraceId()
+
+  if (traceId) {
+    headers[tracingHeader] = traceId
+  }
+
+  const url = `${config.get('publicRegister').apiUrl}${APPLICATION_SUBMISSIONS_ENDPOINT}`
+
+  return Wreck.get(url, {
+    headers,
+    json: true
+  })
+}
+
 export const publicRegisterBrowseController = {
   options: {
     auth: false
   },
   handler: async (request, h) => {
     try {
-      const { payload } = await publicRegisterGetRequest(
-        request,
-        '/application-submissions'
-      )
+      const { payload } = await fetchApplicationSubmissions()
       const entries = sortByReferenceNewestFirst(getEntriesFromPayload(payload))
 
       return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {

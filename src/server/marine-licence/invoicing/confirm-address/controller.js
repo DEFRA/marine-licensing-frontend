@@ -2,7 +2,10 @@ import {
   getMarineLicenceCache,
   setMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { confirmAddressSettings } from '#src/server/common/validation/invoicing/constants.js'
+import {
+  ADDRESS_SOURCE,
+  confirmAddressSettings
+} from '#src/server/common/validation/invoicing/constants.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getConfirmAddressBackLink,
@@ -84,7 +87,8 @@ export const confirmAddressSubmitController = {
       ...marineLicence,
       invoicing: {
         ...invoicing,
-        invoiceAddress
+        invoiceAddress,
+        invoiceAddressSource: ADDRESS_SOURCE.LOOKUP
       }
     })
 

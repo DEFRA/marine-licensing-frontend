@@ -262,14 +262,15 @@ describe('#formatProjectsForDisplay', () => {
           { text: 'ML-2024-001' },
           {
             html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>',
-            attributes: { 'data-sort-value': 'Draft' }
+            attributes: { 'data-sort-value': 'Draft' },
+            classes: 'govuk-table__cell--nowrap'
           },
           {
             text: '15 Jan 2024',
             attributes: { 'data-sort-value': '2024-01-15' }
           },
           {
-            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
+            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
           }
         ]
       }
@@ -298,14 +299,15 @@ describe('#formatProjectsForDisplay', () => {
           { text: '-' },
           {
             html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>',
-            attributes: { 'data-sort-value': 'Draft' }
+            attributes: { 'data-sort-value': 'Draft' },
+            classes: 'govuk-table__cell--nowrap'
           },
           {
             text: '-',
             attributes: { 'data-sort-value': 0 }
           },
           {
-            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
+            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
           }
         ]
       }
@@ -342,14 +344,15 @@ describe('#formatProjectsForDisplay', () => {
         { text: 'ML-2024-001' },
         {
           html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>',
-          attributes: { 'data-sort-value': 'Draft' }
+          attributes: { 'data-sort-value': 'Draft' },
+          classes: 'govuk-table__cell--nowrap'
         },
         {
           text: '15 Jan 2024',
           attributes: { 'data-sort-value': '2024-01-15' }
         },
         {
-          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Project 1">Delete</a>'
+          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Project 1">Delete</a>'
         }
       ]
     })
@@ -360,14 +363,15 @@ describe('#formatProjectsForDisplay', () => {
         { text: 'ML-2024-002' },
         {
           html: '<strong class="govuk-tag govuk-tag--green">Active</strong>',
-          attributes: { 'data-sort-value': 'Active' }
+          attributes: { 'data-sort-value': 'Active' },
+          classes: 'govuk-table__cell--nowrap'
         },
         {
           text: '25 Jun 2024',
           attributes: { 'data-sort-value': '2024-06-25' }
         },
         {
-          html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a><a href="/exemption/withdraw/def456" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Project 2">Withdraw</a>'
+          html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a><a href="/exemption/withdraw/def456" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Project 2">Withdraw</a>'
         }
       ]
     })
@@ -446,7 +450,7 @@ describe('getActionButtons', () => {
     }
     const result = getActionButtons(draft)
     expect(result).toBe(
-      `<a href="${routes.TASK_LIST}/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>`
+      `<a href="${routes.TASK_LIST}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>`
     )
   })
 
@@ -459,7 +463,7 @@ describe('getActionButtons', () => {
     }
     const result = getActionButtons(active)
     expect(result).toBe(
-      `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a><a href="${routes.WITHDRAW_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Test Project">Withdraw</a>`
+      `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a><a href="${routes.WITHDRAW_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Test Project">Withdraw</a>`
     )
   })
 
@@ -524,7 +528,7 @@ describe('getActionButtons', () => {
     }
     const result = getActionButtons(submittedMarineLicence)
     expect(result).toBe(
-      `<a href="${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/ml123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Groyne construction, Bournemouth seafront, Dorset">View details</a><a href="${marineLicenceRoutes.MARINE_LICENCE_WITHDRAW}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Groyne construction, Bournemouth seafront, Dorset">Withdraw</a>`
+      `<a href="${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Groyne construction, Bournemouth seafront, Dorset">View details</a><a href="${marineLicenceRoutes.MARINE_LICENCE_WITHDRAW}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Groyne construction, Bournemouth seafront, Dorset">Withdraw</a>`
     )
   })
 

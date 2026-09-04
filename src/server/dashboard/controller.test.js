@@ -136,14 +136,15 @@ describe('#dashboard', () => {
             { text: '-' },
             {
               html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>',
-              attributes: { 'data-sort-value': 'Draft' }
+              attributes: { 'data-sort-value': 'Draft' },
+              classes: 'govuk-table__cell--nowrap'
             },
             {
               text: '-',
               attributes: { 'data-sort-value': 0 }
             },
             {
-              html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
+              html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
             }
           ]
         }

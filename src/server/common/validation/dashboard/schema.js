@@ -9,7 +9,7 @@ export const dashboardFilterSchema = joi.object({
   user: joi.when('show', {
     is: 'specific-user',
     then: joi.array().items(joi.string().uuid()).single(),
-    otherwise: joi.forbidden()
+    otherwise: joi.any().strip()
   }),
   status: joi
     .array()

@@ -101,12 +101,22 @@ describe('#dashboardFilterSchema', () => {
     expect(error).toBeDefined()
   })
 
-  test('should fail when user is provided but show is not specific-user', () => {
-    const { error } = dashboardFilterSchema.validate({
+  test('should strip user, not fail, when show is not specific-user', () => {
+    const { error, value } = dashboardFilterSchema.validate({
       show: 'my-projects',
       user: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
     })
 
-    expect(error).toBeDefined()
+    expect(error).toBeUndefined()
+    expect(value.user).toBeUndefined()
+  })
+
+  test('should strip user, not fail, when show is absent', () => {
+    const { error, value } = dashboardFilterSchema.validate({
+      user: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+    })
+
+    expect(error).toBeUndefined()
+    expect(value.user).toBeUndefined()
   })
 })

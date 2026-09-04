@@ -3,7 +3,10 @@ import {
   sortProjectsByStatus,
   formatProjectsForDisplay,
   getActionButtons,
-  getStatusLabelText
+  getStatusLabelText,
+  getFilterCategories,
+  getStatusOptions,
+  getTypeOptions
 } from './utils.js'
 import {
   routes,
@@ -101,7 +104,6 @@ describe('#formatProjectsForDisplay', () => {
 
     expect(result).toEqual([
       {
-        attributes: { 'data-is-own-project': 'true' },
         cells: [
           { text: 'Test Project' },
           { text: 'Exempt activity notification' },
@@ -138,7 +140,6 @@ describe('#formatProjectsForDisplay', () => {
 
     expect(result).toEqual([
       {
-        attributes: { 'data-is-own-project': 'true' },
         cells: [
           { text: 'Test Project' },
           { text: 'Exempt activity notification' },
@@ -183,7 +184,6 @@ describe('#formatProjectsForDisplay', () => {
 
     expect(result).toHaveLength(2)
     expect(result[0]).toEqual({
-      attributes: { 'data-is-own-project': 'true' },
       cells: [
         { text: 'Project 1' },
         { text: 'Exempt activity notification' },
@@ -202,7 +202,6 @@ describe('#formatProjectsForDisplay', () => {
       ]
     })
     expect(result[1]).toEqual({
-      attributes: { 'data-is-own-project': 'true' },
       cells: [
         { text: 'Project 2' },
         { text: 'Exempt activity notification' },
@@ -467,5 +466,185 @@ describe('#getStatusLabelText', () => {
     expect(getStatusLabelText('<script>alert(1)</script>')).toBe(
       '&lt;script&gt;alert(1)&lt;/script&gt;'
     )
+  })
+})
+
+describe('#getFilterCategories', () => {
+  it('returns an empty array when there is nothing to filter by', () => {
+    expect(getFilterCategories()).toEqual([])
+    expect(getFilterCategories(null)).toEqual([])
+    expect(getFilterCategories({ show: 'my-projects' })).toEqual([])
+  })
+
+  it('builds a Status category from a single selected status, mapping Rejected to Unable to progress', () => {
+    expect(getFilterCategories({ status: 'REJECTED' })).toEqual([
+      {
+        heading: { text: 'Status' },
+        items: [
+          {
+            href: '#',
+            field: 'status',
+            value: 'REJECTED',
+            text: UNABLE_TO_PROGRESS
+          }
+        ]
+      }
+    ])
+  })
+
+  it('builds a Status category from multiple selected statuses, mapping each to its display text', () => {
+    const result = getFilterCategories({
+      status: [
+        'DRAFT',
+        'ACTIVE',
+        'SUBMITTED',
+        'TRANSFERRED',
+        'REJECTED',
+        'WITHDRAWN'
+      ]
+    })
+
+    expect(result).toEqual([
+      {
+        heading: { text: 'Status' },
+        items: [
+          { href: '#', field: 'status', value: 'DRAFT', text: 'Draft' },
+          { href: '#', field: 'status', value: 'ACTIVE', text: 'Active' },
+          {
+            href: '#',
+            field: 'status',
+            value: 'SUBMITTED',
+            text: 'Submitted'
+          },
+          {
+            href: '#',
+            field: 'status',
+            value: 'TRANSFERRED',
+            text: 'Transferred'
+          },
+          {
+            href: '#',
+            field: 'status',
+            value: 'REJECTED',
+            text: UNABLE_TO_PROGRESS
+          },
+          {
+            href: '#',
+            field: 'status',
+            value: 'WITHDRAWN',
+            text: 'Withdrawn'
+          }
+        ]
+      }
+    ])
+  })
+
+  it('builds a Submission type category, single or multi-selected', () => {
+    expect(getFilterCategories({ type: 'exemption' })).toEqual([
+      {
+        heading: { text: 'Submission type' },
+        items: [
+          {
+            href: '#',
+            field: 'type',
+            value: 'exemption',
+            text: 'Exempt activity notification'
+          }
+        ]
+      }
+    ])
+
+    expect(
+      getFilterCategories({ type: ['exemption', 'marine-licence'] })
+    ).toEqual([
+      {
+        heading: { text: 'Submission type' },
+        items: [
+          {
+            href: '#',
+            field: 'type',
+            value: 'exemption',
+            text: 'Exempt activity notification'
+          },
+          {
+            href: '#',
+            field: 'type',
+            value: 'marine-licence',
+            text: 'Marine licence application'
+          }
+        ]
+      }
+    ])
+  })
+
+  it('returns both categories, Status before Submission type, when both are selected', () => {
+    const result = getFilterCategories({ status: 'DRAFT', type: 'exemption' })
+
+    expect(result).toHaveLength(2)
+    expect(result[0].heading.text).toBe('Status')
+    expect(result[1].heading.text).toBe('Submission type')
+  })
+})
+
+describe('#getStatusOptions', () => {
+  test('returns one option per PROJECT_STATUS, sorted alphabetically by text, with only the given status checked', () => {
+    expect(getStatusOptions('SUBMITTED')).toEqual([
+      { value: 'ACTIVE', text: 'Active', checked: false },
+      { value: 'DRAFT', text: 'Draft', checked: false },
+      { value: 'SUBMITTED', text: 'Submitted', checked: true },
+      { value: 'TRANSFERRED', text: 'Transferred', checked: false },
+      { value: 'REJECTED', text: UNABLE_TO_PROGRESS, checked: false },
+      { value: 'WITHDRAWN', text: 'Withdrawn', checked: false }
+    ])
+  })
+
+  test('correctly checks options when multiple checkboxes are checked', () => {
+    expect(getStatusOptions(['DRAFT', 'ACTIVE'])).toEqual([
+      { value: 'ACTIVE', text: 'Active', checked: true },
+      { value: 'DRAFT', text: 'Draft', checked: true },
+      { value: 'SUBMITTED', text: 'Submitted', checked: false },
+      { value: 'TRANSFERRED', text: 'Transferred', checked: false },
+      { value: 'REJECTED', text: UNABLE_TO_PROGRESS, checked: false },
+      { value: 'WITHDRAWN', text: 'Withdrawn', checked: false }
+    ])
+  })
+
+  test('only returns Active and Draft when the marine licence flag is off', () => {
+    expect(getStatusOptions(undefined, false)).toEqual([
+      { value: 'ACTIVE', text: 'Active', checked: false },
+      { value: 'DRAFT', text: 'Draft', checked: false }
+    ])
+  })
+})
+
+describe('#getTypeOptions', () => {
+  test('returns correct options by default', () => {
+    expect(getTypeOptions()).toEqual([
+      {
+        value: 'exemption',
+        text: 'Exempt activity notification',
+        checked: false
+      },
+      {
+        value: 'marine-licence',
+        text: 'Marine licence application',
+        checked: false
+      }
+    ])
+  })
+
+  test('returns correct options when selected', () => {
+    expect(getTypeOptions(['exemption', 'marine-licence'])).toEqual([
+      {
+        value: 'exemption',
+        text: 'Exempt activity notification',
+        checked: true
+      },
+      {
+        value: 'marine-licence',
+        text: 'Marine licence application',
+        checked: true
+      }
+    ])
   })
 })

@@ -1,4 +1,5 @@
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
+import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import {
   routes,
   marineLicenceRoutes
@@ -6,6 +7,7 @@ import {
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 import {
   PROJECT_STATUS,
+  PROJECT_TYPE,
   UNABLE_TO_PROGRESS
 } from '#src/server/common/constants/projects.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
@@ -81,6 +83,9 @@ const getMarineLicenceActions = ({
   )
 }
 
+export const fetchProjects = async (request, payload = {}) =>
+  authenticatedPostRequest(request, '/projects', payload)
+
 export const sortProjectsByStatus = (projects) => {
   return [...projects].sort((a, b) => {
     const statusA = a.status ?? ''
@@ -133,8 +138,6 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
   projects.map((project) => {
     const { status, projectType } = project
 
-    const isOwnProject = project.isOwnProject ?? true
-
     const baseRow = [
       { text: project.projectName },
       {
@@ -167,9 +170,104 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
     baseRow.push({ html: getActionButtons(project) })
 
     return {
-      cells: baseRow,
-      attributes: {
-        'data-is-own-project': isOwnProject ? 'true' : 'false'
-      }
+      cells: baseRow
     }
   })
+
+export const getFilterCategories = (searchParams) => {
+  const categories = []
+
+  if (!searchParams) {
+    return categories
+  }
+
+  if (searchParams.status) {
+    const { status } = searchParams
+
+    const isMultipleSelected = Array.isArray(status)
+    const transformedStatus = isMultipleSelected ? status : [status]
+
+    categories.push({
+      heading: {
+        text: 'Status'
+      },
+      items: transformedStatus.map((categoryStatus) => ({
+        href: '#',
+        field: 'status',
+        value: categoryStatus,
+        text:
+          categoryStatus === 'REJECTED'
+            ? UNABLE_TO_PROGRESS
+            : PROJECT_STATUS[categoryStatus]
+      }))
+    })
+  }
+
+  if (searchParams.type) {
+    const { type } = searchParams
+
+    const isMultipleSelected = Array.isArray(type)
+    const transformedType = isMultipleSelected ? type : [type]
+
+    categories.push({
+      heading: {
+        text: 'Submission type'
+      },
+      items: transformedType.map((categoryType) => ({
+        href: '#',
+        field: 'type',
+        value: categoryType,
+        text:
+          categoryType === PROJECT_TYPE.EXEMPTION
+            ? EXEMPTION_TYPE
+            : MARINE_LICENCE_TYPE
+      }))
+    })
+  }
+
+  return categories
+}
+
+const MARINE_LICENCE_ONLY_STATUS_KEYS = new Set([
+  'SUBMITTED',
+  'TRANSFERRED',
+  'REJECTED',
+  'WITHDRAWN'
+])
+
+export const getStatusOptions = (status, marineLicenceEnabled = true) => {
+  const isMultipleSelected = Array.isArray(status)
+
+  return Object.entries(PROJECT_STATUS)
+    .filter(
+      ([key]) =>
+        marineLicenceEnabled || !MARINE_LICENCE_ONLY_STATUS_KEYS.has(key)
+    )
+    .map(([key, val]) => ({
+      value: key,
+      text: val === PROJECT_STATUS.REJECTED ? UNABLE_TO_PROGRESS : val,
+      checked: isMultipleSelected ? status.includes(key) : status === key
+    }))
+    .sort((a, b) => a.text.localeCompare(b.text))
+}
+
+export const getTypeOptions = (type) => {
+  const isMultipleSelected = Array.isArray(type)
+
+  return [
+    {
+      value: 'exemption',
+      text: EXEMPTION_TYPE,
+      checked: isMultipleSelected
+        ? type.includes(PROJECT_TYPE.EXEMPTION)
+        : type === PROJECT_TYPE.EXEMPTION
+    },
+    {
+      value: 'marine-licence',
+      text: MARINE_LICENCE_TYPE,
+      checked: isMultipleSelected
+        ? type.includes(PROJECT_TYPE.MARINE_LICENCE)
+        : type === PROJECT_TYPE.MARINE_LICENCE
+    }
+  ]
+}

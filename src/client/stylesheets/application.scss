@@ -1,8 +1,13 @@
 @use 'govuk-frontend';
 @use 'govuk-frontend-overrides';
-$moj-assets-path: '~@ministryofjustice/frontend/moj/assets/';
+@use '@ministryofjustice/frontend/moj/settings/assets' with (
+  $moj-assets-path: '/public/assets/'
+);
 @use '@ministryofjustice/frontend/moj/components/page-header-actions/page-header-actions';
 @use '@ministryofjustice/frontend/moj/components/sortable-table/sortable-table';
+@use '@ministryofjustice/frontend/moj/components/filter/filter';
+@use '@ministryofjustice/frontend/moj/objects/filter-layout';
+@use '@ministryofjustice/frontend/moj/utilities/hidden';
 
 @use 'variables';
 @use 'helpers';

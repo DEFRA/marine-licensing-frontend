@@ -1,5 +1,5 @@
 import { routes } from '#src/server/common/constants/routes.js'
-import { dashboardController } from './controller.js'
+import { dashboardController, dashboardPostController } from './controller.js'
 
 export const dashboardRoutes = [
   {
@@ -10,6 +10,6 @@ export const dashboardRoutes = [
   {
     method: 'POST',
     path: routes.DASHBOARD,
-    handler: dashboardController.handler
+    ...dashboardPostController
   }
 ]

@@ -1,0 +1,24 @@
+// reference: https://design-patterns.service.justice.gov.uk/patterns/filter-a-list
+
+// prevent flicker on loading page with js enabled
+.js-enabled [data-module='moj-filter'] {
+  display: none;
+}
+
+.js-enabled [data-module='moj-filter']:not(.moj-js-hidden) {
+  display: block;
+}
+
+.moj-filter__selected {
+  display: none;
+}
+
+.js-enabled {
+  .moj-filter__selected {
+    display: block;
+  }
+
+  .moj-filter__clear {
+    display: none;
+  }
+}

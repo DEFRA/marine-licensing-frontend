@@ -30,7 +30,7 @@ const getDraftActions = (id, escapedProjectName, projectType) => {
       ? marineLicenceRoutes.MARINE_LICENCE_DELETE
       : routes.DELETE_EXEMPTION
 
-  return `<a href="${taskListRoute}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${deleteRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
+  return `<a href="${taskListRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${deleteRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
 }
 
 const getViewDetailsRoute = (projectType, status) => {
@@ -54,9 +54,7 @@ const getViewDetailsRoute = (projectType, status) => {
 }
 
 const getActiveActions = (id, escapedProjectName, viewRoute, withdrawRoute) => {
-  const marginClass = withdrawRoute ? ' govuk-!-margin-right-4' : ''
-
-  let buttons = `<a href="${viewRoute}/${id}" class="govuk-link${marginClass} govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
+  let buttons = `<a href="${viewRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 
   if (withdrawRoute) {
     buttons += `<a href="${withdrawRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw ${escapedProjectName}">Withdraw</a>`
@@ -219,7 +217,8 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
         html: `<strong class="govuk-tag ${getTagStyle(status)}">${getStatusLabelText(project.status)}</strong>`,
         attributes: {
           'data-sort-value': project.status
-        }
+        },
+        classes: 'govuk-table__cell--nowrap'
       },
       {
         text: project.submittedAt

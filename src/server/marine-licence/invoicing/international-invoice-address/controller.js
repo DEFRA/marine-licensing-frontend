@@ -5,6 +5,7 @@ import {
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { internationalInvoiceAddressSchema } from '#src/server/common/validation/invoicing/international-invoice-address/schema.js'
 import {
+  ADDRESS_SOURCE,
   internationalInvoiceAddressErrorMessages,
   internationalInvoiceAddressSettings,
   INVOICE_TYPE_OPTIONS
@@ -83,7 +84,8 @@ export const internationalInvoiceAddressSubmitController = {
         invoiceAddress: {
           country: payload.country,
           address: payload.address
-        }
+        },
+        invoiceAddressSource: ADDRESS_SOURCE.MANUAL
       }
     })
 

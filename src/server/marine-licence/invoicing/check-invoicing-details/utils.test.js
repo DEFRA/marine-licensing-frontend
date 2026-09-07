@@ -1,5 +1,15 @@
-import { getBackLink } from '#src/server/marine-licence/invoicing/check-invoicing-details/utils.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  getAddressChangeRoute,
+  getBackLink
+} from '#src/server/marine-licence/invoicing/check-invoicing-details/utils.js'
+import {
+  marineLicenceInvoicingRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
+import {
+  ADDRESS_SOURCE,
+  INVOICE_TYPE_OPTIONS
+} from '#src/server/common/validation/invoicing/constants.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 describe('getBackLink', () => {
@@ -37,6 +47,54 @@ describe('getBackLink', () => {
 
     expect(getBackLink(mockRequestFromTaskList, false)).toBe(
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
+})
+
+describe('getAddressChangeRoute', () => {
+  test('returns the postcode search for a UK address provided by lookup', () => {
+    expect(
+      getAddressChangeRoute({
+        invoiceAddressType: INVOICE_TYPE_OPTIONS.UK,
+        invoiceAddressSource: ADDRESS_SOURCE.LOOKUP
+      })
+    ).toBe(
+      marineLicenceInvoicingRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH
+    )
+  })
+
+  test('returns the manual entry page for a UK address entered manually', () => {
+    expect(
+      getAddressChangeRoute({
+        invoiceAddressType: INVOICE_TYPE_OPTIONS.UK,
+        invoiceAddressSource: ADDRESS_SOURCE.MANUAL
+      })
+    ).toBe(marineLicenceInvoicingRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS)
+  })
+
+  test('returns the manual entry page for a UK address with no recorded source', () => {
+    expect(
+      getAddressChangeRoute({ invoiceAddressType: INVOICE_TYPE_OPTIONS.UK })
+    ).toBe(marineLicenceInvoicingRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS)
+  })
+
+  test('returns the international address page for an international address', () => {
+    expect(
+      getAddressChangeRoute({
+        invoiceAddressType: INVOICE_TYPE_OPTIONS.INTERNATIONAL,
+        invoiceAddressSource: ADDRESS_SOURCE.LOOKUP
+      })
+    ).toBe(
+      marineLicenceInvoicingRoutes.MARINE_LICENCE_INTERNATIONAL_INVOICE_ADDRESS
+    )
+  })
+
+  test('returns the UK or international question when no address type has been chosen', () => {
+    expect(getAddressChangeRoute(undefined)).toBe(
+      marineLicenceInvoicingRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
+    )
+    expect(getAddressChangeRoute({})).toBe(
+      marineLicenceInvoicingRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL
     )
   })
 })

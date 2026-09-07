@@ -7,6 +7,7 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { ADDRESS_SOURCE } from '#src/server/common/validation/invoicing/constants.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
 
@@ -73,7 +74,8 @@ describe('#internationalInvoiceAddress', () => {
             invoiceAddressType: 'international',
             invoiceAddress: {
               ...payload
-            }
+            },
+            invoiceAddressSource: ADDRESS_SOURCE.MANUAL
           }
         }
       )

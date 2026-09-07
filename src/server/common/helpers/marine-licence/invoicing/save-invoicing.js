@@ -12,13 +12,18 @@ export const saveInvoicingToBackend = async (request) => {
 
   const individualUser = await isIndividualUser(request)
 
-  const { invoiceContactDetails, invoiceAddressType, invoiceAddress } =
-    invoicing
+  const {
+    invoiceContactDetails,
+    invoiceAddressType,
+    invoiceAddress,
+    invoiceAddressSource
+  } = invoicing
 
   const dataToSave = {
     invoiceContactDetails,
     invoiceAddressType,
     invoiceAddress,
+    invoiceAddressSource,
     ...(individualUser ? {} : { purchaseOrderDetails })
   }
 

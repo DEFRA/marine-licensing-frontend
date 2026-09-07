@@ -320,7 +320,7 @@ describe('#addressLookup', () => {
       expect(result).toEqual({ results: [], error: true })
       expect(request.logger.error).toHaveBeenCalledWith(
         expect.objectContaining({
-          tenant: { message: `statusCode=500 apiUrl=${apiUrl}` }
+          tenant: { message: `statusCode=500 apiUrl=${apiUrl} responseBody={}` }
         }),
         'Postcode lookup request failed'
       )
@@ -334,7 +334,92 @@ describe('#addressLookup', () => {
       expect(result).toEqual({ results: [], error: true })
       expect(request.logger.error).toHaveBeenCalledWith(
         expect.objectContaining({
-          tenant: { message: `statusCode=404 apiUrl=${apiUrl}` }
+          tenant: { message: `statusCode=404 apiUrl=${apiUrl} responseBody={}` }
+        }),
+        'Postcode lookup request failed'
+      )
+    })
+
+    test('should log the response body so a rejected postcode is distinguishable from an outage', async () => {
+      Wreck.get.mockRejectedValue(
+        createWreckResponseError(400, { error: 'Restricted postcode' })
+      )
+
+      const result = await lookupAddresses(request, { postcode: 'NE99 1NC' })
+
+      expect(result).toEqual({ results: [], error: true })
+      expect(request.logger.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tenant: {
+            message: `statusCode=400 apiUrl=${apiUrl} responseBody={"error":"Restricted postcode"}`
+          }
+        }),
+        'Postcode lookup request failed'
+      )
+    })
+
+    test('should log a non-JSON response body as text', async () => {
+      Wreck.get.mockRejectedValue(
+        createWreckResponseError(400, Buffer.from('<html>Bad Request</html>'))
+      )
+
+      await lookupAddresses(request, { postcode: 'NE99 1NC' })
+
+      expect(request.logger.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tenant: {
+            message: `statusCode=400 apiUrl=${apiUrl} responseBody=<html>Bad Request</html>`
+          }
+        }),
+        'Postcode lookup request failed'
+      )
+    })
+
+    test('should truncate a long response body', async () => {
+      Wreck.get.mockRejectedValue(
+        createWreckResponseError(400, Buffer.from('x'.repeat(600)))
+      )
+
+      await lookupAddresses(request, { postcode: 'NE99 1NC' })
+
+      expect(request.logger.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tenant: {
+            message: `statusCode=400 apiUrl=${apiUrl} responseBody=${'x'.repeat(500)}`
+          }
+        }),
+        'Postcode lookup request failed'
+      )
+    })
+
+    test('should report no response body when the response body is empty', async () => {
+      Wreck.get.mockRejectedValue(
+        createWreckResponseError(400, Buffer.from(''))
+      )
+
+      await lookupAddresses(request, { postcode: 'NE99 1NC' })
+
+      expect(request.logger.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tenant: {
+            message: `statusCode=400 apiUrl=${apiUrl} responseBody=none`
+          }
+        }),
+        'Postcode lookup request failed'
+      )
+    })
+
+    test('should report no response body when the error carries none', async () => {
+      const error = new Error('network down')
+      Wreck.get.mockRejectedValue(error)
+
+      await lookupAddresses(request, { postcode: 'NE4 7AR' })
+
+      expect(request.logger.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tenant: {
+            message: `statusCode=undefined apiUrl=${apiUrl} responseBody=none`
+          }
         }),
         'Postcode lookup request failed'
       )
@@ -407,7 +492,9 @@ describe('#addressLookup', () => {
         expect(Wreck.get).toHaveBeenCalledTimes(2)
         expect(request.logger.error).toHaveBeenCalledWith(
           expect.objectContaining({
-            tenant: { message: `statusCode=401 apiUrl=${apiUrl}` }
+            tenant: {
+              message: `statusCode=401 apiUrl=${apiUrl} responseBody={}`
+            }
           }),
           'Postcode lookup request failed'
         )

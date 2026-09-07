@@ -152,20 +152,28 @@ describe('Choose your address', () => {
     expect(getAllByRole(document, 'radio')).toHaveLength(3)
   })
 
-  test('should go to the confirm address page when an address is selected', async () => {
-    mockSearchResults()
+  // The change flag has to survive the redirect, or a user changing an existing address
+  // silently drops out of the change flow and is sent on through the task list instead.
+  test.each([
+    ['the normal flow', ''],
+    ['the change flow', '?action=change']
+  ])(
+    'should go to the confirm address page when an address is selected, in %s',
+    async (_description, suffix) => {
+      mockSearchResults()
 
-    const response = await makePostRequest({
-      url: marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS,
-      server: getServer(),
-      formData: { selectedAddress: '1' }
-    })
+      const response = await makePostRequest({
+        url: `${marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS}${suffix}`,
+        server: getServer(),
+        formData: { selectedAddress: '1' }
+      })
 
-    expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS
-    )
-  })
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS}${suffix}`
+      )
+    }
+  )
 
   test('should go to the UK invoice address page when "None of these" is selected', async () => {
     mockSearchResults()

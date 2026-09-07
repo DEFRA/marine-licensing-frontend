@@ -157,6 +157,29 @@ const lookupWithTokenRetry = async (request, url) => {
   }
 }
 
+const MAX_LOGGED_BODY_LENGTH = 500
+
+// Wreck attaches the upstream response body to the Boom error as data.payload, parsed
+// when the content-type said JSON and a raw buffer otherwise. Truncated because an API
+// gateway can answer with a whole HTML error page.
+const describeErrorPayload = (error) => {
+  const { payload } = error.data ?? {}
+
+  if (payload === undefined || payload === null) {
+    return 'none'
+  }
+
+  const text = Buffer.isBuffer(payload)
+    ? payload.toString('utf8')
+    : JSON.stringify(payload)
+
+  if (!text) {
+    return 'none'
+  }
+
+  return text.slice(0, MAX_LOGGED_BODY_LENGTH)
+}
+
 export const lookupAddresses = async (
   request,
   { postcode, propertyNameOrNumber }
@@ -184,11 +207,13 @@ export const lookupAddresses = async (
     }
   } catch (error) {
     // apiUrl is in the context because a 404 here is almost always a misconfigured URL.
+    // The response body is what distinguishes a rejected postcode from an outage: the
+    // API answers 400 for postcodes it will not serve, and only the body says why.
     request.logger.error(
       {
         event: { action: 'address-lookup-failed' },
         tenant: {
-          message: `statusCode=${error.output?.statusCode} apiUrl=${config.get('addressLookup').apiUrl}`
+          message: `statusCode=${error.output?.statusCode} apiUrl=${config.get('addressLookup').apiUrl} responseBody=${describeErrorPayload(error)}`
         },
         err: error
       },

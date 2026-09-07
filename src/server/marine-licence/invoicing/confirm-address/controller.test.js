@@ -7,6 +7,7 @@ import {
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { saveInvoicingToBackend } from '#src/server/common/helpers/marine-licence/invoicing/save-invoicing.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { ADDRESS_SOURCE } from '#src/server/common/validation/invoicing/constants.js'
 import * as entryPoints from '#src/server/common/helpers/marine-licence/session-cache/invoicing-entry-points.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
@@ -188,7 +189,8 @@ describe('#confirmAddress', () => {
               addressTown: 'NEWCASTLE UPON TYNE',
               addressCounty: 'TYNE & WEAR',
               addressPostcode: 'NE4 7AR'
-            }
+            },
+            invoiceAddressSource: ADDRESS_SOURCE.LOOKUP
           })
         })
       )

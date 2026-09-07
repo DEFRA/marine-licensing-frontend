@@ -239,36 +239,43 @@ describe('Invoice address postcode search', () => {
     })
   })
 
-  test('should go to the confirm address page when the lookup returns a single result', async () => {
-    mockMarineLicence(mockMarineLicenceApplication)
+  // The change flag has to survive the redirect, or a user changing an existing address
+  // silently drops out of the change flow and is sent on through the task list instead.
+  describe.each([
+    ['the normal flow', ''],
+    ['the change flow', '?action=change']
+  ])('in %s', (_description, suffix) => {
+    test('should go to the confirm address page when the lookup returns a single result', async () => {
+      mockMarineLicence(mockMarineLicenceApplication)
 
-    const response = await makePostRequest({
-      url: marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
-      server: getServer(),
-      formData: { postcode: 'NE4 7AR', propertyNameOrNumber: '' }
+      const response = await makePostRequest({
+        url: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}${suffix}`,
+        server: getServer(),
+        formData: { postcode: 'NE4 7AR', propertyNameOrNumber: '' }
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS}${suffix}`
+      )
     })
 
-    expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_CONFIRM_ADDRESS
-    )
-  })
+    test('should go to the choose your address page when the lookup returns more than one result', async () => {
+      mockMarineLicence(mockMarineLicenceApplication)
+      vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
+        results: [anAddress, anotherAddress]
+      })
 
-  test('should go to the choose your address page when the lookup returns more than one result', async () => {
-    mockMarineLicence(mockMarineLicenceApplication)
-    vi.spyOn(addressLookup, 'lookupAddresses').mockResolvedValue({
-      results: [anAddress, anotherAddress]
+      const response = await makePostRequest({
+        url: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}${suffix}`,
+        server: getServer(),
+        formData: { postcode: 'NE4 7AR', propertyNameOrNumber: '' }
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS}${suffix}`
+      )
     })
-
-    const response = await makePostRequest({
-      url: marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
-      server: getServer(),
-      formData: { postcode: 'NE4 7AR', propertyNameOrNumber: '' }
-    })
-
-    expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_CHOOSE_YOUR_ADDRESS
-    )
   })
 })

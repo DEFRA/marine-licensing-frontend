@@ -9,6 +9,7 @@ import {
   getStatusOptions,
   getTypeOptions,
   getUserOptions,
+  getSelectedUsers,
   addUsersToProjects
 } from './utils.js'
 import {
@@ -832,6 +833,28 @@ describe('#getUserOptions', () => {
 
   test('can handle missing data', () => {
     expect(getUserOptions()).toEqual([])
+  })
+})
+
+describe('#getSelectedUsers', () => {
+  test('joins the names of the selected contact ids', () => {
+    const result = getSelectedUsers(mockUsers, {
+      user: ['testContactId', 'johnSmithId']
+    })
+
+    expect(result).toBe('Test User, John Smith')
+  })
+
+  test('drops contact ids that do not resolve to a user', () => {
+    const result = getSelectedUsers(mockUsers, {
+      user: ['testContactId', 'unknown-id']
+    })
+
+    expect(result).toBe('Test User')
+  })
+
+  test('can handle missing searchParams', () => {
+    expect(getSelectedUsers(mockUsers)).toBe('')
   })
 })
 

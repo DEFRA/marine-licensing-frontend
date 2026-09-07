@@ -547,13 +547,18 @@ describe('Dashboard', () => {
         })
       })
 
-      it('should check the "Submissions by owner" radio after filtering', async () => {
-        mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
+      it('should check the "Submissions by owner" radio after filtering by a user', async () => {
+        const johnSmithUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+        mockEmployeeExemptions(
+          mockDashboardServerResponse(employeeExemptions, {
+            [johnSmithUuid]: 'John Smith'
+          })
+        )
 
         const postResponse = await makePostRequest({
           url: routes.DASHBOARD,
           server: getServer(),
-          formData: { show: 'specific-user' }
+          formData: { show: 'specific-user', user: johnSmithUuid }
         })
 
         expect(postResponse.statusCode).toBe(302)
@@ -583,6 +588,50 @@ describe('Dashboard', () => {
         })
 
         expect(myProjectsOption).not.toBeChecked()
+
+        const johnSmithOption = getByRole(filter, 'checkbox', {
+          name: 'John Smith'
+        })
+
+        expect(johnSmithOption).toBeChecked()
+      })
+
+      it('should fall back to "My submissions" when "Submissions by owner" is selected with no user chosen', async () => {
+        mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
+
+        const postResponse = await makePostRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          formData: { show: 'specific-user' }
+        })
+
+        expect(postResponse.statusCode).toBe(302)
+        expect(postResponse.headers.location).toBe(routes.DASHBOARD)
+
+        const sessionCookie = Array.isArray(postResponse.headers['set-cookie'])
+          ? postResponse.headers['set-cookie'].join('; ')
+          : postResponse.headers['set-cookie']
+
+        const getResponse = await makeGetRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          headers: { cookie: sessionCookie }
+        })
+
+        const { document } = new JSDOM(getResponse.result).window
+        const filter = document.querySelector('.moj-filter')
+
+        const mySubmissionRadio = getByRole(filter, 'radio', {
+          name: 'My submissions'
+        })
+
+        expect(mySubmissionRadio).toBeChecked()
+
+        const userSubmissionRadio = getByRole(filter, 'radio', {
+          name: 'Submissions by owner'
+        })
+
+        expect(userSubmissionRadio).not.toBeChecked()
       })
 
       it('should not show "Submissions by owner" when no others exist', async () => {

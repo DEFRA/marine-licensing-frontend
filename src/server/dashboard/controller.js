@@ -10,6 +10,7 @@ import {
   getStatusOptions,
   getTypeOptions,
   getUserOptions,
+  getSelectedUsers,
   addUsersToProjects
 } from '#src/server/dashboard/utils.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
@@ -66,17 +67,24 @@ const buildDashboardViewModel = async (
   const userOptions = getUserOptions(userSession, users, searchParams)
 
   const showSpecificUser = Object.keys(users).length > 0
+  const selectedUsers = getSelectedUsers(users, searchParams)
+
+  const modifiedSearchParams =
+    searchParams.show === 'specific-user' && !selectedUsers
+      ? { ...searchParams, show: 'my-projects' }
+      : searchParams
 
   return {
     projects: formatProjectsForDisplay(sortedProjects, isEmployee),
     isEmployee,
     organisationName,
     filterCategories,
-    searchParams,
+    searchParams: modifiedSearchParams,
     statusOptions,
     typeOptions,
     marineLicenceEnabled,
     userOptions,
+    selectedUsers,
     showSpecificUser
   }
 }

@@ -372,6 +372,12 @@ export const getUserOptions = (userSession, users, searchParams = {}) => {
   return [...ownOption, ...userOptions]
 }
 
+export const getSelectedUsers = (users, searchParams = {}) =>
+  (searchParams.user ?? [])
+    .map((contactId) => users[contactId])
+    .filter(Boolean)
+    .join(', ')
+
 export const addUsersToProjects = (projects, users) =>
   projects.map((project) => ({
     ...project,

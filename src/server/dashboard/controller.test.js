@@ -65,6 +65,7 @@ describe('#dashboard', () => {
         typeOptions: expect.any(Array),
         userOptions: expect.any(Array),
         marineLicenceEnabled: expect.any(Boolean),
+        selectedUsers: '',
         showSpecificUser: false
       })
     })
@@ -103,6 +104,7 @@ describe('#dashboard', () => {
         typeOptions: expect.any(Array),
         userOptions: expect.any(Array),
         marineLicenceEnabled: expect.any(Boolean),
+        selectedUsers: '',
         showSpecificUser: false
       })
     })
@@ -168,6 +170,7 @@ describe('#dashboard', () => {
         typeOptions: expect.any(Array),
         userOptions: expect.any(Array),
         marineLicenceEnabled: expect.any(Boolean),
+        selectedUsers: '',
         showSpecificUser: false
       })
     })
@@ -224,6 +227,7 @@ describe('#dashboard', () => {
         typeOptions: expect.any(Array),
         userOptions: expect.any(Array),
         marineLicenceEnabled: expect.any(Boolean),
+        selectedUsers: '',
         showSpecificUser: false
       })
     })
@@ -325,6 +329,7 @@ describe('#dashboard', () => {
           typeOptions: expect.any(Array),
           userOptions: expect.any(Array),
           marineLicenceEnabled: expect.any(Boolean),
+          selectedUsers: '',
           showSpecificUser: false
         })
       })

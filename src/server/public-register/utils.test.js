@@ -112,5 +112,26 @@ describe('public register utils', () => {
       expect(row[4]).toEqual({ text: '-' })
       expect(row[5].html).toContain('Active')
     })
+
+    test('ignores object-shaped field values', () => {
+      const [row] = formatEntriesForDisplay([
+        {
+          applicationId: { id: 'abc123' },
+          applicationType: { type: PROJECT_TYPE.EXEMPTION },
+          applicationReference: { ref: 'EXE/2026/00001' },
+          projectName: { name: 'Object project' },
+          marinePlanArea: { area: 'North' },
+          dateSubmitted: { date: '2026-01-02' },
+          status: { label: 'Active' }
+        }
+      ])
+
+      expect(row[0]).toEqual({ text: '-' })
+      expect(row[1]).toEqual({ text: '-' })
+      expect(row[2]).toEqual({ text: '-' })
+      expect(row[3]).toEqual({ text: '-' })
+      expect(row[4]).toEqual({ text: '-' })
+      expect(row[5].html).toContain('Active')
+    })
   })
 })

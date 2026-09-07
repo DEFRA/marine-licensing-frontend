@@ -4,23 +4,39 @@ import { getApplicationTypeLabel } from '#src/server/common/helpers/public-regis
 import { getPublicViewDetailsUrl } from '#src/server/common/helpers/public-register/get-public-view-details-url.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
 
+const APPLICATION_REFERENCE_PATTERN = /^[A-Z]+\/(\d{4})\/(\d+)$/
+
+/**
+ * @param {unknown} value
+ * @returns {string}
+ */
+const asDisplayString = (value) => {
+  if (typeof value === 'string') {
+    return value
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value)
+  }
+
+  return ''
+}
+
 /**
  * @param {string} referenceNumber
  * @returns {{ year: number, sequence: number }}
  */
 export const parseApplicationReference = (referenceNumber) => {
-  const match = String(referenceNumber || '')
-    .trim()
-    .toUpperCase()
-    .match(/^[A-Z]+\/(\d{4})\/(\d+)$/)
+  const normalised = asDisplayString(referenceNumber).trim().toUpperCase()
+  const match = APPLICATION_REFERENCE_PATTERN.exec(normalised)
 
   if (!match) {
     return { year: 0, sequence: 0 }
   }
 
   return {
-    year: parseInt(match[1], 10),
-    sequence: parseInt(match[2], 10)
+    year: Number.parseInt(match[1], 10),
+    sequence: Number.parseInt(match[2], 10)
   }
 }
 
@@ -30,8 +46,12 @@ export const parseApplicationReference = (referenceNumber) => {
  */
 export const sortByReferenceNewestFirst = (entries) =>
   [...entries].sort((entryA, entryB) => {
-    const refA = parseApplicationReference(entryA.applicationReference)
-    const refB = parseApplicationReference(entryB.applicationReference)
+    const refA = parseApplicationReference(
+      asDisplayString(entryA.applicationReference)
+    )
+    const refB = parseApplicationReference(
+      asDisplayString(entryB.applicationReference)
+    )
 
     if (refA.year !== refB.year) {
       return refB.year - refA.year
@@ -45,15 +65,17 @@ export const sortByReferenceNewestFirst = (entries) =>
  * @returns {string}
  */
 const formatMarinePlanArea = (entry) => {
-  if (entry.marinePlanArea) {
-    return String(entry.marinePlanArea)
+  const marinePlanArea = asDisplayString(entry.marinePlanArea)
+
+  if (marinePlanArea) {
+    return marinePlanArea
   }
 
   if (
     Array.isArray(entry.marinePlanAreas) &&
     entry.marinePlanAreas.length > 0
   ) {
-    return entry.marinePlanAreas.join(', ')
+    return entry.marinePlanAreas.map(asDisplayString).filter(Boolean).join(', ')
   }
 
   return '-'
@@ -65,26 +87,22 @@ const formatMarinePlanArea = (entry) => {
  */
 export const formatEntriesForDisplay = (entries) =>
   entries.map((entry) => {
-    const projectName = entry.projectName ? String(entry.projectName) : '-'
-    const status = entry.status ? String(entry.status) : 'Active'
-    const viewUrl = getPublicViewDetailsUrl(
-      String(entry.applicationType),
-      String(entry.applicationId)
-    )
+    const projectName = asDisplayString(entry.projectName) || '-'
+    const status = asDisplayString(entry.status) || 'Active'
+    const applicationType = asDisplayString(entry.applicationType)
+    const applicationId = asDisplayString(entry.applicationId)
+    const applicationReference =
+      asDisplayString(entry.applicationReference) || '-'
+    const dateSubmitted = asDisplayString(entry.dateSubmitted)
+    const viewUrl = getPublicViewDetailsUrl(applicationType, applicationId)
 
     return [
-      {
-        text: entry.applicationReference
-          ? String(entry.applicationReference)
-          : '-'
-      },
+      { text: applicationReference },
       { text: projectName },
-      { text: getApplicationTypeLabel(String(entry.applicationType)) },
+      { text: getApplicationTypeLabel(applicationType) },
       { text: formatMarinePlanArea(entry) },
       {
-        text: entry.dateSubmitted
-          ? formatDate(String(entry.dateSubmitted), 'd MMM yyyy')
-          : '-'
+        text: dateSubmitted ? formatDate(dateSubmitted, 'd MMM yyyy') : '-'
       },
       {
         html: `<strong class="govuk-tag ${getTagStyle(status)}">${escapeHtml(status)}</strong>`

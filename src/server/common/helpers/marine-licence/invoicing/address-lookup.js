@@ -4,6 +4,7 @@ import { config } from '#src/config/config.js'
 import { getAccessToken } from '#src/server/common/helpers/marine-licence/invoicing/address-lookup-token.js'
 
 const HTTP_STATUS_NO_CONTENT = 204
+const HTTP_STATUS_BAD_REQUEST = 400
 const HTTP_STATUS_UNAUTHORIZED = 401
 
 export const normalisePostcode = (postcode = '') =>
@@ -180,6 +181,16 @@ const describeErrorPayload = (error) => {
   return text.slice(0, MAX_LOGGED_BODY_LENGTH)
 }
 
+const isRejectedPostcode = (error) => {
+  if (error.output?.statusCode !== HTTP_STATUS_BAD_REQUEST) {
+    return false
+  }
+
+  const message = error.data?.payload?.error?.message
+
+  return typeof message === 'string' && /postcode/i.test(message)
+}
+
 export const lookupAddresses = async (
   request,
   { postcode, propertyNameOrNumber }
@@ -206,6 +217,17 @@ export const lookupAddresses = async (
       ...(truncated ? { truncated: true } : {})
     }
   } catch (error) {
+    if (isRejectedPostcode(error)) {
+      request.logger.info(
+        {
+          event: { action: 'address-lookup-postcode-rejected' },
+          tenant: { message: `responseBody=${describeErrorPayload(error)}` }
+        },
+        'Postcode lookup rejected the postcode'
+      )
+      return { results: [] }
+    }
+
     // apiUrl is in the context because a 404 here is almost always a misconfigured URL.
     // The response body is what distinguishes a rejected postcode from an outage: the
     // API answers 400 for postcodes it will not serve, and only the body says why.

@@ -340,6 +340,41 @@ describe('#addressLookup', () => {
       )
     })
 
+    test('should report no addresses found when the API rejects the postcode', async () => {
+      Wreck.get.mockRejectedValue(
+        createWreckResponseError(400, {
+          error: {
+            statuscode: 400,
+            message:
+              'Requested postcode must contain a minimum of the sector plus 1 digit of the district e.g. SO1. Requested postcode was NE991NC'
+          }
+        })
+      )
+
+      const result = await lookupAddresses(request, { postcode: 'NE99 1NC' })
+
+      expect(result).toEqual({ results: [] })
+      expect(request.logger.error).not.toHaveBeenCalled()
+      expect(request.logger.info).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: { action: 'address-lookup-postcode-rejected' }
+        }),
+        'Postcode lookup rejected the postcode'
+      )
+    })
+
+    test('should still report an error for a 400 that is not about the postcode', async () => {
+      Wreck.get.mockRejectedValue(
+        createWreckResponseError(400, {
+          error: { statuscode: 400, message: 'Invalid maxresults value' }
+        })
+      )
+
+      const result = await lookupAddresses(request, { postcode: 'NE4 7AR' })
+
+      expect(result).toEqual({ results: [], error: true })
+    })
+
     test('should log the response body so a rejected postcode is distinguishable from an outage', async () => {
       Wreck.get.mockRejectedValue(
         createWreckResponseError(400, { error: 'Restricted postcode' })

@@ -61,7 +61,7 @@
     "aws-embedded-metrics": "^4.2.1",
     "convict": "^6.2.5",
     "cssnano": "^9.0.1",
-    "cssnano-preset-default": "^8.0.8",
+    "cssnano-preset-default": "^9.0.1",
     "date-fns": "^4.4.0",
     "dayjs": "^1.11.23",
     "dotenv": "^17.4.2",

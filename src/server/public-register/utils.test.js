@@ -81,14 +81,14 @@ describe('public register utils', () => {
       expect(row[5].html).toContain('Withdrawn')
     })
 
-    test('uses marinePlanArea when present', () => {
+    test('formats a single marine plan area from the array', () => {
       const [row] = formatEntriesForDisplay([
         {
           applicationId: 'abc123',
           applicationType: PROJECT_TYPE.EXEMPTION,
           applicationReference: 'EXE/2026/00001',
           projectName: 'Single area project',
-          marinePlanArea: 'North',
+          marinePlanAreas: ['North'],
           dateSubmitted: '2026-01-02',
           status: 'Active'
         }
@@ -120,7 +120,7 @@ describe('public register utils', () => {
           applicationType: { type: PROJECT_TYPE.EXEMPTION },
           applicationReference: { ref: 'EXE/2026/00001' },
           projectName: { name: 'Object project' },
-          marinePlanArea: { area: 'North' },
+          marinePlanAreas: [{ area: 'North' }],
           dateSubmitted: { date: '2026-01-02' },
           status: { label: 'Active' }
         }

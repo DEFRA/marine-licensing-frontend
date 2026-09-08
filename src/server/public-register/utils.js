@@ -65,17 +65,18 @@ export const sortByReferenceNewestFirst = (entries) =>
  * @returns {string}
  */
 const formatMarinePlanArea = (entry) => {
-  const marinePlanArea = asDisplayString(entry.marinePlanArea)
-
-  if (marinePlanArea) {
-    return marinePlanArea
-  }
-
   if (
     Array.isArray(entry.marinePlanAreas) &&
     entry.marinePlanAreas.length > 0
   ) {
-    return entry.marinePlanAreas.map(asDisplayString).filter(Boolean).join(', ')
+    const areas = entry.marinePlanAreas
+      .map(asDisplayString)
+      .filter(Boolean)
+      .join(', ')
+
+    if (areas) {
+      return areas
+    }
   }
 
   return '-'

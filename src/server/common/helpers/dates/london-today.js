@@ -1,0 +1,34 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'
+
+dayjs.extend(utc)
+
+const LONDON_TIME_ZONE = 'Europe/London'
+
+// Constructed once: building an Intl formatter is the expensive part.
+const londonDateParts = new Intl.DateTimeFormat('en-GB', {
+  timeZone: LONDON_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+})
+
+/**
+ * Today's date as the London clock reads it, normalised to UTC midnight so it
+ * compares directly against activity dates, which are stored at UTC midnight.
+ *
+ * During British Summer Time the UTC day lags the London day between 23:00 and
+ * midnight. Deriving "today" from UTC in that hour would offer the user a start
+ * date that the service has already rolled past, so the two must agree.
+ *
+ * Requesting the parts rather than formatting a string keeps the locale out of
+ * the result: only the timezone affects it.
+ */
+export function londonToday(now = new Date()) {
+  const parts = londonDateParts.formatToParts(now)
+  const datePart = (type) => parts.find((part) => part.type === type).value
+
+  return dayjs.utc(
+    `${datePart('year')}-${datePart('month')}-${datePart('day')}T00:00:00.000Z`
+  )
+}

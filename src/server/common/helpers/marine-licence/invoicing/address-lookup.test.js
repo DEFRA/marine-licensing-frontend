@@ -363,6 +363,22 @@ describe('#addressLookup', () => {
       )
     })
 
+    test('should still report an error for a 400 that only mentions the postcode in passing', async () => {
+      Wreck.get.mockRejectedValue(
+        createWreckResponseError(400, {
+          error: {
+            statuscode: 400,
+            message: 'Parameter postcode is not a recognised query parameter'
+          }
+        })
+      )
+
+      const result = await lookupAddresses(request, { postcode: 'NE4 7AR' })
+
+      expect(result).toEqual({ results: [], error: true })
+      expect(request.logger.error).toHaveBeenCalled()
+    })
+
     test('should still report an error for a 400 that is not about the postcode', async () => {
       Wreck.get.mockRejectedValue(
         createWreckResponseError(400, {

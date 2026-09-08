@@ -181,6 +181,8 @@ const describeErrorPayload = (error) => {
   return text.slice(0, MAX_LOGGED_BODY_LENGTH)
 }
 
+const REJECTED_POSTCODE_MESSAGE = /^requested postcode\b/i
+
 const isRejectedPostcode = (error) => {
   if (error.output?.statusCode !== HTTP_STATUS_BAD_REQUEST) {
     return false
@@ -188,7 +190,10 @@ const isRejectedPostcode = (error) => {
 
   const message = error.data?.payload?.error?.message
 
-  return typeof message === 'string' && /postcode/i.test(message)
+  return (
+    typeof message === 'string' &&
+    REJECTED_POSTCODE_MESSAGE.test(message.trim())
+  )
 }
 
 export const lookupAddresses = async (

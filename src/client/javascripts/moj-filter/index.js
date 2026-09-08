@@ -28,6 +28,10 @@ export class MojFilter {
       }
     })
 
+    // CSS only reveals the panel once this is set, so a slow-loading bundle never
+    // leaves it visible before the toggle button has decided the correct state
+    this.$root.classList.add('app-filter-ready')
+
     this.$form = this.$root.closest('form')
     this.$results = document.getElementById('app-project-results')
     this.$status = document.getElementById('app-project-results-status')

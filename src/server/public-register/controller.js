@@ -42,11 +42,13 @@ const fetchApplicationSubmissions = async () => {
     headers[tracingHeader] = traceId
   }
 
-  const url = `${config.get('publicRegister').apiUrl}${APPLICATION_SUBMISSIONS_ENDPOINT}`
+  const { apiUrl, timeout } = config.get('publicRegister')
+  const url = `${apiUrl}${APPLICATION_SUBMISSIONS_ENDPOINT}`
 
   return Wreck.get(url, {
     headers,
-    json: true
+    json: true,
+    timeout
   })
 }
 

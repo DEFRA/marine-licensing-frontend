@@ -27,7 +27,7 @@ describe('#publicRegisterBrowseController', () => {
     getTraceIdMock.mockReturnValue(undefined)
     vi.spyOn(config, 'get').mockImplementation((key) => {
       if (key === 'publicRegister') {
-        return { apiUrl: 'http://localhost:3003' }
+        return { apiUrl: 'http://localhost:3003', timeout: 10000 }
       }
       if (key === 'tracing.header') {
         return 'x-cdp-request-id'
@@ -63,7 +63,8 @@ describe('#publicRegisterBrowseController', () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        json: true
+        json: true,
+        timeout: 10000
       }
     )
     expect(h.view).toHaveBeenCalledWith(PUBLIC_REGISTER_VIEW_ROUTE, {
@@ -90,7 +91,8 @@ describe('#publicRegisterBrowseController', () => {
           'Content-Type': 'application/json',
           'x-cdp-request-id': 'trace-123'
         },
-        json: true
+        json: true,
+        timeout: 10000
       }
     )
   })

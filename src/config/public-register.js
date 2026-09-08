@@ -11,5 +11,11 @@ export const publicRegisterSchema = {
     nullable: true,
     default: 'http://localhost:3003',
     env: 'MARINE_LICENSING_PUBLIC_REGISTER_API_URL'
+  },
+  timeout: {
+    doc: 'Request timeout for public register API calls in milliseconds',
+    format: Number,
+    default: 10000,
+    env: 'MARINE_LICENSING_PUBLIC_REGISTER_TIMEOUT'
   }
 }

@@ -8,6 +8,8 @@ import {
 } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
+import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { getExemptionService } from '#src/services/exemption-service/index.js'
 
 import {
@@ -40,7 +42,8 @@ describe('#withdraw', () => {
     mockRequest = {
       logger: {
         error: vi.fn(),
-        info: vi.fn()
+        info: vi.fn(),
+        warn: vi.fn()
       }
     }
 
@@ -57,7 +60,8 @@ describe('#withdraw', () => {
       const mockExemption = { id: 'test-project-id' }
       const mockSavedExemption = {
         projectName: 'Test Project',
-        id: 'test-project-id'
+        id: 'test-project-id',
+        status: PROJECT_STATUS.ACTIVE
       }
 
       mockedGetExemptionCache.mockReturnValue(mockExemption)
@@ -123,6 +127,57 @@ describe('#withdraw', () => {
       expect(mockH.redirect).toHaveBeenCalledWith(routes.DASHBOARD)
       expect(result).toBe('redirect-response')
     })
+
+    it('should render the confirmation page for a scheduled project', async () => {
+      mockedGetExemptionCache.mockReturnValue({ id: 'test-project-id' })
+      mockExemptionService.getExemptionById.mockResolvedValue({
+        projectName: 'Test Project',
+        id: 'test-project-id',
+        status: PROJECT_STATUS.SCHEDULED
+      })
+
+      await withdrawExemptionController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalled()
+      expect(mockH.redirect).not.toHaveBeenCalled()
+    })
+
+    it.each([
+      PROJECT_STATUS.EXPIRED,
+      PROJECT_STATUS.WITHDRAWN,
+      PROJECT_STATUS.DRAFT
+    ])(
+      'should redirect to dashboard without rendering when the project is %s',
+      async (status) => {
+        mockedGetExemptionCache.mockReturnValue({ id: 'test-project-id' })
+        mockExemptionService.getExemptionById.mockResolvedValue({
+          projectName: 'Test Project',
+          id: 'test-project-id',
+          status
+        })
+
+        const result = await withdrawExemptionController.handler(
+          mockRequest,
+          mockH
+        )
+
+        expect(mockH.view).not.toHaveBeenCalled()
+        expect(mockRequest.logger.warn).toHaveBeenCalledWith(
+          {
+            event: {
+              action: 'exemption-withdraw:not-withdrawable',
+              outcome: 'failure',
+              reference: 'test-project-id',
+              reason:
+                'Activity period has ended or the exemption is already withdrawn'
+            }
+          },
+          `Exemption test-project-id cannot be withdrawn: status ${status}`
+        )
+        expect(mockH.redirect).toHaveBeenCalledWith(routes.DASHBOARD)
+        expect(result).toBe('redirect-response')
+      }
+    )
 
     it('should redirect to dashboard if saved exemption is undefined', async () => {
       const mockExemption = { id: 'test-project-id' }
@@ -205,6 +260,29 @@ describe('#withdraw', () => {
 
       expect(mockH.redirect).toHaveBeenCalledWith(routes.DASHBOARD)
       expect(result).toBe('redirect-response')
+    })
+
+    it('should surface a conflict rather than redirecting as though it succeeded', async () => {
+      mockRequest.payload = { exemptionId: 'test-project-id' }
+      mockedGetExemptionCache.mockReturnValue({ id: 'test-project-id' })
+
+      const conflict = new Error('Conflict')
+      conflict.output = { statusCode: statusCodes.conflict }
+      mockedAuthenticatedPostRequest.mockRejectedValue(conflict)
+
+      await expect(
+        withdrawExemptionSubmitController.handler(mockRequest, mockH)
+      ).rejects.toMatchObject({
+        isBoom: true,
+        output: { statusCode: statusCodes.conflict }
+      })
+
+      expect(mockH.redirect).not.toHaveBeenCalled()
+      expect(mockedClearExemptionCache).not.toHaveBeenCalled()
+      expect(mockRequest.logger.warn).toHaveBeenCalledWith(
+        { err: conflict },
+        'Exemption can no longer be withdrawn'
+      )
     })
 
     it('should redirect to dashboard when error occurs', async () => {

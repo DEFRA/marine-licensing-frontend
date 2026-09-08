@@ -1,4 +1,5 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "marine-licence/redaction-field/macro.njk" import appMarineLicenceRedactionField %}
 
 {% set rows = [] %}
 
@@ -41,6 +42,18 @@
     text: "Preferred start and end dates of the licence"
   },
   value: {
+    html: appMarineLicenceRedactionField({
+      fieldId: "preferredDates",
+      label: "preferred start and end dates of the licence",
+      originalText: params.preferredDates,
+      redactions: params.redactions.preferredDates,
+      publishedText: params.redactions.preferredDates.redactedText or params.preferredDates,
+      isRedacted: params.redactions.preferredDates,
+      saveUrl: params.redactionSaveUrl,
+      csrfToken: params.csrfToken
+    }),
+    classes: "govuk-summary-list__value--full-width"
+  } if params.enableRedaction else {
     text: params.preferredDates
   },
   actions: {

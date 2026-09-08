@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'vitest'
 import { formatPreferredDates, buildSummaryData } from './summary-data.js'
 import { invoicingReviewData } from './invoicing/invoicing-review-data.js'
-import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockMarineLicenceApplication,
+  mockRedactions
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('formatPreferredDates', () => {
   test('returns formatted range when both start and end are present', () => {
@@ -43,6 +46,18 @@ describe('buildSummaryData', () => {
       ...mockMarineLicenceApplication,
       preferredDates: 'July 2026 to August 2027',
       invoicing: invoicingReviewData(mockMarineLicenceApplication.invoicing)
+    })
+  })
+
+  test('passes redactions through untouched', () => {
+    const result = buildSummaryData({
+      ...mockMarineLicenceApplication,
+      redactions: mockRedactions
+    })
+
+    expect(result).toMatchObject({
+      preferredDates: 'July 2026 to August 2027',
+      redactions: mockRedactions
     })
   })
 })

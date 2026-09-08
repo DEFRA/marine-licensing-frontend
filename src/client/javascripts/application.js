@@ -18,6 +18,7 @@ import { BackLinkHistory } from './back-link-history/index.js'
 import { IatAnswerPrint } from './iat-answer-print/index.js'
 import { ProjectFilter } from './project-filter/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
+import { RedactionField } from './redaction-field/index.js'
 
 createAll(Button)
 createAll(Checkboxes)
@@ -88,5 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
   )
   for (const element of printElements) {
     new IatAnswerPrint(element) // eslint-disable-line no-new
+  }
+
+  const redactionFieldElements = document.querySelectorAll(
+    '[data-module="redaction-field"]'
+  )
+  for (const element of redactionFieldElements) {
+    new RedactionField(element) // eslint-disable-line no-new
   }
 })

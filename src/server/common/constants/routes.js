@@ -94,7 +94,7 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_CSV_DOWNLOAD: '/marine-licence/location-csv-download',
   MARINE_LICENCE_VIEW_DETAILS: '/marine-licence/view-details',
   MARINE_LICENCE_VIEW_DETAILS_PUBLIC: '/marine-licence/view-public-details',
-  MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER: '/view-marine-licence-details',
+  MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER: '/marine-licence/redaction',
   MARINE_LICENCE_COORDINATES_ENTRY_CHOICE:
     '/marine-licence/how-do-you-want-to-enter-the-coordinates',
   MARINE_LICENCE_COORDINATE_SYSTEM_CHOICE:
@@ -233,5 +233,7 @@ export const apiRoutes = {
   MARINE_LICENCE_MARINE_PLAN_POLICY_RESPONSE:
     '/marine-licence/marine-plan-policy-response',
   CONFIRM_SITE_DETAILS: '/marine-licence/confirm-site-details',
-  COPY_MARINE_LICENCE: '/marine-licence/copy-marine-licence'
+  COPY_MARINE_LICENCE: '/marine-licence/copy-marine-licence',
+  REDACT_DATA: '/marine-licence/redact-data',
+  GET_USER_NAMES: '/projects/users'
 }

@@ -1,0 +1,19 @@
+@use 'govuk-frontend' as *;
+
+.app-redaction-field [hidden] {
+  display: none;
+}
+
+.app-redaction-field__panel {
+  border-left: 5px solid $govuk-border-colour;
+  padding-left: 15px;
+}
+
+.app-copy-button__icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: govuk-spacing(1);
+  fill: currentColor;
+  width: 16px;
+  height: 16px;
+}

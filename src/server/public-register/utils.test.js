@@ -59,7 +59,7 @@ describe('public register utils', () => {
       expect(row[2]).toEqual({ text: EXEMPTION_TYPE })
       expect(row[3]).toEqual({ text: 'South, South West' })
       expect(row[4]).toEqual({ text: '18 Mar 2026' })
-      expect(row[5].html).toContain('govuk-tag--green')
+      expect(row[5].html).toContain('govuk-tag--teal')
       expect(row[5].html).toContain('Active')
       expect(row[6].html).toContain('/exemption/view-public-details/abc123')
       expect(row[6].html).toContain('View details')

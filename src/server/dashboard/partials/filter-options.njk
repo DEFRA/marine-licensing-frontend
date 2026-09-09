@@ -1,0 +1,77 @@
+{%- from "govuk/components/radios/macro.njk" import govukRadios -%}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+
+{%- set userChoiceHtml %}
+  {{ govukCheckboxes({
+    idPrefix: "user",
+    name: "user",
+    classes: "govuk-checkboxes--small",
+    errorMessage: errors['user'],
+    items: userOptions
+  }) }}
+{% endset -%}
+
+<div id="app-filter-options">
+  {% if isEmployee %}
+
+    {{ govukRadios({
+      name: "show",
+      classes: "govuk-radios--small",
+      fieldset: {
+        legend: {
+          text: "Show",
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      items: [
+        {
+          value: "all-projects",
+          text: "All " + organisationName + " submissions",
+          checked: searchParams.show == "all-projects"
+        },
+        {
+          value: "my-projects",
+          text: "My submissions",
+          checked: searchParams.show == "my-projects" or not searchParams.show
+        },
+        {
+          value: "specific-user",
+          text: "Submissions by owner",
+          checked: searchParams.show == "specific-user",
+          conditional: {
+            html: userChoiceHtml
+          }
+        } if showSpecificUser
+      ]
+    }) }}
+
+    {% if marineLicenceEnabled %}
+      {{ govukCheckboxes({
+        idPrefix: "type",
+        name: "type",
+        classes: "govuk-checkboxes--small",
+        fieldset: {
+          legend: {
+            text: "Submission type",
+            classes: "govuk-fieldset__legend--s"
+          }
+        },
+        items: typeOptions
+      }) }}
+    {% endif %}
+
+    {{ govukCheckboxes({
+      idPrefix: "status",
+      name: "status",
+      classes: "govuk-checkboxes--small",
+      fieldset: {
+        legend: {
+          text: "Status",
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      items: statusOptions
+    }) }}
+
+  {% endif -%}
+</div>

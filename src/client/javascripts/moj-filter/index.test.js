@@ -209,6 +209,68 @@ describe('MojFilter', () => {
         $selectedFiltersBefore
       )
     })
+
+    test('should swap in the filter options so the owner error appears without a reload', async () => {
+      document.body.innerHTML = `
+        <form class="app-filter-form" action="/projects">
+          <input type="hidden" name="csrfToken" value="test-token" />
+          <div data-module="moj-filter">
+            ${buildSelectedFiltersMarkup()}
+            <div id="app-filter-options">
+              <input type="radio" name="show" value="specific-user" />
+            </div>
+          </div>
+          <div id="app-project-results"></div>
+        </form>
+        <div id="app-project-results-status"></div>
+      `
+
+      fetchMock.mockResolvedValueOnce({
+        ok: true,
+        text: async () =>
+          `<div id="app-project-results"></div>
+           <div id="app-filter-options">
+             <input type="radio" name="show" value="specific-user" checked />
+             <p class="govuk-error-message">Select an owner to view their submissions</p>
+           </div>`
+      })
+
+      const mojFilter = new MojFilter()
+
+      const $form = document.querySelector('form')
+      $form.dispatchEvent(new Event('submit', { cancelable: true }))
+
+      await vi.waitFor(() => {
+        expect(mojFilter.isSubmitting).toBe(false)
+      })
+
+      expect(document.getElementById('app-filter-options').innerHTML).toContain(
+        'Select an owner to view their submissions'
+      )
+      expect(assignSpy).not.toHaveBeenCalled()
+    })
+
+    test('should leave the panel alone when the response has no filter options', async () => {
+      document.body.innerHTML = buildFilterMarkup()
+
+      fetchMock.mockResolvedValueOnce({
+        ok: true,
+        text: async () => '<div id="app-project-results"></div>'
+      })
+
+      const mojFilter = new MojFilter()
+
+      const $form = document.querySelector('form')
+      $form.dispatchEvent(new Event('submit', { cancelable: true }))
+
+      await vi.waitFor(() => {
+        expect(mojFilter.isSubmitting).toBe(false)
+      })
+
+      expect(
+        document.querySelector('input[value="all-projects"]')
+      ).not.toBeNull()
+    })
   })
 
   describe('onTagRemove', () => {

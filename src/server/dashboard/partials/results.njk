@@ -1,3 +1,9 @@
+{% if errors['user'] %}
+
+<p class="govuk-error-message">{{ errors['user'].text }}</p>
+
+{% else %}
+
 {% set showTable = projects and projects.length > 0 %}
 
 {% set subTitle %}
@@ -54,3 +60,5 @@
 <p class="govuk-body app-empty-message{% if showTable %} govuk-!-display-none{% endif %}">
   There are no submissions to display.
 </p>
+
+{% endif %}

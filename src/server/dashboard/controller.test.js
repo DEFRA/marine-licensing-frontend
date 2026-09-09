@@ -66,7 +66,8 @@ describe('#dashboard', () => {
         userOptions: expect.any(Array),
         marineLicenceEnabled: expect.any(Boolean),
         selectedUsers: '',
-        showSpecificUser: false
+        showSpecificUser: false,
+        errors: undefined
       })
     })
 
@@ -105,7 +106,8 @@ describe('#dashboard', () => {
         userOptions: expect.any(Array),
         marineLicenceEnabled: expect.any(Boolean),
         selectedUsers: '',
-        showSpecificUser: false
+        showSpecificUser: false,
+        errors: undefined
       })
     })
 
@@ -171,7 +173,8 @@ describe('#dashboard', () => {
         userOptions: expect.any(Array),
         marineLicenceEnabled: expect.any(Boolean),
         selectedUsers: '',
-        showSpecificUser: false
+        showSpecificUser: false,
+        errors: undefined
       })
     })
 
@@ -228,8 +231,38 @@ describe('#dashboard', () => {
         userOptions: expect.any(Array),
         marineLicenceEnabled: expect.any(Boolean),
         selectedUsers: '',
-        showSpecificUser: false
+        showSpecificUser: false,
+        errors: undefined
       })
+    })
+
+    test('Should show the owner error when specific-user is chosen without a resolvable owner', async () => {
+      const h = { view: vi.fn() }
+      const request = {
+        logger: { error: vi.fn() },
+        state: {},
+        yar: createYarMock({ show: 'specific-user' })
+      }
+
+      authenticatedPostRequestMock.mockResolvedValueOnce({
+        payload: { value: { projects: [], users: { 'contact-1': 'Alex' } } }
+      })
+
+      await dashboardController.handler(request, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        DASHBOARD_VIEW_ROUTE,
+        expect.objectContaining({
+          searchParams: { show: 'specific-user' },
+          errors: {
+            user: {
+              href: '#user',
+              field: 'user',
+              text: 'Select an owner to view their submissions'
+            }
+          }
+        })
+      )
     })
   })
 
@@ -330,8 +363,43 @@ describe('#dashboard', () => {
           userOptions: expect.any(Array),
           marineLicenceEnabled: expect.any(Boolean),
           selectedUsers: '',
-          showSpecificUser: false
+          showSpecificUser: false,
+          errors: undefined
         })
+      })
+
+      test('Should render the owner error in the fetch response, without a page reload', async () => {
+        authenticatedPostRequestMock.mockResolvedValueOnce({
+          payload: {
+            value: { projects: [], users: { 'contact-1': 'Alex' } },
+            isEmployee: true
+          }
+        })
+
+        const h = { view: vi.fn(), response: vi.fn() }
+        const request = {
+          logger: { error: vi.fn() },
+          state: {},
+          headers: { 'x-requested-with': 'XMLHttpRequest' },
+          payload: { show: 'specific-user' },
+          yar: createYarMock()
+        }
+
+        await dashboardPostController.handler(request, h)
+
+        expect(h.response).not.toHaveBeenCalled()
+        expect(h.view).toHaveBeenCalledWith(
+          DASHBOARD_RESULTS_VIEW_ROUTE,
+          expect.objectContaining({
+            errors: {
+              user: {
+                href: '#user',
+                field: 'user',
+                text: 'Select an owner to view their submissions'
+              }
+            }
+          })
+        )
       })
 
       test('Should log the error and return a 500 when the backend call fails', async () => {

@@ -1,11 +1,12 @@
 import { FilterToggleButton, SortableTable } from '@ministryofjustice/frontend'
-import { createAll } from 'govuk-frontend'
+import { createAll, Radios } from 'govuk-frontend'
 
 const FETCH_TIMEOUT_MS = 8000
 const CLEAR_LINK_SELECTOR = '.moj-filter__heading-action a'
 
 const SELECTED_FILTERS_SELECTOR = '.moj-filter__selected'
 const TAG_SELECTOR = '.moj-filter__tag'
+const FILTER_OPTIONS_ID = 'app-filter-options'
 
 export class MojFilter {
   constructor() {
@@ -93,6 +94,8 @@ export class MojFilter {
         $selectedFilters.innerHTML = $newSelectedFilters.innerHTML
       }
 
+      this.replaceFilterOptions(template)
+
       createAll(SortableTable, undefined, this.$results)
 
       this.initClearFiltersLink()
@@ -110,6 +113,19 @@ export class MojFilter {
       this.isSubmitting = false
       this.$submitButton?.removeAttribute('disabled')
     }
+  }
+
+  replaceFilterOptions(template) {
+    const $newOptions = template.content.getElementById(FILTER_OPTIONS_ID)
+    const $options = document.getElementById(FILTER_OPTIONS_ID)
+
+    if (!$newOptions || !$options) {
+      return
+    }
+
+    $options.innerHTML = $newOptions.innerHTML
+
+    createAll(Radios, undefined, $options)
   }
 
   initSelectedFilterTags() {

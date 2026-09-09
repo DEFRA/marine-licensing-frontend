@@ -14,12 +14,34 @@ import {
   addUsersToProjects
 } from '#src/server/dashboard/utils.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import {
+  errorDescriptionByFieldName,
+  mapErrorsForDisplay
+} from '#src/server/common/helpers/errors.js'
 
 export const DASHBOARD_VIEW_ROUTE = 'dashboard/index.njk'
 export const DASHBOARD_RESULTS_VIEW_ROUTE =
   'dashboard/partials/fetch-response.njk'
 
 const DASHBOARD_PAGE_TITLE = 'Projects'
+
+export const errorMessages = {
+  DASHBOARD_OWNER_REQUIRED: 'Select an owner to view their submissions'
+}
+
+// left undefined when valid, so the layout does not prefix the page title
+const getOwnerErrors = (show, selectedUsers) => {
+  if (show !== 'specific-user' || selectedUsers) {
+    return undefined
+  }
+
+  const errorSummary = mapErrorsForDisplay(
+    [{ field: 'user', message: 'DASHBOARD_OWNER_REQUIRED' }],
+    errorMessages
+  )
+
+  return errorDescriptionByFieldName(errorSummary)
+}
 
 export const FILTER_SEARCH_FLASH_KEY = 'dashboardFilterSearch'
 
@@ -69,17 +91,15 @@ const buildDashboardViewModel = async (
   const showSpecificUser = Object.keys(users).length > 0
   const selectedUsers = getSelectedUsers(users, searchParams)
 
-  const modifiedSearchParams =
-    searchParams.show === 'specific-user' && !selectedUsers
-      ? { ...searchParams, show: 'my-projects' }
-      : searchParams
+  const errors = getOwnerErrors(searchParams.show, selectedUsers)
 
   return {
+    errors,
     projects: formatProjectsForDisplay(sortedProjects, isEmployee),
     isEmployee,
     organisationName,
     filterCategories,
-    searchParams: modifiedSearchParams,
+    searchParams,
     statusOptions,
     typeOptions,
     marineLicenceEnabled,

@@ -376,7 +376,7 @@ describe('#formatProjectsForDisplay', () => {
         { text: 'Exempt activity notification' },
         { text: 'ML-2024-002' },
         {
-          html: '<strong class="govuk-tag govuk-tag--green">Active</strong>',
+          html: '<strong class="govuk-tag govuk-tag--teal">Active</strong>',
           attributes: { 'data-sort-value': 'Active' },
           classes: 'govuk-table__cell--nowrap'
         },
@@ -448,7 +448,7 @@ describe('#formatProjectsForDisplay', () => {
 
     expect(result[0].cells[3].html).toContain('govuk-tag--blue')
     expect(result[0].cells[3].html).toContain('Draft')
-    expect(result[1].cells[3].html).toContain('govuk-tag--green')
+    expect(result[1].cells[3].html).toContain('govuk-tag--teal')
     expect(result[1].cells[3].html).toContain('Active')
     expect(result[2].cells[3].html).toContain('govuk-tag--grey')
     expect(result[2].cells[3].html).toContain('Withdrawn')
@@ -492,6 +492,33 @@ describe('getActionButtons', () => {
     expect(result).toBe(
       `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a>`
     )
+  })
+
+  it('offers Withdraw for a scheduled exemption', () => {
+    const scheduled = {
+      id: 'abc123',
+      projectName: 'Test Project',
+      status: PROJECT_STATUS.SCHEDULED,
+      projectType: 'exemption'
+    }
+
+    expect(getActionButtons(scheduled)).toContain(
+      `${routes.WITHDRAW_EXEMPTION}/abc123`
+    )
+  })
+
+  it('does not offer Withdraw once an exemption has expired', () => {
+    const expired = {
+      id: 'abc123',
+      projectName: 'Test Project',
+      status: PROJECT_STATUS.EXPIRED,
+      projectType: 'exemption'
+    }
+
+    const result = getActionButtons(expired)
+
+    expect(result).toContain(`${routes.VIEW_DETAILS}/abc123`)
+    expect(result).not.toContain('Withdraw')
   })
 
   it('returns View details link when status is Submitted', () => {
@@ -761,6 +788,8 @@ describe('#getStatusOptions', () => {
     expect(getStatusOptions('SUBMITTED')).toEqual([
       { value: 'ACTIVE', text: 'Active', checked: false },
       { value: 'DRAFT', text: 'Draft', checked: false },
+      { value: 'EXPIRED', text: 'Expired', checked: false },
+      { value: 'SCHEDULED', text: 'Scheduled', checked: false },
       { value: 'SUBMITTED', text: 'Submitted', checked: true },
       { value: 'TRANSFERRED', text: 'Transferred', checked: false },
       { value: 'REJECTED', text: UNABLE_TO_PROGRESS, checked: false },
@@ -772,6 +801,8 @@ describe('#getStatusOptions', () => {
     expect(getStatusOptions(['DRAFT', 'ACTIVE'])).toEqual([
       { value: 'ACTIVE', text: 'Active', checked: true },
       { value: 'DRAFT', text: 'Draft', checked: true },
+      { value: 'EXPIRED', text: 'Expired', checked: false },
+      { value: 'SCHEDULED', text: 'Scheduled', checked: false },
       { value: 'SUBMITTED', text: 'Submitted', checked: false },
       { value: 'TRANSFERRED', text: 'Transferred', checked: false },
       { value: 'REJECTED', text: UNABLE_TO_PROGRESS, checked: false },
@@ -779,10 +810,12 @@ describe('#getStatusOptions', () => {
     ])
   })
 
-  test('only returns Active and Draft when the marine licence flag is off', () => {
+  test('only returns exemption statuses when the marine licence flag is off', () => {
     expect(getStatusOptions(undefined, false)).toEqual([
       { value: 'ACTIVE', text: 'Active', checked: false },
-      { value: 'DRAFT', text: 'Draft', checked: false }
+      { value: 'DRAFT', text: 'Draft', checked: false },
+      { value: 'EXPIRED', text: 'Expired', checked: false },
+      { value: 'SCHEDULED', text: 'Scheduled', checked: false }
     ])
   })
 })

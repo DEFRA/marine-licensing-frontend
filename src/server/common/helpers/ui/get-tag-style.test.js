@@ -9,8 +9,16 @@ describe('getTagStyle', () => {
     expect(getTagStyle('Withdrawn')).toBe('govuk-tag--grey')
   })
 
-  it('should return green for Active', () => {
-    expect(getTagStyle('Active')).toBe('govuk-tag--green')
+  it('should return green for Scheduled', () => {
+    expect(getTagStyle('Scheduled')).toBe('govuk-tag--green')
+  })
+
+  it('should return teal for Active', () => {
+    expect(getTagStyle('Active')).toBe('govuk-tag--teal')
+  })
+
+  it('should return grey for Expired', () => {
+    expect(getTagStyle('Expired')).toBe('govuk-tag--grey')
   })
 
   it('should return magenta for Transferred', () => {
@@ -21,7 +29,7 @@ describe('getTagStyle', () => {
     expect(getTagStyle('Rejected')).toBe('govuk-tag--orange')
   })
 
-  it('should return green for unknown status', () => {
-    expect(getTagStyle('SomeOtherStatus')).toBe('govuk-tag--green')
+  it('should return green for unknown status, so marine licences are unaffected', () => {
+    expect(getTagStyle('Submitted')).toBe('govuk-tag--green')
   })
 })

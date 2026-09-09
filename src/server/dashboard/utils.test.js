@@ -177,6 +177,19 @@ describe('#fetchProjects', () => {
     expect(authenticatedPostRequestMock).toHaveBeenCalledTimes(1)
     expect(result.payload.value.users).toEqual(mockUsers)
   })
+
+  test('does not cache an empty user list', async () => {
+    getUserSessionMock.mockResolvedValue({ organisationId: 'org-1' })
+    const request = buildRequest()
+    request.server.app.dashboardUsersCache.get.mockResolvedValue(null)
+    authenticatedPostRequestMock.mockResolvedValue({
+      payload: { value: { projects: [{ contactId: 'testContactId' }] } }
+    })
+
+    await fetchProjects(request, { show: 'all-projects' })
+
+    expect(request.server.app.dashboardUsersCache.set).not.toHaveBeenCalled()
+  })
 })
 
 describe('#sortProjectsByStatus', () => {

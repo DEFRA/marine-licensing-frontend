@@ -128,7 +128,9 @@ export const fetchProjects = async (request, payload = {}) => {
   let users = cachedUsers ?? result.payload?.value?.users ?? {}
 
   if (!cachedUsers) {
-    await setCachedUsers(users)
+    if (Object.keys(users).length) {
+      await setCachedUsers(users)
+    }
     return result
   }
 

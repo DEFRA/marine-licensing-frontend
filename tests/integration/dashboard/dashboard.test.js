@@ -596,7 +596,7 @@ describe('Dashboard', () => {
         expect(johnSmithOption).toBeChecked()
       })
 
-      it('should fall back to "My submissions" when "Submissions by owner" is selected with no user chosen', async () => {
+      it('should show error when "Submissions by owner" is selected with no user chosen', async () => {
         mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
 
         const postResponse = await makePostRequest({
@@ -621,17 +621,19 @@ describe('Dashboard', () => {
         const { document } = new JSDOM(getResponse.result).window
         const filter = document.querySelector('.moj-filter')
 
-        const mySubmissionRadio = getByRole(filter, 'radio', {
-          name: 'My submissions'
-        })
-
-        expect(mySubmissionRadio).toBeChecked()
-
         const userSubmissionRadio = getByRole(filter, 'radio', {
           name: 'Submissions by owner'
         })
 
-        expect(userSubmissionRadio).not.toBeChecked()
+        expect(userSubmissionRadio).toBeChecked()
+
+        const errorMessage = document.querySelector('#user-error')
+        expect(errorMessage).toHaveTextContent(
+          'Select an owner to view their submissions'
+        )
+        expect(errorMessage.closest('.govuk-form-group')).toHaveClass(
+          'govuk-form-group--error'
+        )
       })
 
       it('should not show "Submissions by owner" when no others exist', async () => {

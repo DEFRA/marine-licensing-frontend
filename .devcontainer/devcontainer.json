@@ -1,0 +1,43 @@
+{
+  "name": "marine-licensing-frontend",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24-bookworm",
+  "runArgs": ["--add-host=host.docker.internal:host-gateway"],
+  "containerEnv": {
+    "TZ": "Europe/London",
+    "DEFRA_ID_OIDC_CONFIGURATION_URL": "http://host.docker.internal:3200/cdp-defra-id-stub/.well-known/openid-configuration",
+    "ENTRA_ID_OIDC_CONFIGURATION_URL": "http://host.docker.internal:3200/cdp-defra-id-stub/.well-known/openid-configuration",
+    "APP_BASE_URL": "http://localhost:3000"
+  },
+  "privileged": true,
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/node/.ssh,readonly,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind,readonly"
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "dockerDashComposeVersion": "v2"
+    }
+  },
+  "forwardPorts": [9229],
+  "portsAttributes": {
+    "3000": {
+      "label": "Application",
+      "onAutoForward": "notify"
+    },
+    "9229": {
+      "label": "Node debug",
+      "onAutoForward": "silent"
+    }
+  },
+  "postCreateCommand": "npm install",
+  "postAttachCommand": "bash scripts/devcontainer-stub-proxy.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "stylelint.vscode-stylelint"
+      ]
+    }
+  }
+}

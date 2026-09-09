@@ -95,7 +95,8 @@ export class RedactionField extends Component {
       const response = await fetch(this.$form.action, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify(Object.fromEntries(new FormData(this.$form))),
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)

@@ -6,6 +6,7 @@ export const errorMessages = {
   MARINE_LICENCE_NOT_FOUND: 'Marine licence not found',
   MARINE_LICENCE_NOT_SUBMITTED: 'Marine licence has not been submitted',
   MARINE_LICENCE_SUBMISSION_FAILED: 'Error submitting marine licence',
+  MARINE_LICENCE_REDACTION_FAILED: 'Error saving marine licence redaction',
   SUBMISSION_FAILED: 'Error submitting exemption',
   EXEMPTION_SUBMISSION_FAILED: 'Error submitting exemption',
   UNAUTHORIZED_ACCESS: 'You do not have permission to view this exemption',

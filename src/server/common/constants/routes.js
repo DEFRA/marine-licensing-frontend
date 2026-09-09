@@ -234,6 +234,6 @@ export const apiRoutes = {
     '/marine-licence/marine-plan-policy-response',
   CONFIRM_SITE_DETAILS: '/marine-licence/confirm-site-details',
   COPY_MARINE_LICENCE: '/marine-licence/copy-marine-licence',
-  REDACT_DATA: '/marine-licence/redact-data',
+  REDACT_TEXT: '/marine-licence/redact-text',
   GET_USER_NAMES: '/projects/users'
 }

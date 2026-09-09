@@ -1,52 +1,27 @@
 import Boom from '@hapi/boom'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
-import {
-  routes,
-  marineLicenceRoutes
-} from '#src/server/common/constants/routes.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { isProjectViewable } from '#src/server/common/helpers/view-details/utils.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
-import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { buildApplicationDetailsCardData } from '#src/server/marine-licence/view-details/utils.js'
-import {
-  FEE_ESTIMATE_AMOUNT,
-  FEE_ESTIMATE_MONITORING_AMOUNT
-} from '#src/server/common/validation/fee-estimate/constants.js'
 
-export const VIEW_DETAILS_VIEW_ROUTE = 'marine-licence/view-details/index'
+export const VIEW_DETAILS_INTERNAL_USER_VIEW_ROUTE =
+  'marine-licence/view-marine-licence-internal-user/index'
 
-const getApplicantBackLink = (status, marineLicenceId) => {
-  if (status === PROJECT_STATUS.TRANSFERRED) {
-    return `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_TRANSFERRED}/${marineLicenceId}`
-  }
+const getRedactionSaveUrl = (marineLicenceId) =>
+  `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${marineLicenceId}/redact`
 
-  if (status === PROJECT_STATUS.REJECTED) {
-    return `${marineLicenceRoutes.MARINE_LICENCE_APPLICATION_REJECTED}/${marineLicenceId}`
-  }
-
-  return routes.DASHBOARD
-}
-
-export const viewDetailsController = {
+export const viewDetailsInternalUserController = {
   async handler(request, h) {
     const { marineLicenceId } = request.params
 
-    const isPublicView = request.path.startsWith(
-      marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_PUBLIC
-    )
-
-    const isApplicantView = !isPublicView
-
     try {
       const service = getMarineLicenceService(request)
-      const serviceMethod = isPublicView
-        ? 'getPublicMarineLicenceById'
-        : 'getMarineLicenceById'
-      const marineLicence = await service[serviceMethod](marineLicenceId)
+      const marineLicence = await service.getMarineLicenceById(marineLicenceId)
 
       if (!isProjectViewable(marineLicence)) {
         request.logger.error(
@@ -63,10 +38,6 @@ export const viewDetailsController = {
       const formattedMarineLicence = buildSummaryData(marineLicence)
       const { coordinatesType, summaryData } = buildSiteData(marineLicence)
 
-      const pageCaption = isApplicantView
-        ? `${marineLicence.applicationReference} - Marine licence`
-        : marineLicence.applicationReference
-
       const waterFrameworkDirectiveData = waterFrameworkReviewData(
         formattedMarineLicence.waterFrameworkDirective
       )
@@ -76,32 +47,26 @@ export const viewDetailsController = {
       const applicationDetailsCardData =
         buildApplicationDetailsCardData(marineLicence)
 
-      return h.view(VIEW_DETAILS_VIEW_ROUTE, {
+      return h.view(VIEW_DETAILS_INTERNAL_USER_VIEW_ROUTE, {
         pageTitle: formattedMarineLicence.projectName,
         specialLegalPowers: formattedMarineLicence.specialLegalPowers,
-        publicRegister: formattedMarineLicence.publicRegister,
         harbourAuthority: formattedMarineLicence.harbourAuthority,
         otherAuthorities: formattedMarineLicence.otherAuthorities,
         preferredDates: formattedMarineLicence.preferredDates,
+        redactions: formattedMarineLicence.redactions,
         projectName: formattedMarineLicence.projectName,
         projectBackground: formattedMarineLicence.projectBackground,
         publicConsultation: formattedMarineLicence.publicConsultation,
         coordinatesType,
         summaryData,
         isReadOnly: true,
-        pageCaption,
-        backLink: isApplicantView
-          ? getApplicantBackLink(marineLicence.status, marineLicenceId)
-          : null,
-        isApplicantView,
+        pageCaption: marineLicence.applicationReference,
+        backLink: null,
         marineLicenceId,
+        redactionSaveUrl: getRedactionSaveUrl(marineLicenceId),
+        csrfToken: request.plugins.crumb,
         waterFrameworkDirectiveData,
-        invoicingData: formattedMarineLicence.invoicing,
-        invoicingChangeLink:
-          marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
         marinePlanPolicies,
-        amount: FEE_ESTIMATE_AMOUNT,
-        monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT,
         ...applicationDetailsCardData
       })
     } catch (error) {

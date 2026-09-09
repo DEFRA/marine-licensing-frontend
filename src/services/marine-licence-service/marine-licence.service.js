@@ -1,6 +1,10 @@
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { createLogger } from '#src/server/common/helpers/logging/logger.js'
-import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import {
+  authenticatedGetRequest,
+  authenticatedPostRequest
+} from '#src/server/common/helpers/authenticated-requests.js'
+import { apiRoutes } from '#src/server/common/constants/routes.js'
 
 const apiPaths = {
   getMarineLicence: (id) => `/marine-licence/${id}`,
@@ -35,6 +39,24 @@ export class MarineLicenceService {
     if (payload?.message !== 'success' || !payload.value) {
       this.logger.error({ id }, errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
       throw new Error(errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
+    }
+
+    return payload.value
+  }
+
+  async saveRedaction(id, fieldKey, text) {
+    const { payload } = await authenticatedPostRequest(
+      this.request,
+      apiRoutes.REDACT_TEXT,
+      { id, fieldKey, text }
+    )
+
+    if (payload?.message !== 'success' || !payload.value) {
+      this.logger.error(
+        { id, fieldKey },
+        errorMessages.MARINE_LICENCE_REDACTION_FAILED
+      )
+      throw new Error(errorMessages.MARINE_LICENCE_REDACTION_FAILED)
     }
 
     return payload.value

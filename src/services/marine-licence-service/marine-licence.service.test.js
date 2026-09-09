@@ -2,7 +2,11 @@ import { vi } from 'vitest'
 import { MarineLicenceService } from './marine-licence.service.js'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { createLogger } from '#src/server/common/helpers/logging/logger.js'
-import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import {
+  authenticatedGetRequest,
+  authenticatedPostRequest
+} from '#src/server/common/helpers/authenticated-requests.js'
+import { apiRoutes } from '#src/server/common/constants/routes.js'
 
 vi.mock('~/src/server/common/helpers/logging/logger.js')
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
@@ -271,6 +275,69 @@ describe('MarineLicenceService', () => {
           `/public/marine-licence/${validId}`
         )
       })
+    })
+  })
+
+  describe('saveRedaction', () => {
+    const validId = '507f1f77bcf86cd799439011'
+
+    beforeEach(() => {
+      service = new MarineLicenceService(mockRequest, mockLogger)
+    })
+
+    test('should call the redact endpoint and return the saved value', async () => {
+      const savedValue = { fieldKey: 'preferredDates', text: 'Redacted' }
+
+      vi.mocked(authenticatedPostRequest).mockResolvedValue({
+        payload: { message: 'success', value: savedValue }
+      })
+
+      const result = await service.saveRedaction(
+        validId,
+        'preferredDates',
+        'Redacted'
+      )
+
+      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+        mockRequest,
+        apiRoutes.REDACT_TEXT,
+        {
+          marineLicenceId: validId,
+          fieldKey: 'preferredDates',
+          text: 'Redacted'
+        }
+      )
+      expect(result).toEqual(savedValue)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
+    test.each([
+      [
+        'message is not success',
+        { payload: { message: 'error', value: null } }
+      ],
+      ['value is null', { payload: { message: 'success', value: null } }],
+      ['payload is undefined', {}]
+    ])('should throw when %s', async (_label, apiResponse) => {
+      vi.mocked(authenticatedPostRequest).mockResolvedValue(apiResponse)
+
+      await expect(
+        service.saveRedaction(validId, 'preferredDates', 'Redacted')
+      ).rejects.toThrow(errorMessages.MARINE_LICENCE_REDACTION_FAILED)
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        { id: validId, fieldKey: 'preferredDates' },
+        errorMessages.MARINE_LICENCE_REDACTION_FAILED
+      )
+    })
+
+    test('should propagate network errors', async () => {
+      const networkError = new Error('Network timeout')
+      vi.mocked(authenticatedPostRequest).mockRejectedValue(networkError)
+
+      await expect(
+        service.saveRedaction(validId, 'preferredDates', 'Redacted')
+      ).rejects.toThrow('Network timeout')
     })
   })
 })

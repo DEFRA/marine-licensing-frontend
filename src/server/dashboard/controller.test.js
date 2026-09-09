@@ -67,7 +67,8 @@ describe('#dashboard', () => {
         marineLicenceEnabled: expect.any(Boolean),
         selectedUsers: '',
         showSpecificUser: false,
-        errors: undefined
+        errors: undefined,
+        clearHref: routes.DASHBOARD
       })
     })
 
@@ -107,7 +108,8 @@ describe('#dashboard', () => {
         marineLicenceEnabled: expect.any(Boolean),
         selectedUsers: '',
         showSpecificUser: false,
-        errors: undefined
+        errors: undefined,
+        clearHref: routes.DASHBOARD
       })
     })
 
@@ -174,7 +176,8 @@ describe('#dashboard', () => {
         marineLicenceEnabled: expect.any(Boolean),
         selectedUsers: '',
         showSpecificUser: false,
-        errors: undefined
+        errors: undefined,
+        clearHref: routes.DASHBOARD
       })
     })
 
@@ -232,7 +235,8 @@ describe('#dashboard', () => {
         marineLicenceEnabled: expect.any(Boolean),
         selectedUsers: '',
         showSpecificUser: false,
-        errors: undefined
+        errors: undefined,
+        clearHref: routes.DASHBOARD
       })
     })
 
@@ -364,7 +368,8 @@ describe('#dashboard', () => {
           marineLicenceEnabled: expect.any(Boolean),
           selectedUsers: '',
           showSpecificUser: false,
-          errors: undefined
+          errors: undefined,
+          clearHref: routes.DASHBOARD
         })
       })
 

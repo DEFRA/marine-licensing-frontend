@@ -371,6 +371,7 @@ export const getUserOptions = (userSession, users, searchParams = {}) => {
           checked:
             show === 'specific-user' && userSearchParam.includes(userContactId)
         }))
+        .sort((a, b) => a.text.localeCompare(b.text))
     : []
 
   return [...ownOption, ...userOptions]

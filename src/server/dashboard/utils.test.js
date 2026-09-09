@@ -868,13 +868,13 @@ describe('#getUserOptions', () => {
       checked: false
     })
 
-    expect(results[1]).toEqual({
-      value: 'testContactId',
-      text: 'Test User',
-      checked: false
-    })
-
-    expect(results.length).toBe(5)
+    expect(results.map(({ text }) => text)).toEqual([
+      'Mine (Sam Evans)',
+      'Another user',
+      'Jane Doe',
+      'John Smith',
+      'Test User'
+    ])
   })
 
   test('can handle missing data', () => {

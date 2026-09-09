@@ -95,6 +95,7 @@ const buildDashboardViewModel = async (
 
   return {
     errors,
+    clearHref: routes.DASHBOARD,
     projects: formatProjectsForDisplay(sortedProjects, isEmployee),
     isEmployee,
     organisationName,

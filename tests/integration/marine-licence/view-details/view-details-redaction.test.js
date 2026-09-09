@@ -16,7 +16,7 @@ import { validateWaterFrameworkDirective } from '#tests/integration/shared/summa
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
-describe('Marine Licence View Details', () => {
+describe('Marine Licence View Details Redaction', () => {
   const getServer = setupTestServer()
   let document
 

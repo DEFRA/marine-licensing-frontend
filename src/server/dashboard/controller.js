@@ -88,7 +88,7 @@ const buildDashboardViewModel = async (
   const typeOptions = getTypeOptions(searchParams.type)
   const userOptions = getUserOptions(userSession, users, searchParams)
 
-  const showSpecificUser = Object.keys(users).length > 0
+  const showSpecificUser = userOptions.length > 1
   const selectedUsers = getSelectedUsers(users, searchParams)
 
   const errors = getOwnerErrors(searchParams.show, selectedUsers)

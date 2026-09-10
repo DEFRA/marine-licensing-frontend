@@ -171,7 +171,6 @@ export const expectedFeeEstimateCard = {
 }
 
 export const expectedPublicRegisterCard = {
-  cardTitle: 'Public register card',
   rows: [
     {
       key: 'Request that information is withheld',

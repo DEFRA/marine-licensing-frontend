@@ -6,7 +6,7 @@
 
 {% set _ = rows.push({
      key: { text: "Request that information is withheld" },
-     value: { html: "Yes" if isWithholding else "No" },
+     value: { text: "Yes" if isWithholding else "No" },
      classes: "govuk-summary-list__row--no-border"
    })
 %}
@@ -15,7 +15,7 @@
 
 {% set _ = rows.push({
   key: { text: "Details of information to be withheld and why" },
-  value: { html: params.publicRegister.reason }
+  value: { text: params.publicRegister.reason }
 }) %}
 
 {% endif %}

@@ -142,15 +142,15 @@ describe('#dashboard', () => {
             { text: '-' },
             {
               html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>',
-              attributes: { 'data-sort-value': 'Draft' },
-              classes: 'govuk-table__cell--nowrap'
+              attributes: { 'data-sort-value': 'Draft' }
             },
             {
               text: '-',
               attributes: { 'data-sort-value': 0 }
             },
             {
-              html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
+              html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>',
+              classes: 'govuk-table__cell--nowrap'
             }
           ]
         }
@@ -292,7 +292,9 @@ describe('#dashboard', () => {
           true
         )
         expect(yar.commit).toHaveBeenCalledWith(h)
-        expect(h.redirect).toHaveBeenCalledWith(routes.DASHBOARD)
+        expect(h.redirect).toHaveBeenCalledWith(
+          `${routes.DASHBOARD}#app-project-results`
+        )
       })
 
       test('Should log the error and still redirect when there is an error', async () => {
@@ -317,11 +319,13 @@ describe('#dashboard', () => {
           { err: expect.any(Error) },
           'Error fetching projects'
         )
-        expect(h.redirect).toHaveBeenCalledWith(routes.DASHBOARD)
+        expect(h.redirect).toHaveBeenCalledWith(
+          `${routes.DASHBOARD}#app-project-results`
+        )
       })
     })
 
-    describe('client side request)', () => {
+    describe('client side request', () => {
       test('Should fetch with the submitted payload and render the results partial', async () => {
         const serverResponse = {
           projects: [

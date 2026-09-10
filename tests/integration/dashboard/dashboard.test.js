@@ -274,7 +274,7 @@ describe('Dashboard', () => {
       const table = getByRole(doc, 'table', { name: 'Projects' })
 
       const nameHeader = getByRole(table, 'columnheader', {
-        name: 'Project name'
+        name: 'Name'
       })
       const typeHeader = getByRole(table, 'columnheader', { name: 'Type' })
       const referenceHeader = getByRole(table, 'columnheader', {
@@ -562,7 +562,9 @@ describe('Dashboard', () => {
         })
 
         expect(postResponse.statusCode).toBe(302)
-        expect(postResponse.headers.location).toBe(routes.DASHBOARD)
+        expect(postResponse.headers.location).toBe(
+          `${routes.DASHBOARD}#app-project-results`
+        )
 
         const sessionCookie = Array.isArray(postResponse.headers['set-cookie'])
           ? postResponse.headers['set-cookie'].join('; ')
@@ -606,7 +608,9 @@ describe('Dashboard', () => {
         })
 
         expect(postResponse.statusCode).toBe(302)
-        expect(postResponse.headers.location).toBe(routes.DASHBOARD)
+        expect(postResponse.headers.location).toBe(
+          `${routes.DASHBOARD}#app-project-results`
+        )
 
         const sessionCookie = Array.isArray(postResponse.headers['set-cookie'])
           ? postResponse.headers['set-cookie'].join('; ')
@@ -648,7 +652,9 @@ describe('Dashboard', () => {
         })
 
         expect(postResponse.statusCode).toBe(302)
-        expect(postResponse.headers.location).toBe(routes.DASHBOARD)
+        expect(postResponse.headers.location).toBe(
+          `${routes.DASHBOARD}#app-project-results`
+        )
 
         const sessionCookie = Array.isArray(postResponse.headers['set-cookie'])
 
@@ -666,6 +672,21 @@ describe('Dashboard', () => {
         })
 
         expect(userSubmissionRadio).not.toBeInTheDocument()
+      })
+
+      it('should not redirect to anchor on first page load', async () => {
+        mockEmployeeExemptions(
+          mockDashboardServerResponse(employeeExemptions, {})
+        )
+
+        const postResponse = await makePostRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          formData: {}
+        })
+
+        expect(postResponse.statusCode).toBe(302)
+        expect(postResponse.headers.location).toBe(routes.DASHBOARD)
       })
     })
 

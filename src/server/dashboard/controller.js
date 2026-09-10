@@ -183,6 +183,10 @@ export const dashboardPostController = {
       request.logger.error({ err: error }, FETCH_ERROR)
     }
 
-    return h.redirect(routes.DASHBOARD)
+    const redirectRoute = request.payload.show
+      ? routes.DASHBOARD + '#app-project-results'
+      : routes.DASHBOARD
+
+    return h.redirect(redirectRoute)
   }
 }

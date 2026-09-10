@@ -276,15 +276,15 @@ describe('#formatProjectsForDisplay', () => {
           { text: 'ML-2024-001' },
           {
             html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>',
-            attributes: { 'data-sort-value': 'Draft' },
-            classes: 'govuk-table__cell--nowrap'
+            attributes: { 'data-sort-value': 'Draft' }
           },
           {
             text: '15 Jan 2024',
             attributes: { 'data-sort-value': '2024-01-15' }
           },
           {
-            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
+            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>',
+            classes: 'govuk-table__cell--nowrap'
           }
         ]
       }
@@ -313,15 +313,15 @@ describe('#formatProjectsForDisplay', () => {
           { text: '-' },
           {
             html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>',
-            attributes: { 'data-sort-value': 'Draft' },
-            classes: 'govuk-table__cell--nowrap'
+            attributes: { 'data-sort-value': 'Draft' }
           },
           {
             text: '-',
             attributes: { 'data-sort-value': 0 }
           },
           {
-            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
+            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>',
+            classes: 'govuk-table__cell--nowrap'
           }
         ]
       }
@@ -358,15 +358,15 @@ describe('#formatProjectsForDisplay', () => {
         { text: 'ML-2024-001' },
         {
           html: '<strong class="govuk-tag govuk-tag--blue">Draft</strong>',
-          attributes: { 'data-sort-value': 'Draft' },
-          classes: 'govuk-table__cell--nowrap'
+          attributes: { 'data-sort-value': 'Draft' }
         },
         {
           text: '15 Jan 2024',
           attributes: { 'data-sort-value': '2024-01-15' }
         },
         {
-          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Project 1">Delete</a>'
+          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Project 1">Delete</a>',
+          classes: 'govuk-table__cell--nowrap'
         }
       ]
     })
@@ -377,15 +377,15 @@ describe('#formatProjectsForDisplay', () => {
         { text: 'ML-2024-002' },
         {
           html: '<strong class="govuk-tag govuk-tag--teal">Active</strong>',
-          attributes: { 'data-sort-value': 'Active' },
-          classes: 'govuk-table__cell--nowrap'
+          attributes: { 'data-sort-value': 'Active' }
         },
         {
           text: '25 Jun 2024',
           attributes: { 'data-sort-value': '2024-06-25' }
         },
         {
-          html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a><a href="/exemption/withdraw/def456" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Project 2">Withdraw</a>'
+          html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a><a href="/exemption/withdraw/def456" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Project 2">Withdraw</a>',
+          classes: 'govuk-table__cell--nowrap'
         }
       ]
     })

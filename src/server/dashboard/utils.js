@@ -221,8 +221,7 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
         html: `<strong class="govuk-tag ${getTagStyle(status)}">${getStatusLabelText(project.status)}</strong>`,
         attributes: {
           'data-sort-value': project.status
-        },
-        classes: 'govuk-table__cell--nowrap'
+        }
       },
       {
         text: project.submittedAt
@@ -238,7 +237,10 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
       baseRow.push({ text: project.ownerName || '-' })
     }
 
-    baseRow.push({ html: getActionButtons(project) })
+    baseRow.push({
+      html: getActionButtons(project),
+      classes: 'govuk-table__cell--nowrap'
+    })
 
     return {
       cells: baseRow

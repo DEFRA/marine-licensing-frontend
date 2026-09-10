@@ -15,6 +15,12 @@
   display: none;
 }
 
+.moj-filter-layout__filter {
+  width: 310px;
+  min-width: 310px;
+  max-width: 310px;
+}
+
 .js-enabled {
   .moj-filter__selected {
     display: block;

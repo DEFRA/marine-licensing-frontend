@@ -285,38 +285,27 @@ describe('MarineLicenceService', () => {
       service = new MarineLicenceService(mockRequest, mockLogger)
     })
 
-    test('should call the redact endpoint and return the saved value', async () => {
-      const savedValue = { fieldKey: 'preferredDates', text: 'Redacted' }
-
+    test('should call the redact endpoint', async () => {
       vi.mocked(authenticatedPostRequest).mockResolvedValue({
-        payload: { message: 'success', value: savedValue }
+        payload: { message: 'success' }
       })
 
-      const result = await service.saveRedaction(
-        validId,
-        'preferredDates',
-        'Redacted'
-      )
+      await service.saveRedaction(validId, 'preferredDates', 'Redacted')
 
       expect(authenticatedPostRequest).toHaveBeenCalledWith(
         mockRequest,
         apiRoutes.REDACT_TEXT,
         {
-          marineLicenceId: validId,
+          id: validId,
           fieldKey: 'preferredDates',
           text: 'Redacted'
         }
       )
-      expect(result).toEqual(savedValue)
       expect(mockLogger.error).not.toHaveBeenCalled()
     })
 
     test.each([
-      [
-        'message is not success',
-        { payload: { message: 'error', value: null } }
-      ],
-      ['value is null', { payload: { message: 'success', value: null } }],
+      ['message is not success', { payload: { message: 'error' } }],
       ['payload is undefined', {}]
     ])('should throw when %s', async (_label, apiResponse) => {
       vi.mocked(authenticatedPostRequest).mockResolvedValue(apiResponse)

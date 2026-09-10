@@ -52,7 +52,7 @@ describe('marine-licence view details internal-user redaction controller', () =>
     vi.mocked(getMarineLicenceService).mockReturnValue(mockMarineLicenceService)
   })
 
-  test('should call view with backLink null and applicationReference-only pageCaption', async () => {
+  test('should call view with correct page header', async () => {
     const marineLicence = createSubmittedMarineLicence()
     const mockServiceInstance = {
       getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
@@ -72,8 +72,8 @@ describe('marine-licence view details internal-user redaction controller', () =>
     expect(mockH.view).toHaveBeenCalledWith(
       VIEW_DETAILS_INTERNAL_USER_VIEW_ROUTE,
       expect.objectContaining({
-        pageTitle: marineLicence.projectName,
-        pageCaption: marineLicence.applicationReference,
+        pageTitle: 'Redact application for the public register',
+        pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`,
         backLink: null
       })
     )
@@ -119,7 +119,12 @@ describe('marine-licence view details internal-user redaction controller', () =>
       VIEW_DETAILS_INTERNAL_USER_VIEW_ROUTE,
       expect.objectContaining({
         preferredDates: 'July 2026 to August 2027',
-        redactions: mockRedactions
+        redactions: {
+          preferredDates: {
+            ...mockRedactions.preferredDates,
+            redactedTextValue: mockRedactions.preferredDates.redactedText
+          }
+        }
       })
     )
   })

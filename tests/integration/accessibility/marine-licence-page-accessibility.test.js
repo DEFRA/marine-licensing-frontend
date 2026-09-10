@@ -286,7 +286,7 @@ const marineLicencePages = [
   },
   {
     url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${mockSubmittedMarineLicenceApplication.id}`,
-    title: mockSubmittedMarineLicenceApplication.projectName,
+    title: 'Redact application for the public register',
     marineLicence: mockSubmittedMarineLicenceApplication
   },
   {

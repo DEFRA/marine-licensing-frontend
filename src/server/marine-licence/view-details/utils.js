@@ -1,9 +1,28 @@
+import { escape } from 'lodash'
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { getStatusLabelText } from '#src/server/dashboard/utils.js'
 
 const APPLICATION_DATE_FORMAT = 'd MMMM yyyy'
+
+const REDACTION_LABEL = '***REDACTED***'
+const REDACTION_LABEL_HTML = `<span class="app-redaction-label">${REDACTION_LABEL}</span>`
+
+const wrapRedactionLabels = (text) =>
+  escape(text ?? '').replaceAll(REDACTION_LABEL, REDACTION_LABEL_HTML)
+
+export const buildRedactionsForView = (redactions) =>
+  Object.fromEntries(
+    Object.entries(redactions ?? {}).map(([fieldKey, redaction]) => [
+      fieldKey,
+      {
+        ...redaction,
+        redactedText: wrapRedactionLabels(redaction.redactedText),
+        redactedTextValue: redaction.redactedText
+      }
+    ])
+  )
 
 export const buildApplicationDetailsCardData = (marineLicence) => {
   const {

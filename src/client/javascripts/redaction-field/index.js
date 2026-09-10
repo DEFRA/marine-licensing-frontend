@@ -10,7 +10,7 @@ export class RedactionField extends Component {
     super($root)
 
     this.$trigger = this.$root.querySelector('.app-redaction-field__trigger')
-    this.$panel = this.$root.querySelector('.app-redaction-field__panel')
+    this.$redactPanel = this.$root.querySelector('.app-redaction-field__panel')
     this.$form = this.$root.querySelector('.app-redaction-field__form')
     this.$input = this.$root.querySelector('.app-redaction-field__input')
     this.$copyButton = this.$root.querySelector(
@@ -24,15 +24,9 @@ export class RedactionField extends Component {
     )
     this.$status = this.$root.querySelector('.app-redaction-field__status')
 
-    this.$publishedTextContainer = this.$root.querySelector(
+    this.$redactedTextContainer = this.$root.querySelector(
       '.app-redaction-field__published-text'
     )
-    this.$publishedTextValue = this.$root.querySelector(
-      '.app-redaction-field__published-text-value'
-    )
-
-    this.lastSavedValue = this.$input.value
-
     this.$copyButton.hidden = false
     this.$cancelButton.hidden = false
     this.closePanel({ focusTrigger: false })
@@ -40,30 +34,39 @@ export class RedactionField extends Component {
     this.$trigger.addEventListener('click', (event) =>
       this.onRedactClick(event)
     )
-    this.$cancelButton.addEventListener('click', () => this.onCancelClick())
+    this.$cancelButton.addEventListener('click', (event) =>
+      this.onCancelClick(event)
+    )
     this.$copyButton.addEventListener('click', () => this.onCopyClick())
     this.$form.addEventListener('submit', (event) => this.onSaveSubmit(event))
   }
 
   onRedactClick(event) {
     event.preventDefault()
-    this.$panel.hidden = false
+    this.$redactPanel.hidden = false
     this.$trigger.setAttribute('aria-expanded', 'true')
     this.$trigger.hidden = true
-    this.$publishedTextContainer.hidden = true
+    this.$redactedTextContainer.hidden = true
     this.$input.focus()
   }
 
-  onCancelClick() {
-    this.$input.value = this.lastSavedValue
+  onCancelClick(event) {
+    event.preventDefault()
+
+    if (this.$saveButton.disabled) {
+      return
+    }
+
+    this.$form.reset()
     this.closePanel()
   }
 
   closePanel({ focusTrigger = true } = {}) {
-    this.$panel.hidden = true
+    this.$redactPanel.hidden = true
+
     this.$trigger.setAttribute('aria-expanded', 'false')
     this.$trigger.hidden = false
-    this.$publishedTextContainer.hidden = false
+    this.$redactedTextContainer.hidden = false
 
     if (focusTrigger) {
       this.$trigger.focus()
@@ -88,17 +91,14 @@ export class RedactionField extends Component {
       return
     }
 
-    this.setControlsDisabled(true)
+    this.setSaving(true)
     this.announce('')
 
     try {
       const response = await fetch(this.$form.action, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify(Object.fromEntries(new FormData(this.$form))),
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: new URLSearchParams(new FormData(this.$form)),
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
       })
 
@@ -106,23 +106,30 @@ export class RedactionField extends Component {
         throw new Error('Unexpected response saving redaction')
       }
 
-      this.onSaveSuccess()
+      const responseText = await response.text()
+      this.onSaveSuccess(responseText)
     } catch {
       this.announce('Error saving — please try again')
     } finally {
-      this.setControlsDisabled(false)
+      this.setSaving(false)
     }
   }
 
-  onSaveSuccess() {
-    this.lastSavedValue = this.$input.value
-    this.$publishedTextValue.textContent = this.$input.value
-    this.closePanel()
-    this.announce('Saved')
+  onSaveSuccess(html) {
+    const template = document.createElement('template')
+    template.innerHTML = html
+
+    const $new = template.content.getElementById(this.$root.id)
+
+    this.$root.replaceWith($new)
+
+    const component = new RedactionField($new)
+    component.$trigger.focus()
+    component.announce('Saved')
   }
 
-  setControlsDisabled(isDisabled) {
-    this.$saveButton.disabled = isDisabled
-    this.$cancelButton.disabled = isDisabled
+  setSaving(isSaving) {
+    this.$saveButton.disabled = isSaving
+    this.$cancelButton.setAttribute('aria-disabled', String(isSaving))
   }
 }

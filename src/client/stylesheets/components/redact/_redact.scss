@@ -4,6 +4,12 @@
   display: none;
 }
 
+.app-redaction-label {
+  background: govuk-colour('black');
+  color: govuk-colour('white');
+  font-weight: $govuk-font-weight-bold;
+}
+
 .app-redaction-field__panel {
   border-left: 5px solid $govuk-border-colour;
   padding-left: 15px;
@@ -13,7 +19,7 @@
   display: inline-block;
   vertical-align: middle;
   margin-right: govuk-spacing(1);
-  fill: currentColor;
+  fill: currentcolor;
   width: 16px;
   height: 16px;
 }

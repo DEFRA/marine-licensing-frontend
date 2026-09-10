@@ -33,6 +33,13 @@
       {% endif %}
       <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
 
+      <p class="govuk-body">Check each answer and redact anything that must not appear on the public register. Replace whatever you redact with <span class="app-redaction-label">***REDACTED***</span>.</p>
+
+      <div class="govuk-inset-text">
+        <h2 class="govuk-heading-s">The information the applicant wants withheld and why.</h2>
+        <p class="govuk-body">We would like two things withheld. First, the fees and financial figures in our proposed works summary, because they are commercially sensitive. A second operator is expected to bid for a concession in the same harbour next year, and if they can see what we are paying and what we expect to take they can pitch against us. Second, we would like the pontoon dimensions, the construction method and our working hours withheld. We spent two years getting this set-up right and we do not want another hire business copying it.</p>
+      </div>
+
       {{ appMarineLicenceApplicationDetailsCard({
         statusTag: statusTag,
         isTransferred: isTransferred,

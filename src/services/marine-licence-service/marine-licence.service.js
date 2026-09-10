@@ -34,6 +34,7 @@ export class MarineLicenceService {
     const endpoint = isPublic
       ? apiPaths.getPublicMarineLicence(id)
       : apiPaths.getMarineLicence(id)
+
     const { payload } = await authenticatedGetRequest(this.request, endpoint)
 
     if (payload?.message !== 'success' || !payload.value) {
@@ -50,15 +51,12 @@ export class MarineLicenceService {
       apiRoutes.REDACT_TEXT,
       { id, fieldKey, text }
     )
-
-    if (payload?.message !== 'success' || !payload.value) {
+    if (payload?.message !== 'success') {
       this.logger.error(
         { id, fieldKey },
         errorMessages.MARINE_LICENCE_REDACTION_FAILED
       )
       throw new Error(errorMessages.MARINE_LICENCE_REDACTION_FAILED)
     }
-
-    return payload.value
   }
 }

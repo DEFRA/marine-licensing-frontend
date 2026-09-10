@@ -14,10 +14,37 @@
   }) }}
 {% endset %}
 
-<div class="app-redaction-field" data-module="redaction-field">
-    <p class="govuk-body app-redaction-field__published-text" hidden>
-      <span class="app-redaction-field__published-text-value">{{ params.publishedText }}</span>
-    </p>
+{% set applicantsTextHeading %}
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Applicant's text</h3>
+{% endset %}
+
+{% set publishedTextHeading %}
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Text to be published</h3>
+{% endset %}
+
+<div class="app-redaction-field" id="redaction-field-{{ params.fieldId }}" data-module="redaction-field">
+
+    {% if params.isRedacted %}
+
+        <div class="app-redaction-field__published-text" hidden>
+          {{ applicantsTextHeading | safe }}
+          <p class="govuk-body">{{ params.originalText }}</p>
+
+          {{ publishedTextHeading | safe }}
+          <p class="govuk-body">{{ params.publishedText | safe }}</p>
+
+        </div>
+        {% else %}
+
+        <div class="app-redaction-field__published-text">
+
+        <p class="govuk-body">
+          <span class="app-redaction-field__published-text-value">{{ params.publishedText | safe }}</span>
+        </p>
+
+        </div>
+
+    {% endif %}
 
     <a
       class="govuk-link app-redaction-field__trigger"
@@ -25,13 +52,22 @@
       aria-expanded="false"
       aria-controls="redaction-panel-{{ params.fieldId }}"
       hidden
-    >Redact<span class="govuk-visually-hidden"> {{ params.label }}</span></a>
+    >
+    {% if params.isRedacted %}
+      Change redaction
+    {% else %}
+      Redact{% endif %}
+      <span class="govuk-visually-hidden"> {{ params.label }}</span>
+    </a>
 
   <div class="app-redaction-field__panel" id="redaction-panel-{{ params.fieldId }}">
-    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Applicant's text</h3>
+
+    {{ applicantsTextHeading | safe }}
+
     <p class="govuk-body">{{ params.originalText }}</p>
 
     <form class="app-redaction-field__form" method="post" action="{{ params.saveUrl }}">
+
       {{ govukInput({
         id: "redaction-input-" + params.fieldId,
         name: "text",
@@ -40,7 +76,7 @@
           text: "Text to be published",
           classes: "govuk-label--s"
         },
-        value: params.publishedText,
+        value: params.redactions.redactedTextValue or params.originalText,
         classes: "app-redaction-field__input"
       }) }}
 
@@ -50,17 +86,15 @@
       <p class="govuk-body app-redaction-field__status govuk-visually-hidden" aria-live="polite"></p>
 
       <div class="govuk-button-group">
+
         {{ govukButton({
           text: "Save",
           classes: "govuk-button--secondary app-redaction-field__save-button",
           type: "submit"
         }) }}
-        {{ govukButton({
-          text: "Cancel",
-          type: "button",
-          classes: "govuk-button--as-link app-redaction-field__cancel-button",
-          attributes: { hidden: { value: true, optional: true } }
-        }) }}
+
+        <a class="govuk-link app-redaction-field__cancel-button" href="#" hidden>Cancel</a>
+
       </div>
     </form>
   </div>

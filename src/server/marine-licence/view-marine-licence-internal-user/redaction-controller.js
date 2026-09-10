@@ -4,6 +4,7 @@ import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { isClientSideFetchRequest } from '#src/server/common/helpers/is-client-side-fetch-request.js'
+import { viewDetailsInternalUserController } from '#src/server/marine-licence/view-marine-licence-internal-user/controller.js'
 
 const REDACTION_TEXT_MAX_LENGTH = 1000
 
@@ -29,24 +30,25 @@ export const saveRedactionController = {
     const { fieldKey, text } = request.payload
 
     const viewUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${marineLicenceId}`
+    const isFetch = isClientSideFetchRequest(request)
 
     try {
       const service = getMarineLicenceService(request)
-      const value = await service.saveRedaction(marineLicenceId, fieldKey, text)
-
-      if (!isClientSideFetchRequest(request)) {
-        return h.redirect(viewUrl)
-      }
-
-      return h.response(value).code(statusCodes.ok)
+      await service.saveRedaction(marineLicenceId, fieldKey, text)
     } catch (error) {
       request.logger.error(error, 'Error saving marine licence redaction')
 
-      if (!isClientSideFetchRequest(request)) {
+      if (!isFetch) {
         return h.redirect(viewUrl)
       }
 
       throw Boom.internal('Error saving marine licence redaction')
     }
+
+    if (!isFetch) {
+      return h.redirect(viewUrl)
+    }
+
+    return viewDetailsInternalUserController.handler(request, h)
   }
 }

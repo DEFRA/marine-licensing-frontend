@@ -166,7 +166,7 @@ describe('Public register', () => {
       fieldsetLabel:
         'Sharing your application information on the public register',
       errorMessage:
-        'PLACEHOLDER: Select whether you want to request that information is withheld',
+        'Select whether you want to request that information is withheld',
       findByHeading: true
     })
   })
@@ -192,8 +192,7 @@ describe('Public register', () => {
       document,
       fieldsetLabel:
         'Sharing your application information on the public register',
-      errorMessage:
-        'PLACEHOLDER: Provide details of what you want withheld and why',
+      errorMessage: 'Enter details of what you want withheld and why',
       findByHeading: true,
       useErrorClass: true
     })

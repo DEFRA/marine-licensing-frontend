@@ -14,11 +14,7 @@ import {
   marineLicencePublicRegisterSettings
 } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
-import {
-  mapBackendErrorFields,
-  toPublicRegister,
-  toWithholdPayload
-} from '#src/server/marine-licence/public-register/utils.js'
+import { toPublicRegister } from '#src/server/marine-licence/public-register/utils.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
 
@@ -29,7 +25,7 @@ export const publicRegisterController = {
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
       ...marineLicencePublicRegisterSettings,
       projectName: marineLicence.projectName,
-      payload: toWithholdPayload(marineLicence.publicRegister),
+      payload: marineLicence.publicRegister ?? {},
       backLink: getCommonRedirectLink(request)
     })
   }
@@ -85,7 +81,7 @@ export const publicRegisterSubmitController = {
       }
 
       const errorSummary = mapErrorsForDisplay(
-        mapBackendErrorFields(details),
+        details,
         marineLicencePublicRegisterErrorMessages
       )
 

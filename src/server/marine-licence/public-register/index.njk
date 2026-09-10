@@ -46,7 +46,7 @@
     <h2 class="govuk-heading-m">Do you want to request that information is withheld for either of these reasons?</h2>
   {% endset -%}
 
-  {% set withholdDetailsHint %}
+  {% set reasonHint %}
     To help us make a decision, you must tell us:
     {# govuk-hint is required here: govuk-list sets its own text colour #}
     <ul class="govuk-list govuk-list--bullet govuk-hint">
@@ -59,24 +59,24 @@
 
   {% set conditionalHtml %}
     {{ govukTextarea({
-      id: "withholdDetails",
-      name: "withholdDetails",
+      id: "reason",
+      name: "reason",
       label: {
         text: "Provide details of what you want withheld and why"
       },
-      hint: { html: withholdDetailsHint },
-      errorMessage: errors['withholdDetails'],
-      value: payload.withholdDetails
+      hint: { html: reasonHint },
+      errorMessage: errors['reason'],
+      value: payload.reason
     }) }}
   {% endset -%}
 
   {{ appRadioPage({
-    name: "withholdRequest",
+    name: "consent",
     errorSummary: errorSummary,
     heading: heading,
     isPageHeading: true,
-    value: payload.withholdRequest,
-    errorMessage: errors['withholdRequest'],
+    value: payload.consent,
+    errorMessage: errors['consent'],
     projectName: projectName,
     hint: { html: hintText },
     items: [

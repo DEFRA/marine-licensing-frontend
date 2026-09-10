@@ -89,7 +89,7 @@ describe('Public register', () => {
   test('public register form state when information is not withheld', async () => {
     mockMarineLicence({
       ...marineLicence,
-      publicRegister: { consent: 'yes' }
+      publicRegister: { consent: 'no' }
     })
 
     const document = await loadPage({
@@ -121,7 +121,7 @@ describe('Public register', () => {
     mockMarineLicence({
       ...marineLicence,
       publicRegister: {
-        consent: 'no',
+        consent: 'yes',
         reason: 'Some reason'
       }
     })
@@ -147,7 +147,7 @@ describe('Public register', () => {
     })
   })
 
-  test('should show a validation error when submitted without a consent decision', async () => {
+  test('should show a validation error when submitted without an answer', async () => {
     mockMarineLicence(marineLicence)
 
     const submitPublicRegisterForm = async (formData) => {
@@ -159,7 +159,7 @@ describe('Public register', () => {
       return document
     }
 
-    const document = await submitPublicRegisterForm({ withholdDetails: '' })
+    const document = await submitPublicRegisterForm({ reason: '' })
 
     expectFieldsetError({
       document,
@@ -184,8 +184,8 @@ describe('Public register', () => {
     }
 
     const document = await submitPublicRegisterForm({
-      withholdRequest: 'yes',
-      withholdDetails: ''
+      consent: 'yes',
+      reason: ''
     })
 
     expectFieldsetError({

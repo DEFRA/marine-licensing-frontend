@@ -14,7 +14,7 @@ describe('#publicRegister', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    publicRegister: { consent: 'no', reason: 'Some reason' }
+    publicRegister: { consent: 'yes', reason: 'Some details' }
   }
 
   beforeEach(() => {
@@ -34,22 +34,17 @@ describe('#publicRegister', () => {
   describe('#publicRegisterController', () => {
     test.each([
       {
-        name: 'withholding',
-        publicRegister: { consent: 'no', reason: 'Some reason' },
-        expected: { withholdRequest: 'yes', withholdDetails: 'Some reason' }
+        name: 'the stored answer when one exists',
+        publicRegister: { consent: 'yes', reason: 'Some details' },
+        expected: { consent: 'yes', reason: 'Some details' }
       },
       {
-        name: 'not withholding',
-        publicRegister: { consent: 'yes' },
-        expected: { withholdRequest: 'no' }
-      },
-      {
-        name: 'not yet answered',
+        name: 'an empty form when not yet answered',
         publicRegister: undefined,
         expected: {}
       }
     ])(
-      'Should pre-populate the radio when $name',
+      'Should pre-populate the form with $name',
       async ({ publicRegister, expected }) => {
         vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
           ...mockLicence,
@@ -82,7 +77,10 @@ describe('#publicRegister', () => {
       await expect(
         publicRegisterSubmitController.handler(
           {
-            payload: { withholdRequest: 'yes', withholdDetails: 'Some reason' },
+            payload: {
+              consent: 'yes',
+              reason: 'Some details'
+            },
             query: {}
           },
           h
@@ -99,7 +97,7 @@ describe('#publicRegister', () => {
       }
 
       await publicRegisterSubmitController.handler(
-        { payload: { withholdRequest: 'no' }, query: {} },
+        { payload: { consent: 'no' }, query: {} },
         h
       )
 
@@ -108,7 +106,7 @@ describe('#publicRegister', () => {
         '/marine-licence/public-register',
         {
           id: mockLicence.id,
-          consent: 'yes'
+          consent: 'no'
         }
       )
       expect(h.redirect).toHaveBeenCalledWith(
@@ -124,7 +122,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { withholdRequest: 'yes', withholdDetails: 'Some reason' },
+          payload: { consent: 'yes', reason: 'Some details' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -135,8 +133,8 @@ describe('#publicRegister', () => {
         '/marine-licence/public-register',
         {
           id: mockLicence.id,
-          consent: 'no',
-          reason: 'Some reason'
+          consent: 'yes',
+          reason: 'Some details'
         }
       )
       expect(h.redirect).toHaveBeenCalledWith(
@@ -167,7 +165,7 @@ describe('#publicRegister', () => {
               validation: {
                 details: [
                   {
-                    path: ['consent'],
+                    field: 'reason',
                     message: 'PUBLIC_REGISTER_REASON_REQUIRED',
                     type: 'any.required'
                   }
@@ -184,7 +182,10 @@ describe('#publicRegister', () => {
 
         await publicRegisterSubmitController.handler(
           {
-            payload: { withholdRequest: 'yes', withholdDetails: 'Some reason' },
+            payload: {
+              consent: 'yes',
+              reason: 'Some details'
+            },
             query
           },
           h
@@ -195,8 +196,8 @@ describe('#publicRegister', () => {
           expect.objectContaining({
             backLink: expectedBackLink,
             payload: {
-              withholdRequest: 'yes',
-              withholdDetails: 'Some reason'
+              consent: 'yes',
+              reason: 'Some details'
             }
           })
         )

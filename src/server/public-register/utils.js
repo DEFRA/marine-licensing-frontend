@@ -45,20 +45,13 @@ export const parseApplicationReference = (referenceNumber) => {
  * @returns {Array<Record<string, unknown>>}
  */
 export const sortByReferenceNewestFirst = (entries) =>
-  [...entries].sort((entryA, entryB) => {
-    const refA = parseApplicationReference(
-      asDisplayString(entryA.applicationReference)
-    )
-    const refB = parseApplicationReference(
-      asDisplayString(entryB.applicationReference)
-    )
-
-    if (refA.year !== refB.year) {
-      return refB.year - refA.year
-    }
-
-    return refB.sequence - refA.sequence
-  })
+  entries
+    .map((entry) => ({
+      entry,
+      ...parseApplicationReference(asDisplayString(entry.applicationReference))
+    }))
+    .sort((a, b) => b.year - a.year || b.sequence - a.sequence)
+    .map(({ entry }) => entry)
 
 /**
  * @param {Record<string, unknown>} entry

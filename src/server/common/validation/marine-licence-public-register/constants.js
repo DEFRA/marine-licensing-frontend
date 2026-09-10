@@ -1,0 +1,13 @@
+export const marineLicencePublicRegisterSettings = {
+  pageTitle: 'Sharing your application information on the public register',
+  heading: 'Sharing your application information on the public register'
+}
+
+export const marineLicencePublicRegisterErrorMessages = {
+  PUBLIC_REGISTER_CONSENT_REQUIRED:
+    'PLACEHOLDER: Select whether you want to request that information is withheld',
+  PUBLIC_REGISTER_REASON_REQUIRED:
+    'PLACEHOLDER: Provide details of what you want withheld and why',
+  PUBLIC_REGISTER_REASON_MAX_LENGTH:
+    'PLACEHOLDER: Details of what you want withheld and why must be 1000 characters or less'
+}

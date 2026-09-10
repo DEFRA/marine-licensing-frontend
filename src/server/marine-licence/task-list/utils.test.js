@@ -467,7 +467,7 @@ describe('taskList utils', () => {
           status: { text: 'Completed' },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Sharing your project information publicly'
+            text: 'Public register'
           }
         }
       ])
@@ -486,7 +486,7 @@ describe('taskList utils', () => {
           },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Sharing your project information publicly'
+            text: 'Public register'
           }
         }
       ])
@@ -507,7 +507,7 @@ describe('taskList utils', () => {
             },
             title: {
               classes: 'govuk-link--no-visited-state',
-              text: 'Sharing your project information publicly'
+              text: 'Public register'
             }
           }
         ])

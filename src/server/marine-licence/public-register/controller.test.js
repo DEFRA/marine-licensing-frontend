@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
+  publicRegisterController,
   publicRegisterSubmitController,
   PUBLIC_REGISTER_VIEW_ROUTE
 } from '#src/server/marine-licence/public-register/controller.js'
@@ -30,6 +31,43 @@ describe('#publicRegister', () => {
     vi.restoreAllMocks()
   })
 
+  describe('#publicRegisterController', () => {
+    test.each([
+      {
+        name: 'withholding',
+        publicRegister: { consent: 'no', reason: 'Some reason' },
+        expected: { withholdRequest: 'yes', withholdDetails: 'Some reason' }
+      },
+      {
+        name: 'not withholding',
+        publicRegister: { consent: 'yes' },
+        expected: { withholdRequest: 'no' }
+      },
+      {
+        name: 'not yet answered',
+        publicRegister: undefined,
+        expected: {}
+      }
+    ])(
+      'Should pre-populate the radio when $name',
+      async ({ publicRegister, expected }) => {
+        vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+          ...mockLicence,
+          publicRegister
+        })
+
+        const h = { view: vi.fn() }
+
+        await publicRegisterController.handler({ query: {} }, h)
+
+        expect(h.view).toHaveBeenCalledWith(
+          PUBLIC_REGISTER_VIEW_ROUTE,
+          expect.objectContaining({ payload: expected })
+        )
+      }
+    )
+  })
+
   describe('#publicRegisterSubmitController', () => {
     test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
       const thrownError = { res: { statusCode: 500 }, data: {} }
@@ -44,7 +82,7 @@ describe('#publicRegister', () => {
       await expect(
         publicRegisterSubmitController.handler(
           {
-            payload: { consent: 'no', reason: 'Some reason' },
+            payload: { withholdRequest: 'yes', withholdDetails: 'Some reason' },
             query: {}
           },
           h
@@ -61,7 +99,7 @@ describe('#publicRegister', () => {
       }
 
       await publicRegisterSubmitController.handler(
-        { payload: { consent: 'yes' }, query: {} },
+        { payload: { withholdRequest: 'no' }, query: {} },
         h
       )
 
@@ -86,7 +124,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { consent: 'no', reason: 'Some reason' },
+          payload: { withholdRequest: 'yes', withholdDetails: 'Some reason' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -146,7 +184,7 @@ describe('#publicRegister', () => {
 
         await publicRegisterSubmitController.handler(
           {
-            payload: { consent: 'no', reason: 'Some reason' },
+            payload: { withholdRequest: 'yes', withholdDetails: 'Some reason' },
             query
           },
           h
@@ -156,7 +194,10 @@ describe('#publicRegister', () => {
           PUBLIC_REGISTER_VIEW_ROUTE,
           expect.objectContaining({
             backLink: expectedBackLink,
-            payload: { consent: 'no', reason: 'Some reason' }
+            payload: {
+              withholdRequest: 'yes',
+              withholdDetails: 'Some reason'
+            }
           })
         )
       }

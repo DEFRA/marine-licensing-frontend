@@ -33,7 +33,7 @@ describe('Public register', () => {
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Sharing your project information publicly'
+      'Sharing your application information on the public register'
     )
     getByRole(document, 'button', { name: 'Save and continue' })
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
@@ -69,7 +69,8 @@ describe('Public register', () => {
     expect(
       getInputInFieldset({
         document,
-        fieldsetLabel: 'Sharing your project information publicly',
+        fieldsetLabel:
+          'Sharing your application information on the public register',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -77,14 +78,15 @@ describe('Public register', () => {
     expect(
       getInputInFieldset({
         document,
-        fieldsetLabel: 'Sharing your project information publicly',
+        fieldsetLabel:
+          'Sharing your application information on the public register',
         inputLabel: 'No',
         findByHeading: true
       })
     ).not.toBeChecked()
   })
 
-  test('public register form state when consent is yes', async () => {
+  test('public register form state when information is not withheld', async () => {
     mockMarineLicence({
       ...marineLicence,
       publicRegister: { consent: 'yes' }
@@ -98,22 +100,24 @@ describe('Public register', () => {
     expect(
       getInputInFieldset({
         document,
-        fieldsetLabel: 'Sharing your project information publicly',
-        inputLabel: 'Yes',
+        fieldsetLabel:
+          'Sharing your application information on the public register',
+        inputLabel: 'No',
         findByHeading: true
       })
     ).toBeChecked()
     expect(
       getInputInFieldset({
         document,
-        fieldsetLabel: 'Sharing your project information publicly',
-        inputLabel: 'No',
+        fieldsetLabel:
+          'Sharing your application information on the public register',
+        inputLabel: 'Yes',
         findByHeading: true
       })
     ).not.toBeChecked()
   })
 
-  test('public register form state when consent is no and reason set', async () => {
+  test('public register form state when information is withheld and details set', async () => {
     mockMarineLicence({
       ...marineLicence,
       publicRegister: {
@@ -130,15 +134,15 @@ describe('Public register', () => {
     expect(
       getInputInFieldset({
         document,
-        fieldsetLabel: 'Sharing your project information publicly',
-        inputLabel: 'No',
+        fieldsetLabel:
+          'Sharing your application information on the public register',
+        inputLabel: 'Yes',
         findByHeading: true
       })
     ).toBeChecked()
     expectInputValue({
       document,
-      inputLabel:
-        'Provide details of why you do not consent to your project information being published',
+      inputLabel: 'Provide details of what you want withheld and why',
       value: 'Some reason'
     })
   })
@@ -155,18 +159,19 @@ describe('Public register', () => {
       return document
     }
 
-    const document = await submitPublicRegisterForm({ reason: '' })
+    const document = await submitPublicRegisterForm({ withholdDetails: '' })
 
     expectFieldsetError({
       document,
-      fieldsetLabel: 'Sharing your project information publicly',
+      fieldsetLabel:
+        'Sharing your application information on the public register',
       errorMessage:
-        'Select whether you consent to the MMO publishing your project information publicly',
+        'PLACEHOLDER: Select whether you want to request that information is withheld',
       findByHeading: true
     })
   })
 
-  test('should show a validation error when "no" is selected but reason is missing', async () => {
+  test('should show a validation error when "yes" is selected but details are missing', async () => {
     mockMarineLicence(marineLicence)
 
     const submitPublicRegisterForm = async (formData) => {
@@ -179,15 +184,16 @@ describe('Public register', () => {
     }
 
     const document = await submitPublicRegisterForm({
-      consent: 'no',
-      reason: ''
+      withholdRequest: 'yes',
+      withholdDetails: ''
     })
 
     expectFieldsetError({
       document,
-      fieldsetLabel: 'Sharing your project information publicly',
+      fieldsetLabel:
+        'Sharing your application information on the public register',
       errorMessage:
-        'Provide details of why you do not consent to your project information being published',
+        'PLACEHOLDER: Provide details of what you want withheld and why',
       findByHeading: true,
       useErrorClass: true
     })

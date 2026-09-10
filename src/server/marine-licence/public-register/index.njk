@@ -1,5 +1,5 @@
 {% extends 'layouts/page.njk' %}
-{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "radio-page/macro.njk" import appRadioPage %}
 
@@ -54,13 +54,13 @@
     	<li>whether this is because of national security or commercial confidentiality, and why</li>
     	<li>what the impact would be if this information were published</li>
     </ul>
-    Enter a maximum of 1,000 characters
   {% endset -%}
 
   {% set conditionalHtml %}
-    {{ govukTextarea({
+    {{ govukCharacterCount({
       id: "reason",
       name: "reason",
+      maxlength: 1000,
       label: {
         text: "Provide details of what you want withheld and why"
       },

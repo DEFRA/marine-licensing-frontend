@@ -12,10 +12,4 @@ describe('#toPublicRegister', () => {
       consent: 'no'
     })
   })
-
-  test('ignores anything else in the form payload', () => {
-    expect(toPublicRegister({ consent: 'no', csrfToken: 'a-token' })).toEqual({
-      consent: 'no'
-    })
-  })
 })

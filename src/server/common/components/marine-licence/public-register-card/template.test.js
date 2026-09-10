@@ -58,6 +58,20 @@ describe('Marine Licence Public Register Card Component', () => {
     })
   })
 
+  describe('When the question has not been answered', () => {
+    test('Should show the withhold request row as incomplete', () => {
+      const component = renderComponentJSDOM(COMPONENT, {
+        publicRegister: undefined,
+        isReadOnly: true
+      })
+      validatePublicRegister(component, {
+        publicRegister: {
+          'Request that information is withheld': 'Incomplete'
+        }
+      })
+    })
+  })
+
   describe('When information is withheld', () => {
     const renderComponent = (params) =>
       renderComponentJSDOM(COMPONENT, {

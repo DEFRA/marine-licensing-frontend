@@ -1,15 +1,16 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
 
 {% set isWithholding = params.publicRegister.consent === 'yes' %}
+{% set withholdAnswer = ("Yes" if isWithholding else "No") if params.publicRegister.consent else "" %}
 
 {% set rows = [] %}
 
 {% set _ = rows.push({
-     key: { text: "Request that information is withheld" },
-     value: { text: "Yes" if isWithholding else "No" },
-     classes: "govuk-summary-list__row--no-border"
-   })
-%}
+  key: { text: "Request that information is withheld" },
+  value: { html: appIncompleteField({ text: withholdAnswer }) },
+  classes: "govuk-summary-list__row--no-border"
+}) %}
 
 {% if isWithholding %}
 

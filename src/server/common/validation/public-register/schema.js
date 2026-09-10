@@ -1,5 +1,7 @@
 import joi from 'joi'
 
+// consent 'yes' means the applicant is happy for information to be published.
+// The marine licence journey's schema uses the same field with the opposite meaning.
 export const publicRegisterSchema = joi.object({
   consent: joi.string().valid('yes', 'no').required().messages({
     'any.only': 'PUBLIC_REGISTER_CONSENT_REQUIRED',

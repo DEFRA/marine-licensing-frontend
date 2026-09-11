@@ -1,9 +1,12 @@
+import { JSDOM } from 'jsdom'
 import {
   getByRole,
   queryByRole,
   getByText,
-  getAllByRole
+  getAllByRole,
+  queryAllByRole
 } from '@testing-library/dom'
+import { config } from '~/src/config/config.js'
 import { routes } from '~/src/server/common/constants/routes.js'
 import {
   setupTestServer,
@@ -13,10 +16,60 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { getProjectsTableRow } from '~/tests/integration/shared/dom-helpers.js'
+import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { employeeSession } from '~/tests/integration/shared/session-fixtures.js'
+import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
+import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
+import { mockDashboardServerResponse } from '#src/server/test-helpers/mocks/dashboard.js'
+
+vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 describe('Dashboard', () => {
   const getServer = setupTestServer()
+
+  beforeAll(() => {
+    vi.mocked(getUserSession).mockResolvedValue(employeeSession)
+  })
+
+  const employeeExemptions = [
+    {
+      id: '123',
+      projectName: 'My Draft Project',
+      status: 'Draft',
+      submittedAt: null,
+      isOwnProject: true,
+      contactId: 'johnSmithId'
+    },
+    {
+      id: '456',
+      projectName: 'My Active Project',
+      status: 'Active',
+      submittedAt: '2025-10-23T12:00:00.000Z',
+      isOwnProject: true,
+      johnSmithId: 'johnSmithId'
+    },
+    {
+      id: '789',
+      projectName: 'Colleague Draft',
+      status: 'Draft',
+      submittedAt: null,
+      isOwnProject: false,
+      contactId: 'janeDoeId'
+    },
+    {
+      id: '101',
+      projectName: 'Colleague Active',
+      status: 'Active',
+      submittedAt: '2025-10-20T12:00:00.000Z',
+      isOwnProject: false,
+      contactId: 'janeDoeId'
+    }
+  ]
 
   const loadDashboardPage = () =>
     loadPage({
@@ -50,7 +103,7 @@ describe('Dashboard', () => {
   ]
 
   it('should render the dashboard page title, heading and Create button', async () => {
-    mockExemptions(exemptions)
+    mockExemptions(mockDashboardServerResponse(exemptions))
     const doc = await loadDashboardPage()
     expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent(
       'Projects'
@@ -58,7 +111,7 @@ describe('Dashboard', () => {
   })
 
   it('should render a draft exemption', async () => {
-    mockExemptions(exemptions)
+    mockExemptions(mockDashboardServerResponse(exemptions))
     const doc = await loadDashboardPage()
     const cells = getProjectsTableRow({
       document: doc,
@@ -82,7 +135,7 @@ describe('Dashboard', () => {
   })
 
   it('should render an active exemption', async () => {
-    mockExemptions(exemptions)
+    mockExemptions(mockDashboardServerResponse(exemptions))
     const doc = await loadDashboardPage()
     const cells = getProjectsTableRow({
       document: doc,
@@ -103,7 +156,7 @@ describe('Dashboard', () => {
   })
 
   it('should render a submitted marine licence', async () => {
-    mockMarineLicence(marineLicences)
+    mockMarineLicence({ projects: marineLicences, users: [] })
     const doc = await loadDashboardPage()
 
     const cells = getProjectsTableRow({
@@ -135,7 +188,11 @@ describe('Dashboard', () => {
   })
 
   it('should not offer Withdraw for a submitted marine licence owned by another user', async () => {
-    mockMarineLicence([{ ...marineLicences[0], isOwnProject: false }])
+    mockMarineLicence(
+      mockDashboardServerResponse([
+        { ...marineLicences[0], isOwnProject: false }
+      ])
+    )
     const doc = await loadDashboardPage()
 
     const cells = getProjectsTableRow({
@@ -153,13 +210,16 @@ describe('Dashboard', () => {
   })
 
   it('should render a withdrawn marine licence with View details only', async () => {
-    mockMarineLicence([
-      {
-        ...marineLicences[0],
-        status: 'Withdrawn',
-        applicationReference: 'MLA/2025/10018'
-      }
-    ])
+    mockMarineLicence({
+      projects: [
+        {
+          ...marineLicences[0],
+          status: 'Withdrawn',
+          applicationReference: 'MLA/2025/10018'
+        }
+      ],
+      users: []
+    })
     const doc = await loadDashboardPage()
 
     const cells = getProjectsTableRow({
@@ -188,30 +248,33 @@ describe('Dashboard', () => {
   })
 
   it('should render a message if there are no projects', async () => {
-    mockExemptions([])
+    mockExemptions({ projects: [], users: [] })
     const doc = await loadDashboardPage()
     const table = queryByRole(doc, 'table', { name: 'Projects' })
-    expect(table).not.toBeInTheDocument()
+
+    const row = table.querySelectorAll('tbody tr')
+    expect(row.length).toBe(0)
+
     expect(
-      getByText(doc, 'There are no projects to display.')
+      getByText(doc, 'There are no submissions to display.')
     ).toBeInTheDocument()
   })
 
   describe('Sortable table integration', () => {
     it('should render table with moj-sortable-table data-module', async () => {
-      mockExemptions(exemptions)
+      mockExemptions(mockDashboardServerResponse(exemptions))
       const doc = await loadDashboardPage()
       const table = getByRole(doc, 'table', { name: 'Projects' })
       expect(table).toHaveAttribute('data-module', 'moj-sortable-table')
     })
 
     it('should set aria-sort on sortable column headers', async () => {
-      mockExemptions(exemptions)
+      mockExemptions(mockDashboardServerResponse(exemptions))
       const doc = await loadDashboardPage()
       const table = getByRole(doc, 'table', { name: 'Projects' })
 
       const nameHeader = getByRole(table, 'columnheader', {
-        name: 'Project name'
+        name: 'Name'
       })
       const typeHeader = getByRole(table, 'columnheader', { name: 'Type' })
       const referenceHeader = getByRole(table, 'columnheader', {
@@ -230,7 +293,7 @@ describe('Dashboard', () => {
     })
 
     it('should not set aria-sort on Actions column', async () => {
-      mockExemptions(exemptions)
+      mockExemptions(mockDashboardServerResponse(exemptions))
       const doc = await loadDashboardPage()
       const table = getByRole(doc, 'table', { name: 'Projects' })
 
@@ -241,7 +304,7 @@ describe('Dashboard', () => {
     })
 
     it('should set data-sort-value on date cells for proper sorting', async () => {
-      mockExemptions(exemptions)
+      mockExemptions(mockDashboardServerResponse(exemptions))
       const doc = await loadDashboardPage()
 
       const draftRow = getProjectsTableRow({
@@ -279,7 +342,7 @@ describe('Dashboard', () => {
           submittedAt: null
         }
       ]
-      mockExemptions(unsortedExemptions)
+      mockExemptions({ projects: unsortedExemptions, users: [] })
       const doc = await loadDashboardPage()
       const table = getByRole(doc, 'table', { name: 'Projects' })
       const rows = table.querySelectorAll('tbody tr')
@@ -290,83 +353,8 @@ describe('Dashboard', () => {
   })
 
   describe('Employee user dashboard (ML-928)', () => {
-    const employeeExemptions = [
-      {
-        id: '123',
-        projectName: 'My Draft Project',
-        status: 'Draft',
-        submittedAt: null,
-        isOwnProject: true,
-        ownerName: 'John Smith'
-      },
-      {
-        id: '456',
-        projectName: 'My Active Project',
-        status: 'Active',
-        submittedAt: '2025-10-23T12:00:00.000Z',
-        isOwnProject: true,
-        ownerName: 'John Smith'
-      },
-      {
-        id: '789',
-        projectName: 'Colleague Draft',
-        status: 'Draft',
-        submittedAt: null,
-        isOwnProject: false,
-        ownerName: 'Jane Doe'
-      },
-      {
-        id: '101',
-        projectName: 'Colleague Active',
-        status: 'Active',
-        submittedAt: '2025-10-20T12:00:00.000Z',
-        isOwnProject: false,
-        ownerName: 'Jane Doe'
-      }
-    ]
-
-    it('should render filter radios for employee users', async () => {
-      mockEmployeeExemptions(employeeExemptions)
-      const doc = await loadDashboardPage()
-
-      const myProjectsRadio = doc.querySelector(
-        'input[name="filter"][value="my-projects"]'
-      )
-      const allProjectsRadio = doc.querySelector(
-        'input[name="filter"][value="all-projects"]'
-      )
-
-      expect(myProjectsRadio).toBeInTheDocument()
-      expect(allProjectsRadio).toBeInTheDocument()
-    })
-
-    it('should not render filter radios for non-employee users', async () => {
-      mockExemptions(exemptions)
-      const doc = await loadDashboardPage()
-
-      const myProjectsRadio = doc.querySelector(
-        'input[name="filter"][value="my-projects"]'
-      )
-      const allProjectsRadio = doc.querySelector(
-        'input[name="filter"][value="all-projects"]'
-      )
-
-      expect(myProjectsRadio).not.toBeInTheDocument()
-      expect(allProjectsRadio).not.toBeInTheDocument()
-    })
-
-    it('should render "My projects" as the default selected filter', async () => {
-      mockEmployeeExemptions(employeeExemptions)
-      const doc = await loadDashboardPage()
-
-      const myProjectsRadio = doc.querySelector(
-        'input[name="filter"][value="my-projects"]'
-      )
-      expect(myProjectsRadio).toBeChecked()
-    })
-
     it('should render Owner column header for employee users', async () => {
-      mockEmployeeExemptions(employeeExemptions)
+      mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
       const doc = await loadDashboardPage()
       const table = getByRole(doc, 'table', { name: 'Projects' })
 
@@ -375,7 +363,7 @@ describe('Dashboard', () => {
     })
 
     it('should not render Owner column header for non-employee users', async () => {
-      mockExemptions(exemptions)
+      mockExemptions(mockDashboardServerResponse(exemptions))
       const doc = await loadDashboardPage()
       const table = getByRole(doc, 'table', { name: 'Projects' })
 
@@ -385,7 +373,7 @@ describe('Dashboard', () => {
     })
 
     it('should render owner name in Owner column for employee view', async () => {
-      mockEmployeeExemptions(employeeExemptions)
+      mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
       const doc = await loadDashboardPage()
 
       const cells = getProjectsTableRow({
@@ -396,25 +384,8 @@ describe('Dashboard', () => {
       expect(cellContents).toContain('John Smith')
     })
 
-    it('should set data-is-own-project attribute on table rows', async () => {
-      mockEmployeeExemptions(employeeExemptions)
-      const doc = await loadDashboardPage()
-      const table = getByRole(doc, 'table', { name: 'Projects' })
-      const rows = table.querySelectorAll('tbody tr')
-
-      const ownProjectRow = Array.from(rows).find((row) =>
-        row.textContent.includes('My Draft Project')
-      )
-      const otherProjectRow = Array.from(rows).find((row) =>
-        row.textContent.includes('Colleague Draft')
-      )
-
-      expect(ownProjectRow).toHaveAttribute('data-is-own-project', 'true')
-      expect(otherProjectRow).toHaveAttribute('data-is-own-project', 'false')
-    })
-
     it('should show Continue and Delete actions for own draft projects', async () => {
-      mockEmployeeExemptions(employeeExemptions)
+      mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
       const doc = await loadDashboardPage()
 
       const cells = getProjectsTableRow({
@@ -432,7 +403,7 @@ describe('Dashboard', () => {
     })
 
     it('should show View details action for own active projects', async () => {
-      mockEmployeeExemptions(employeeExemptions)
+      mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
       const doc = await loadDashboardPage()
 
       const cells = getProjectsTableRow({
@@ -449,7 +420,7 @@ describe('Dashboard', () => {
     })
 
     it('should show no actions for other users draft projects', async () => {
-      mockEmployeeExemptions(employeeExemptions)
+      mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
       const doc = await loadDashboardPage()
 
       const cells = getProjectsTableRow({
@@ -463,7 +434,7 @@ describe('Dashboard', () => {
     })
 
     it('should show View details action for other users active projects', async () => {
-      mockEmployeeExemptions(employeeExemptions)
+      mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
       const doc = await loadDashboardPage()
 
       const cells = getProjectsTableRow({
@@ -478,24 +449,312 @@ describe('Dashboard', () => {
         })
       ).toHaveAttribute('href', '/exemption/view-details/101')
     })
+  })
 
-    it('should render Update results button for non-JS fallback', async () => {
-      mockEmployeeExemptions(employeeExemptions)
-      const doc = await loadDashboardPage()
+  describe('Filter', () => {
+    describe('when marine licence is enabled', () => {
+      beforeAll(() => {
+        config.set('marineLicence.enabled', true)
+      })
 
-      const updateButton = doc.querySelector('.app-filter-submit')
-      expect(updateButton).toBeInTheDocument()
-      expect(updateButton.textContent.trim()).toBe('Update results')
+      afterAll(() => {
+        config.set('marineLicence.enabled', false)
+      })
+
+      it('should render table with moj-filter module for employees', async () => {
+        mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
+        const doc = await loadDashboardPage()
+        const filter = doc.querySelector('.moj-filter')
+        expect(filter).toHaveAttribute('data-module', 'moj-filter')
+
+        expect(
+          queryAllByRole(filter, 'button', { name: 'Clear filters' })
+        ).toHaveLength(1)
+
+        expect(
+          getByRole(filter, 'button', { name: 'Apply filters' })
+        ).toBeInTheDocument()
+
+        expect(
+          getByRole(filter, 'heading', {
+            name: 'Selected filters'
+          })
+        ).toBeInTheDocument()
+
+        expect(filter.querySelectorAll('.moj-filter__tag').length).toBe(0)
+
+        expect(
+          getByRole(filter, 'group', {
+            name: 'Show'
+          })
+        ).toBeInTheDocument()
+
+        const orgSubmissionRadio = getByRole(filter, 'radio', {
+          name: 'All Test Org submissions'
+        })
+
+        const mySubmissionRadio = getByRole(filter, 'radio', {
+          name: 'My submissions'
+        })
+
+        const userSubmissionRadio = getByRole(filter, 'radio', {
+          name: 'Submissions by owner'
+        })
+
+        expect(orgSubmissionRadio).not.toBeChecked()
+        expect(mySubmissionRadio).toBeChecked()
+        expect(userSubmissionRadio).not.toBeChecked()
+
+        expect(
+          getByRole(filter, 'checkbox', { name: 'Mine (Test User)' })
+        ).toBeInTheDocument()
+
+        expect(
+          getByRole(filter, 'checkbox', { name: 'John Smith' })
+        ).toBeInTheDocument()
+
+        const statusGroup = getByRole(filter, 'group', {
+          name: 'Status'
+        })
+        expect(statusGroup).toBeInTheDocument()
+
+        const statuses = [
+          'Active',
+          'Draft',
+          'Submitted',
+          'Transferred',
+          'Unable to progress',
+          'Withdrawn'
+        ]
+
+        statuses.forEach((status) => {
+          const checkbox = getByRole(statusGroup, 'checkbox', {
+            name: status
+          })
+          expect(checkbox).not.toBeChecked()
+        })
+
+        const typeGroup = getByRole(filter, 'group', {
+          name: 'Submission type'
+        })
+        expect(typeGroup).toBeInTheDocument()
+
+        const typeValues = [EXEMPTION_TYPE, MARINE_LICENCE_TYPE]
+
+        typeValues.forEach((type) => {
+          const checkbox = getByRole(typeGroup, 'checkbox', { name: type })
+          expect(checkbox).not.toBeChecked()
+        })
+      })
+
+      it('should check the "Submissions by owner" radio after filtering by a user', async () => {
+        const johnSmithUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+        mockEmployeeExemptions(
+          mockDashboardServerResponse(employeeExemptions, {
+            [johnSmithUuid]: 'John Smith'
+          })
+        )
+
+        const postResponse = await makePostRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          formData: { show: 'specific-user', user: johnSmithUuid }
+        })
+
+        expect(postResponse.statusCode).toBe(302)
+        expect(postResponse.headers.location).toBe(
+          `${routes.DASHBOARD}#app-project-results`
+        )
+
+        const sessionCookie = Array.isArray(postResponse.headers['set-cookie'])
+          ? postResponse.headers['set-cookie'].join('; ')
+          : postResponse.headers['set-cookie']
+
+        const getResponse = await makeGetRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          headers: { cookie: sessionCookie }
+        })
+
+        const { document } = new JSDOM(getResponse.result).window
+        const filter = document.querySelector('.moj-filter')
+
+        const userSubmissionRadio = getByRole(filter, 'radio', {
+          name: 'Submissions by owner'
+        })
+
+        expect(userSubmissionRadio).toBeChecked()
+
+        const myProjectsOption = getByRole(filter, 'checkbox', {
+          name: 'Mine (Test User)'
+        })
+
+        expect(myProjectsOption).not.toBeChecked()
+
+        const johnSmithOption = getByRole(filter, 'checkbox', {
+          name: 'John Smith'
+        })
+
+        expect(johnSmithOption).toBeChecked()
+      })
+
+      it('should show error when "Submissions by owner" is selected with no user chosen', async () => {
+        mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
+
+        const postResponse = await makePostRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          formData: { show: 'specific-user' }
+        })
+
+        expect(postResponse.statusCode).toBe(302)
+        expect(postResponse.headers.location).toBe(
+          `${routes.DASHBOARD}#app-project-results`
+        )
+
+        const sessionCookie = Array.isArray(postResponse.headers['set-cookie'])
+          ? postResponse.headers['set-cookie'].join('; ')
+          : postResponse.headers['set-cookie']
+
+        const getResponse = await makeGetRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          headers: { cookie: sessionCookie }
+        })
+
+        const { document } = new JSDOM(getResponse.result).window
+        const filter = document.querySelector('.moj-filter')
+
+        const userSubmissionRadio = getByRole(filter, 'radio', {
+          name: 'Submissions by owner'
+        })
+
+        expect(userSubmissionRadio).toBeChecked()
+
+        const errorMessage = document.querySelector('#user-error')
+        expect(errorMessage).toHaveTextContent(
+          'Select an owner to view their submissions'
+        )
+        expect(errorMessage.closest('.govuk-form-group')).toHaveClass(
+          'govuk-form-group--error'
+        )
+      })
+
+      it('should not show "Submissions by owner" when no others exist', async () => {
+        mockEmployeeExemptions(
+          mockDashboardServerResponse(employeeExemptions, {})
+        )
+
+        const postResponse = await makePostRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          formData: { show: 'specific-user' }
+        })
+
+        expect(postResponse.statusCode).toBe(302)
+        expect(postResponse.headers.location).toBe(
+          `${routes.DASHBOARD}#app-project-results`
+        )
+
+        const sessionCookie = Array.isArray(postResponse.headers['set-cookie'])
+
+        const getResponse = await makeGetRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          headers: { cookie: sessionCookie }
+        })
+
+        const { document } = new JSDOM(getResponse.result).window
+        const filter = document.querySelector('.moj-filter')
+
+        const userSubmissionRadio = queryByRole(filter, 'radio', {
+          name: 'Submissions by owner'
+        })
+
+        expect(userSubmissionRadio).not.toBeInTheDocument()
+      })
+
+      it('should not redirect to anchor on first page load', async () => {
+        mockEmployeeExemptions(
+          mockDashboardServerResponse(employeeExemptions, {})
+        )
+
+        const postResponse = await makePostRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          formData: {}
+        })
+
+        expect(postResponse.statusCode).toBe(302)
+        expect(postResponse.headers.location).toBe(routes.DASHBOARD)
+      })
     })
 
-    it('should have app-project-filter data-module on radios container', async () => {
-      mockEmployeeExemptions(employeeExemptions)
-      const doc = await loadDashboardPage()
+    describe('when marine licence is disabled', () => {
+      beforeAll(() => {
+        config.set('marineLicence.enabled', false)
+      })
 
-      const filterModule = doc.querySelector(
-        '[data-module*="app-project-filter"]'
-      )
-      expect(filterModule).toBeInTheDocument()
+      it('should only show Active and Draft statuses and hide the Submission type filter', async () => {
+        mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
+        const doc = await loadDashboardPage()
+        const filter = doc.querySelector('.moj-filter')
+
+        const statusGroup = getByRole(filter, 'group', {
+          name: 'Status'
+        })
+
+        ;['Active', 'Draft'].forEach((status) => {
+          expect(
+            getByRole(statusGroup, 'checkbox', { name: status })
+          ).not.toBeChecked()
+        })
+        ;[
+          'Submitted',
+          'Transferred',
+          'Unable to progress',
+          'Withdrawn'
+        ].forEach((status) => {
+          expect(
+            queryByRole(statusGroup, 'checkbox', { name: status })
+          ).not.toBeInTheDocument()
+        })
+
+        expect(
+          queryByRole(filter, 'group', { name: 'Submission type' })
+        ).not.toBeInTheDocument()
+      })
+    })
+
+    it('should not render table with moj-filter module for individuals', async () => {
+      mockExemptions(mockDashboardServerResponse(exemptions))
+      const doc = await loadDashboardPage()
+      const filter = doc.querySelector('.moj-filter')
+      expect(filter).toBeFalsy()
+    })
+
+    describe('Invalid filter payload', () => {
+      it('should redirect to the dashboard when the no-JS payload fails validation', async () => {
+        const response = await makePostRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          formData: { show: 'not-a-value' }
+        })
+
+        expect(response.statusCode).toBe(302)
+        expect(response.headers.location).toBe(routes.DASHBOARD)
+      })
+
+      it('should return a 400 when the JS-fetch payload fails validation', async () => {
+        const response = await makePostRequest({
+          url: routes.DASHBOARD,
+          server: getServer(),
+          formData: { show: 'not-a-value' },
+          headers: { 'x-requested-with': 'XMLHttpRequest' }
+        })
+
+        expect(response.statusCode).toBe(400)
+      })
     })
   })
 })

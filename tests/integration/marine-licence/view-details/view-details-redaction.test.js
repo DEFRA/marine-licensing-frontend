@@ -13,6 +13,7 @@ import {
   expectedExternalActivityCards,
   expectedWaterFrameworkDirectiveCard
 } from './fixtures.js'
+import { toApplicationReferenceUrlSegment } from '~/src/server/common/helpers/marine-licence/application-reference-url-segment.js'
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
@@ -28,7 +29,7 @@ describe('Marine Licence View Details Redaction', () => {
 
     mockMarineLicence(mockSubmittedMarineLicenceApplication)
     return loadPage({
-      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${mockSubmittedMarineLicenceApplication.id}`,
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${toApplicationReferenceUrlSegment(mockSubmittedMarineLicenceApplication.applicationReference)}`,
       server
     })
   }
@@ -53,8 +54,8 @@ describe('Marine Licence View Details Redaction', () => {
 
   describe('redaction field', () => {
     const licenceId = mockSubmittedMarineLicenceApplication.id
-    const viewUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${licenceId}`
-    const redactUrl = `${viewUrl}/redact`
+    const viewUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${toApplicationReferenceUrlSegment(mockSubmittedMarineLicenceApplication.applicationReference)}`
+    const redactUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${licenceId}/redact`
     const applicantText = 'July 2026 to August 2027'
     const redactedText = 'Redacted preferred dates'
 

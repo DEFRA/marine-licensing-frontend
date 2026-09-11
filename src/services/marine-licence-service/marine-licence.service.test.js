@@ -177,6 +177,69 @@ describe('MarineLicenceService', () => {
     })
   })
 
+  describe('getMarineLicenceByReference', () => {
+    const validReference = 'MLA/2026/10264'
+
+    beforeEach(() => {
+      service = new MarineLicenceService(mockRequest, mockLogger)
+    })
+
+    test('should return marine licence data for a valid reference', async () => {
+      const expectedMarineLicence = {
+        id: '507f1f77bcf86cd799439011',
+        projectName: 'Test Project',
+        applicationReference: validReference
+      }
+
+      vi.mocked(authenticatedGetRequest).mockResolvedValue({
+        payload: { message: 'success', value: expectedMarineLicence }
+      })
+
+      const result = await service.getMarineLicenceByReference(validReference)
+
+      expect(authenticatedGetRequest).toHaveBeenCalledWith(
+        mockRequest,
+        `/marine-licence/applicationReference/${validReference}`
+      )
+      expect(result).toEqual(expectedMarineLicence)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
+    test.each([
+      ['null', null],
+      ['undefined', undefined],
+      ['empty string', '']
+    ])(
+      'should throw when reference is %s',
+      async (_label, invalidReference) => {
+        await expect(
+          service.getMarineLicenceByReference(invalidReference)
+        ).rejects.toThrow(errorMessages.MARINE_LICENCE_NOT_FOUND)
+
+        expect(mockLogger.error).toHaveBeenCalledWith(
+          { id: undefined, applicationReference: invalidReference },
+          errorMessages.MARINE_LICENCE_NOT_FOUND
+        )
+        expect(authenticatedGetRequest).not.toHaveBeenCalled()
+      }
+    )
+
+    test('should throw when API response is not successful', async () => {
+      vi.mocked(authenticatedGetRequest).mockResolvedValue({
+        payload: { message: 'error', value: null }
+      })
+
+      await expect(
+        service.getMarineLicenceByReference(validReference)
+      ).rejects.toThrow(errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        { id: undefined, applicationReference: validReference },
+        errorMessages.MARINE_LICENCE_DATA_NOT_FOUND
+      )
+    })
+  })
+
   describe('getPublicMarineLicenceById', () => {
     const validId = '507f1f77bcf86cd799439011'
 

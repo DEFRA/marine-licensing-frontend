@@ -14,6 +14,7 @@ import {
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
+import { toApplicationReferenceUrlSegment } from '#src/server/common/helpers/marine-licence/application-reference-url-segment.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/site-data.js', () => ({
   buildSiteData: vi
@@ -75,6 +76,37 @@ describe('marine-licence view details internal-user redaction controller', () =>
         pageTitle: 'Redact application for the public register',
         pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`,
         backLink: null
+      })
+    )
+  })
+
+  test('looks up by applicationReference', async () => {
+    const marineLicence = createSubmittedMarineLicence()
+    const mockServiceInstance = {
+      getMarineLicenceByReference: vi.fn().mockResolvedValue(marineLicence)
+    }
+    vi.mocked(getMarineLicenceService).mockReturnValue(mockServiceInstance)
+
+    const applicationReferenceUrlSegment = toApplicationReferenceUrlSegment(
+      marineLicence.applicationReference
+    )
+
+    const mockH = { view: vi.fn() }
+    const mockRequest = createMockRequest({
+      params: { applicationReference: applicationReferenceUrlSegment }
+    })
+
+    await viewDetailsInternalUserController.handler(mockRequest, mockH)
+
+    expect(
+      mockServiceInstance.getMarineLicenceByReference
+    ).toHaveBeenCalledWith(applicationReferenceUrlSegment)
+
+    expect(mockH.view).toHaveBeenCalledWith(
+      VIEW_DETAILS_INTERNAL_USER_VIEW_ROUTE,
+      expect.objectContaining({
+        marineLicenceId: marineLicence.id,
+        redactionSaveUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${marineLicence.id}/redact`
       })
     )
   })

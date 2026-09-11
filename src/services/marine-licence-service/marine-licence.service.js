@@ -8,7 +8,9 @@ import { apiRoutes } from '#src/server/common/constants/routes.js'
 
 const apiPaths = {
   getMarineLicence: (id) => `/marine-licence/${id}`,
-  getPublicMarineLicence: (id) => `/public/marine-licence/${id}`
+  getPublicMarineLicence: (id) => `/public/marine-licence/${id}`,
+  getMarineLicenceByReference: (applicationReference) =>
+    `/marine-licence/applicationReference/${applicationReference}`
 }
 
 export class MarineLicenceService {
@@ -25,20 +27,37 @@ export class MarineLicenceService {
     return this.getMarineLicenceData({ id, isPublic: true })
   }
 
-  async getMarineLicenceData({ id, isPublic = false }) {
-    if (!id) {
-      this.logger.error({ id }, errorMessages.MARINE_LICENCE_NOT_FOUND)
+  async getMarineLicenceByReference(applicationReference) {
+    return this.getMarineLicenceData({ applicationReference })
+  }
+
+  async getMarineLicenceData({ id, applicationReference, isPublic = false }) {
+    if (!id && !applicationReference) {
+      this.logger.error(
+        { id, applicationReference },
+        errorMessages.MARINE_LICENCE_NOT_FOUND
+      )
       throw new Error(errorMessages.MARINE_LICENCE_NOT_FOUND)
     }
 
-    const endpoint = isPublic
-      ? apiPaths.getPublicMarineLicence(id)
-      : apiPaths.getMarineLicence(id)
+    console.log('GETS PASSED')
+
+    let endpoint
+    if (applicationReference) {
+      endpoint = apiPaths.getMarineLicenceByReference(applicationReference)
+    } else if (isPublic) {
+      endpoint = apiPaths.getPublicMarineLicence(id)
+    } else {
+      endpoint = apiPaths.getMarineLicence(id)
+    }
 
     const { payload } = await authenticatedGetRequest(this.request, endpoint)
 
     if (payload?.message !== 'success' || !payload.value) {
-      this.logger.error({ id }, errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
+      this.logger.error(
+        { id, applicationReference },
+        errorMessages.MARINE_LICENCE_DATA_NOT_FOUND
+      )
       throw new Error(errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
     }
 

@@ -5,7 +5,7 @@ import { saveRedactionController } from '#src/server/marine-licence/view-marine-
 export const viewMarineLicenceInternalUserRoutes = [
   {
     method: 'GET',
-    path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/{marineLicenceId}`,
+    path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/{applicationReference}`,
     ...viewDetailsInternalUserController
   },
   {

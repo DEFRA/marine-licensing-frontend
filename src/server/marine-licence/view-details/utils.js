@@ -1,4 +1,4 @@
-import { escape } from 'lodash'
+import escapeHtml from 'lodash/escape.js'
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
@@ -10,7 +10,7 @@ const REDACTION_LABEL = '***REDACTED***'
 const REDACTION_LABEL_HTML = `<span class="app-redaction-label">${REDACTION_LABEL}</span>`
 
 const wrapRedactionLabels = (text) =>
-  escape(text ?? '').replaceAll(REDACTION_LABEL, REDACTION_LABEL_HTML)
+  escapeHtml(text ?? '').replaceAll(REDACTION_LABEL, REDACTION_LABEL_HTML)
 
 export const buildRedactionsForView = (redactions) =>
   Object.fromEntries(

@@ -22,16 +22,18 @@ const getRedactionSaveUrl = (marineLicenceId) =>
 
 export const viewDetailsInternalUserController = {
   async handler(request, h) {
-    const { marineLicenceId } = request.params
+    const { marineLicenceId, applicationReference } = request.params
 
     try {
       const service = getMarineLicenceService(request)
-      const marineLicence = await service.getMarineLicenceById(marineLicenceId)
+      const marineLicence = marineLicenceId
+        ? await service.getMarineLicenceById(marineLicenceId)
+        : await service.getMarineLicenceByReference(applicationReference)
 
       if (!isProjectViewable(marineLicence)) {
         request.logger.error(
           {
-            id: marineLicenceId,
+            id: marineLicence.id,
             status: marineLicence.status,
             hasApplicationReference: !!marineLicence.applicationReference
           },
@@ -67,8 +69,8 @@ export const viewDetailsInternalUserController = {
         isReadOnly: true,
         pageCaption: `${marineLicence.applicationReference} - ${formattedMarineLicence.projectName}`,
         backLink: null,
-        marineLicenceId,
-        redactionSaveUrl: getRedactionSaveUrl(marineLicenceId),
+        marineLicenceId: marineLicence.id,
+        redactionSaveUrl: getRedactionSaveUrl(marineLicence.id),
         csrfToken: request.plugins.crumb,
         waterFrameworkDirectiveData,
         marinePlanPolicies,

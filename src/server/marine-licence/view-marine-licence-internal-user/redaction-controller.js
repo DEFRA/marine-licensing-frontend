@@ -5,6 +5,7 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { isClientSideFetchRequest } from '#src/server/common/helpers/is-client-side-fetch-request.js'
 import { viewDetailsInternalUserController } from '#src/server/marine-licence/view-marine-licence-internal-user/controller.js'
+import { REDACTION_LABEL } from '#src/server/marine-licence/view-details/utils.js'
 
 const REDACTION_TEXT_MAX_LENGTH = 1000
 
@@ -32,9 +33,11 @@ export const saveRedactionController = {
     const viewUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${marineLicenceId}`
     const isFetch = isClientSideFetchRequest(request)
 
+    const redactionText = text.trim() === '' ? REDACTION_LABEL : text
+
     try {
       const service = getMarineLicenceService(request)
-      await service.saveRedaction(marineLicenceId, fieldKey, text)
+      await service.saveRedaction(marineLicenceId, fieldKey, redactionText)
     } catch (error) {
       request.logger.error(error, 'Error saving marine licence redaction')
 

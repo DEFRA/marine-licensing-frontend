@@ -6,7 +6,7 @@ import { getStatusLabelText } from '#src/server/dashboard/utils.js'
 
 const APPLICATION_DATE_FORMAT = 'd MMMM yyyy'
 
-const REDACTION_LABEL = '***REDACTED***'
+export const REDACTION_LABEL = '***REDACTED***'
 const REDACTION_LABEL_HTML = `<span class="app-redaction-label">${REDACTION_LABEL}</span>`
 
 const wrapRedactionLabels = (text) =>

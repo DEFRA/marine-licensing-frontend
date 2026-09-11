@@ -3,6 +3,7 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { viewDetailsInternalUserController } from '#src/server/marine-licence/view-marine-licence-internal-user/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { saveRedactionController } from './redaction-controller.js'
+import { REDACTION_LABEL } from '../view-details/utils.js'
 
 vi.mock('#src/services/marine-licence-service/index.js')
 vi.mock(
@@ -62,6 +63,23 @@ describe('saveRedactionController', () => {
     expect(result).toBe('rendered page')
     expect(mockH.redirect).not.toHaveBeenCalled()
   })
+
+  test.each([[''], ['   ']])(
+    'saves the redaction label when the text is empty (%j)',
+    async (text) => {
+      const mockRequest = createMockRequest({
+        payload: { fieldKey: 'preferredDates', text }
+      })
+
+      await saveRedactionController.handler(mockRequest, createMockH())
+
+      expect(mockMarineLicenceService.saveRedaction).toHaveBeenCalledWith(
+        'test-id',
+        'preferredDates',
+        REDACTION_LABEL
+      )
+    }
+  )
 
   test('redirects back to the view page for a native form post', async () => {
     const mockRequest = createMockRequest({ headers: {} })

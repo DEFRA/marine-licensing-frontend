@@ -8,23 +8,23 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
-import { publicRegisterSchema } from '#src/server/common/validation/public-register/schema.js'
+import { marineLicencePublicRegisterSchema } from '#src/server/common/validation/marine-licence-public-register/schema.js'
 import {
-  publicRegisterErrorMessages,
-  publicRegisterSettings
-} from '#src/server/common/validation/public-register/constants.js'
+  marineLicencePublicRegisterErrorMessages,
+  marineLicencePublicRegisterSettings
+} from '#src/server/common/validation/marine-licence-public-register/constants.js'
 import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 
-export const PUBLIC_REGISTER_VIEW_ROUTE = 'templates/public-register'
+export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
 
 export const publicRegisterController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
-      ...publicRegisterSettings,
+      ...marineLicencePublicRegisterSettings,
       projectName: marineLicence.projectName,
-      payload: marineLicence.publicRegister,
+      payload: marineLicence.publicRegister ?? {},
       backLink: getCommonRedirectLink(request)
     })
   }
@@ -33,14 +33,14 @@ export const publicRegisterController = {
 export const publicRegisterSubmitController = {
   options: {
     validate: {
-      payload: publicRegisterSchema,
+      payload: marineLicencePublicRegisterSchema,
       failAction: (request, h, err) => {
         const { projectName } = getMarineLicenceCache(request)
         const backLink = getCommonRedirectLink(request)
         return createFailAction({
           viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
-          settings: publicRegisterSettings,
-          errorMessages: publicRegisterErrorMessages,
+          settings: marineLicencePublicRegisterSettings,
+          errorMessages: marineLicencePublicRegisterErrorMessages,
           projectName,
           backLink,
           payload: request.payload
@@ -54,24 +54,24 @@ export const publicRegisterSubmitController = {
     const marineLicence = getMarineLicenceCache(request)
 
     try {
-      const userDoesNotConsent = payload.consent === 'no'
+      const isWithholding = payload.withholdConsent === 'yes'
+      const publicRegister = {
+        withholdConsent: payload.withholdConsent,
+        ...(isWithholding && { reason: payload.reason })
+      }
 
       await authenticatedPatchRequest(
         request,
         '/marine-licence/public-register',
         {
-          consent: payload.consent,
-          ...(userDoesNotConsent && { reason: payload.reason }),
+          ...publicRegister,
           id: marineLicence.id
         }
       )
 
       await setMarineLicenceCache(request, h, {
         ...marineLicence,
-        publicRegister: {
-          consent: payload.consent,
-          ...(userDoesNotConsent && { reason: payload.reason })
-        }
+        publicRegister
       })
 
       return h.redirect(getCommonRedirectLink(request))
@@ -85,13 +85,13 @@ export const publicRegisterSubmitController = {
 
       const errorSummary = mapErrorsForDisplay(
         details,
-        publicRegisterErrorMessages
+        marineLicencePublicRegisterErrorMessages
       )
 
       const errors = errorDescriptionByFieldName(errorSummary)
 
       return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
-        ...publicRegisterSettings,
+        ...marineLicencePublicRegisterSettings,
         payload,
         projectName: marineLicence.projectName,
         backLink: getCommonRedirectLink(request),

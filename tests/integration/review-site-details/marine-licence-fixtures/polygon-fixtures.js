@@ -8,9 +8,6 @@ const baseMlPolygonMarineLicence = {
   id: 'test-ml-polygon-123',
   projectName: 'Hammersmith pontoon construction',
   multipleSiteDetails: {},
-  publicRegister: {
-    withholdFromPublicRegister: false
-  },
   taskList: {
     projectName: { status: 'completed' },
     siteDetails: { status: 'completed' }

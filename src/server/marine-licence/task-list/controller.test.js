@@ -137,7 +137,7 @@ describe('#taskListController', () => {
         status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Sharing your project information publicly'
+          text: 'Public register'
         }
       }
     ]

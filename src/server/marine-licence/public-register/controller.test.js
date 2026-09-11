@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
+  publicRegisterController,
   publicRegisterSubmitController,
   PUBLIC_REGISTER_VIEW_ROUTE
 } from '#src/server/marine-licence/public-register/controller.js'
@@ -13,7 +14,7 @@ describe('#publicRegister', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    publicRegister: { consent: 'no', reason: 'Some reason' }
+    publicRegister: { withholdConsent: 'yes', reason: 'Some details' }
   }
 
   beforeEach(() => {
@@ -30,6 +31,24 @@ describe('#publicRegister', () => {
     vi.restoreAllMocks()
   })
 
+  describe('#publicRegisterController', () => {
+    test('Should render an empty form when the question is not yet answered', async () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+        ...mockLicence,
+        publicRegister: undefined
+      })
+
+      const h = { view: vi.fn() }
+
+      await publicRegisterController.handler({ query: {} }, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        PUBLIC_REGISTER_VIEW_ROUTE,
+        expect.objectContaining({ payload: {} })
+      )
+    })
+  })
+
   describe('#publicRegisterSubmitController', () => {
     test('Should pass error to global catchAll behaviour if it contains no validation data', async () => {
       const thrownError = { res: { statusCode: 500 }, data: {} }
@@ -44,7 +63,10 @@ describe('#publicRegister', () => {
       await expect(
         publicRegisterSubmitController.handler(
           {
-            payload: { consent: 'no', reason: 'Some reason' },
+            payload: {
+              withholdConsent: 'yes',
+              reason: 'Some details'
+            },
             query: {}
           },
           h
@@ -61,7 +83,7 @@ describe('#publicRegister', () => {
       }
 
       await publicRegisterSubmitController.handler(
-        { payload: { consent: 'yes' }, query: {} },
+        { payload: { withholdConsent: 'no' }, query: {} },
         h
       )
 
@@ -70,8 +92,13 @@ describe('#publicRegister', () => {
         '/marine-licence/public-register',
         {
           id: mockLicence.id,
-          consent: 'yes'
+          withholdConsent: 'no'
         }
+      )
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        expect.objectContaining({ publicRegister: { withholdConsent: 'no' } })
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
@@ -86,7 +113,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { consent: 'no', reason: 'Some reason' },
+          payload: { withholdConsent: 'yes', reason: 'Some details' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -97,39 +124,31 @@ describe('#publicRegister', () => {
         '/marine-licence/public-register',
         {
           id: mockLicence.id,
-          consent: 'no',
-          reason: 'Some reason'
+          withholdConsent: 'yes',
+          reason: 'Some details'
         }
+      )
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        expect.objectContaining({
+          publicRegister: { withholdConsent: 'yes', reason: 'Some details' }
+        })
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       )
     })
 
-    test.each([
-      {
-        name: 'task list backlink',
-        query: {},
-        expectedBackLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-      },
-      {
-        name: 'check-your-answers backlink',
-        query: { from: 'check-your-answers' },
-        expectedBackLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-      }
-    ])(
-      'Should handle API validation errors in catch block with $name',
-      async ({ query, expectedBackLink }) => {
-        vi.spyOn(
-          authRequests,
-          'authenticatedPatchRequest'
-        ).mockRejectedValueOnce({
+    test('Should handle API validation errors in catch block', async () => {
+      vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(
+        {
           data: {
             payload: {
               validation: {
                 details: [
                   {
-                    path: ['consent'],
+                    field: 'reason',
                     message: 'PUBLIC_REGISTER_REASON_REQUIRED',
                     type: 'any.required'
                   }
@@ -137,29 +156,40 @@ describe('#publicRegister', () => {
               }
             }
           }
-        })
-
-        const h = {
-          redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-          view: vi.fn()
         }
+      )
 
-        await publicRegisterSubmitController.handler(
-          {
-            payload: { consent: 'no', reason: 'Some reason' },
-            query
-          },
-          h
-        )
-
-        expect(h.view).toHaveBeenCalledWith(
-          PUBLIC_REGISTER_VIEW_ROUTE,
-          expect.objectContaining({
-            backLink: expectedBackLink,
-            payload: { consent: 'no', reason: 'Some reason' }
-          })
-        )
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
       }
-    )
+
+      await publicRegisterSubmitController.handler(
+        {
+          payload: {
+            withholdConsent: 'yes',
+            reason: 'Some details'
+          },
+          query: {}
+        },
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        PUBLIC_REGISTER_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          payload: {
+            withholdConsent: 'yes',
+            reason: 'Some details'
+          },
+          errors: expect.objectContaining({
+            reason: expect.objectContaining({
+              text: 'Enter details of what you want withheld and why'
+            })
+          })
+        })
+      )
+    })
   })
 })

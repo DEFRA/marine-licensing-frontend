@@ -1,0 +1,44 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
+
+{% set isWithholding = params.publicRegister.withholdConsent === 'yes' %}
+{% set withholdAnswer = ("Yes" if isWithholding else "No") if params.publicRegister.withholdConsent else "" %}
+
+{% set rows = [] %}
+
+{% set _ = rows.push({
+  key: { text: "Request that information is withheld" },
+  value: { html: appIncompleteField({ text: withholdAnswer }) },
+  classes: "govuk-summary-list__row--no-border"
+}) %}
+
+{% if isWithholding %}
+
+{% set _ = rows.push({
+  key: { text: "Details of information to be withheld and why" },
+  value: { text: params.publicRegister.reason }
+}) %}
+
+{% endif %}
+
+{{ govukSummaryList({
+    card: {
+      title: {
+        text: "Sharing your application information publicly"
+      },
+      actions: {
+        items: [
+          {
+            href: params.changeLink ~ "?from=check-your-answers",
+            text: "Change",
+            visuallyHiddenText: " sharing your application information publicly",
+            classes: "govuk-link--no-visited-state"
+          }
+        ]
+      } if not params.isReadOnly,
+      attributes: {
+        id: "public-register-card"
+      }
+    },
+    rows: rows
+  }) }}

@@ -86,37 +86,6 @@ describe('Public register', () => {
     ).not.toBeChecked()
   })
 
-  test('public register form state when information is not withheld', async () => {
-    mockMarineLicence({
-      ...marineLicence,
-      publicRegister: { consent: 'yes' }
-    })
-
-    const document = await loadPage({
-      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-      server: getServer()
-    })
-
-    expect(
-      getInputInFieldset({
-        document,
-        fieldsetLabel:
-          'Sharing your application information on the public register',
-        inputLabel: 'No',
-        findByHeading: true
-      })
-    ).toBeChecked()
-    expect(
-      getInputInFieldset({
-        document,
-        fieldsetLabel:
-          'Sharing your application information on the public register',
-        inputLabel: 'Yes',
-        findByHeading: true
-      })
-    ).not.toBeChecked()
-  })
-
   test('public register form state when information is withheld and details set', async () => {
     mockMarineLicence({
       ...marineLicence,

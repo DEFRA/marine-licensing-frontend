@@ -8,7 +8,7 @@ const CARD_TITLE = 'Sharing your application information publicly'
 const DETAILS_KEY = 'Details of information to be withheld and why'
 
 describe('Marine Licence Public Register Card Component', () => {
-  describe('When no information is withheld', () => {
+  describe('Card title and change link', () => {
     const renderComponent = (params) =>
       renderComponentJSDOM(COMPONENT, {
         publicRegister: { consent: 'yes' },
@@ -21,20 +21,6 @@ describe('Marine Licence Public Register Card Component', () => {
       expect(
         within(component).getByRole('heading', { level: 2 })
       ).toHaveTextContent(CARD_TITLE)
-    })
-
-    test('Should display "No" for the withhold request', () => {
-      const component = renderComponent()
-      validatePublicRegister(component, {
-        publicRegister: {
-          'Request that information is withheld': 'No'
-        }
-      })
-    })
-
-    test('Should not display the details row', () => {
-      const component = renderComponent()
-      expect(within(component).queryByText(DETAILS_KEY)).not.toBeInTheDocument()
     })
 
     test('should not show a change link when read-only', () => {
@@ -55,6 +41,28 @@ describe('Marine Licence Public Register Card Component', () => {
         'href',
         `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?from=check-your-answers`
       )
+    })
+  })
+
+  describe('When no information is withheld', () => {
+    const renderComponent = () =>
+      renderComponentJSDOM(COMPONENT, {
+        publicRegister: { consent: 'yes' },
+        isReadOnly: true
+      })
+
+    test('Should display "No" for the withhold request', () => {
+      const component = renderComponent()
+      validatePublicRegister(component, {
+        publicRegister: {
+          'Request that information is withheld': 'No'
+        }
+      })
+    })
+
+    test('Should not display the details row', () => {
+      const component = renderComponent()
+      expect(within(component).queryByText(DETAILS_KEY)).not.toBeInTheDocument()
     })
   })
 
@@ -83,13 +91,6 @@ describe('Marine Licence Public Register Card Component', () => {
         ...params
       })
 
-    test('Should have correct card title', () => {
-      const component = renderComponent()
-      expect(
-        within(component).getByRole('heading', { level: 2 })
-      ).toHaveTextContent(CARD_TITLE)
-    })
-
     test('Should display "Yes" for the withhold request, and the details', () => {
       const component = renderComponent()
       validatePublicRegister(component, {
@@ -109,19 +110,6 @@ describe('Marine Licence Public Register Card Component', () => {
           [DETAILS_KEY]: ''
         }
       })
-    })
-
-    test('should show a change link when not read-only', () => {
-      const component = renderComponent({
-        isReadOnly: false,
-        changeLink: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-      })
-      expect(
-        within(component).getByRole('link', { name: /Change/ })
-      ).toHaveAttribute(
-        'href',
-        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?from=check-your-answers`
-      )
     })
   })
 })

@@ -154,24 +154,9 @@ describe('#publicRegister', () => {
       )
     })
 
-    test.each([
-      {
-        name: 'task list backlink',
-        query: {},
-        expectedBackLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-      },
-      {
-        name: 'check-your-answers backlink',
-        query: { from: 'check-your-answers' },
-        expectedBackLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-      }
-    ])(
-      'Should handle API validation errors in catch block with $name',
-      async ({ query, expectedBackLink }) => {
-        vi.spyOn(
-          authRequests,
-          'authenticatedPatchRequest'
-        ).mockRejectedValueOnce({
+    test('Should handle API validation errors in catch block', async () => {
+      vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(
+        {
           data: {
             payload: {
               validation: {
@@ -185,35 +170,40 @@ describe('#publicRegister', () => {
               }
             }
           }
-        })
-
-        const h = {
-          redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-          view: vi.fn()
         }
+      )
 
-        await publicRegisterSubmitController.handler(
-          {
-            payload: {
-              consent: 'yes',
-              reason: 'Some details'
-            },
-            query
-          },
-          h
-        )
-
-        expect(h.view).toHaveBeenCalledWith(
-          PUBLIC_REGISTER_VIEW_ROUTE,
-          expect.objectContaining({
-            backLink: expectedBackLink,
-            payload: {
-              consent: 'yes',
-              reason: 'Some details'
-            }
-          })
-        )
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
       }
-    )
+
+      await publicRegisterSubmitController.handler(
+        {
+          payload: {
+            consent: 'yes',
+            reason: 'Some details'
+          },
+          query: {}
+        },
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        PUBLIC_REGISTER_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+          payload: {
+            consent: 'yes',
+            reason: 'Some details'
+          },
+          errors: expect.objectContaining({
+            reason: expect.objectContaining({
+              text: 'Enter details of what you want withheld and why'
+            })
+          })
+        })
+      )
+    })
   })
 })

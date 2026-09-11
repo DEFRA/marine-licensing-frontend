@@ -116,6 +116,18 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       )
     })
 
+    test('renders the public register card with a Change link', () => {
+      const card = document.querySelector('#public-register-card')
+      expect(card).toBeTruthy()
+
+      const changeLink = card.querySelector('.govuk-summary-card__actions a')
+      expect(changeLink).toBeTruthy()
+      expect(changeLink.textContent).toContain('Change')
+      expect(changeLink.getAttribute('href')).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?from=check-your-answers`
+      )
+    })
+
     test('renders harbour authority details with a Change link', () => {
       const card = document.querySelector('#other-permissions-card')
       expect(card).toBeTruthy()

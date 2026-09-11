@@ -4,6 +4,11 @@
   vertical-align: top;
 }
 
+.govuk-radios__conditional:has(.govuk-form-group--error) {
+  border-left: none;
+  padding-left: 0;
+}
+
 @include govuk-media-query($from: tablet) {
   .govuk-summary-list--full-width {
     &.govuk-summary-list {

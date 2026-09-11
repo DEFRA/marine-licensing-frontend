@@ -18,14 +18,14 @@ describe('#marineLicencePublicRegisterSchema', () => {
 
   test('should fail on empty payload', () => {
     const { error } = marineLicencePublicRegisterSchema.validate({})
-    expect(error.message).toBe('PUBLIC_REGISTER_CONSENT_REQUIRED')
+    expect(error.message).toBe('PUBLIC_REGISTER_WITHHOLD_CONSENT_REQUIRED')
   })
 
   test('should fail on invalid withholdConsent value', () => {
     const { error } = marineLicencePublicRegisterSchema.validate({
       withholdConsent: 'invalid'
     })
-    expect(error.message).toBe('PUBLIC_REGISTER_CONSENT_REQUIRED')
+    expect(error.message).toBe('PUBLIC_REGISTER_WITHHOLD_CONSENT_REQUIRED')
   })
 
   test('should fail when withholding but details are empty', () => {

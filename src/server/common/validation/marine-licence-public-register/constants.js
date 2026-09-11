@@ -4,7 +4,7 @@ export const marineLicencePublicRegisterSettings = {
 }
 
 export const marineLicencePublicRegisterErrorMessages = {
-  PUBLIC_REGISTER_CONSENT_REQUIRED:
+  PUBLIC_REGISTER_WITHHOLD_CONSENT_REQUIRED:
     'Select whether you want to request that information is withheld',
   PUBLIC_REGISTER_REASON_REQUIRED:
     'Enter details of what you want withheld and why',

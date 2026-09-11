@@ -302,6 +302,14 @@ export const config = convict({
       env: 'ENABLE_MARINE_LICENCE'
     }
   },
+  dashboard: {
+    userCacheTtl: {
+      doc: 'TTL for the cached owner name lookups',
+      format: Number,
+      default: oneDay,
+      env: 'DASHBOARD_USER_CACHE_TTL'
+    }
+  },
   selfService: {
     enabled: {
       doc: 'Enable the Self Service IAT journey',

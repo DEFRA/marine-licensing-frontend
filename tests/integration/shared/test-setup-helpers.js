@@ -11,6 +11,7 @@ import {
 } from '~/src/server/common/helpers/exemptions/session-cache/utils.js'
 import {
   authenticatedGetRequest,
+  authenticatedPostRequest,
   authenticatedPatchRequest
 } from '~/src/server/common/helpers/authenticated-requests.js'
 import {
@@ -102,10 +103,13 @@ export const mockExemptions = (exemptions) => {
   vi.mocked(authenticatedGetRequest).mockResolvedValue({
     payload: { message: 'success', value: exemptions }
   })
+  vi.mocked(authenticatedPostRequest).mockResolvedValue({
+    payload: { message: 'success', value: exemptions }
+  })
 }
 
 export const mockEmployeeExemptions = (exemptions) => {
-  vi.mocked(authenticatedGetRequest).mockResolvedValue({
+  vi.mocked(authenticatedPostRequest).mockResolvedValue({
     payload: { message: 'success', value: exemptions, isEmployee: true }
   })
 }
@@ -210,10 +214,36 @@ export const mockMarineLicence = (m) => {
       }
     })
   })
+
+  const existingPostMock = vi
+    .mocked(authenticatedPostRequest)
+    .getMockImplementation()
+  vi.mocked(authenticatedPostRequest).mockImplementation(
+    (request, endpoint) => {
+      if (endpoint?.startsWith('/projects')) {
+        return Promise.resolve({
+          payload: {
+            message: 'success',
+            value: m
+          }
+        })
+      }
+      if (existingPostMock) {
+        return existingPostMock(request, endpoint)
+      }
+      return Promise.resolve({
+        payload: {
+          message: 'success',
+          value: m
+        }
+      })
+    }
+  )
   return {
     clearMarineLicenceCache,
     getMarineLicenceCache,
     setMarineLicenceCache,
-    authenticatedGetRequest
+    authenticatedGetRequest,
+    authenticatedPostRequest
   }
 }

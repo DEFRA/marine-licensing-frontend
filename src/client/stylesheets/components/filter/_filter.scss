@@ -1,0 +1,32 @@
+// reference: https://design-patterns.service.justice.gov.uk/patterns/filter-a-list
+
+// Hidden by default under js-enabled (before the JS bundle has loaded). Only revealed
+// once moj-filter/index.js sets .app-filter-ready - ".moj-js-hidden absent" alone can't
+// be trusted, since that's also true pre-init.
+.js-enabled [data-module='moj-filter'] {
+  display: none;
+}
+
+.js-enabled [data-module='moj-filter'].app-filter-ready:not(.moj-js-hidden) {
+  display: block;
+}
+
+.moj-filter__selected {
+  display: none;
+}
+
+.moj-filter-layout__filter {
+  width: 310px;
+  min-width: 310px;
+  max-width: 310px;
+}
+
+.js-enabled {
+  .moj-filter__selected {
+    display: block;
+  }
+
+  .moj-filter__clear {
+    display: none;
+  }
+}

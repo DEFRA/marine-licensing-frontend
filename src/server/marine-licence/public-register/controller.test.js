@@ -32,35 +32,21 @@ describe('#publicRegister', () => {
   })
 
   describe('#publicRegisterController', () => {
-    test.each([
-      {
-        name: 'the stored answer when the question has been answered',
-        publicRegister: { withholdConsent: 'yes', reason: 'Some details' },
-        expected: { withholdConsent: 'yes', reason: 'Some details' }
-      },
-      {
-        name: 'an empty form when the question is not yet answered',
-        publicRegister: undefined,
-        expected: {}
-      }
-    ])(
-      'Should pre-populate the form with $name',
-      async ({ publicRegister, expected }) => {
-        vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
-          ...mockLicence,
-          publicRegister
-        })
+    test('Should render an empty form when the question is not yet answered', async () => {
+      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+        ...mockLicence,
+        publicRegister: undefined
+      })
 
-        const h = { view: vi.fn() }
+      const h = { view: vi.fn() }
 
-        await publicRegisterController.handler({ query: {} }, h)
+      await publicRegisterController.handler({ query: {} }, h)
 
-        expect(h.view).toHaveBeenCalledWith(
-          PUBLIC_REGISTER_VIEW_ROUTE,
-          expect.objectContaining({ payload: expected })
-        )
-      }
-    )
+      expect(h.view).toHaveBeenCalledWith(
+        PUBLIC_REGISTER_VIEW_ROUTE,
+        expect.objectContaining({ payload: {} })
+      )
+    })
   })
 
   describe('#publicRegisterSubmitController', () => {

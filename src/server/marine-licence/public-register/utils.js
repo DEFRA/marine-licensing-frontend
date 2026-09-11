@@ -1,7 +1,7 @@
-const invertConsent = (consent) => (consent === 'yes' ? 'no' : 'yes')
+const INVERTED_CONSENT = { yes: 'no', no: 'yes' }
 
-export const toPublicRegister = ({ consent, reason }) => {
-  const storedConsent = invertConsent(consent)
+export const toStoredPublicRegister = ({ consent, reason }) => {
+  const storedConsent = INVERTED_CONSENT[consent]
 
   return {
     consent: storedConsent,
@@ -11,10 +11,11 @@ export const toPublicRegister = ({ consent, reason }) => {
 
 export const toPublicRegisterFormValues = (publicRegister) => {
   const { consent, reason } = publicRegister ?? {}
+  const formConsent = INVERTED_CONSENT[consent]
 
-  if (!consent) {
+  if (!formConsent) {
     return {}
   }
 
-  return { consent: invertConsent(consent), ...(reason && { reason }) }
+  return { consent: formConsent, ...(reason && { reason }) }
 }

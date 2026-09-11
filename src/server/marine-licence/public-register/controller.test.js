@@ -34,12 +34,12 @@ describe('#publicRegister', () => {
   describe('#publicRegisterController', () => {
     test.each([
       {
-        name: 'the stored answer when one exists',
+        name: 'a Yes answer when the stored record withholds information',
         publicRegister: { consent: 'no', reason: 'Some details' },
         expected: { consent: 'yes', reason: 'Some details' }
       },
       {
-        name: 'an empty form when not yet answered',
+        name: 'an empty form when the question is not yet answered',
         publicRegister: undefined,
         expected: {}
       }

@@ -1,8 +1,8 @@
 import joi from 'joi'
 
 // This validates the form, where 'yes' means the applicant wants information
-// withheld. toPublicRegister inverts it before it reaches the API, which stores
-// 'yes' as consent to publish.
+// withheld. toStoredPublicRegister inverts it before it reaches the API, which
+// stores 'yes' as consent to publish.
 export const marineLicencePublicRegisterSchema = joi.object({
   consent: joi.string().valid('yes', 'no').required().messages({
     'any.only': 'PUBLIC_REGISTER_CONSENT_REQUIRED',

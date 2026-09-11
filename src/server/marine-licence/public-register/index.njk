@@ -15,7 +15,7 @@
 
 {% block content %}
 
-  {% set hintText %}
+  {% set publicRegisterContentHtml %}
     <p class="govuk-body">We are required by law to publish information about your application on the MMO's public register.</p>
 
     <p class="govuk-body">The information may also appear on <a class="govuk-link" href="https://www.gov.uk/guidance/explore-marine-plans" target="_blank" rel="noopener noreferrer">Explore Marine Plans (opens in new tab)</a>.</p>
@@ -78,7 +78,7 @@
     value: payload.consent,
     errorMessage: errors['consent'],
     projectName: projectName,
-    hint: { html: hintText },
+    contentHtml: publicRegisterContentHtml,
     items: [
       {
         value: "no",

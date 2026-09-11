@@ -15,7 +15,7 @@ import {
 } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
-  toPublicRegister,
+  toStoredPublicRegister,
   toPublicRegisterFormValues
 } from '#src/server/marine-licence/public-register/utils.js'
 
@@ -58,7 +58,7 @@ export const publicRegisterSubmitController = {
     const marineLicence = getMarineLicenceCache(request)
 
     try {
-      const publicRegister = toPublicRegister(payload)
+      const publicRegister = toStoredPublicRegister(payload)
 
       await authenticatedPatchRequest(
         request,

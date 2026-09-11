@@ -14,7 +14,7 @@ describe('#publicRegister', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    publicRegister: { consent: 'yes', reason: 'Some details' }
+    publicRegister: { consent: 'no', reason: 'Some details' }
   }
 
   beforeEach(() => {
@@ -35,7 +35,7 @@ describe('#publicRegister', () => {
     test.each([
       {
         name: 'the stored answer when one exists',
-        publicRegister: { consent: 'yes', reason: 'Some details' },
+        publicRegister: { consent: 'no', reason: 'Some details' },
         expected: { consent: 'yes', reason: 'Some details' }
       },
       {
@@ -106,8 +106,13 @@ describe('#publicRegister', () => {
         '/marine-licence/public-register',
         {
           id: mockLicence.id,
-          consent: 'no'
+          consent: 'yes'
         }
+      )
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        expect.objectContaining({ publicRegister: { consent: 'yes' } })
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
@@ -133,9 +138,16 @@ describe('#publicRegister', () => {
         '/marine-licence/public-register',
         {
           id: mockLicence.id,
-          consent: 'yes',
+          consent: 'no',
           reason: 'Some details'
         }
+      )
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        expect.objectContaining({
+          publicRegister: { consent: 'no', reason: 'Some details' }
+        })
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS

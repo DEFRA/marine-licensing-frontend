@@ -14,7 +14,10 @@ import {
   marineLicencePublicRegisterSettings
 } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
-import { toPublicRegister } from '#src/server/marine-licence/public-register/utils.js'
+import {
+  toPublicRegister,
+  toPublicRegisterFormValues
+} from '#src/server/marine-licence/public-register/utils.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
 
@@ -25,7 +28,7 @@ export const publicRegisterController = {
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
       ...marineLicencePublicRegisterSettings,
       projectName: marineLicence.projectName,
-      payload: marineLicence.publicRegister ?? {},
+      payload: toPublicRegisterFormValues(marineLicence.publicRegister),
       backLink: getCommonRedirectLink(request)
     })
   }

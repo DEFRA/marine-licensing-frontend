@@ -89,7 +89,7 @@ describe('Public register', () => {
   test('public register form state when information is not withheld', async () => {
     mockMarineLicence({
       ...marineLicence,
-      publicRegister: { consent: 'no' }
+      publicRegister: { consent: 'yes' }
     })
 
     const document = await loadPage({
@@ -121,7 +121,7 @@ describe('Public register', () => {
     mockMarineLicence({
       ...marineLicence,
       publicRegister: {
-        consent: 'yes',
+        consent: 'no',
         reason: 'Some reason'
       }
     })

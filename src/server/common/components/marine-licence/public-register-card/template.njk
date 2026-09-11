@@ -1,7 +1,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "incomplete-field/macro.njk" import appIncompleteField %}
 
-{% set isWithholding = params.publicRegister.consent === 'yes' %}
+{% set isWithholding = params.publicRegister.consent === 'no' %}
 {% set withholdAnswer = ("Yes" if isWithholding else "No") if params.publicRegister.consent else "" %}
 
 {% set rows = [] %}

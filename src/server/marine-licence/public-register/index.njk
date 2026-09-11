@@ -71,12 +71,12 @@
   {% endset -%}
 
   {{ appRadioPage({
-    name: "consent",
+    name: "withholdConsent",
     errorSummary: errorSummary,
     heading: heading,
     isPageHeading: true,
-    value: payload.consent,
-    errorMessage: errors['consent'],
+    value: payload.withholdConsent,
+    errorMessage: errors['withholdConsent'],
     projectName: projectName,
     contentHtml: publicRegisterContentHtml,
     items: [

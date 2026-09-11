@@ -105,7 +105,7 @@ export const mockMarineLicenceApplication = {
     feeBand: '2A'
   },
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
-  publicRegister: { consent: 'yes' },
+  publicRegister: { withholdConsent: 'no' },
   harbourAuthority: { details: 'Harbour details', area: 'yes' },
   invoicing: {
     invoiceAddressType: 'uk',

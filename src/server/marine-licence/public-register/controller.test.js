@@ -14,7 +14,7 @@ describe('#publicRegister', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    publicRegister: { consent: 'no', reason: 'Some details' }
+    publicRegister: { withholdConsent: 'yes', reason: 'Some details' }
   }
 
   beforeEach(() => {
@@ -34,9 +34,9 @@ describe('#publicRegister', () => {
   describe('#publicRegisterController', () => {
     test.each([
       {
-        name: 'a Yes answer when the stored record withholds information',
-        publicRegister: { consent: 'no', reason: 'Some details' },
-        expected: { consent: 'yes', reason: 'Some details' }
+        name: 'the stored answer when the question has been answered',
+        publicRegister: { withholdConsent: 'yes', reason: 'Some details' },
+        expected: { withholdConsent: 'yes', reason: 'Some details' }
       },
       {
         name: 'an empty form when the question is not yet answered',
@@ -78,7 +78,7 @@ describe('#publicRegister', () => {
         publicRegisterSubmitController.handler(
           {
             payload: {
-              consent: 'yes',
+              withholdConsent: 'yes',
               reason: 'Some details'
             },
             query: {}
@@ -97,7 +97,7 @@ describe('#publicRegister', () => {
       }
 
       await publicRegisterSubmitController.handler(
-        { payload: { consent: 'no' }, query: {} },
+        { payload: { withholdConsent: 'no' }, query: {} },
         h
       )
 
@@ -106,13 +106,13 @@ describe('#publicRegister', () => {
         '/marine-licence/public-register',
         {
           id: mockLicence.id,
-          consent: 'yes'
+          withholdConsent: 'no'
         }
       )
       expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
         expect.any(Object),
         h,
-        expect.objectContaining({ publicRegister: { consent: 'yes' } })
+        expect.objectContaining({ publicRegister: { withholdConsent: 'no' } })
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
@@ -127,7 +127,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { consent: 'yes', reason: 'Some details' },
+          payload: { withholdConsent: 'yes', reason: 'Some details' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -138,7 +138,7 @@ describe('#publicRegister', () => {
         '/marine-licence/public-register',
         {
           id: mockLicence.id,
-          consent: 'no',
+          withholdConsent: 'yes',
           reason: 'Some details'
         }
       )
@@ -146,7 +146,7 @@ describe('#publicRegister', () => {
         expect.any(Object),
         h,
         expect.objectContaining({
-          publicRegister: { consent: 'no', reason: 'Some details' }
+          publicRegister: { withholdConsent: 'yes', reason: 'Some details' }
         })
       )
       expect(h.redirect).toHaveBeenCalledWith(
@@ -181,7 +181,7 @@ describe('#publicRegister', () => {
       await publicRegisterSubmitController.handler(
         {
           payload: {
-            consent: 'yes',
+            withholdConsent: 'yes',
             reason: 'Some details'
           },
           query: {}
@@ -194,7 +194,7 @@ describe('#publicRegister', () => {
         expect.objectContaining({
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           payload: {
-            consent: 'yes',
+            withholdConsent: 'yes',
             reason: 'Some details'
           },
           errors: expect.objectContaining({

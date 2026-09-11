@@ -11,7 +11,7 @@ describe('Marine Licence Public Register Card Component', () => {
   describe('Card title and change link', () => {
     const renderComponent = (params) =>
       renderComponentJSDOM(COMPONENT, {
-        publicRegister: { consent: 'yes' },
+        publicRegister: { withholdConsent: 'no' },
         isReadOnly: true,
         ...params
       })
@@ -47,7 +47,7 @@ describe('Marine Licence Public Register Card Component', () => {
   describe('When no information is withheld', () => {
     const renderComponent = () =>
       renderComponentJSDOM(COMPONENT, {
-        publicRegister: { consent: 'yes' },
+        publicRegister: { withholdConsent: 'no' },
         isReadOnly: true
       })
 
@@ -84,7 +84,7 @@ describe('Marine Licence Public Register Card Component', () => {
     const renderComponent = (params) =>
       renderComponentJSDOM(COMPONENT, {
         publicRegister: {
-          consent: 'no',
+          withholdConsent: 'yes',
           reason: 'Commercial sensitivity - contains proprietary information'
         },
         isReadOnly: true,
@@ -103,7 +103,9 @@ describe('Marine Licence Public Register Card Component', () => {
     })
 
     test('should show nothing in the details field if none was provided', () => {
-      const component = renderComponent({ publicRegister: { consent: 'no' } })
+      const component = renderComponent({
+        publicRegister: { withholdConsent: 'yes' }
+      })
       validatePublicRegister(component, {
         publicRegister: {
           'Request that information is withheld': 'Yes',

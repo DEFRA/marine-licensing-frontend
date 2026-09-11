@@ -16,7 +16,7 @@ describe('Public register', () => {
   const marineLicence = {
     id: 'marine-licence-123',
     projectName: 'Test Marine Project',
-    publicRegister: { consent: undefined, reason: '' }
+    publicRegister: { withholdConsent: undefined, reason: '' }
   }
 
   test('page elements', async () => {
@@ -90,7 +90,7 @@ describe('Public register', () => {
     mockMarineLicence({
       ...marineLicence,
       publicRegister: {
-        consent: 'no',
+        withholdConsent: 'yes',
         reason: 'Some reason'
       }
     })
@@ -153,7 +153,7 @@ describe('Public register', () => {
     }
 
     const document = await submitPublicRegisterForm({
-      consent: 'yes',
+      withholdConsent: 'yes',
       reason: ''
     })
 

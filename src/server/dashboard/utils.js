@@ -1,12 +1,17 @@
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
+import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import {
   routes,
-  marineLicenceRoutes
+  marineLicenceRoutes,
+  apiRoutes
 } from '#src/server/common/constants/routes.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 import {
   PROJECT_STATUS,
-  UNABLE_TO_PROGRESS
+  PROJECT_TYPE,
+  UNABLE_TO_PROGRESS,
+  WITHDRAWABLE_EXEMPTION_STATUSES
 } from '#src/server/common/constants/projects.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
 import escapeHtml from 'lodash/escape.js'
@@ -26,7 +31,7 @@ const getDraftActions = (id, escapedProjectName, projectType) => {
       ? marineLicenceRoutes.MARINE_LICENCE_DELETE
       : routes.DELETE_EXEMPTION
 
-  return `<a href="${taskListRoute}/${id}" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${deleteRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
+  return `<a href="${taskListRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${deleteRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Delete ${escapedProjectName}">Delete</a>`
 }
 
 const getViewDetailsRoute = (projectType, status) => {
@@ -50,9 +55,7 @@ const getViewDetailsRoute = (projectType, status) => {
 }
 
 const getActiveActions = (id, escapedProjectName, viewRoute, withdrawRoute) => {
-  const marginClass = withdrawRoute ? ' govuk-!-margin-right-4' : ''
-
-  let buttons = `<a href="${viewRoute}/${id}" class="govuk-link${marginClass} govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
+  let buttons = `<a href="${viewRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 
   if (withdrawRoute) {
     buttons += `<a href="${withdrawRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw ${escapedProjectName}">Withdraw</a>`
@@ -81,6 +84,77 @@ const getMarineLicenceActions = ({
   )
 }
 
+const findMissingContactIds = (projects, users) => [
+  ...new Set(
+    projects
+      .map((project) => project.contactId)
+      .filter((contactId) => contactId && !(contactId in users))
+  )
+]
+
+const resolveMissingUsers = async (request, missingContactIds) => {
+  try {
+    const { payload } = await authenticatedPostRequest(
+      request,
+      apiRoutes.GET_USER_NAMES,
+      { contactIds: missingContactIds }
+    )
+    return payload?.value ?? {}
+  } catch (error) {
+    request.logger.error(
+      { err: error },
+      'Failed to resolve missing dashboard user names'
+    )
+    return {}
+  }
+}
+
+export const fetchProjects = async (request, payload = {}) => {
+  const userSession = await getUserSession(request, request.state?.userSession)
+  const organisationId = userSession?.organisationId
+  const cache = request.server?.app.dashboardUsersCache
+
+  const cachedUsers = organisationId ? await cache.get(organisationId) : null
+  const requestPayload = cachedUsers ? { ...payload, skipUsers: true } : payload
+
+  const result = await authenticatedPostRequest(
+    request,
+    '/projects',
+    requestPayload
+  )
+
+  const setCachedUsers = (usersToCache) =>
+    organisationId ? cache.set(organisationId, usersToCache) : null
+
+  let users = cachedUsers ?? result.payload?.value?.users ?? {}
+
+  if (!cachedUsers) {
+    if (Object.keys(users).length) {
+      await setCachedUsers(users)
+    }
+    return result
+  }
+
+  const projects = result.payload?.value?.projects ?? []
+  const missingContactIds = findMissingContactIds(projects, users)
+
+  if (missingContactIds.length) {
+    const resolvedUsers = await resolveMissingUsers(request, missingContactIds)
+
+    if (Object.keys(resolvedUsers).length) {
+      users = { ...users, ...resolvedUsers }
+      await setCachedUsers(users)
+    }
+  }
+
+  result.payload.value = {
+    ...result.payload?.value,
+    users
+  }
+
+  return result
+}
+
 export const sortProjectsByStatus = (projects) => {
   return [...projects].sort((a, b) => {
     const statusA = a.status ?? ''
@@ -107,7 +181,8 @@ export const getActionButtons = (project) => {
     })
   }
 
-  const canWithdraw = status === PROJECT_STATUS.ACTIVE && isOwnProject
+  const canWithdraw =
+    WITHDRAWABLE_EXEMPTION_STATUSES.includes(status) && isOwnProject
   const withdrawRoute = canWithdraw ? routes.WITHDRAW_EXEMPTION : null
 
   if (isOwnProject) {
@@ -132,8 +207,6 @@ export const getStatusLabelText = (status) => {
 export const formatProjectsForDisplay = (projects, isEmployee = false) =>
   projects.map((project) => {
     const { status, projectType } = project
-
-    const isOwnProject = project.isOwnProject ?? true
 
     const baseRow = [
       { text: project.projectName },
@@ -164,12 +237,156 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
       baseRow.push({ text: project.ownerName || '-' })
     }
 
-    baseRow.push({ html: getActionButtons(project) })
+    baseRow.push({
+      html: getActionButtons(project),
+      classes: 'govuk-table__cell--nowrap'
+    })
 
     return {
-      cells: baseRow,
-      attributes: {
-        'data-is-own-project': isOwnProject ? 'true' : 'false'
-      }
+      cells: baseRow
     }
   })
+
+export const getFilterCategories = (searchParams) => {
+  const categories = []
+
+  if (!searchParams) {
+    return categories
+  }
+
+  if (searchParams.status) {
+    const { status } = searchParams
+
+    const isMultipleSelected = Array.isArray(status)
+    const transformedStatus = isMultipleSelected ? status : [status]
+
+    categories.push({
+      heading: {
+        text: 'Status'
+      },
+      items: transformedStatus.map((categoryStatus) => ({
+        href: '#',
+        field: 'status',
+        value: categoryStatus,
+        text:
+          categoryStatus === 'REJECTED'
+            ? UNABLE_TO_PROGRESS
+            : PROJECT_STATUS[categoryStatus]
+      }))
+    })
+  }
+
+  if (searchParams.type) {
+    const { type } = searchParams
+
+    const isMultipleSelected = Array.isArray(type)
+    const transformedType = isMultipleSelected ? type : [type]
+
+    categories.push({
+      heading: {
+        text: 'Submission type'
+      },
+      items: transformedType.map((categoryType) => ({
+        href: '#',
+        field: 'type',
+        value: categoryType,
+        text:
+          categoryType === PROJECT_TYPE.EXEMPTION
+            ? EXEMPTION_TYPE
+            : MARINE_LICENCE_TYPE
+      }))
+    })
+  }
+
+  return categories
+}
+
+const MARINE_LICENCE_ONLY_STATUS_KEYS = new Set([
+  'SUBMITTED',
+  'TRANSFERRED',
+  'REJECTED',
+  'WITHDRAWN'
+])
+
+export const getStatusOptions = (status, marineLicenceEnabled = true) => {
+  const isMultipleSelected = Array.isArray(status)
+
+  return Object.entries(PROJECT_STATUS)
+    .filter(
+      ([key]) =>
+        marineLicenceEnabled || !MARINE_LICENCE_ONLY_STATUS_KEYS.has(key)
+    )
+    .map(([key, val]) => ({
+      value: key,
+      text: val === PROJECT_STATUS.REJECTED ? UNABLE_TO_PROGRESS : val,
+      checked: isMultipleSelected ? status.includes(key) : status === key
+    }))
+    .sort((a, b) => a.text.localeCompare(b.text))
+}
+
+export const getTypeOptions = (type) => {
+  const isMultipleSelected = Array.isArray(type)
+
+  return [
+    {
+      value: 'exemption',
+      text: EXEMPTION_TYPE,
+      checked: isMultipleSelected
+        ? type.includes(PROJECT_TYPE.EXEMPTION)
+        : type === PROJECT_TYPE.EXEMPTION
+    },
+    {
+      value: 'marine-licence',
+      text: MARINE_LICENCE_TYPE,
+      checked: isMultipleSelected
+        ? type.includes(PROJECT_TYPE.MARINE_LICENCE)
+        : type === PROJECT_TYPE.MARINE_LICENCE
+    }
+  ]
+}
+
+export const getUserOptions = (userSession, users, searchParams = {}) => {
+  if (!userSession) {
+    return []
+  }
+
+  const { show, user: userSearchParam = [] } = searchParams
+
+  const { contactId, displayName } = userSession
+
+  const ownOption = [
+    {
+      value: contactId,
+      text: `Mine (${displayName})`,
+      checked: show === 'specific-user' && userSearchParam.includes(contactId)
+    }
+  ]
+
+  const hasUsers = users && Object.keys(users).length > 0
+
+  const userOptions = hasUsers
+    ? Object.entries(users)
+        .filter(([userContactId]) => userContactId !== contactId)
+        .map(([userContactId, userDisplayName]) => ({
+          value: userContactId,
+          text: userDisplayName,
+          checked:
+            show === 'specific-user' && userSearchParam.includes(userContactId)
+        }))
+        .sort((a, b) => a.text.localeCompare(b.text))
+    : []
+
+  return [...ownOption, ...userOptions]
+}
+
+export const getSelectedUsers = (users, searchParams = {}) =>
+  (searchParams.user ?? [])
+    .map((contactId) => users[contactId])
+    .filter(Boolean)
+    .join(', ')
+
+export const addUsersToProjects = (projects, users) =>
+  projects.map((project) => ({
+    ...project,
+    ownerName: users[project.contactId] || '-'
+  }))

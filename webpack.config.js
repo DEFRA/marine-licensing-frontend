@@ -178,6 +178,22 @@ export default {
         {
           from: path.join(dirname, 'src/client/images'),
           to: 'assets/images'
+        },
+        {
+          from: path.join(
+            dirname,
+            'node_modules/@ministryofjustice/frontend/moj/assets/images'
+          ),
+          to: 'assets/images',
+          globOptions: {
+            ignore: [
+              '**/*',
+              '!**/icon-toggle-plus-minus.svg',
+              '!**/icon-close-cross-black.svg',
+              '!**/icon-tag-remove-cross.svg',
+              '!**/icon-tag-remove-cross-white.svg'
+            ]
+          }
         }
       ]
     })

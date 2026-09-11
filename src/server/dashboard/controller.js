@@ -1,52 +1,192 @@
-import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { config } from '#src/config/config.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
-import { sortProjectsByStatus, formatProjectsForDisplay } from './utils.js'
+import { routes } from '#src/server/common/constants/routes.js'
+import { dashboardFilterSchema } from '#src/server/common/validation/dashboard/schema.js'
+import {
+  sortProjectsByStatus,
+  formatProjectsForDisplay,
+  getFilterCategories,
+  fetchProjects,
+  getStatusOptions,
+  getTypeOptions,
+  getUserOptions,
+  getSelectedUsers,
+  addUsersToProjects
+} from '#src/server/dashboard/utils.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import {
+  errorDescriptionByFieldName,
+  mapErrorsForDisplay
+} from '#src/server/common/helpers/errors.js'
 
 export const DASHBOARD_VIEW_ROUTE = 'dashboard/index.njk'
+export const DASHBOARD_RESULTS_VIEW_ROUTE =
+  'dashboard/partials/fetch-response.njk'
+
 const DASHBOARD_PAGE_TITLE = 'Projects'
 
-const FILTER_MY_PROJECTS = 'my-projects'
-const FILTER_ALL_PROJECTS = 'all-projects'
+export const errorMessages = {
+  DASHBOARD_OWNER_REQUIRED: 'Select an owner to view their submissions'
+}
+
+// left undefined when valid, so the layout does not prefix the page title
+const getOwnerErrors = (show, selectedUsers) => {
+  if (show !== 'specific-user' || selectedUsers) {
+    return undefined
+  }
+
+  const errorSummary = mapErrorsForDisplay(
+    [{ field: 'user', message: 'DASHBOARD_OWNER_REQUIRED' }],
+    errorMessages
+  )
+
+  return errorDescriptionByFieldName(errorSummary)
+}
+
+export const FILTER_SEARCH_FLASH_KEY = 'dashboardFilterSearch'
+
+const FETCH_ERROR = 'Error fetching projects'
+
+const isClientSideFetchRequest = (request) =>
+  request.headers['x-requested-with'] === 'XMLHttpRequest'
+
+const dashboardPayloadFailAction = (request, h, error) => {
+  request.logger.error({ err: error }, 'Invalid dashboard filter payload')
+
+  if (isClientSideFetchRequest(request)) {
+    return h.response().code(statusCodes.badRequest).takeover()
+  }
+
+  return h.redirect(routes.DASHBOARD).takeover()
+}
+
+const buildDashboardViewModel = async (
+  request,
+  projectsPayload,
+  searchParams = {}
+) => {
+  const value = projectsPayload.value ?? {}
+
+  const { projects = [], users = {} } = value
+
+  const projectsWithUsers = addUsersToProjects(projects, users)
+  const sortedProjects = sortProjectsByStatus(projectsWithUsers)
+
+  const isEmployee = projectsPayload.isEmployee ?? false
+
+  const userSession = await getUserSession(request, request.state?.userSession)
+  const organisationName = userSession?.organisationName || ''
+
+  const marineLicenceEnabled = config.get('marineLicence').enabled
+
+  const statusOptions = getStatusOptions(
+    searchParams.status,
+    marineLicenceEnabled
+  )
+
+  const filterCategories = getFilterCategories(searchParams)
+  const typeOptions = getTypeOptions(searchParams.type)
+  const userOptions = getUserOptions(userSession, users, searchParams)
+
+  const showSpecificUser = userOptions.length > 1
+  const selectedUsers = getSelectedUsers(users, searchParams)
+
+  const errors = getOwnerErrors(searchParams.show, selectedUsers)
+
+  return {
+    errors,
+    clearHref: routes.DASHBOARD,
+    projects: formatProjectsForDisplay(sortedProjects, isEmployee),
+    isEmployee,
+    organisationName,
+    filterCategories,
+    searchParams,
+    statusOptions,
+    typeOptions,
+    marineLicenceEnabled,
+    userOptions,
+    selectedUsers,
+    showSpecificUser
+  }
+}
 
 export const dashboardController = {
   handler: async (request, h) => {
     try {
-      const { payload } = await authenticatedGetRequest(request, '/projects')
+      const flashedResult = request.yar.flash(FILTER_SEARCH_FLASH_KEY)
+      const hasFlashedResult = flashedResult && !Array.isArray(flashedResult)
 
-      const projects = payload.value ?? []
-      const sortedProjects = sortProjectsByStatus(projects)
-      const isEmployee = payload.isEmployee ?? false
-
-      const userSession = await getUserSession(
+      const { payload } = await fetchProjects(
         request,
-        request.state?.userSession
+        hasFlashedResult ? flashedResult : {}
       )
-      const organisationName = userSession?.organisationName || ''
 
-      const filterValue = request.payload?.filter || FILTER_MY_PROJECTS
+      const viewModel = await buildDashboardViewModel(
+        request,
+        payload,
+        flashedResult
+      )
 
       return h.view(DASHBOARD_VIEW_ROUTE, {
         pageTitle: DASHBOARD_PAGE_TITLE,
         heading: DASHBOARD_PAGE_TITLE,
-        projects: formatProjectsForDisplay(sortedProjects, isEmployee),
-        isEmployee,
-        organisationName,
-        filterValue,
-        filterMyProjects: FILTER_MY_PROJECTS,
-        filterAllProjects: FILTER_ALL_PROJECTS
+        ...viewModel
       })
     } catch (error) {
-      request.logger.error({ err: error }, 'Error fetching projects')
+      request.logger.error({ err: error }, FETCH_ERROR)
 
       return h.view(DASHBOARD_VIEW_ROUTE, {
         pageTitle: DASHBOARD_PAGE_TITLE,
         heading: DASHBOARD_PAGE_TITLE,
         projects: [],
         isEmployee: false,
-        filterValue: FILTER_MY_PROJECTS,
-        filterMyProjects: FILTER_MY_PROJECTS,
-        filterAllProjects: FILTER_ALL_PROJECTS
+        searchParams: {}
       })
     }
+  }
+}
+
+export const dashboardPostController = {
+  options: {
+    validate: {
+      payload: dashboardFilterSchema,
+      failAction: dashboardPayloadFailAction
+    }
+  },
+  handler: async (request, h) => {
+    if (isClientSideFetchRequest(request)) {
+      try {
+        const { payload } = await fetchProjects(request, request.payload)
+
+        const searchParams = request.payload
+
+        const viewModel = await buildDashboardViewModel(
+          request,
+          payload,
+          searchParams
+        )
+
+        return h.view(DASHBOARD_RESULTS_VIEW_ROUTE, {
+          heading: DASHBOARD_PAGE_TITLE,
+          ...viewModel
+        })
+      } catch (error) {
+        request.logger.error({ err: error }, FETCH_ERROR)
+        return h.response().code(statusCodes.internalServerError)
+      }
+    }
+
+    try {
+      request.yar.flash(FILTER_SEARCH_FLASH_KEY, request.payload, true)
+      await request.yar.commit(h)
+    } catch (error) {
+      request.logger.error({ err: error }, FETCH_ERROR)
+    }
+
+    const redirectRoute = request.payload.show
+      ? routes.DASHBOARD + '#app-project-results'
+      : routes.DASHBOARD
+
+    return h.redirect(redirectRoute)
   }
 }

@@ -1,18 +1,36 @@
 import { vi } from 'vitest'
 import {
+  fetchProjects,
   sortProjectsByStatus,
   formatProjectsForDisplay,
   getActionButtons,
-  getStatusLabelText
+  getStatusLabelText,
+  getFilterCategories,
+  getStatusOptions,
+  getTypeOptions,
+  getUserOptions,
+  getSelectedUsers,
+  addUsersToProjects
 } from './utils.js'
 import {
   routes,
-  marineLicenceRoutes
+  marineLicenceRoutes,
+  apiRoutes
 } from '#src/server/common/constants/routes.js'
 import {
   PROJECT_STATUS,
   UNABLE_TO_PROGRESS
 } from '#src/server/common/constants/projects.js'
+import {
+  mockDashboardServerResponse,
+  mockUsers
+} from '#src/server/test-helpers/mocks/dashboard.js'
+import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
+
+vi.mock('~/src/server/common/helpers/authenticated-requests.js')
+vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 vi.mock('~/src/config/nunjucks/filters/format-date.js', () => ({
   formatDate: vi.fn((date) => {
@@ -22,6 +40,157 @@ vi.mock('~/src/config/nunjucks/filters/format-date.js', () => ({
     return '01 Jan 2024'
   })
 }))
+
+describe('#fetchProjects', () => {
+  const authenticatedPostRequestMock = vi.mocked(authenticatedPostRequest)
+  const getUserSessionMock = vi.mocked(getUserSession)
+
+  const buildRequest = () => ({
+    state: { userSession: { sessionId: 'session-1' } },
+    logger: { error: vi.fn() },
+    server: {
+      app: {
+        dashboardUsersCache: {
+          get: vi.fn(),
+          set: vi.fn()
+        }
+      }
+    }
+  })
+
+  test('does not touch the cache when the session has no organisationId', async () => {
+    getUserSessionMock.mockResolvedValue({})
+    authenticatedPostRequestMock.mockResolvedValue({
+      payload: { value: { projects: [], users: mockUsers } }
+    })
+    const request = buildRequest()
+
+    const result = await fetchProjects(request, { show: 'all-projects' })
+
+    expect(request.server.app.dashboardUsersCache.get).not.toHaveBeenCalled()
+    expect(request.server.app.dashboardUsersCache.set).not.toHaveBeenCalled()
+    expect(authenticatedPostRequestMock).toHaveBeenCalledWith(
+      request,
+      '/projects',
+      { show: 'all-projects' }
+    )
+    expect(result.payload.value.users).toEqual(mockUsers)
+  })
+
+  test('requests users from backend and populates the cache with result from server', async () => {
+    getUserSessionMock.mockResolvedValue({ organisationId: 'org-1' })
+    authenticatedPostRequestMock.mockResolvedValue({
+      payload: { value: { projects: [], users: mockUsers } }
+    })
+    const request = buildRequest()
+    request.server.app.dashboardUsersCache.get.mockResolvedValue(null)
+
+    const result = await fetchProjects(request, { show: 'all-projects' })
+
+    expect(authenticatedPostRequestMock).toHaveBeenCalledWith(
+      request,
+      '/projects',
+      { show: 'all-projects' }
+    )
+    expect(request.server.app.dashboardUsersCache.set).toHaveBeenCalledWith(
+      'org-1',
+      mockUsers
+    )
+    expect(result.payload.value.users).toEqual(mockUsers)
+  })
+
+  test('requests with skipUsers param when we already have a cache', async () => {
+    getUserSessionMock.mockResolvedValue({ organisationId: 'org-1' })
+    authenticatedPostRequestMock.mockResolvedValue({
+      payload: { value: { projects: [], users: {} } }
+    })
+    const request = buildRequest()
+    request.server.app.dashboardUsersCache.get.mockResolvedValue(mockUsers)
+
+    const result = await fetchProjects(request, { show: 'all-projects' })
+
+    expect(authenticatedPostRequestMock).toHaveBeenCalledWith(
+      request,
+      '/projects',
+      { show: 'all-projects', skipUsers: true }
+    )
+    expect(request.server.app.dashboardUsersCache.set).not.toHaveBeenCalled()
+    expect(result.payload.value.users).toEqual(mockUsers)
+  })
+
+  test('resolves and caches names for a project owner missing from cached users', async () => {
+    getUserSessionMock.mockResolvedValue({ organisationId: 'org-1' })
+    const request = buildRequest()
+    request.server.app.dashboardUsersCache.get.mockResolvedValue(mockUsers)
+    authenticatedPostRequestMock
+      .mockResolvedValueOnce({
+        payload: {
+          value: { projects: [{ contactId: 'newContactId' }], users: {} }
+        }
+      })
+      .mockResolvedValueOnce({
+        payload: { value: { newContactId: 'New Person' } }
+      })
+
+    const result = await fetchProjects(request, { show: 'all-projects' })
+
+    expect(authenticatedPostRequestMock).toHaveBeenCalledWith(
+      request,
+      apiRoutes.GET_USER_NAMES,
+      { contactIds: ['newContactId'] }
+    )
+    expect(result.payload.value.users).toEqual({
+      ...mockUsers,
+      newContactId: 'New Person'
+    })
+    expect(request.server.app.dashboardUsersCache.set).toHaveBeenLastCalledWith(
+      'org-1',
+      { ...mockUsers, newContactId: 'New Person' }
+    )
+  })
+
+  test('does not call api when every cached project owner is already known', async () => {
+    getUserSessionMock.mockResolvedValue({ organisationId: 'org-1' })
+    const request = buildRequest()
+    request.server.app.dashboardUsersCache.get.mockResolvedValue(mockUsers)
+    authenticatedPostRequestMock.mockResolvedValue({
+      payload: { value: { projects: [{ contactId: 'testContactId' }] } }
+    })
+
+    await fetchProjects(request, { show: 'all-projects' })
+
+    expect(authenticatedPostRequestMock).toHaveBeenCalledTimes(1)
+  })
+
+  test('does not call api on a fresh fetch', async () => {
+    getUserSessionMock.mockResolvedValue({ organisationId: 'org-1' })
+    const request = buildRequest()
+    request.server.app.dashboardUsersCache.get.mockResolvedValue(null)
+    authenticatedPostRequestMock.mockResolvedValue({
+      payload: {
+        value: { projects: [{ contactId: 'newContactId' }], users: mockUsers }
+      }
+    })
+
+    const result = await fetchProjects(request, { show: 'all-projects' })
+
+    expect(authenticatedPostRequestMock).toHaveBeenCalledTimes(1)
+    expect(result.payload.value.users).toEqual(mockUsers)
+  })
+
+  test('does not cache an empty user list', async () => {
+    getUserSessionMock.mockResolvedValue({ organisationId: 'org-1' })
+    const request = buildRequest()
+    request.server.app.dashboardUsersCache.get.mockResolvedValue(null)
+    authenticatedPostRequestMock.mockResolvedValue({
+      payload: { value: { projects: [{ contactId: 'testContactId' }] } }
+    })
+
+    await fetchProjects(request, { show: 'all-projects' })
+
+    expect(request.server.app.dashboardUsersCache.set).not.toHaveBeenCalled()
+  })
+})
 
 describe('#sortProjectsByStatus', () => {
   it('sorts projects by status Z-A (Draft before Active)', () => {
@@ -101,7 +270,6 @@ describe('#formatProjectsForDisplay', () => {
 
     expect(result).toEqual([
       {
-        attributes: { 'data-is-own-project': 'true' },
         cells: [
           { text: 'Test Project' },
           { text: 'Exempt activity notification' },
@@ -115,7 +283,8 @@ describe('#formatProjectsForDisplay', () => {
             attributes: { 'data-sort-value': '2024-01-15' }
           },
           {
-            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
+            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>',
+            classes: 'govuk-table__cell--nowrap'
           }
         ]
       }
@@ -138,7 +307,6 @@ describe('#formatProjectsForDisplay', () => {
 
     expect(result).toEqual([
       {
-        attributes: { 'data-is-own-project': 'true' },
         cells: [
           { text: 'Test Project' },
           { text: 'Exempt activity notification' },
@@ -152,7 +320,8 @@ describe('#formatProjectsForDisplay', () => {
             attributes: { 'data-sort-value': 0 }
           },
           {
-            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>'
+            html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>',
+            classes: 'govuk-table__cell--nowrap'
           }
         ]
       }
@@ -183,7 +352,6 @@ describe('#formatProjectsForDisplay', () => {
 
     expect(result).toHaveLength(2)
     expect(result[0]).toEqual({
-      attributes: { 'data-is-own-project': 'true' },
       cells: [
         { text: 'Project 1' },
         { text: 'Exempt activity notification' },
@@ -197,18 +365,18 @@ describe('#formatProjectsForDisplay', () => {
           attributes: { 'data-sort-value': '2024-01-15' }
         },
         {
-          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Project 1">Delete</a>'
+          html: '<a href="/exemption/task-list/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="/exemption/delete/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Project 1">Delete</a>',
+          classes: 'govuk-table__cell--nowrap'
         }
       ]
     })
     expect(result[1]).toEqual({
-      attributes: { 'data-is-own-project': 'true' },
       cells: [
         { text: 'Project 2' },
         { text: 'Exempt activity notification' },
         { text: 'ML-2024-002' },
         {
-          html: '<strong class="govuk-tag govuk-tag--green">Active</strong>',
+          html: '<strong class="govuk-tag govuk-tag--teal">Active</strong>',
           attributes: { 'data-sort-value': 'Active' }
         },
         {
@@ -216,7 +384,8 @@ describe('#formatProjectsForDisplay', () => {
           attributes: { 'data-sort-value': '2024-06-25' }
         },
         {
-          html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a><a href="/exemption/withdraw/def456" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Project 2">Withdraw</a>'
+          html: '<a href="/exemption/view-details/def456" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Project 2">View details</a><a href="/exemption/withdraw/def456" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Project 2">Withdraw</a>',
+          classes: 'govuk-table__cell--nowrap'
         }
       ]
     })
@@ -279,7 +448,7 @@ describe('#formatProjectsForDisplay', () => {
 
     expect(result[0].cells[3].html).toContain('govuk-tag--blue')
     expect(result[0].cells[3].html).toContain('Draft')
-    expect(result[1].cells[3].html).toContain('govuk-tag--green')
+    expect(result[1].cells[3].html).toContain('govuk-tag--teal')
     expect(result[1].cells[3].html).toContain('Active')
     expect(result[2].cells[3].html).toContain('govuk-tag--grey')
     expect(result[2].cells[3].html).toContain('Withdrawn')
@@ -295,7 +464,7 @@ describe('getActionButtons', () => {
     }
     const result = getActionButtons(draft)
     expect(result).toBe(
-      `<a href="${routes.TASK_LIST}/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>`
+      `<a href="${routes.TASK_LIST}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Continue to task list">Continue</a><a href="${routes.DELETE_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Delete Test Project">Delete</a>`
     )
   })
 
@@ -308,7 +477,7 @@ describe('getActionButtons', () => {
     }
     const result = getActionButtons(active)
     expect(result).toBe(
-      `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a><a href="${routes.WITHDRAW_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Test Project">Withdraw</a>`
+      `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a><a href="${routes.WITHDRAW_EXEMPTION}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Test Project">Withdraw</a>`
     )
   })
 
@@ -323,6 +492,33 @@ describe('getActionButtons', () => {
     expect(result).toBe(
       `<a href="${routes.VIEW_DETAILS}/abc123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Test Project">View details</a>`
     )
+  })
+
+  it('offers Withdraw for a scheduled exemption', () => {
+    const scheduled = {
+      id: 'abc123',
+      projectName: 'Test Project',
+      status: PROJECT_STATUS.SCHEDULED,
+      projectType: 'exemption'
+    }
+
+    expect(getActionButtons(scheduled)).toContain(
+      `${routes.WITHDRAW_EXEMPTION}/abc123`
+    )
+  })
+
+  it('does not offer Withdraw once an exemption has expired', () => {
+    const expired = {
+      id: 'abc123',
+      projectName: 'Test Project',
+      status: PROJECT_STATUS.EXPIRED,
+      projectType: 'exemption'
+    }
+
+    const result = getActionButtons(expired)
+
+    expect(result).toContain(`${routes.VIEW_DETAILS}/abc123`)
+    expect(result).not.toContain('Withdraw')
   })
 
   it('returns View details link when status is Submitted', () => {
@@ -373,7 +569,7 @@ describe('getActionButtons', () => {
     }
     const result = getActionButtons(submittedMarineLicence)
     expect(result).toBe(
-      `<a href="${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/ml123" class="govuk-link govuk-!-margin-right-4 govuk-link--no-visited-state" aria-label="View details of Groyne construction, Bournemouth seafront, Dorset">View details</a><a href="${marineLicenceRoutes.MARINE_LICENCE_WITHDRAW}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Groyne construction, Bournemouth seafront, Dorset">Withdraw</a>`
+      `<a href="${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Groyne construction, Bournemouth seafront, Dorset">View details</a><a href="${marineLicenceRoutes.MARINE_LICENCE_WITHDRAW}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Groyne construction, Bournemouth seafront, Dorset">Withdraw</a>`
     )
   })
 
@@ -467,5 +663,255 @@ describe('#getStatusLabelText', () => {
     expect(getStatusLabelText('<script>alert(1)</script>')).toBe(
       '&lt;script&gt;alert(1)&lt;/script&gt;'
     )
+  })
+})
+
+describe('#getFilterCategories', () => {
+  it('returns an empty array when there is nothing to filter by', () => {
+    expect(getFilterCategories()).toEqual([])
+    expect(getFilterCategories(null)).toEqual([])
+    expect(getFilterCategories({ show: 'my-projects' })).toEqual([])
+  })
+
+  it('builds a Status category from a single selected status, mapping Rejected to Unable to progress', () => {
+    expect(getFilterCategories({ status: 'REJECTED' })).toEqual([
+      {
+        heading: { text: 'Status' },
+        items: [
+          {
+            href: '#',
+            field: 'status',
+            value: 'REJECTED',
+            text: UNABLE_TO_PROGRESS
+          }
+        ]
+      }
+    ])
+  })
+
+  it('builds a Status category from multiple selected statuses, mapping each to its display text', () => {
+    const result = getFilterCategories({
+      status: [
+        'DRAFT',
+        'ACTIVE',
+        'SUBMITTED',
+        'TRANSFERRED',
+        'REJECTED',
+        'WITHDRAWN'
+      ]
+    })
+
+    expect(result).toEqual([
+      {
+        heading: { text: 'Status' },
+        items: [
+          { href: '#', field: 'status', value: 'DRAFT', text: 'Draft' },
+          { href: '#', field: 'status', value: 'ACTIVE', text: 'Active' },
+          {
+            href: '#',
+            field: 'status',
+            value: 'SUBMITTED',
+            text: 'Submitted'
+          },
+          {
+            href: '#',
+            field: 'status',
+            value: 'TRANSFERRED',
+            text: 'Transferred'
+          },
+          {
+            href: '#',
+            field: 'status',
+            value: 'REJECTED',
+            text: UNABLE_TO_PROGRESS
+          },
+          {
+            href: '#',
+            field: 'status',
+            value: 'WITHDRAWN',
+            text: 'Withdrawn'
+          }
+        ]
+      }
+    ])
+  })
+
+  it('builds a Submission type category, single or multi-selected', () => {
+    expect(getFilterCategories({ type: 'exemption' })).toEqual([
+      {
+        heading: { text: 'Submission type' },
+        items: [
+          {
+            href: '#',
+            field: 'type',
+            value: 'exemption',
+            text: 'Exempt activity notification'
+          }
+        ]
+      }
+    ])
+
+    expect(
+      getFilterCategories({ type: ['exemption', 'marine-licence'] })
+    ).toEqual([
+      {
+        heading: { text: 'Submission type' },
+        items: [
+          {
+            href: '#',
+            field: 'type',
+            value: 'exemption',
+            text: 'Exempt activity notification'
+          },
+          {
+            href: '#',
+            field: 'type',
+            value: 'marine-licence',
+            text: 'Marine licence application'
+          }
+        ]
+      }
+    ])
+  })
+
+  it('returns both categories, Status before Submission type, when both are selected', () => {
+    const result = getFilterCategories({ status: 'DRAFT', type: 'exemption' })
+
+    expect(result).toHaveLength(2)
+    expect(result[0].heading.text).toBe('Status')
+    expect(result[1].heading.text).toBe('Submission type')
+  })
+})
+
+describe('#getStatusOptions', () => {
+  test('returns one option per PROJECT_STATUS, sorted alphabetically by text, with only the given status checked', () => {
+    expect(getStatusOptions('SUBMITTED')).toEqual([
+      { value: 'ACTIVE', text: 'Active', checked: false },
+      { value: 'DRAFT', text: 'Draft', checked: false },
+      { value: 'EXPIRED', text: 'Expired', checked: false },
+      { value: 'SCHEDULED', text: 'Scheduled', checked: false },
+      { value: 'SUBMITTED', text: 'Submitted', checked: true },
+      { value: 'TRANSFERRED', text: 'Transferred', checked: false },
+      { value: 'REJECTED', text: UNABLE_TO_PROGRESS, checked: false },
+      { value: 'WITHDRAWN', text: 'Withdrawn', checked: false }
+    ])
+  })
+
+  test('correctly checks options when multiple checkboxes are checked', () => {
+    expect(getStatusOptions(['DRAFT', 'ACTIVE'])).toEqual([
+      { value: 'ACTIVE', text: 'Active', checked: true },
+      { value: 'DRAFT', text: 'Draft', checked: true },
+      { value: 'EXPIRED', text: 'Expired', checked: false },
+      { value: 'SCHEDULED', text: 'Scheduled', checked: false },
+      { value: 'SUBMITTED', text: 'Submitted', checked: false },
+      { value: 'TRANSFERRED', text: 'Transferred', checked: false },
+      { value: 'REJECTED', text: UNABLE_TO_PROGRESS, checked: false },
+      { value: 'WITHDRAWN', text: 'Withdrawn', checked: false }
+    ])
+  })
+
+  test('only returns exemption statuses when the marine licence flag is off', () => {
+    expect(getStatusOptions(undefined, false)).toEqual([
+      { value: 'ACTIVE', text: 'Active', checked: false },
+      { value: 'DRAFT', text: 'Draft', checked: false },
+      { value: 'EXPIRED', text: 'Expired', checked: false },
+      { value: 'SCHEDULED', text: 'Scheduled', checked: false }
+    ])
+  })
+})
+
+describe('#getTypeOptions', () => {
+  test('returns correct options by default', () => {
+    expect(getTypeOptions()).toEqual([
+      {
+        value: 'exemption',
+        text: 'Exempt activity notification',
+        checked: false
+      },
+      {
+        value: 'marine-licence',
+        text: 'Marine licence application',
+        checked: false
+      }
+    ])
+  })
+
+  test('returns correct options when selected', () => {
+    expect(getTypeOptions(['exemption', 'marine-licence'])).toEqual([
+      {
+        value: 'exemption',
+        text: 'Exempt activity notification',
+        checked: true
+      },
+      {
+        value: 'marine-licence',
+        text: 'Marine licence application',
+        checked: true
+      }
+    ])
+  })
+})
+
+describe('#getUserOptions', () => {
+  test('correctly formats own user and others', () => {
+    const results = getUserOptions(
+      {
+        contactId: 'contact-123',
+        displayName: 'Sam Evans'
+      },
+      mockUsers
+    )
+
+    expect(results[0]).toEqual({
+      value: 'contact-123',
+      text: 'Mine (Sam Evans)',
+      checked: false
+    })
+
+    expect(results.map(({ text }) => text)).toEqual([
+      'Mine (Sam Evans)',
+      'Another user',
+      'Jane Doe',
+      'John Smith',
+      'Test User'
+    ])
+  })
+
+  test('can handle missing data', () => {
+    expect(getUserOptions()).toEqual([])
+  })
+})
+
+describe('#getSelectedUsers', () => {
+  test('joins the names of the selected contact ids', () => {
+    const result = getSelectedUsers(mockUsers, {
+      user: ['testContactId', 'johnSmithId']
+    })
+
+    expect(result).toBe('Test User, John Smith')
+  })
+
+  test('drops contact ids that do not resolve to a user', () => {
+    const result = getSelectedUsers(mockUsers, {
+      user: ['testContactId', 'unknown-id']
+    })
+
+    expect(result).toBe('Test User')
+  })
+
+  test('can handle missing searchParams', () => {
+    expect(getSelectedUsers(mockUsers)).toBe('')
+  })
+})
+
+describe('#addUsersToProjects', () => {
+  test('adds user correctly to project', () => {
+    const { projects, users } = mockDashboardServerResponse([
+      { ...mockMarineLicenceApplication, contactId: 'testContactId' }
+    ])
+
+    const result = addUsersToProjects(projects, users)
+
+    expect(result[0].ownerName).toEqual('Test User')
   })
 })

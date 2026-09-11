@@ -40,8 +40,6 @@ export class MarineLicenceService {
       throw new Error(errorMessages.MARINE_LICENCE_NOT_FOUND)
     }
 
-    console.log('GETS PASSED')
-
     let endpoint
     if (applicationReference) {
       endpoint = apiPaths.getMarineLicenceByReference(applicationReference)

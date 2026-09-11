@@ -177,6 +177,7 @@ export const routes = {
   SERVICE_HOME: '/home',
   COOKIES: '/help/cookies',
   PRIVACY: '/help/privacy',
+  PUBLIC_REGISTER_BROWSE: '/public-register',
   DECLARATION: '/declaration',
   IAT_START: '/journey/self-service/start',
   IAT_INVALID: '/journey/self-service/invalid',

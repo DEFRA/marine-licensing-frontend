@@ -49,7 +49,9 @@ services:
       MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_ID: local-stub-client-id
       MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_SECRET: local-stub-client-secret
       MARINE_LICENSING_ADDRESS_LOOKUP_CLIENT_SCOPE: api://stub/.default
+      MARINE_LICENSING_PUBLIC_REGISTER_API_URL: http://marine-licensing-public-register:3003
       ENABLE_MARINE_LICENCE: true
+      ENABLE_PUBLIC_REGISTER: true
     volumes:
       - ./compose/users:/users
     command: 'sh -c "for f in /users/*.json; do curl -sS -X POST -H \"Content-Type: application/json\" -d @\"$$f\" \"http://defra-id-stub:3200/cdp-defra-id-stub/API/register\"; done & node ."'

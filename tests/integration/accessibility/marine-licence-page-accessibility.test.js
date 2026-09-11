@@ -17,6 +17,7 @@ import {
 import { agentSession } from '../shared/session-fixtures.js'
 import { selectActivityVariants } from '~/src/server/common/constants/activity-variants.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
+import { toApplicationReferenceUrlSegment } from '~/src/server/common/helpers/marine-licence/application-reference-url-segment.js'
 import { runPageAccessibilityTests } from './page-accessibility-tests.js'
 import { loadPage, submitForm } from '../shared/app-server.js'
 import { runAxeChecks } from '~/.vite/axe-helper.js'
@@ -285,8 +286,8 @@ const marineLicencePages = [
     marineLicence: mockSubmittedMarineLicenceApplication
   },
   {
-    url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${mockSubmittedMarineLicenceApplication.id}`,
-    title: mockSubmittedMarineLicenceApplication.projectName,
+    url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${toApplicationReferenceUrlSegment(mockSubmittedMarineLicenceApplication.applicationReference)}`,
+    title: 'Redact application for the public register',
     marineLicence: mockSubmittedMarineLicenceApplication
   },
   {

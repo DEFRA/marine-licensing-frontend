@@ -202,7 +202,7 @@ describe('#context', () => {
       },
       {
         page: 'the internal user view details page',
-        path: '/view-marine-licence-details',
+        path: '/marine-licence/redaction/abc123',
         expected: marineLicenceMidJourneyUrl
       },
       {

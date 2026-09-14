@@ -1,0 +1,58 @@
+{%- from "govuk/components/table/macro.njk" import govukTable -%}
+{% extends "layouts/page.njk" %}
+
+{% set bodyClasses = "govuk-wide-template" %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">{{ heading }}</h1>
+
+      <p class="govuk-body">The Marine Management Organisation (MMO) publishes exempt activity notifications where the applicant has consented to public publishing. This information is held under Section 101 of the Marine and Coastal Access Act 2009.</p>
+
+      <p class="govuk-body">We publicise up-to-date information of:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>exempt activity notifications, including project name, activity, exempted activity article and marine plan area</li>
+        <li>whether a notification is active or has been withdrawn</li>
+      </ul>
+
+      <p class="govuk-body">We do not publish applicant contact details or financial information.</p>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if errorLoading %}
+        <h2 class="govuk-heading-m">Unable to load the public register</h2>
+        <p class="govuk-body">Try again later.</p>
+      {% elif resultCount == 0 %}
+        <h2 class="govuk-heading-m">No published applications</h2>
+        <p class="govuk-body">There are no published applications to show.</p>
+      {% else %}
+        <h2 class="govuk-heading-m">
+          {{ resultCount }} published {% if resultCount == 1 %}application{% else %}applications{% endif %}
+        </h2>
+        <p class="govuk-body">Results are sorted by reference number, newest first.</p>
+
+        {{ govukTable({
+          caption: "Published applications",
+          captionClasses: "govuk-visually-hidden",
+          head: [
+            { text: "Reference number" },
+            { text: "Project name" },
+            { text: "Application type" },
+            { text: "Marine plan area" },
+            { text: "Date submitted" },
+            { text: "Status" },
+            { text: "Public view details" }
+          ],
+          rows: rows
+        }) }}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

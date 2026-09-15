@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# S3 Metadata Viewer for LocalStack
+# S3 Metadata Viewer for Floci
 # Usage: ./s3-metadata-viewer.sh <bucket-name> [endpoint-url]
 
 set -e
@@ -23,7 +23,7 @@ NC='\033[0m' # No Color
 usage() {
     echo "Usage: $0 [bucket-name] [endpoint-url]"
     echo "  bucket-name: Name of the S3 bucket (default: mmo-uploads)"
-    echo "  endpoint-url: LocalStack endpoint (default: http://localhost:4566)"
+    echo "  endpoint-url: Floci endpoint (default: http://localhost:4566)"
     echo ""
     echo "Example: $0"
     echo "Example: $0 my-bucket"
@@ -139,7 +139,7 @@ main() {
         exit 1
     fi
 
-    echo -e "${WHITE}🚀 S3 Metadata Viewer for LocalStack${NC}"
+    echo -e "${WHITE}🚀 S3 Metadata Viewer for Floci${NC}"
     echo -e "${WHITE}═══════════════════════════════════════${NC}"
     echo -e "${GREEN}Bucket:${NC} $BUCKET_NAME"
     echo -e "${GREEN}Endpoint:${NC} $ENDPOINT_URL"
@@ -173,7 +173,7 @@ main() {
 
     else
         echo -e "${RED}❌ Error: Could not list objects in bucket '$BUCKET_NAME'${NC}"
-        echo -e "${RED}   Make sure the bucket exists and LocalStack is running${NC}"
+        echo -e "${RED}   Make sure the bucket exists and Floci is running${NC}"
         exit 1
     fi
 }

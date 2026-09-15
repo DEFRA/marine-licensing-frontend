@@ -189,7 +189,13 @@ async function processUploadStatus(status, context) {
   }
 
   request.logger.warn(
-    { uploadId: uploadConfig.uploadId, status: status.status },
+    {
+      event: {
+        action: 'construction_drawing_upload_unknown_status',
+        reference: uploadConfig.uploadId,
+        reason: status.status
+      }
+    },
     'ConstructionDrawingUpload: Unknown upload status'
   )
 
@@ -228,7 +234,13 @@ export const uploadConstructionDrawingWaitController = {
       })
     } catch (error) {
       request.logger.error(
-        { err: error, uploadId: uploadConfig.uploadId },
+        {
+          err: error,
+          event: {
+            action: 'construction_drawing_upload_status_check_failed',
+            reference: uploadConfig.uploadId
+          }
+        },
         'ConstructionDrawingUpload: ERROR: Failed to check upload status'
       )
 

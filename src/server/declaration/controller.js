@@ -81,7 +81,13 @@ const submitMarineLicence = async (request, h) => {
     throw new Error(errorMessages.UNEXPECTED_API_RESPONSE)
   } catch (error) {
     request.logger.error(
-      { err: error, marineLicenceId: id },
+      {
+        err: error,
+        event: {
+          action: 'marine_licence_submission_failed',
+          reference: id
+        }
+      },
       errorMessages.MARINE_LICENCE_SUBMISSION_FAILED
     )
     throw Boom.badRequest(errorMessages.MARINE_LICENCE_SUBMISSION_FAILED, error)
@@ -127,7 +133,10 @@ const submitExemption = async (request, h) => {
     throw new Error(errorMessages.UNEXPECTED_API_RESPONSE)
   } catch (error) {
     request.logger.error(
-      { err: error, exemptionId: id },
+      {
+        err: error,
+        event: { action: 'exemption_submission_failed', reference: id }
+      },
       errorMessages.SUBMISSION_FAILED
     )
     throw Boom.badRequest(errorMessages.SUBMISSION_FAILED, error)
@@ -146,7 +155,10 @@ export const declarationSubmitController = {
       return submitExemption(request, h)
     }
 
-    request.logger.error({ projectType: type }, 'Unknown project type')
+    request.logger.error(
+      { event: { action: 'unknown_project_type', reason: type } },
+      'Unknown project type'
+    )
     return h.view(DECLARATION_VIEW_ROUTE, getViewContext(type))
   }
 }

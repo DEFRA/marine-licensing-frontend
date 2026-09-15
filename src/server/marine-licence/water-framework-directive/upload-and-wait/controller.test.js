@@ -175,7 +175,13 @@ describe('#uploadAndWait', () => {
         )
 
         expect(mockRequest.logger.warn).toHaveBeenCalledWith(
-          { uploadId: 'test-upload-id', status: 'unknown' },
+          {
+            event: {
+              action: 'wfd_file_upload_unknown_status',
+              reference: 'test-upload-id',
+              reason: 'unknown'
+            }
+          },
           'WFD FileUpload: Unknown upload status'
         )
 

@@ -253,8 +253,11 @@ describe('siteDetails utils', () => {
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
         {
           err: expect.any(Error),
-          exemptionId: 'test-exemption-id',
-          coordinatesType: 'coordinates'
+          event: {
+            action: 'exemption:site-review-submit-failed',
+            reference: 'test-exemption-id',
+            reason: 'coordinates'
+          }
         },
         'Error submitting site review'
       )

@@ -24,7 +24,10 @@ export class ExemptionService {
 
   async getExemptionData({ id, isPublic = false }) {
     if (!id) {
-      this.logger.error({ id }, errorMessages.EXEMPTION_NOT_FOUND)
+      this.logger.error(
+        { event: { action: 'exemption_not_found', reference: id } },
+        errorMessages.EXEMPTION_NOT_FOUND
+      )
       throw new Error(errorMessages.EXEMPTION_NOT_FOUND)
     }
     const endpoint = isPublic
@@ -33,7 +36,10 @@ export class ExemptionService {
     const { payload } = await authenticatedGetRequest(this.request, endpoint)
 
     if (payload?.message !== 'success' || !payload.value) {
-      this.logger.error({ id }, errorMessages.EXEMPTION_DATA_NOT_FOUND)
+      this.logger.error(
+        { event: { action: 'exemption_data_not_found', reference: id } },
+        errorMessages.EXEMPTION_DATA_NOT_FOUND
+      )
       throw new Error(errorMessages.EXEMPTION_DATA_NOT_FOUND)
     }
     return payload.value

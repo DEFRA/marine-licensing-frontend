@@ -118,7 +118,7 @@ describe('ExemptionService', () => {
           )
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: null },
+            { event: { action: 'exemption_not_found', reference: null } },
             errorMessages.EXEMPTION_NOT_FOUND
           )
           expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
@@ -130,7 +130,7 @@ describe('ExemptionService', () => {
           )
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: undefined },
+            { event: { action: 'exemption_not_found', reference: undefined } },
             errorMessages.EXEMPTION_NOT_FOUND
           )
           expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
@@ -142,7 +142,7 @@ describe('ExemptionService', () => {
           )
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: '' },
+            { event: { action: 'exemption_not_found', reference: '' } },
             errorMessages.EXEMPTION_NOT_FOUND
           )
           expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
@@ -165,7 +165,7 @@ describe('ExemptionService', () => {
           )
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: validId },
+            { event: { action: 'exemption_data_not_found', reference: validId } },
             errorMessages.EXEMPTION_DATA_NOT_FOUND
           )
         })
@@ -173,7 +173,7 @@ describe('ExemptionService', () => {
         test('should throw error when API response has no message property', async () => {
           mockAuthenticatedGetRequest.mockResolvedValue({
             payload: {
-              value: { id: validId }
+              value: { event: { action: 'exemption_data_not_found', reference: validId } }
             }
           })
 
@@ -182,7 +182,7 @@ describe('ExemptionService', () => {
           )
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: validId },
+            { event: { action: 'exemption_data_not_found', reference: validId } },
             errorMessages.EXEMPTION_DATA_NOT_FOUND
           )
         })
@@ -200,7 +200,7 @@ describe('ExemptionService', () => {
           )
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: validId },
+            { event: { action: 'exemption_data_not_found', reference: validId } },
             errorMessages.EXEMPTION_DATA_NOT_FOUND
           )
         })
@@ -217,7 +217,7 @@ describe('ExemptionService', () => {
           )
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: validId },
+            { event: { action: 'exemption_data_not_found', reference: validId } },
             errorMessages.EXEMPTION_DATA_NOT_FOUND
           )
         })
@@ -232,7 +232,7 @@ describe('ExemptionService', () => {
           )
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: validId },
+            { event: { action: 'exemption_data_not_found', reference: validId } },
             errorMessages.EXEMPTION_DATA_NOT_FOUND
           )
         })
@@ -245,7 +245,7 @@ describe('ExemptionService', () => {
           )
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: validId },
+            { event: { action: 'exemption_data_not_found', reference: validId } },
             errorMessages.EXEMPTION_DATA_NOT_FOUND
           )
         })
@@ -343,7 +343,7 @@ describe('ExemptionService', () => {
           await expect(service.getExemptionById(invalidId)).rejects.toThrow()
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: invalidId },
+            { event: { action: 'exemption_not_found', reference: invalidId } },
             errorMessages.EXEMPTION_NOT_FOUND
           )
           expect(mockLogger.error).toHaveBeenCalledTimes(1)
@@ -360,7 +360,7 @@ describe('ExemptionService', () => {
           await expect(service.getExemptionById(validId)).rejects.toThrow()
 
           expect(mockLogger.error).toHaveBeenCalledWith(
-            { id: validId },
+            { event: { action: 'exemption_data_not_found', reference: validId } },
             errorMessages.EXEMPTION_DATA_NOT_FOUND
           )
           expect(mockLogger.error).toHaveBeenCalledTimes(1)
@@ -423,7 +423,7 @@ describe('ExemptionService', () => {
         )
 
         expect(mockLogger.error).toHaveBeenCalledWith(
-          { id: null },
+          { event: { action: 'exemption_not_found', reference: null } },
           errorMessages.EXEMPTION_NOT_FOUND
         )
         expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
@@ -435,7 +435,7 @@ describe('ExemptionService', () => {
         )
 
         expect(mockLogger.error).toHaveBeenCalledWith(
-          { id: undefined },
+          { event: { action: 'exemption_not_found', reference: undefined } },
           errorMessages.EXEMPTION_NOT_FOUND
         )
         expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
@@ -447,7 +447,7 @@ describe('ExemptionService', () => {
         )
 
         expect(mockLogger.error).toHaveBeenCalledWith(
-          { id: '' },
+          { event: { action: 'exemption_not_found', reference: '' } },
           errorMessages.EXEMPTION_NOT_FOUND
         )
         expect(mockAuthenticatedGetRequest).not.toHaveBeenCalled()
@@ -470,7 +470,7 @@ describe('ExemptionService', () => {
         )
 
         expect(mockLogger.error).toHaveBeenCalledWith(
-          { id: validId },
+          { event: { action: 'exemption_data_not_found', reference: validId } },
           errorMessages.EXEMPTION_DATA_NOT_FOUND
         )
       })

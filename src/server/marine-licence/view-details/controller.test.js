@@ -205,8 +205,11 @@ describe('marine-licence view details controller', () => {
 
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           expect.objectContaining({
-            id: mockMarineLicenceApplication.id,
-            status: 'Draft'
+            event: {
+              action: 'marine_licence_not_viewable',
+              reference: mockMarineLicenceApplication.id,
+              reason: 'Draft'
+            }
           }),
           errorMessages.MARINE_LICENCE_NOT_SUBMITTED
         )
@@ -233,7 +236,7 @@ describe('marine-licence view details controller', () => {
         ).rejects.toMatchObject({ isBoom: true, output: { statusCode: 500 } })
 
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
-          expect.any(Error),
+          { err: expect.any(Error) },
           'Error displaying marine licence details'
         )
       })

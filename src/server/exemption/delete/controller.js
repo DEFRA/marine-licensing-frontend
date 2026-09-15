@@ -68,8 +68,10 @@ export const deleteExemptionSubmitController = {
       if (!exemptionId || exemptionId !== cachedExemptionId) {
         request.logger.error(
           {
-            formExemptionId: exemptionId,
-            cachedExemptionId
+            event: { action: 'exemption_id_mismatch' },
+            tenant: {
+              message: `formExemptionId=${exemptionId} cachedExemptionId=${cachedExemptionId}`
+            }
           },
           'Exemption ID mismatch or missing'
         )
@@ -78,7 +80,10 @@ export const deleteExemptionSubmitController = {
 
       await authenticatedRequest(request, 'DELETE', `/exemption/${exemptionId}`)
 
-      request.logger.info({ exemptionId }, `Deleted exemption ${exemptionId}`)
+      request.logger.info(
+        { event: { action: 'exemption_deleted', reference: exemptionId } },
+        `Deleted exemption ${exemptionId}`
+      )
 
       await clearExemptionCache(request, h)
 

@@ -75,8 +75,11 @@ export const deleteMarineLicenceSubmitController = {
       if (!marineLicenceId || marineLicenceId !== cachedMarineLicenceId) {
         request.logger.error(
           {
-            formMarineLicenceId: marineLicenceId,
-            cachedMarineLicenceId
+            event: {
+              action: 'marine-licence:delete-id-mismatch',
+              reference: cachedMarineLicenceId,
+              reason: `formMarineLicenceId=${marineLicenceId}`
+            }
           },
           'Marine licence ID mismatch or missing'
         )
@@ -95,7 +98,15 @@ export const deleteMarineLicenceSubmitController = {
       )
 
       request.logger.info(
-        { marineLicenceId },
+        {
+          event: {
+            action: 'marine-licence:deleted',
+            reference: marineLicenceId
+          },
+          tenant: {
+            message: `deletedBy=${authedUser.contactId}`
+          }
+        },
         `Deleted marine licence ${marineLicenceId} by user ${authedUser.contactId}`
       )
 

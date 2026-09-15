@@ -28,10 +28,17 @@ export class FileValidationService {
 
     this.logger.debug(
       {
-        filename,
-        extension,
-        allowedExtensions: normalizedAllowed,
-        isValid
+        event: {
+          action: 'file_extension_validation',
+          reason: String(isValid)
+        },
+        tenant: {
+          message: JSON.stringify({
+            filename,
+            extension,
+            allowedExtensions: normalizedAllowed
+          })
+        }
       },
       'File extension validation'
     )

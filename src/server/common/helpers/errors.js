@@ -26,10 +26,13 @@ export function catchAll(request, h) {
   if (statusCode >= statusCodes.internalServerError) {
     request.logger.error(
       {
-        err: response, // Pino automatically serializes Error objects with stack trace
-        statusCode,
-        path: request.path,
-        method: request.method
+        err: response,
+        event: { action: 'catch_all_error' },
+        http: {
+          request: { method: request.method },
+          response: { status_code: statusCode }
+        },
+        url: { path: request.path }
       },
       'Error occurred'
     )

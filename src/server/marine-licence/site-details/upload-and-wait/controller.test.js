@@ -376,8 +376,11 @@ describe('#uploadAndWait', () => {
 
         expect(mockRequest.logger.warn).toHaveBeenCalledWith(
           {
-            uploadId: 'test-upload-id',
-            status: 'unknown'
+            event: {
+              action: 'file_upload_unknown_status',
+              reference: 'test-upload-id',
+              reason: 'unknown'
+            }
           },
           'FileUpload: Unknown upload status'
         )
@@ -565,11 +568,17 @@ describe('#uploadAndWait', () => {
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
             err: expect.any(Error),
-            filename: 'test.kml',
-            fileType: 'kml',
-            errorCode: null,
-            mappedMessage:
-              'The selected file could not be processed – try again'
+            error: {
+              code: null,
+              message: 'The selected file could not be processed – try again',
+              type: 'kml'
+            },
+            event: {
+              action: 'file_upload_geo_parser_failed'
+            },
+            tenant: {
+              message: 'filename=test.kml'
+            }
           },
           'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
         )
@@ -635,11 +644,18 @@ describe('#uploadAndWait', () => {
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
             err: geoParserError,
-            filename: 'coordinates.zip',
-            fileType: 'shapefile',
-            errorCode: 'SHAPEFILE_MISSING_CORE_FILES',
-            mappedMessage:
-              'The selected file must include .shp .shx and .dbf files'
+            error: {
+              code: 'SHAPEFILE_MISSING_CORE_FILES',
+              message:
+                'The selected file must include .shp .shx and .dbf files',
+              type: 'shapefile'
+            },
+            event: {
+              action: 'file_upload_geo_parser_failed'
+            },
+            tenant: {
+              message: 'filename=coordinates.zip'
+            }
           },
           'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
         )
@@ -734,7 +750,10 @@ describe('#uploadAndWait', () => {
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
             err: expect.any(Error),
-            uploadId: 'test-upload-id'
+            event: {
+              action: 'file_upload_status_check_failed',
+              reference: 'test-upload-id'
+            }
           },
           'FileUpload: ERROR: Failed to check upload status'
         )

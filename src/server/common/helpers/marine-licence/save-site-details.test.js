@@ -59,9 +59,10 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          fileType: 'kml',
-          featureCount: 1,
-          filename: 'test-upload-id'
+          event: { action: 'save_file_upload_site_details' },
+          tenant: {
+            message: 'fileType=kml featureCount=1 filename=test-upload-id'
+          }
         },
         'Saving file upload site details'
       )
@@ -398,10 +399,13 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          marineLicenceId: mockMarineLicenceApplication.id,
-          siteCount: 1,
-          coordinatesType: 'file',
-          isSingleSite: true
+          event: {
+            action: 'save_site_details_success',
+            reference: mockMarineLicenceApplication.id
+          },
+          tenant: {
+            message: 'siteCount=1 coordinatesType=file isSingleSite=true'
+          }
         },
         'Successfully saved site details to backend'
       )
@@ -434,10 +438,13 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          marineLicenceId: mockMarineLicenceApplication.id,
-          siteCount: 1,
-          coordinatesType: 'file',
-          isSingleSite: false
+          event: {
+            action: 'save_site_details_success',
+            reference: mockMarineLicenceApplication.id
+          },
+          tenant: {
+            message: 'siteCount=1 coordinatesType=file isSingleSite=false'
+          }
         },
         'Successfully saved site details to backend'
       )
@@ -473,10 +480,13 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          marineLicenceId: mockManualCoordinatesMarineLicence.id,
-          siteCount: 1,
-          coordinatesType: 'coordinates',
-          isSingleSite: false
+          event: {
+            action: 'save_site_details_success',
+            reference: mockManualCoordinatesMarineLicence.id
+          },
+          tenant: {
+            message: 'siteCount=1 coordinatesType=coordinates isSingleSite=false'
+          }
         },
         'Successfully saved site details to backend'
       )

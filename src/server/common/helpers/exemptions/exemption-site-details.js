@@ -48,7 +48,10 @@ export const processFileUploadSiteDetails = (
     request.logger.error(
       {
         err: error,
-        exemptionId: id
+        event: {
+          action: 'file_upload_summary_data_error',
+          reference: id
+        }
       },
       errorMessages.FILE_UPLOAD_DATA_ERROR
     )

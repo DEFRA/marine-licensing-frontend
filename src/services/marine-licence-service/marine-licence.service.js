@@ -23,7 +23,10 @@ export class MarineLicenceService {
 
   async getMarineLicenceData({ id, isPublic = false }) {
     if (!id) {
-      this.logger.error({ id }, errorMessages.MARINE_LICENCE_NOT_FOUND)
+      this.logger.error(
+        { event: { action: 'marine_licence_not_found', reference: id } },
+        errorMessages.MARINE_LICENCE_NOT_FOUND
+      )
       throw new Error(errorMessages.MARINE_LICENCE_NOT_FOUND)
     }
 
@@ -33,7 +36,10 @@ export class MarineLicenceService {
     const { payload } = await authenticatedGetRequest(this.request, endpoint)
 
     if (payload?.message !== 'success' || !payload.value) {
-      this.logger.error({ id }, errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
+      this.logger.error(
+        { event: { action: 'marine_licence_data_not_found', reference: id } },
+        errorMessages.MARINE_LICENCE_DATA_NOT_FOUND
+      )
       throw new Error(errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
     }
 

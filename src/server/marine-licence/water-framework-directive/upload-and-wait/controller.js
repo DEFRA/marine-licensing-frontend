@@ -126,7 +126,13 @@ const processUploadStatus = async (status, context) => {
   }
 
   request.logger.warn(
-    { uploadId: uploadConfig.uploadId, status: status.status },
+    {
+      event: {
+        action: 'wfd_file_upload_unknown_status',
+        reference: uploadConfig.uploadId,
+        reason: status.status
+      }
+    },
     'WFD FileUpload: Unknown upload status'
   )
 

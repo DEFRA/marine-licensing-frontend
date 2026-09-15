@@ -86,8 +86,11 @@ export const fileUploadController = {
       request.logger.error(
         {
           err: error,
-          exemptionId: exemption.id,
-          fileUploadType
+          event: {
+            action: 'exemption:file-upload-init-failed',
+            reference: exemption.id,
+            reason: fileUploadType
+          }
         },
         'Failed to initialize file upload'
       )

@@ -22,6 +22,7 @@
     "lint": "run-s lint:js lint:scss",
     "lint:fix": "eslint . --fix",
     "lint:js": "eslint .",
+    "test:eslint-rules": "node --test eslint-rules/**/*.test.js",
     "lint:scss": "stylelint \"src/**/*.scss\" --cache --cache-location .cache/stylelint --cache-strategy content --color --ignore-path .gitignore",
     "postversion": "git add package.json package-lock.json && git commit -m $npm_package_version",
     "test": "TZ=UTC vitest run --coverage",

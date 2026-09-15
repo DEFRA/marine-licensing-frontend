@@ -38,6 +38,8 @@ All application logging must follow CDP's streamlined Elastic Common Schema
 (ECS). Logs that use non-standard fields may land in `broken_logs*` and will
 not be searchable in OpenSearch as intended. Treat logs like cattle, not pets.
 
+Enforced by ESLint rule `local/cdp-logging` (`eslint-rules/cdp-logging.js`).
+
 ### How to log
 
 - Use `request.logger` in request handlers, or `createLogger()` from

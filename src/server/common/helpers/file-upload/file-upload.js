@@ -74,9 +74,10 @@ export const createFileUploadErrorDisplay = (error, request) => {
 
   request.logger.debug(
     {
-      message,
-      fieldName,
-      fileType
+      event: { action: 'display_upload_error' },
+      tenant: {
+        message: `message=${message} fieldName=${fieldName} fileType=${fileType}`
+      }
     },
     'Displaying upload error from session'
   )

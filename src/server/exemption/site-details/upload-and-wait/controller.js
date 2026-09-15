@@ -40,10 +40,14 @@ async function handleGeoParserError(request, h, error, filename, fileType) {
   request.logger.error(
     {
       err: error,
-      filename,
-      fileType,
-      errorCode,
-      mappedMessage: message
+      error: errorCode ? { code: errorCode, message } : { message },
+      event: {
+        action: 'exemption:file-upload-geo-parse-failed',
+        reason: fileType
+      },
+      tenant: {
+        message: `filename=${filename}`
+      }
     },
     'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
   )
@@ -160,8 +164,11 @@ function handleUnknownStatus(request, uploadConfig, status, h) {
   // Unknown status - redirect to file type selection
   request.logger.warn(
     {
-      uploadId: uploadConfig.uploadId,
-      status: status.status
+      event: {
+        action: 'exemption:file-upload-unknown-status',
+        reference: uploadConfig.uploadId,
+        reason: status.status
+      }
     },
     'FileUpload: Unknown upload status'
   )
@@ -234,7 +241,10 @@ export const uploadAndWaitController = {
       request.logger.error(
         {
           err: error,
-          uploadId: uploadConfig.uploadId
+          event: {
+            action: 'exemption:file-upload-status-check-failed',
+            reference: uploadConfig.uploadId
+          }
         },
         'FileUpload: ERROR: Failed to check upload status'
       )

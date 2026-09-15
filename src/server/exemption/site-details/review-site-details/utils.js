@@ -228,8 +228,11 @@ export const handleSubmissionError = (
   request.logger.error(
     {
       err: error,
-      exemptionId,
-      coordinatesType
+      event: {
+        action: 'exemption:site-review-submit-failed',
+        reference: exemptionId,
+        reason: coordinatesType
+      }
     },
     'Error submitting site review'
   )

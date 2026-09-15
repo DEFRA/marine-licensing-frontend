@@ -25,7 +25,10 @@ describe('#logExtractionSuccess', () => {
     logExtractionSuccess(request, geoJSON, extractedCoordinates)
 
     expect(request.logger.info).toHaveBeenCalledWith(
-      { featureCount: 2, coordinateCount: 3 },
+      {
+        event: { action: 'coordinate_extraction_success' },
+        tenant: { message: 'featureCount=2 coordinateCount=3' }
+      },
       'FileUpload: Successfully extracted coordinates'
     )
   })
@@ -44,7 +47,13 @@ describe('#logExtractionError', () => {
     logExtractionError(request, error, fileContext)
 
     expect(request.logger.error).toHaveBeenCalledWith(
-      { err: error, ...fileContext },
+      {
+        err: error,
+        event: { action: 'coordinate_extraction_failed' },
+        tenant: {
+          message: 's3Bucket=test-bucket s3Key=test-key fileType=kml'
+        }
+      },
       'FileUpload: ERROR: Failed to extract coordinates from file'
     )
   })
@@ -60,7 +69,12 @@ describe('#logSuccessfulProcessing', () => {
     logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
 
     expect(request.logger.info).toHaveBeenCalledWith(
-      { filename: 'test.kml', fileType: 'kml', featureCount: 2 },
+      {
+        event: { action: 'file_upload_processing_success' },
+        tenant: {
+          message: 'filename=test.kml fileType=kml featureCount=2'
+        }
+      },
       'FileUpload: File upload and coordinate extraction completed successfully'
     )
   })

@@ -60,9 +60,14 @@ export const viewDetailsController = {
       if (!isProjectViewable(marineLicence)) {
         request.logger.error(
           {
-            id: marineLicenceId,
-            status: marineLicence.status,
-            hasApplicationReference: !!marineLicence.applicationReference
+            event: {
+              action: 'marine_licence_not_viewable',
+              reference: marineLicenceId,
+              reason: marineLicence.status
+            },
+            tenant: {
+              message: `hasApplicationReference=${!!marineLicence.applicationReference}`
+            }
           },
           errorMessages.MARINE_LICENCE_NOT_SUBMITTED
         )
@@ -119,7 +124,10 @@ export const viewDetailsController = {
         throw error
       }
 
-      request.logger.error(error, 'Error displaying marine licence details')
+      request.logger.error(
+        { err: error },
+        'Error displaying marine licence details'
+      )
       throw Boom.internal('Error displaying marine licence details')
     }
   }

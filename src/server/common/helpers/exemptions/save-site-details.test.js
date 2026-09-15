@@ -101,9 +101,10 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          fileType: 'kml',
-          featureCount: 0,
-          filename: 'test-upload-id'
+          event: { action: 'save_file_upload_site_details' },
+          tenant: {
+            message: 'fileType=kml featureCount=0 filename=test-upload-id'
+          }
         },
         'Saving file upload site details'
       )
@@ -264,8 +265,10 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          coordinatesType: 'coordinates',
-          coordinatesEntry: 'single'
+          event: { action: 'save_manual_coordinate_site_details' },
+          tenant: {
+            message: 'coordinatesType=coordinates coordinatesEntry=single'
+          }
         },
         'Saving manual coordinate site details'
       )
@@ -301,9 +304,13 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          exemptionId: mockFileUploadExemption.id,
-          siteCount: 1,
-          coordinatesType: 'file'
+          event: {
+            action: 'save_site_details_success',
+            reference: mockFileUploadExemption.id
+          },
+          tenant: {
+            message: 'siteCount=1 coordinatesType=file'
+          }
         },
         'Successfully saved site details to backend'
       )

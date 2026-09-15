@@ -1,5 +1,7 @@
 import neostandard from 'neostandard'
 
+import cdpLogging from './eslint-rules/cdp-logging.js'
+
 export default [
   ...neostandard({
     env: ['node', 'vitest', 'browser'],
@@ -9,8 +11,16 @@ export default [
     noStyle: true
   }),
   {
+    plugins: {
+      local: {
+        rules: {
+          'cdp-logging': cdpLogging
+        }
+      }
+    },
     rules: {
-      'no-console': 'error'
+      'no-console': 'error',
+      'local/cdp-logging': 'error'
     }
   }
 ]

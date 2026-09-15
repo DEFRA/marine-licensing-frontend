@@ -91,7 +91,7 @@ describe('MarineLicenceService', () => {
         )
 
         expect(mockLogger.error).toHaveBeenCalledWith(
-          { id: invalidId },
+          { event: { action: 'marine_licence_not_found', reference: invalidId } },
           errorMessages.MARINE_LICENCE_NOT_FOUND
         )
         expect(authenticatedGetRequest).not.toHaveBeenCalled()
@@ -116,7 +116,7 @@ describe('MarineLicenceService', () => {
         )
 
         expect(mockLogger.error).toHaveBeenCalledWith(
-          { id: validId },
+          { event: { action: 'marine_licence_data_not_found', reference: validId } },
           errorMessages.MARINE_LICENCE_DATA_NOT_FOUND
         )
       })
@@ -217,7 +217,7 @@ describe('MarineLicenceService', () => {
         ).rejects.toThrow(errorMessages.MARINE_LICENCE_NOT_FOUND)
 
         expect(mockLogger.error).toHaveBeenCalledWith(
-          { id: invalidId },
+          { event: { action: 'marine_licence_not_found', reference: invalidId } },
           errorMessages.MARINE_LICENCE_NOT_FOUND
         )
         expect(authenticatedGetRequest).not.toHaveBeenCalled()
@@ -238,7 +238,7 @@ describe('MarineLicenceService', () => {
         ).rejects.toThrow(errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
 
         expect(mockLogger.error).toHaveBeenCalledWith(
-          { id: validId },
+          { event: { action: 'marine_licence_data_not_found', reference: validId } },
           errorMessages.MARINE_LICENCE_DATA_NOT_FOUND
         )
       })

@@ -50,7 +50,10 @@ export const deleteAllSitesSubmitController = {
       request.logger.error(
         {
           err: error,
-          exemptionId: exemption.id
+          event: {
+            action: 'exemption:delete-all-sites-failed',
+            reference: exemption.id
+          }
         },
         'Error deleting all sites'
       )

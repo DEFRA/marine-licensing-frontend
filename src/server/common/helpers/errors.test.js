@@ -124,9 +124,12 @@ describe('#catchAll', () => {
     expect(mockErrorLogger).toHaveBeenCalledWith(
       {
         err: request.response,
-        statusCode: statusCodes.internalServerError,
-        path: request.path,
-        method: request.method
+        event: { action: 'catch_all_error' },
+        http: {
+          request: { method: request.method },
+          response: { status_code: statusCodes.internalServerError }
+        },
+        url: { path: request.path }
       },
       'Error occurred'
     )

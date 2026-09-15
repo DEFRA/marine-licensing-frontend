@@ -27,8 +27,9 @@ export class FilenameHandler {
     } catch (error) {
       this.logger.warn(
         {
-          encodedfilename: encodedFilename,
-          error: error.message
+          err: error,
+          event: { action: 'rfc2047_filename_decode_failed' },
+          tenant: { message: encodedFilename }
         },
         'Failed to decode RFC-2047 filename'
       )

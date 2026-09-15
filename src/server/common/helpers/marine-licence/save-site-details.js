@@ -36,9 +36,10 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
 
     request.logger.info(
       {
-        fileType: site.fileUploadType,
-        featureCount,
-        filename: uploadedFile.filename
+        event: { action: 'save_file_upload_site_details' },
+        tenant: {
+          message: `fileType=${site.fileUploadType} featureCount=${featureCount} filename=${uploadedFile.filename}`
+        }
       },
       'Saving file upload site details'
     )
@@ -159,10 +160,13 @@ export const saveSiteDetailsToBackend = async (
 
     request.logger.info(
       {
-        marineLicenceId: marineLicence.id,
-        siteCount: cacheData.length,
-        coordinatesType,
-        isSingleSite
+        event: {
+          action: 'save_site_details_success',
+          reference: marineLicence.id
+        },
+        tenant: {
+          message: `siteCount=${cacheData.length} coordinatesType=${coordinatesType} isSingleSite=${isSingleSite}`
+        }
       },
       'Successfully saved site details to backend'
     )
@@ -170,8 +174,11 @@ export const saveSiteDetailsToBackend = async (
     request.logger.error(
       {
         err: error,
-        marineLicenceId: marineLicence.id,
-        coordinatesType
+        event: {
+          action: 'save_site_details_failed',
+          reference: marineLicence.id
+        },
+        tenant: { message: `coordinatesType=${coordinatesType}` }
       },
       'Failed to save site details to backend'
     )

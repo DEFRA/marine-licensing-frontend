@@ -37,7 +37,12 @@ export const withdrawMarineLicenceConfirmController = {
 
       if (!marineLicence) {
         request.logger.warn(
-          { marineLicenceId },
+          {
+            event: {
+              action: 'withdraw_licence_not_found',
+              reference: marineLicenceId
+            }
+          },
           'Marine licence to withdraw not found'
         )
         return h.redirect(routes.DASHBOARD)
@@ -45,7 +50,13 @@ export const withdrawMarineLicenceConfirmController = {
 
       if (marineLicence.status !== PROJECT_STATUS.SUBMITTED) {
         request.logger.warn(
-          { marineLicenceId, status: marineLicence.status },
+          {
+            event: {
+              action: 'withdraw_licence_not_submitted',
+              reference: marineLicenceId,
+              reason: marineLicence.status
+            }
+          },
           'Marine licence cannot be withdrawn'
         )
         return h.redirect(routes.DASHBOARD)
@@ -89,8 +100,16 @@ export const withdrawMarineLicenceSubmitController = {
       if (!marineLicenceId || marineLicenceId !== cachedMarineLicenceId) {
         request.logger.warn(
           {
-            formMarineLicenceId: marineLicenceId,
-            cachedMarineLicenceId
+            event: {
+              action: 'withdraw_licence_id_mismatch',
+              reason: 'form and cached IDs do not match'
+            },
+            tenant: {
+              message: JSON.stringify({
+                formMarineLicenceId: marineLicenceId,
+                cachedMarineLicenceId
+              })
+            }
           },
           'Marine licence ID mismatch or missing'
         )
@@ -104,7 +123,12 @@ export const withdrawMarineLicenceSubmitController = {
       )
 
       request.logger.info(
-        { marineLicenceId },
+        {
+          event: {
+            action: 'marine_licence_withdrawn',
+            reference: marineLicenceId
+          }
+        },
         `Withdrawn marine licence ${marineLicenceId}`
       )
 

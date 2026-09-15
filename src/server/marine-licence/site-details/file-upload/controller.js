@@ -101,8 +101,11 @@ export const fileUploadController = {
       request.logger.error(
         {
           err: error,
-          marineLicenceId: marineLicence.id,
-          fileUploadType
+          event: {
+            action: 'marine-licence:file-upload-init-failed',
+            reference: marineLicence.id,
+            reason: fileUploadType
+          }
         },
         'Failed to initialize file upload'
       )

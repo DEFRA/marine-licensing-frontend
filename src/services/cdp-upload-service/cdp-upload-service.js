@@ -89,14 +89,13 @@ export class CdpUploadService {
     this.filenameHandler = new FilenameHandler(this.logger)
 
     this.logger.debug(
-      {
+      `CdpUploadService initialized: ${JSON.stringify({
         cdpServiceBaseUrl: this.config.cdpUploadServiceBaseUrl,
         appBaseUrl: this.baseUrl,
         timeout: this.config.timeout,
         maxFileSize: this.config.maxFileSize,
         allowedMimeTypes: this.allowedMimeTypes
-      },
-      'CdpUploadService initialized'
+      })}`
     )
   }
 
@@ -140,8 +139,11 @@ export class CdpUploadService {
 
       this.logger.info(
         {
-          uploadId: data.uploadId,
-          redirectUrl
+          event: {
+            action: 'upload_session_initiated',
+            reference: data.uploadId
+          },
+          url: { full: redirectUrl }
         },
         'Upload session initiated successfully'
       )
@@ -157,9 +159,11 @@ export class CdpUploadService {
     } catch (error) {
       this.logger.error(
         {
-          error: error.message,
-          redirectUrl,
-          mimeTypes
+          err: error,
+          event: { action: 'upload_session_initiate_failed' },
+          tenant: {
+            message: JSON.stringify({ redirectUrl, mimeTypes })
+          }
         },
         'Failed to initiate upload session'
       )
@@ -169,7 +173,13 @@ export class CdpUploadService {
 
   async getStatus(uploadId, statusUrl) {
     try {
-      this.logger.debug({ uploadId, statusUrl }, 'Checking upload status')
+      this.logger.debug(
+        {
+          event: { action: 'upload_status_check', reference: uploadId },
+          url: { full: statusUrl }
+        },
+        'Checking upload status'
+      )
 
       const { res, payload } = await this._makeStatusRequest(statusUrl)
 
@@ -191,8 +201,11 @@ export class CdpUploadService {
 
       this.logger.debug(
         {
-          uploadId,
-          status: transformedStatus.status
+          event: {
+            action: 'upload_status_retrieved',
+            reference: uploadId,
+            reason: transformedStatus.status
+          }
         },
         'Upload status retrieved'
       )
@@ -219,13 +232,16 @@ export class CdpUploadService {
     if (res.statusCode < HTTP_200 || res.statusCode >= HTTP_300) {
       const errorMessage = `API call failed with status: ${res.statusCode}`
       const logContext = {
-        status: res.statusCode,
-        statusText: res.statusMessage,
-        endpoint
+        event: { action: 'cdp_upload_api_error' },
+        http: {
+          response: { status_code: res.statusCode }
+        },
+        url: { path: endpoint },
+        tenant: { message: res.statusMessage }
       }
 
       if (uploadId) {
-        logContext.uploadId = uploadId
+        logContext.event.reference = uploadId
       }
 
       this.logger.error(logContext, errorMessage)
@@ -390,15 +406,28 @@ export class CdpUploadService {
 
   _handleStatusErrors(res, uploadId) {
     if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
-      this.logger.warn({ uploadId }, 'Upload session not found')
+      this.logger.warn(
+        {
+          event: {
+            action: 'upload_session_not_found',
+            reference: uploadId
+          }
+        },
+        'Upload session not found'
+      )
       return this._createUploadNotFoundError()
     }
 
     if (res.statusCode >= HTTP_STATUS.SERVER_ERROR) {
       this.logger.error(
         {
-          uploadId,
-          status: res.statusCode
+          event: {
+            action: 'upload_status_service_error',
+            reference: uploadId
+          },
+          http: {
+            response: { status_code: res.statusCode }
+          }
         },
         'Service error when checking status'
       )
@@ -412,8 +441,11 @@ export class CdpUploadService {
     if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
       this.logger.error(
         {
-          uploadId,
-          error: error.message
+          err: error,
+          event: {
+            action: 'upload_status_timeout',
+            reference: uploadId
+          }
         },
         'Request timeout when checking status'
       )
@@ -422,8 +454,11 @@ export class CdpUploadService {
 
     this.logger.error(
       {
-        uploadId,
-        error: error.message
+        err: error,
+        event: {
+          action: 'upload_status_check_failed',
+          reference: uploadId
+        }
       },
       'Failed to check upload status'
     )

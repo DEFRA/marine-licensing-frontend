@@ -34,9 +34,15 @@ export const viewDetailsController = {
       if (!isProjectViewable(exemption)) {
         request.logger.error(
           {
-            id: exemptionId,
-            status: exemption.status,
-            hasApplicationReference: !!exemption.applicationReference
+            event: {
+              action: 'exemption:view-not-submitted',
+              reference: exemptionId,
+              reason: exemption.status,
+              outcome: 'failure'
+            },
+            tenant: {
+              message: `hasApplicationReference=${!!exemption.applicationReference}`
+            }
           },
           errorMessages.EXEMPTION_NOT_SUBMITTED
         )

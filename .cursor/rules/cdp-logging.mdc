@@ -9,6 +9,8 @@ All generated logging must follow CDP's streamlined Elastic Common Schema.
 Non-standard fields may end up in `broken_logs*` and will not search correctly
 in OpenSearch. Docs: CDP Portal → Documentation → Logging.
 
+Enforced by ESLint `local/cdp-logging` (`eslint-rules/cdp-logging.js`).
+
 ## Logger
 
 - Prefer `request.logger` in handlers; otherwise `createLogger()` from

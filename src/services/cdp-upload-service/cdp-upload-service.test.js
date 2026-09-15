@@ -45,14 +45,7 @@ describe('#CdpUploadService', () => {
       expect(service.allowedMimeTypes).toBeUndefined()
       expect(service.config).toEqual(config.get('cdpUploader'))
       expect(mockLoggerDebug).toHaveBeenCalledWith(
-        {
-          cdpServiceBaseUrl: config.get('cdpUploader').cdpUploadServiceBaseUrl,
-          appBaseUrl: config.get('appBaseUrl'),
-          timeout: config.get('cdpUploader').timeout,
-          maxFileSize: config.get('cdpUploader').maxFileSize,
-          allowedMimeTypes: undefined
-        },
-        'CdpUploadService initialized'
+        expect.stringContaining('CdpUploadService initialized:')
       )
     })
 
@@ -63,12 +56,10 @@ describe('#CdpUploadService', () => {
       // Then
       expect(service.allowedMimeTypes).toEqual(mockAllowedMimeTypes)
       expect(mockLoggerDebug).toHaveBeenCalledWith(
-        expect.objectContaining({
-          cdpServiceBaseUrl: config.get('cdpUploader').cdpUploadServiceBaseUrl,
-          appBaseUrl: config.get('appBaseUrl'),
-          allowedMimeTypes: mockAllowedMimeTypes
-        }),
-        'CdpUploadService initialized'
+        expect.stringContaining('CdpUploadService initialized:')
+      )
+      expect(mockLoggerDebug.mock.calls[0][0]).toContain(
+        JSON.stringify(mockAllowedMimeTypes)
       )
     })
   })
@@ -120,8 +111,11 @@ describe('#CdpUploadService', () => {
 
         expect(mockLoggerInfo).toHaveBeenCalledWith(
           {
-            uploadId: mockUploadId,
-            redirectUrl: mockRedirectUrl
+            event: {
+              action: 'upload_session_initiated',
+              reference: mockUploadId
+            },
+            url: { full: mockRedirectUrl }
           },
           'Upload session initiated successfully'
         )
@@ -333,9 +327,10 @@ describe('#CdpUploadService', () => {
 
         expect(mockLoggerError).toHaveBeenCalledWith(
           expect.objectContaining({
-            status: 400,
-            statusText: 'Bad Request',
-            endpoint: '/initiate'
+            event: { action: 'cdp_upload_api_error' },
+            http: { response: { status_code: 400 } },
+            url: { path: '/initiate' },
+            tenant: { message: 'Bad Request' }
           }),
           'API call failed with status: 400'
         )
@@ -357,7 +352,8 @@ describe('#CdpUploadService', () => {
 
         expect(mockLoggerError).toHaveBeenCalledWith(
           expect.objectContaining({
-            error: 'Request timeout'
+            err: networkError,
+            event: { action: 'upload_session_initiate_failed' }
           }),
           'Failed to initiate upload session'
         )
@@ -401,8 +397,11 @@ describe('#CdpUploadService', () => {
 
         expect(mockLoggerDebug).toHaveBeenCalledWith(
           {
-            uploadId: mockUploadId,
-            status: 'error'
+            event: {
+              action: 'upload_status_retrieved',
+              reference: mockUploadId,
+              reason: 'error'
+            }
           },
           'Upload status retrieved'
         )
@@ -679,7 +678,10 @@ describe('#CdpUploadService', () => {
 
         expect(mockLoggerWarn).toHaveBeenCalledWith(
           {
-            uploadId: mockUploadId
+            event: {
+              action: 'upload_session_not_found',
+              reference: mockUploadId
+            }
           },
           'Upload session not found'
         )
@@ -699,10 +701,13 @@ describe('#CdpUploadService', () => {
 
         expect(mockLoggerError).toHaveBeenCalledWith(
           {
-            uploadId: mockUploadId,
-            status: 400,
-            statusText: 'Bad Request',
-            endpoint: '/status'
+            event: {
+              action: 'cdp_upload_api_error',
+              reference: mockUploadId
+            },
+            http: { response: { status_code: 400 } },
+            url: { path: '/status' },
+            tenant: { message: 'Bad Request' }
           },
           'API call failed with status: 400'
         )
@@ -746,8 +751,11 @@ describe('#CdpUploadService', () => {
 
         expect(mockLoggerError).toHaveBeenCalledWith(
           {
-            uploadId: mockUploadId,
-            error: 'Request timeout'
+            err: timeoutError,
+            event: {
+              action: 'upload_status_timeout',
+              reference: mockUploadId
+            }
           },
           'Request timeout when checking status'
         )

@@ -54,9 +54,10 @@ export const prepareFileUploadDataForSave = (siteDetails, request) => {
 
     request.logger.info(
       {
-        fileType: site.fileUploadType,
-        featureCount,
-        filename: uploadedFile.filename
+        event: { action: 'save_file_upload_site_details' },
+        tenant: {
+          message: `fileType=${site.fileUploadType} featureCount=${featureCount} filename=${uploadedFile.filename}`
+        }
       },
       'Saving file upload site details'
     )
@@ -71,8 +72,10 @@ export const prepareManualCoordinateDataForSave = (exemption, request) => {
   for (const site of exemption.siteDetails) {
     request.logger.info(
       {
-        coordinatesType: site.coordinatesType,
-        coordinatesEntry: site.coordinatesEntry
+        event: { action: 'save_manual_coordinate_site_details' },
+        tenant: {
+          message: `coordinatesType=${site.coordinatesType} coordinatesEntry=${site.coordinatesEntry}`
+        }
       },
       'Saving manual coordinate site details'
     )
@@ -123,9 +126,13 @@ export const saveSiteDetailsToBackend = async (request, h) => {
 
     request.logger.info(
       {
-        exemptionId: exemption.id,
-        siteCount: cacheData.length,
-        coordinatesType
+        event: {
+          action: 'save_site_details_success',
+          reference: exemption.id
+        },
+        tenant: {
+          message: `siteCount=${cacheData.length} coordinatesType=${coordinatesType}`
+        }
       },
       'Successfully saved site details to backend'
     )
@@ -133,8 +140,11 @@ export const saveSiteDetailsToBackend = async (request, h) => {
     request.logger.error(
       {
         err: error,
-        exemptionId: exemption.id,
-        coordinatesType
+        event: {
+          action: 'save_site_details_failed',
+          reference: exemption.id
+        },
+        tenant: { message: `coordinatesType=${coordinatesType}` }
       },
       'Failed to save site details to backend'
     )

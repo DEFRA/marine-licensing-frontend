@@ -5,18 +5,22 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
-import { mockSubmittedMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockRedactedMarineLicenceApplication,
+  mockSubmittedMarineLicenceApplication
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   expectedExternalActivityCards,
   expectedWaterFrameworkDirectiveCard
 } from './fixtures.js'
+import { toApplicationReferenceUrlSegment } from '~/src/server/common/helpers/marine-licence/application-reference-url-segment.js'
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
-describe('Marine Licence View Details', () => {
+describe('Marine Licence View Details Redaction', () => {
   const getServer = setupTestServer()
   let document
 
@@ -25,7 +29,7 @@ describe('Marine Licence View Details', () => {
 
     mockMarineLicence(mockSubmittedMarineLicenceApplication)
     return loadPage({
-      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${mockSubmittedMarineLicenceApplication.id}`,
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${toApplicationReferenceUrlSegment(mockSubmittedMarineLicenceApplication.applicationReference)}`,
       server
     })
   }
@@ -36,8 +40,90 @@ describe('Marine Licence View Details', () => {
 
   test('renders the page in Dynamics view', async () => {
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      mockSubmittedMarineLicenceApplication.projectName
+      'Redact application for the public register'
     )
+
+    expect(document.querySelector('.govuk-caption-l').textContent).toBe(
+      `${mockSubmittedMarineLicenceApplication.applicationReference} - ${mockSubmittedMarineLicenceApplication.projectName}`
+    )
+
+    expect(document.querySelector('.app-redaction-label').textContent).toBe(
+      '***REDACTED***'
+    )
+  })
+
+  describe('redaction field', () => {
+    const licenceId = mockSubmittedMarineLicenceApplication.id
+    const viewUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${toApplicationReferenceUrlSegment(mockSubmittedMarineLicenceApplication.applicationReference)}`
+    const redactUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${licenceId}/redact`
+    const applicantText = 'July 2026 to August 2027'
+    const redactedText = 'Redacted preferred dates'
+
+    describe('when the field has not been redacted', () => {
+      test('offers to redact the applicant text', () => {
+        expect(
+          document.querySelector('#redaction-field-preferredDates')
+        ).not.toBeNull()
+
+        const triggerText = document.querySelector(
+          '#redaction-field-preferredDates .app-redaction-field__trigger'
+        ).textContent
+
+        expect(triggerText).toContain('Redact')
+        expect(triggerText).not.toContain('Change')
+      })
+
+      test('prepopulates the form with the applicant text', () => {
+        expect(
+          document.querySelector(
+            '#redaction-field-preferredDates .app-redaction-field__input'
+          ).value
+        ).toBe(applicantText)
+
+        expect(
+          document.querySelector(
+            '#redaction-field-preferredDates input[name="fieldKey"]'
+          ).value
+        ).toBe('preferredDates')
+
+        expect(
+          document
+            .querySelector(
+              '#redaction-field-preferredDates .app-redaction-field__form'
+            )
+            .getAttribute('action')
+        ).toBe(redactUrl)
+      })
+    })
+
+    test('shows the existing redaction when the field has been redacted', async () => {
+      vi.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
+      mockMarineLicence(mockRedactedMarineLicenceApplication)
+
+      const redactedDocument = await loadPage({
+        requestUrl: viewUrl,
+        server: getServer()
+      })
+
+      expect(
+        redactedDocument.querySelector(
+          '#redaction-field-preferredDates .app-redaction-field__trigger'
+        ).textContent
+      ).toContain('Change redaction')
+
+      const summary = redactedDocument.querySelector(
+        '#redaction-field-preferredDates .app-redaction-field__published-text'
+      ).textContent
+
+      expect(summary).toContain(applicantText)
+      expect(summary).toContain(redactedText)
+
+      expect(
+        redactedDocument.querySelector(
+          '#redaction-field-preferredDates .app-redaction-field__input'
+        ).value
+      ).toBe(redactedText)
+    })
   })
 
   describe('site details', () => {

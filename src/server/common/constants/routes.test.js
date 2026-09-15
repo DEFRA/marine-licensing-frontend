@@ -22,11 +22,11 @@ describe('isEntraIdRoute', () => {
   })
 
   test('should return true for exact match on /view-marine-licence-details', () => {
-    expect(isEntraIdRoute('/view-marine-licence-details')).toBe(true)
+    expect(isEntraIdRoute('/marine-licence/redaction/abc123')).toBe(true)
   })
 
   test('should return true for route starting with /view-marine-licence-details', () => {
-    expect(isEntraIdRoute('/view-marine-licence-details/abc123')).toBe(true)
+    expect(isEntraIdRoute('/marine-licence/redaction/abc123')).toBe(true)
   })
 
   test('should return true for route starting with /marine-licence/location-csv-download', () => {

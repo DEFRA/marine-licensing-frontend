@@ -18,6 +18,7 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
+import { isClientSideFetchRequest } from '#src/server/common/helpers/is-client-side-fetch-request.js'
 
 export const DASHBOARD_VIEW_ROUTE = 'dashboard/index.njk'
 export const DASHBOARD_RESULTS_VIEW_ROUTE =
@@ -46,9 +47,6 @@ const getOwnerErrors = (show, selectedUsers) => {
 export const FILTER_SEARCH_FLASH_KEY = 'dashboardFilterSearch'
 
 const FETCH_ERROR = 'Error fetching projects'
-
-const isClientSideFetchRequest = (request) =>
-  request.headers['x-requested-with'] === 'XMLHttpRequest'
 
 const dashboardPayloadFailAction = (request, h, error) => {
   request.logger.error({ err: error }, 'Invalid dashboard filter payload')

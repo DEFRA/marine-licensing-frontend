@@ -5,9 +5,6 @@ describe('Marine Licence Redaction Field Component', () => {
     fieldId: 'preferredDates',
     label: 'preferred start and end dates of the licence',
     originalText: 'April 2026 to September 2027',
-    publishedText: 'April 2026 to September 2027',
-    redactions: {},
-    isRedacted: false,
     saveUrl: '/view-marine-licence-details/test-id/redact',
     csrfToken: 'test-crumb-token'
   }
@@ -58,9 +55,11 @@ describe('Marine Licence Redaction Field Component', () => {
     const $component = renderComponent('marine-licence/redaction-field', {
       ...baseParams,
       isRedacted: true,
-      redactions: { redactedTextValue: 'Redacted preferred dates' },
-      publishedText:
-        'Redacted preferred dates <span class="app-redaction-label">***REDACTED***</span>'
+      redaction: {
+        redactedText:
+          'Redacted preferred dates <span class="app-redaction-label">***REDACTED***</span>',
+        redactedTextValue: 'Redacted preferred dates'
+      }
     })
 
     expect($component('.app-redaction-field__trigger').text()).toContain(

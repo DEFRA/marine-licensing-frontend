@@ -117,4 +117,71 @@ describe('Marine Licence Marine Plan Policies Component', () => {
 
     expect($('#marine-plan-policies-card')).toHaveLength(0)
   })
+
+  describe('redaction', () => {
+    const redactableParams = {
+      isReadOnly: true,
+      enableRedaction: true,
+      policies: [
+        {
+          policyCode: 'E-AGG-3',
+          wording: '<p>Wording</p>',
+          response: 'My consideration'
+        }
+      ],
+      redactions: {},
+      redactionSaveUrl: '/view-marine-licence-details/test-id/redact',
+      csrfToken: 'test-crumb-token'
+    }
+
+    test('renders a redaction field for the policy response', () => {
+      const $ = renderComponent(
+        'marine-licence/marine-plan-policies-card',
+        redactableParams
+      )
+
+      const $field = $('#redaction-field-marinePlanPolicyResponse-E-AGG-3')
+      expect($field).toHaveLength(1)
+      expect($field.find('input[name="fieldKey"]').attr('value')).toBe(
+        'marinePlanPolicyResponses'
+      )
+      expect($field.find('input[name="policyCode"]').attr('value')).toBe(
+        'E-AGG-3'
+      )
+      expect($field.find('.app-redaction-field__input').attr('value')).toBe(
+        'My consideration'
+      )
+    })
+
+    test('shows the redacted state for an already redacted response', () => {
+      const $ = renderComponent('marine-licence/marine-plan-policies-card', {
+        ...redactableParams,
+        redactions: {
+          marinePlanPolicyResponses: {
+            'E-AGG-3': {
+              redactedText: 'Redacted by MMO',
+              redactedTextValue: 'Redacted by MMO'
+            }
+          }
+        }
+      })
+
+      expect($('.app-redaction-field__trigger').text()).toContain(
+        'Change redaction'
+      )
+      expect($('.app-redaction-field__input').attr('value')).toBe(
+        'Redacted by MMO'
+      )
+    })
+
+    test('renders plain text when redaction is not enabled', () => {
+      const $ = renderComponent('marine-licence/marine-plan-policies-card', {
+        ...redactableParams,
+        enableRedaction: false
+      })
+
+      expect($('.app-redaction-field')).toHaveLength(0)
+      expect($.html()).toContain('My consideration')
+    })
+  })
 })

@@ -8,6 +8,17 @@
     text: "Project name"
   },
   value: {
+    html: appMarineLicenceRedactionField({
+      fieldId: "projectName",
+      label: "project name",
+      originalText: params.projectName,
+      redaction: params.redactions.projectName,
+      isRedacted: params.redactions.projectName,
+      saveUrl: params.redactionSaveUrl,
+      csrfToken: params.csrfToken
+    }),
+    classes: "govuk-summary-list__value--full-width"
+  } if params.enableRedaction else {
     text: params.projectName
   },
   actions: {
@@ -25,6 +36,17 @@
     text: "Project background"
   },
   value: {
+    html: appMarineLicenceRedactionField({
+      fieldId: "projectBackground",
+      label: "project background",
+      originalText: params.projectBackground,
+      redaction: params.redactions.projectBackground,
+      isRedacted: params.redactions.projectBackground,
+      saveUrl: params.redactionSaveUrl,
+      csrfToken: params.csrfToken
+    }),
+    classes: "govuk-summary-list__value--full-width"
+  } if params.enableRedaction else {
     text: params.projectBackground
   },
   actions: {
@@ -46,8 +68,7 @@
       fieldId: "preferredDates",
       label: "preferred start and end dates of the licence",
       originalText: params.preferredDates,
-      redactions: params.redactions.preferredDates,
-      publishedText: params.redactions.preferredDates.redactedText or params.preferredDates,
+      redaction: params.redactions.preferredDates,
       isRedacted: params.redactions.preferredDates,
       saveUrl: params.redactionSaveUrl,
       csrfToken: params.csrfToken

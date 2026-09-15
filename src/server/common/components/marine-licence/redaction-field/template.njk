@@ -14,6 +14,8 @@
   }) }}
 {% endset %}
 
+{% set publishedText = params.redaction.redactedText or (params.originalText | escape) %}
+
 {% set applicantsTextHeading %}
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Applicant's text</h3>
 {% endset %}
@@ -31,7 +33,7 @@
           <p class="govuk-body">{{ params.originalText }}</p>
 
           {{ publishedTextHeading | safe }}
-          <p class="govuk-body">{{ params.publishedText | safe }}</p>
+          <p class="govuk-body">{{ publishedText | safe }}</p>
 
         </div>
         {% else %}
@@ -39,7 +41,7 @@
         <div class="app-redaction-field__published-text">
 
         <p class="govuk-body">
-          <span class="app-redaction-field__published-text-value">{{ params.publishedText | safe }}</span>
+          <span class="app-redaction-field__published-text-value">{{ publishedText | safe }}</span>
         </p>
 
         </div>
@@ -76,11 +78,20 @@
           text: "Text to be published",
           classes: "govuk-label--s"
         },
-        value: params.redactions.redactedTextValue or params.originalText,
+        value: params.redaction.redactedTextValue or params.originalText,
         classes: "app-redaction-field__input"
       }) }}
 
-      <input type="hidden" name="fieldKey" value="{{ params.fieldId }}">
+      <input type="hidden" name="fieldKey" value="{{ params.fieldKey or params.fieldId }}">
+      {% if params.index is defined %}
+        <input type="hidden" name="index" value="{{ params.index }}">
+      {% endif %}
+      {% if params.activityIndex is defined %}
+        <input type="hidden" name="activityIndex" value="{{ params.activityIndex }}">
+      {% endif %}
+      {% if params.policyCode is defined %}
+        <input type="hidden" name="policyCode" value="{{ params.policyCode }}">
+      {% endif %}
       <input type="hidden" name="csrfToken" value="{{ params.csrfToken }}">
 
       <p class="govuk-body app-redaction-field__status govuk-visually-hidden" aria-live="polite"></p>

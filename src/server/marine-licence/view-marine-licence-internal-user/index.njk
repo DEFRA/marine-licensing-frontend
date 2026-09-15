@@ -53,6 +53,7 @@
       }) }}
 
       {{ appMarineLicenceProjectDetailsCard({
+        projectName: projectName,
         projectBackground: projectBackground,
         isReadOnly: isReadOnly,
         preferredDates: preferredDates,
@@ -68,11 +69,16 @@
         }) }}
 
         {% for site in summaryData %}
+          {% set siteIndex0 = loop.index0 %}
           {{ appMarineLicenceSiteDetailsCard({
             site: site,
             loopIndex0: loop.index0,
             coordinatesType: coordinatesType,
-            cspNonce: cspNonce
+            cspNonce: cspNonce,
+            enableRedaction: true,
+            redactions: redactions,
+            redactionSaveUrl: redactionSaveUrl,
+            csrfToken: csrfToken
           }) }}
 
           {% for activityDetails in site.activityDetails %}
@@ -80,8 +86,14 @@
               activityDetails: activityDetails,
               siteNumber: site.siteNumber,
               index: loop.index,
+              siteIndex0: siteIndex0,
+              activityIndex0: loop.index0,
               isReadOnly: true,
-              isApplicant: false
+              isApplicant: false,
+              enableRedaction: true,
+              redactions: redactions,
+              redactionSaveUrl: redactionSaveUrl,
+              csrfToken: csrfToken
             }) }}
           {% endfor %}
         {% endfor %}
@@ -90,12 +102,20 @@
       {{ appMarineLicenceMarinePlanPoliciesCard({
         policies: marinePlanPolicies,
         isApplicant: false,
-        isReadOnly: true
+        isReadOnly: true,
+        enableRedaction: true,
+        redactions: redactions,
+        redactionSaveUrl: redactionSaveUrl,
+        csrfToken: csrfToken
       }) }}
 
       {{ appMarineLicenceWaterFrameworkDirectiveCard({
         waterFrameworkDirectiveData: waterFrameworkDirectiveData,
-        isReadOnly: isReadOnly
+        isReadOnly: isReadOnly,
+        enableRedaction: true,
+        redactions: redactions,
+        redactionSaveUrl: redactionSaveUrl,
+        csrfToken: csrfToken
       }) }}
 
       {{ appMarineLicenceOtherPermissionsCard({
@@ -103,7 +123,11 @@
         harbourAuthority: harbourAuthority,
         otherAuthorities: otherAuthorities,
         publicConsultation: publicConsultation,
-        isReadOnly: isReadOnly
+        isReadOnly: isReadOnly,
+        enableRedaction: true,
+        redactions: redactions,
+        redactionSaveUrl: redactionSaveUrl,
+        csrfToken: csrfToken
       }) }}
 
     </div>

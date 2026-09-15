@@ -19,6 +19,7 @@ import { MojFilter } from './moj-filter/index.js'
 import { IatAnswerPrint } from './iat-answer-print/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
 import { RedactionField } from './redaction-field/index.js'
+import { WithholdLocation } from './withhold-location/index.js'
 
 createAll(Button)
 createAll(Checkboxes)
@@ -86,6 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
   )
   for (const element of redactionFieldElements) {
     new RedactionField(element) // eslint-disable-line no-new
+  }
+
+  const withholdLocationElements = document.querySelectorAll(
+    '[data-module="withhold-location"]'
+  )
+  for (const element of withholdLocationElements) {
+    new WithholdLocation(element) // eslint-disable-line no-new
   }
 
   // eslint-disable-next-line no-new

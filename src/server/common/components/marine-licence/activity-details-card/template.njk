@@ -1,7 +1,33 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "incomplete-field/macro.njk" import appIncompleteField %}
+{% from "marine-licence/redaction-field/macro.njk" import appMarineLicenceRedactionField %}
 
 {% set rows = [] %}
+
+{#
+  Activity fields have `index` and the `activityIndex` within that site.
+#}
+{% macro activityValue(params, field, label, text) %}
+  {%- if params.enableRedaction -%}
+    {% set redaction = params.redactions.siteDetails[params.siteIndex0].activityDetails[params.activityIndex0][field] %}
+    {{ appMarineLicenceRedactionField({
+      fieldId: field + "-" + params.siteIndex0 + "-" + params.activityIndex0,
+      fieldKey: "siteDetails.activityDetails." + field,
+      index: params.siteIndex0,
+      activityIndex: params.activityIndex0,
+      label: "site " + params.siteNumber + " activity " + params.index + " " + label,
+      originalText: text,
+      redaction: redaction,
+      isRedacted: redaction,
+      saveUrl: params.redactionSaveUrl,
+      csrfToken: params.csrfToken
+    }) }}
+  {%- else -%}
+    {{ appIncompleteField({ text: text }) }}
+  {%- endif -%}
+{% endmacro %}
+
+{% set valueClasses = "govuk-summary-list__value--full-width" if params.enableRedaction %}
 
 {% set activityRowsHeading %}
   Site {{ params.siteNumber }} - Activity {{ params.index }}
@@ -9,7 +35,7 @@
 
 {% set _ = rows.push({
     key: { text: "Type of activity"},
-    value: { html: appIncompleteField({text:params.activityDetails.activitySubType})},
+    value: { html: activityValue(params, "activitySubType", "type of activity", params.activityDetails.activitySubType), classes: valueClasses },
     actions: setSiteDetailsAction(params.activityDetails.activitySubType, 'type-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
@@ -25,40 +51,44 @@
     </ul>
   {% endset %}
 
+  {# The whole bulleted list is redacted as one field, so it is joined into a single value. #}
   {% set _ = rows.push({
       key: { text: activityHeadingText },
-      value: { html: activityList },
+      value: {
+        html: activityValue(params, "activities", activityHeadingText | lower, params.activityDetails.activities | join(", ")) if params.enableRedaction else activityList,
+        classes: valueClasses
+      },
       actions: setSiteDetailsAction(true,  params.activityDetails.activityLink, params.siteNumber, "", { activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
   }) %}
 {% endif %}
 
 {% set _ = rows.push({
     key: { text: "Activity description"},
-    value: { html: appIncompleteField({text:params.activityDetails.activityDescription})},
+    value: { html: activityValue(params, "activityDescription", "activity description", params.activityDetails.activityDescription), classes: valueClasses },
     actions: setSiteDetailsAction(params.activityDetails.activityDescription, 'activity-description', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
 {% set _ = rows.push({
     key: { text: "Maximum duration of activity"},
-    value: { html: appIncompleteField({text:params.activityDetails.activityDuration})},
+    value: { html: activityValue(params, "activityDuration", "maximum duration of activity", params.activityDetails.activityDuration), classes: valueClasses },
     actions: setSiteDetailsAction(params.activityDetails.activityDuration, 'activity-duration', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
 {% set _ = rows.push({
     key: { text: "Completion date"},
-    value: { html: appIncompleteField({text:params.activityDetails.completionDate})},
+    value: { html: activityValue(params, "completionDate", "completion date", params.activityDetails.completionDate), classes: valueClasses },
     actions: setSiteDetailsAction(params.activityDetails.completionDate, 'completion-date', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
 {% set _ = rows.push({
     key: { text: "Activity limited to specific months"},
-    value: { html: appIncompleteField({text:params.activityDetails.activityMonths})},
+    value: { html: activityValue(params, "activityMonths", "months the activity is limited to", params.activityDetails.activityMonths), classes: valueClasses },
     actions: setSiteDetailsAction(params.activityDetails.activityMonths, 'months-of-activity', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 
 {% set _ = rows.push({
     key: { text: "Proposed working hours"},
-    value: { html: appIncompleteField({text:params.activityDetails.workingHours})},
+    value: { html: activityValue(params, "workingHours", "proposed working hours", params.activityDetails.workingHours), classes: valueClasses },
     actions: setSiteDetailsAction(params.activityDetails.workingHours, 'working-hours', params.siteNumber, "", { skipAction: true, activityNumber: params.index }) if not params.changeLink and not params.isReadOnly
 }) %}
 

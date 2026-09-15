@@ -75,11 +75,24 @@ export class MarineLicenceService {
     return payload.value
   }
 
-  async saveRedaction(id, fieldKey, text) {
+  async saveRedaction(
+    id,
+    fieldKey,
+    text,
+    { index, activityIndex, policyCode, withhold } = {}
+  ) {
     const { payload } = await authenticatedPostRequest(
       this.request,
       apiRoutes.REDACT_TEXT,
-      { id, fieldKey, text }
+      {
+        id,
+        fieldKey,
+        ...(text !== undefined && { text }),
+        ...(index !== undefined && { index }),
+        ...(activityIndex !== undefined && { activityIndex }),
+        ...(policyCode !== undefined && { policyCode }),
+        ...(withhold !== undefined && { withhold })
+      }
     )
     if (payload?.message !== 'success') {
       this.logger.error(

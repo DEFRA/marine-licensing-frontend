@@ -1,11 +1,30 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
+{% from "marine-licence/redaction-field/macro.njk" import appMarineLicenceRedactionField %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set summaryRows = [] %}
 
+{% set isLocationWithheld = params.redactions.siteDetails[params.loopIndex0].withholdLocation %}
+
 {% set _ = summaryRows.push({
   key: { text: "Site name" },
-  value: { text: params.site.siteName }
+  value: {
+    html: appMarineLicenceRedactionField({
+      fieldId: "siteName-" + params.loopIndex0,
+      fieldKey: "siteDetails.siteName",
+      index: params.loopIndex0,
+      label: "site " + params.site.siteNumber + " name",
+      originalText: params.site.siteName,
+      redaction: params.redactions.siteDetails[params.loopIndex0].siteName,
+      isRedacted: params.redactions.siteDetails[params.loopIndex0].siteName,
+      saveUrl: params.redactionSaveUrl,
+      csrfToken: params.csrfToken
+    }),
+    classes: "govuk-summary-list__value--full-width"
+  } if params.enableRedaction else {
+    text: params.site.siteName
+  }
 }) %}
 
 {% if params.coordinatesType === "coordinates" %}
@@ -20,30 +39,93 @@
   }) %}
 
   {% if params.site.polygonCoordinates %}
-    {% for coordinate in params.site.polygonCoordinates %}
-      {% set _ = summaryRows.push({
-        classes: "" if loop.last else "govuk-summary-list__row--no-border",
-        key: { text: coordinate.label },
-        value: { text: coordinate.value }
-      }) %}
-    {% endfor %}
+    {% if not isLocationWithheld %}
+      {% for coordinate in params.site.polygonCoordinates %}
+        {% set _ = summaryRows.push({
+          classes: "" if loop.last else "govuk-summary-list__row--no-border",
+          key: { text: coordinate.label },
+          value: { text: coordinate.value }
+        }) %}
+      {% endfor %}
+    {% endif %}
   {% else %}
-    {% set _ = summaryRows.push({
-      key: { text: "Coordinates at centre of site" },
-      value: { text: params.site.coordinates }
-    }) %}
+    {% if not isLocationWithheld %}
+      {% set _ = summaryRows.push({
+        key: { text: "Coordinates at centre of site" },
+        value: { text: params.site.coordinates }
+      }) %}
+    {% endif %}
 
     {% set _ = summaryRows.push({
       key: { text: "Width of circular site" },
-      value: { text: params.site.width }
+      value: {
+        html: appMarineLicenceRedactionField({
+          fieldId: "circleWidth-" + params.loopIndex0,
+          fieldKey: "siteDetails.circleWidth",
+          index: params.loopIndex0,
+          label: "site " + params.site.siteNumber + " width",
+          originalText: params.site.width,
+          redaction: params.redactions.siteDetails[params.loopIndex0].circleWidth,
+          isRedacted: params.redactions.siteDetails[params.loopIndex0].circleWidth,
+          saveUrl: params.redactionSaveUrl,
+          csrfToken: params.csrfToken
+        }),
+        classes: "govuk-summary-list__value--full-width"
+      } if params.enableRedaction else {
+        text: params.site.width
+      }
     }) %}
   {% endif %}
 {% endif %}
 
+{% set withholdButtonHtml %}
+  {% if not isLocationWithheld %}
+     Withhold location
+     {% else %}
+     Display location
+  {% endif %}
+  <span class="govuk-visually-hidden"> for site {{ params.site.siteNumber }}</span>
+{% endset %}
+
+{% set withholdButtonClasses %}
+  {{ "" if isLocationWithheld else "govuk-!-margin-top-4" }}
+{% endset %}
+
+{% set mapHtml %}
+  {% if not isLocationWithheld %}
+    {{ appSiteDetailsMap(params.site.siteDetailsData, params.loopIndex0) }}
+  {% endif %}
+
+  {% if params.enableRedaction %}
+    <form class="app-withhold-location__form" method="post" action="{{ params.redactionSaveUrl }}">
+      <input type="hidden" name="fieldKey" value="siteDetails.withholdLocation">
+      <input type="hidden" name="index" value="{{ params.loopIndex0 }}">
+      <input type="hidden" name="withhold" value="{{ "false" if isLocationWithheld else "true" }}">
+      <input type="hidden" name="csrfToken" value="{{ params.csrfToken }}">
+
+      {% if isLocationWithheld %}
+        <div class="app-redaction-field__panel">
+          <span class="app-redaction-label">***REDACTED***</span>
+          <p class="govuk-body govuk-!-margin-top-1">This location will not be published on the public register.</p>
+        </div>
+      {% endif %}
+
+      <div class="govuk-button-group {{ withholdButtonClasses }}">
+        {{ govukButton({
+          html: withholdButtonHtml,
+          type: "submit",
+          classes: "govuk-link govuk-button--as-link govuk-!-margin-bottom-0 app-withhold-location__button"
+        }) }}
+      </div>
+    </form>
+  {% endif %}
+
+{% endset %}
+
 {% set _ = summaryRows.push({
   key: { text: "Map view" },
   value: {
-    html: appSiteDetailsMap(params.site.siteDetailsData, params.loopIndex0),
+    html: mapHtml,
     classes: "govuk-summary-list__value--full-width"
   }
 }) %}
@@ -52,9 +134,14 @@
   Site {{ params.site.siteNumber }}
 {% endset %}
 
+{% set cardAttributes = { id: "site-details-" + params.site.siteNumber } %}
+{% if params.enableRedaction %}
+  {% set cardAttributes = { id: "site-details-" + params.site.siteNumber, "data-module": "withhold-location" } %}
+{% endif %}
+
 {{ govukSummaryList({
   card: {
-    attributes: { id: "site-details-" + params.site.siteNumber },
+    attributes: cardAttributes,
     title: { text: siteCardHeading },
     actions: {
       items: [{

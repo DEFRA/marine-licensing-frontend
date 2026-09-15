@@ -70,6 +70,35 @@ describe('Marine Licence Project Details Card Component', () => {
   })
 
   describe('redaction available', () => {
+    const redactableParams = {
+      isReadOnly: true,
+      enableRedaction: true,
+      projectName: 'Test Marine Project',
+      projectBackground: 'Some project background',
+      preferredDates: 'April 2026 to September 2027',
+      redactions: {},
+      redactionSaveUrl: '/view-marine-licence-details/test-id/redact',
+      csrfToken: 'test-crumb-token'
+    }
+
+    test.each([
+      ['projectName', 'Test Marine Project'],
+      ['projectBackground', 'Some project background'],
+      ['preferredDates', 'April 2026 to September 2027']
+    ])('renders a redaction field for %s', (fieldId, text) => {
+      const $comp = renderComponent(
+        'marine-licence/project-details-card',
+        redactableParams
+      )
+
+      const $field = $comp(`#redaction-field-${fieldId}`)
+      expect($field).toHaveLength(1)
+      expect($field.find('input[name="fieldKey"]').attr('value')).toBe(fieldId)
+      expect($field.find('.app-redaction-field__input').attr('value')).toBe(
+        text
+      )
+    })
+
     test('renders a field correctly when redaction is enabled', () => {
       const $comp = renderComponent('marine-licence/project-details-card', {
         isReadOnly: true,

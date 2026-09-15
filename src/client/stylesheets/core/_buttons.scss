@@ -2,6 +2,7 @@
 
 .govuk-button--as-link {
   @include govuk-link-common;
+
   @include govuk-font-size($size: 16);
   color: govuk-functional-colour(link);
   padding: 0;
@@ -11,7 +12,8 @@
 
   &:hover {
     background: none;
-    color: govuk-functional-colour(link);
+    color: govuk-functional-colour(link-hover);
     text-decoration: underline;
+    text-decoration-thickness: 3px;
   }
 }

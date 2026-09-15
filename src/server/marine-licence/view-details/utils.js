@@ -12,17 +12,49 @@ const REDACTION_LABEL_HTML = `<span class="app-redaction-label">${REDACTION_LABE
 const wrapRedactionLabels = (text) =>
   escapeHtml(text ?? '').replaceAll(REDACTION_LABEL, REDACTION_LABEL_HTML)
 
-export const buildRedactionsForView = (redactions) =>
-  Object.fromEntries(
-    Object.entries(redactions ?? {}).map(([fieldKey, redaction]) => [
-      fieldKey,
-      {
-        ...redaction,
-        redactedText: wrapRedactionLabels(redaction.redactedText),
-        redactedTextValue: redaction.redactedText
-      }
-    ])
-  )
+const isObject = (value) => typeof value === 'object' && value !== null
+
+const isTextRedaction = (value) => isObject(value) && 'redactedText' in value
+
+const buildRedaction = (redaction) => {
+  return {
+    ...redaction,
+    redactedText: wrapRedactionLabels(redaction.redactedText),
+    redactedTextValue: redaction.redactedText
+  }
+}
+
+const buildRedactionValue = (value) => {
+  if (!isObject(value)) {
+    return value
+  }
+
+  if (isTextRedaction(value)) {
+    return buildRedaction(value)
+  }
+
+  return buildRedactionsForView(value)
+}
+
+/**
+ * Redactions are stored under the dotted fieldKey the backend was sent, so they
+ * nest as deeply as that key goes:
+ *
+ *   projectName                  -> redactions.projectName
+ *   specialLegalPowers.details   -> redactions.specialLegalPowers.details
+ *   siteDetails.siteName         -> redactions.siteDetails.0.siteName
+ *
+ * Walk down through the groups until a redaction is reached, and build that.
+ */
+export const buildRedactionsForView = (group) => {
+  const result = {}
+
+  for (const [key, value] of Object.entries(group ?? {})) {
+    result[key] = buildRedactionValue(value)
+  }
+
+  return result
+}
 
 export const buildApplicationDetailsCardData = (marineLicence) => {
   const {

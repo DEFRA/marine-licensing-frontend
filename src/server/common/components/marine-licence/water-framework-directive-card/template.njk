@@ -1,15 +1,43 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "marine-licence/redaction-field/macro.njk" import appMarineLicenceRedactionField %}
 
 {% if params.waterFrameworkDirectiveData.nauticalMile %}
 {% set rows = [] %}
 
 {% set rows = (rows.push({
   key: params.waterFrameworkDirectiveData.nauticalMile.key,
-  value: params.waterFrameworkDirectiveData.nauticalMile.value
+  value: {
+    html: appMarineLicenceRedactionField({
+      fieldId: "waterFrameworkDirective-nauticalMile",
+      fieldKey: "waterFrameworkDirective.nauticalMile",
+      label: params.waterFrameworkDirectiveData.nauticalMile.key.text,
+      originalText: params.waterFrameworkDirectiveData.nauticalMile.value.text,
+      redaction: params.redactions.waterFrameworkDirective.nauticalMile,
+      isRedacted: params.redactions.waterFrameworkDirective.nauticalMile,
+      saveUrl: params.redactionSaveUrl,
+      csrfToken: params.csrfToken
+    }),
+    classes: "govuk-summary-list__value--full-width"
+  } if params.enableRedaction else params.waterFrameworkDirectiveData.nauticalMile.value
 }), rows) %}
 
 {% if params.waterFrameworkDirectiveData.excludedActivities %}
-    {% set rows = (rows.push(params.waterFrameworkDirectiveData.excludedActivities), rows) %}
+    {% set rows = (rows.push({
+      key: params.waterFrameworkDirectiveData.excludedActivities.key,
+      value: {
+        html: appMarineLicenceRedactionField({
+          fieldId: "waterFrameworkDirective-excludedActivities",
+          fieldKey: "waterFrameworkDirective.excludedActivities",
+          label: params.waterFrameworkDirectiveData.excludedActivities.key.text,
+          originalText: params.waterFrameworkDirectiveData.excludedActivities.value.text,
+          redaction: params.redactions.waterFrameworkDirective.excludedActivities,
+          isRedacted: params.redactions.waterFrameworkDirective.excludedActivities,
+          saveUrl: params.redactionSaveUrl,
+          csrfToken: params.csrfToken
+        }),
+        classes: "govuk-summary-list__value--full-width"
+      } if params.enableRedaction else params.waterFrameworkDirectiveData.excludedActivities.value
+    }), rows) %}
 {% endif %}
 
 {% if params.waterFrameworkDirectiveData.uploadedFile %}

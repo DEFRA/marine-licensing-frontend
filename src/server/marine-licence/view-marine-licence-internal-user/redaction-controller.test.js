@@ -54,7 +54,8 @@ describe('saveRedactionController', () => {
     expect(mockMarineLicenceService.saveRedaction).toHaveBeenCalledWith(
       'test-id',
       'preferredDates',
-      'Redacted text'
+      'Redacted text',
+      { index: undefined }
     )
     expect(viewDetailsInternalUserController.handler).toHaveBeenCalledWith(
       mockRequest,
@@ -76,10 +77,45 @@ describe('saveRedactionController', () => {
       expect(mockMarineLicenceService.saveRedaction).toHaveBeenCalledWith(
         'test-id',
         'preferredDates',
-        REDACTION_LABEL
+        REDACTION_LABEL,
+        { index: undefined }
       )
     }
   )
+
+  test('passes the site index through for a repeated field', async () => {
+    const mockRequest = createMockRequest({
+      payload: { fieldKey: 'siteName', index: 1, text: 'Redacted site' }
+    })
+
+    await saveRedactionController.handler(mockRequest, createMockH())
+
+    expect(mockMarineLicenceService.saveRedaction).toHaveBeenCalledWith(
+      'test-id',
+      'siteName',
+      'Redacted site',
+      { index: 1 }
+    )
+  })
+
+  test('includes the policy code for redacting a policy response', async () => {
+    const mockRequest = createMockRequest({
+      payload: {
+        fieldKey: 'marinePlanPolicyResponses',
+        policyCode: 'E-AGG-3',
+        text: 'Redacted by MMO'
+      }
+    })
+
+    await saveRedactionController.handler(mockRequest, createMockH())
+
+    expect(mockMarineLicenceService.saveRedaction).toHaveBeenCalledWith(
+      'test-id',
+      'marinePlanPolicyResponses',
+      'Redacted by MMO',
+      { index: undefined, policyCode: 'E-AGG-3' }
+    )
+  })
 
   test('redirects back to the view page for a native form post', async () => {
     const mockRequest = createMockRequest({ headers: {} })
@@ -167,6 +203,71 @@ describe('saveRedactionController', () => {
         })
 
       expect(error).toBeUndefined()
+    })
+
+    test('schema allows a withhold payload with no text', () => {
+      const { error } =
+        saveRedactionController.options.validate.payload.validate({
+          fieldKey: 'siteDetails.withholdLocation',
+          index: 0,
+          withhold: true
+        })
+
+      expect(error).toBeUndefined()
+    })
+
+    test.each([
+      ['true', true],
+      ['false', false]
+    ])('schema coerces the form string %j to a boolean', (given, expected) => {
+      const { error, value } =
+        saveRedactionController.options.validate.payload.validate({
+          fieldKey: 'siteDetails.withholdLocation',
+          index: 0,
+          withhold: given
+        })
+
+      expect(error).toBeUndefined()
+      expect(value.withhold).toBe(expected)
+    })
+  })
+
+  describe('withholding a site location', () => {
+    const withholdPayload = (withhold) => ({
+      fieldKey: 'siteDetails.withholdLocation',
+      index: 0,
+      withhold
+    })
+
+    test.each([[true], [false]])(
+      'passes withhold %j through with no redaction text',
+      async (withhold) => {
+        const mockRequest = createMockRequest({
+          payload: withholdPayload(withhold)
+        })
+
+        await saveRedactionController.handler(mockRequest, createMockH())
+
+        expect(mockMarineLicenceService.saveRedaction).toHaveBeenCalledWith(
+          'test-id',
+          'siteDetails.withholdLocation',
+          undefined,
+          { index: 0, policyCode: undefined, withhold }
+        )
+      }
+    )
+
+    test('redirects back to the view page for a native form post', async () => {
+      const mockRequest = createMockRequest({
+        payload: withholdPayload(true),
+        headers: {}
+      })
+      const mockH = createMockH()
+
+      await saveRedactionController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(VIEW_URL)
+      expect(viewDetailsInternalUserController.handler).not.toHaveBeenCalled()
     })
   })
 })

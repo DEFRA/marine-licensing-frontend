@@ -59,6 +59,88 @@ describe('Marine Licence View Details Redaction', () => {
     const applicantText = 'July 2026 to August 2027'
     const redactedText = 'Redacted preferred dates'
 
+    test.each([
+      ['projectName', mockSubmittedMarineLicenceApplication.projectName],
+      [
+        'projectBackground',
+        mockSubmittedMarineLicenceApplication.projectBackground
+      ],
+      ['preferredDates', 'July 2026 to August 2027']
+    ])('renders a redaction field for %s', (fieldId, text) => {
+      const $field = document.querySelector(`#redaction-field-${fieldId}`)
+
+      expect($field).not.toBeNull()
+      expect($field.querySelector('input[name="fieldKey"]').value).toBe(fieldId)
+      expect($field.querySelector('.app-redaction-field__input').value).toBe(
+        text
+      )
+    })
+
+    test.each(['specialLegalPowers', 'harbourAuthority', 'publicConsultation'])(
+      'renders a redaction field for %s',
+      (groupName) => {
+        const $field = document.querySelector(
+          `#redaction-field-${groupName}-details`
+        )
+
+        expect($field).not.toBeNull()
+        expect($field.querySelector('input[name="fieldKey"]').value).toBe(
+          `${groupName}.details`
+        )
+      }
+    )
+
+    test.each([
+      'activitySubType',
+      'activities',
+      'activityDescription',
+      'activityDuration',
+      'completionDate',
+      'activityMonths',
+      'workingHours'
+    ])('renders a redaction field for activity %s', (field) => {
+      const $field = document.querySelector(`#redaction-field-${field}-0-0`)
+
+      expect($field).not.toBeNull()
+      expect($field.querySelector('input[name="fieldKey"]').value).toBe(
+        `siteDetails.activityDetails.${field}`
+      )
+      expect($field.querySelector('input[name="index"]').value).toBe('0')
+      expect($field.querySelector('input[name="activityIndex"]').value).toBe(
+        '0'
+      )
+    })
+
+    test('numbers activity redaction fields by site and activity', () => {
+      const $second = document.querySelector(
+        '#redaction-field-workingHours-0-1'
+      )
+
+      expect($second).not.toBeNull()
+      expect($second.querySelector('input[name="index"]').value).toBe('0')
+      expect($second.querySelector('input[name="activityIndex"]').value).toBe(
+        '1'
+      )
+    })
+
+    test('renders a redaction field for each site name', () => {
+      const siteCount = mockSubmittedMarineLicenceApplication.siteDetails.length
+
+      for (let index = 0; index < siteCount; index++) {
+        const $field = document.querySelector(
+          `#redaction-field-siteName-${index}`
+        )
+
+        expect($field).not.toBeNull()
+        expect($field.querySelector('input[name="fieldKey"]').value).toBe(
+          'siteDetails.siteName'
+        )
+        expect($field.querySelector('input[name="index"]').value).toBe(
+          String(index)
+        )
+      }
+    })
+
     describe('when the field has not been redacted', () => {
       test('offers to redact the applicant text', () => {
         expect(
@@ -141,6 +223,47 @@ describe('Marine Licence View Details Redaction', () => {
     test('does not render the internal-user-only site-details-card', () => {
       expect(document.querySelector('#site-details-card')).toBeNull()
     })
+
+    test('offers to withhold the location of a site that is on show', () => {
+      const $button = document.querySelector(
+        '#site-details-1 .app-withhold-location__button'
+      )
+
+      expect($button.textContent).toContain('Withhold location')
+      expect(
+        document.querySelector('#site-details-1 .app-site-details-map')
+      ).not.toBeNull()
+    })
+
+    test('offers to display the location of a withheld site', async () => {
+      vi.mocked(getAuthProvider).mockReturnValue(AUTH_STRATEGIES.ENTRA_ID)
+      mockMarineLicence({
+        ...mockSubmittedMarineLicenceApplication,
+        redactions: { siteDetails: { 0: { withholdLocation: true } } }
+      })
+
+      const withheldDocument = await loadPage({
+        requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${toApplicationReferenceUrlSegment(mockSubmittedMarineLicenceApplication.applicationReference)}`,
+        server: getServer()
+      })
+
+      const $container = withheldDocument.querySelector(
+        '#site-details-1 .app-withhold-location__form'
+      )
+
+      const $button = withheldDocument.querySelector(
+        '#site-details-1 .app-withhold-location__button'
+      )
+
+      expect($container.textContent).toContain(
+        'This location will not be published on the public register.'
+      )
+      expect($button.textContent).toContain('Display location')
+      expect($button.textContent).not.toContain('Withhold location')
+      expect(
+        withheldDocument.querySelector('#site-details-1 .app-site-details-map')
+      ).toBeNull()
+    })
   })
 
   describe('hidden cards', () => {
@@ -171,11 +294,28 @@ describe('Marine Licence View Details Redaction', () => {
     })
 
     test('renders the water framework directive card', () => {
-      validateWaterFrameworkDirective(
-        document,
-        expectedWaterFrameworkDirectiveCard
-      )
+      validateWaterFrameworkDirective(document, {
+        waterFrameworkDirective: Object.fromEntries(
+          Object.entries(
+            expectedWaterFrameworkDirectiveCard.waterFrameworkDirective
+          ).map(([heading, value]) => [heading, [value]])
+        )
+      })
     })
+
+    test.each(['nauticalMile', 'excludedActivities'])(
+      'renders a redaction field for %s',
+      (fieldName) => {
+        const $field = document.querySelector(
+          `#redaction-field-waterFrameworkDirective-${fieldName}`
+        )
+
+        expect($field).not.toBeNull()
+        expect($field.querySelector('input[name="fieldKey"]').value).toBe(
+          `waterFrameworkDirective.${fieldName}`
+        )
+      }
+    )
 
     test('does not render a Change link', () => {
       const card = document.querySelector('#water-framework-directive-card')
@@ -206,6 +346,20 @@ describe('Marine Licence View Details Redaction', () => {
       expect(card.textContent).toContain('First policy wording.')
       expect(card.textContent).toContain('My first consideration.')
       expect(card.textContent).toContain(`Applicant's consideration`)
+    })
+
+    test('renders a redaction field for the policy response', () => {
+      const $field = document.querySelector(
+        '#redaction-field-marinePlanPolicyResponse-S-CC-1'
+      )
+
+      expect($field).not.toBeNull()
+      expect($field.querySelector('input[name="fieldKey"]').value).toBe(
+        'marinePlanPolicyResponses'
+      )
+      expect($field.querySelector('input[name="policyCode"]').value).toBe(
+        'S-CC-1'
+      )
     })
 
     test('does not render a Change link for any row', () => {
@@ -249,11 +403,14 @@ describe('Marine Licence View Details Redaction', () => {
             rows[0].querySelector('.govuk-summary-list__key').textContent.trim()
           ).toBe(expectedExternalActivityCards[activityIndex].rows[0].key)
 
+          // the value now also carries the redaction field's own markup
           expect(
             rows[0]
               .querySelector('.govuk-summary-list__value')
               .textContent.trim()
-          ).toBe(expectedExternalActivityCards[activityIndex].rows[0].value)
+          ).toContain(
+            expectedExternalActivityCards[activityIndex].rows[0].value
+          )
 
           expect(
             rows[1].querySelector('.govuk-summary-list__key').textContent.trim()
@@ -263,7 +420,9 @@ describe('Marine Licence View Details Redaction', () => {
             rows[1]
               .querySelector('.govuk-summary-list__value')
               .textContent.trim()
-          ).toBe(expectedExternalActivityCards[activityIndex].rows[1].value)
+          ).toContain(
+            expectedExternalActivityCards[activityIndex].rows[1].value
+          )
         }
         siteCount++
       }

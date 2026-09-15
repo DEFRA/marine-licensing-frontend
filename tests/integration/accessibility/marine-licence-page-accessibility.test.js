@@ -92,7 +92,7 @@ const marineLicencePages = [
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-    title: 'Sharing your project information publicly'
+    title: 'Sharing your application information on the public register'
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,

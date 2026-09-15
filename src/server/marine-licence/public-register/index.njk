@@ -1,0 +1,100 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% set publicRegisterContentHtml %}
+    <p class="govuk-body">We are required by law to publish information about your application on the MMO's public register.</p>
+
+    <p class="govuk-body">The information may also appear on <a class="govuk-link" href="https://www.gov.uk/guidance/explore-marine-plans" target="_blank" rel="noopener noreferrer">Explore Marine Plans (opens in new tab)</a>.</p>
+
+    <p class="govuk-body">Publishing this information helps you and other applicants:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>get a clear picture of activity in the marine environment</li>
+      <li>prepare applications more effectively by avoiding conflicts with existing marine activity</li>
+      <li>evaluate the environmental impact of proposed works in the context of other marine activity, leading to better applications and evidence for decision makers</li>
+    </ul>
+
+    <p class="govuk-body">We will not publish contact details, such as your email address, phone number or postal address, or any financial information.</p>
+
+    <h2 class="govuk-heading-m">Requesting information is withheld</h2>
+
+    <p class="govuk-body">You can only ask us to withhold specific information from the public register if publishing it would:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>compromise national security, or</li>
+      <li>breach a legally protected commercial or industrial confidentiality</li>
+    </ul>
+
+    <p class="govuk-body">We will not withhold information for any other reasons.</p>
+
+    <p class="govuk-body">You must justify your request. We will review it and decide whether the information can be withheld.</p>
+
+    <h2 class="govuk-heading-m">Do you want to request that information is withheld for either of these reasons?</h2>
+  {% endset -%}
+
+  {% set reasonHint %}
+    To help us make a decision, you must tell us:
+    {# govuk-hint is required here: govuk-list sets its own text colour #}
+    <ul class="govuk-list govuk-list--bullet govuk-hint">
+    	<li>which information in your application you want withheld</li>
+    	<li>whether this is because of national security or commercial confidentiality, and why</li>
+    	<li>what the impact would be if this information were published</li>
+    </ul>
+  {% endset -%}
+
+  {% set conditionalHtml %}
+    {{ govukCharacterCount({
+      id: "reason",
+      name: "reason",
+      maxlength: 1000,
+      label: {
+        text: "Provide details of what you want withheld and why"
+      },
+      hint: { html: reasonHint },
+      errorMessage: errors['reason'],
+      value: payload.reason
+    }) }}
+  {% endset -%}
+
+  {{ appRadioPage({
+    name: "withholdConsent",
+    errorSummary: errorSummary,
+    heading: heading,
+    isPageHeading: true,
+    value: payload.withholdConsent,
+    errorMessage: errors['withholdConsent'],
+    projectName: projectName,
+    contentHtml: publicRegisterContentHtml,
+    items: [
+      {
+        value: "no",
+        text: "No"
+      },
+      {
+        value: "yes",
+        text: "Yes",
+        conditional: {
+          html: conditionalHtml
+        }
+      }
+    ],
+    csrfToken: csrfToken,
+    buttonText: "Save and continue",
+    cancelLink: backLink
+  }) }}
+
+{% endblock %}

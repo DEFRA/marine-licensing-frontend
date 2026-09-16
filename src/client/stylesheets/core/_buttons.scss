@@ -1,0 +1,17 @@
+@use 'govuk-frontend' as *;
+
+.govuk-button--as-link {
+  @include govuk-link-common;
+  @include govuk-font-size($size: 16);
+  color: govuk-functional-colour(link);
+  padding: 0;
+  border-width: 0;
+  background: none;
+  box-shadow: none;
+
+  &:hover {
+    background: none;
+    color: govuk-functional-colour(link);
+    text-decoration: underline;
+  }
+}

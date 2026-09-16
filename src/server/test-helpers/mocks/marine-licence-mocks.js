@@ -187,6 +187,19 @@ export const mockSubmittedMarineLicenceApplication = {
   submittedAt: '2026-05-26T10:00:00Z'
 }
 
+export const mockRedactions = {
+  preferredDates: {
+    redactedText: 'Redacted preferred dates',
+    redactedAt: '2026-06-01T09:30:00Z',
+    redactedBy: 'Test Internal User'
+  }
+}
+
+export const mockRedactedMarineLicenceApplication = {
+  ...mockSubmittedMarineLicenceApplication,
+  redactions: mockRedactions
+}
+
 export const mockTransferredMarineLicenceApplication = {
   ...mockSubmittedMarineLicenceApplication,
   status: PROJECT_STATUS.TRANSFERRED,

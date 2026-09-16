@@ -1,0 +1,101 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set copyButtonContentHtml %}
+    {% include "./copy-icon.njk" %}Copy ***REDACTED***
+{% endset %}
+
+{% set copyButtonHtml %}
+  {{ govukButton({
+    html: copyButtonContentHtml,
+    type: "button",
+    classes: "govuk-button--as-link govuk-!-margin-bottom-0 app-redaction-field__copy-button",
+    attributes: { hidden: { value: true, optional: true } }
+  }) }}
+{% endset %}
+
+{% set applicantsTextHeading %}
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Applicant's text</h3>
+{% endset %}
+
+{% set publishedTextHeading %}
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Text to be published</h3>
+{% endset %}
+
+<div class="app-redaction-field" id="redaction-field-{{ params.fieldId }}" data-module="redaction-field">
+
+    {% if params.isRedacted %}
+
+        <div class="app-redaction-field__published-text" hidden>
+          {{ applicantsTextHeading | safe }}
+          <p class="govuk-body">{{ params.originalText }}</p>
+
+          {{ publishedTextHeading | safe }}
+          <p class="govuk-body">{{ params.publishedText | safe }}</p>
+
+        </div>
+        {% else %}
+
+        <div class="app-redaction-field__published-text">
+
+        <p class="govuk-body">
+          <span class="app-redaction-field__published-text-value">{{ params.publishedText | safe }}</span>
+        </p>
+
+        </div>
+
+    {% endif %}
+
+    <a
+      class="govuk-link app-redaction-field__trigger"
+      href="#"
+      aria-expanded="false"
+      aria-controls="redaction-panel-{{ params.fieldId }}"
+      hidden
+    >
+    {% if params.isRedacted %}
+      Change redaction
+    {% else %}
+      Redact{% endif %}
+      <span class="govuk-visually-hidden"> {{ params.label }}</span>
+    </a>
+
+  <div class="app-redaction-field__panel" id="redaction-panel-{{ params.fieldId }}">
+
+    {{ applicantsTextHeading | safe }}
+
+    <p class="govuk-body">{{ params.originalText }}</p>
+
+    <form class="app-redaction-field__form" method="post" action="{{ params.saveUrl }}">
+
+      {{ govukInput({
+        id: "redaction-input-" + params.fieldId,
+        name: "text",
+        hint: { html: copyButtonHtml },
+        label: {
+          text: "Text to be published",
+          classes: "govuk-label--s"
+        },
+        value: params.redactions.redactedTextValue or params.originalText,
+        classes: "app-redaction-field__input"
+      }) }}
+
+      <input type="hidden" name="fieldKey" value="{{ params.fieldId }}">
+      <input type="hidden" name="csrfToken" value="{{ params.csrfToken }}">
+
+      <p class="govuk-body app-redaction-field__status govuk-visually-hidden" aria-live="polite"></p>
+
+      <div class="govuk-button-group">
+
+        {{ govukButton({
+          text: "Save",
+          classes: "govuk-button--secondary app-redaction-field__save-button",
+          type: "submit"
+        }) }}
+
+        <a class="govuk-link app-redaction-field__cancel-button" href="#" hidden>Cancel</a>
+
+      </div>
+    </form>
+  </div>
+</div>

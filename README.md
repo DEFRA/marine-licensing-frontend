@@ -170,7 +170,7 @@ docker run -p 3000:3000 marine-licensing-frontend
 
 A local environment with:
 
-- Localstack for AWS services (S3, SQS)
+- Floci for AWS services (S3, SQS)
 - Redis
 - MongoDB
 - This service

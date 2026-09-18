@@ -10,7 +10,8 @@ const buildFileUploadSummaryData = (marineLicence, siteDetails) =>
     siteName: site.siteName,
     siteNumber: index + 1,
     siteDetailsData: createSiteDetailsDataJson(site),
-    activityDetails: parseActivityDetails(site)
+    activityDetails: parseActivityDetails(site),
+    constructionDrawings: site.constructionDrawings
   }))
 
 export const buildSiteData = (completeMarineLicence) => {
@@ -38,7 +39,10 @@ export const buildSiteData = (completeMarineLicence) => {
       summaryData: buildManualCoordinateSummaryData(
         siteDetails,
         multipleSiteDetails ?? {}
-      )
+      ).map((site, index) => ({
+        ...site,
+        constructionDrawings: siteDetails[index]?.constructionDrawings
+      }))
     }
   }
 

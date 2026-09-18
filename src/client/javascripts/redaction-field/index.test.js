@@ -20,6 +20,13 @@ const buildMarkup = ({
       <span class="app-redaction-field__published-text-value">${publishedText}</span>
     </p>
     <a class="app-redaction-field__trigger" href="#" aria-expanded="false" hidden>${triggerText}</a>
+    <form class="app-redaction-field__remove-form" method="post" action="${saveUrl}">
+      <input type="hidden" name="fieldKey" value="preferredDates" />
+      <input type="hidden" name="csrfToken" value="test-token" />
+      <input type="hidden" name="remove" value="true" />
+      <p class="app-redaction-field__status"></p>
+      <button type="submit" class="app-redaction-field__remove-trigger">Remove redaction</button>
+    </form>
     <div class="app-redaction-field__panel">
       <button type="button" class="app-redaction-field__copy-button" hidden>Copy ***REDACTED***</button>
       <form class="app-redaction-field__form" method="post" action="${saveUrl}">
@@ -99,6 +106,11 @@ describe('RedactionField', () => {
     expect(component.$redactedTextContainer.hidden).toBe(true)
     expect(component.$trigger.getAttribute('aria-expanded')).toBe('true')
     expect(document.activeElement).toBe(component.$input)
+
+    const $removeTrigger = document.querySelector(
+      '.app-redaction-field__remove-trigger'
+    )
+    expect($removeTrigger.textContent).toBe('Remove redaction')
   })
 
   test('discards edits and hides the panel on Cancel click', () => {
@@ -164,6 +176,30 @@ describe('RedactionField', () => {
     expect(
       $swapped.querySelector('.app-redaction-field__status').textContent
     ).toBe('Saved')
+  })
+
+  test('submits remove form', async () => {
+    component.$input.value = 'Redacted text'
+
+    submitForm(component.$removeForm)
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled())
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      component.$removeForm.action,
+      expect.objectContaining({
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+    )
+
+    const [, options] = fetchMock.mock.calls[0]
+    expect(options.body.toString()).toBe(
+      new URLSearchParams({
+        fieldKey: 'preferredDates',
+        csrfToken: 'test-token',
+        remove: true
+      }).toString()
+    )
   })
 
   test('announces an error and keeps the panel open when saving fails', async () => {

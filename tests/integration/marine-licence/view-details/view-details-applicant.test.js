@@ -1,4 +1,5 @@
-import { getByRole } from '@testing-library/dom'
+import { vi } from 'vitest'
+import { getByRole, queryByRole, queryByText } from '@testing-library/dom'
 import {
   marineLicenceRoutes,
   routes
@@ -11,8 +12,13 @@ import { loadPage } from '~/tests/integration/shared/app-server.js'
 import {
   mockSubmittedMarineLicenceApplication,
   mockTransferredMarineLicenceApplication,
-  mockRejectedMarineLicenceApplication
+  mockRejectedMarineLicenceApplication,
+  mockMarineLicenceWithApplicationTask,
+  mockApplicationTaskContactId
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+
+vi.mock('~/src/server/common/plugins/auth/utils.js')
 import {
   expectedProjectDetailsCard,
   expectedOtherPermissionsCard,
@@ -174,6 +180,69 @@ describe('Marine Licence View Details', () => {
         ).toBe(value)
       }
     )
+  })
+
+  describe('things that require your attention', () => {
+    const asOwner = () =>
+      vi.mocked(getUserSession).mockResolvedValue({
+        contactId: mockApplicationTaskContactId
+      })
+
+    const ATTENTION_HEADING = 'Things that require your attention'
+
+    test('renders an outstanding task as a red tag linking to the notification', async () => {
+      asOwner()
+
+      const document = await loadViewDetailsPage(
+        getServer(),
+        mockMarineLicenceWithApplicationTask
+      )
+
+      expect(
+        getByRole(document, 'heading', { name: ATTENTION_HEADING })
+      ).toBeInTheDocument()
+      expect(
+        getByRole(document, 'link', {
+          name: 'Notification about withholding information'
+        })
+      ).toHaveAttribute(
+        'href',
+        `${marineLicenceRoutes.MARINE_LICENCE_WITHHOLDING_NOTIFICATION}/${mockMarineLicenceWithApplicationTask.id}`
+      )
+
+      const status = document.querySelector('.govuk-task-list__status')
+      expect(status.textContent.trim()).toBe('Not yet read')
+      expect(status.querySelector('.govuk-tag--red')).toBeTruthy()
+    })
+
+    test('renders a resolved task as plain text with no tag', async () => {
+      asOwner()
+
+      const document = await loadViewDetailsPage(getServer(), {
+        ...mockMarineLicenceWithApplicationTask,
+        applicationTasks: [
+          {
+            ...mockMarineLicenceWithApplicationTask.applicationTasks[0],
+            resolvedAt: '2026-08-15T10:00:00.000Z'
+          }
+        ]
+      })
+
+      const status = document.querySelector('.govuk-task-list__status')
+      expect(status.textContent.trim()).toBe('Read')
+      expect(status.querySelector('.govuk-tag')).toBeNull()
+    })
+
+    test('omits the section entirely when the application has no tasks', async () => {
+      asOwner()
+
+      const document = await loadViewDetailsPage(getServer())
+
+      expect(
+        queryByRole(document, 'heading', { name: ATTENTION_HEADING })
+      ).toBeNull()
+      expect(queryByText(document, ATTENTION_HEADING)).toBeNull()
+    })
   })
 
   describe('project details card', () => {

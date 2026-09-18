@@ -9,6 +9,14 @@ export const PROJECT_STATUS = {
   WITHDRAWN: 'Withdrawn'
 }
 
+// Derived by the API from outstanding application tasks and carried on `displayStatus`,
+// never on `status`. Deliberately outside PROJECT_STATUS: it is a label to render, not a
+// status an application can be in, and anything comparing or filtering `status` must not
+// see it.
+export const DISPLAY_STATUS = {
+  ACTION_REQUIRED: 'Action required'
+}
+
 // An exemption whose activity period has ended can no longer be withdrawn.
 export const WITHDRAWABLE_EXEMPTION_STATUSES = [
   PROJECT_STATUS.SCHEDULED,

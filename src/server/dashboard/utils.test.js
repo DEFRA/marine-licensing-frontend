@@ -291,6 +291,28 @@ describe('#formatProjectsForDisplay', () => {
     ])
   })
 
+  test('renders the display status while the withdraw action follows the stored status', () => {
+    const [{ cells }] = formatProjectsForDisplay([
+      {
+        id: 'abc123',
+        projectName: 'Awaiting Applicant',
+        projectType: 'MARINE_LICENCE',
+        applicationReference: 'ML-2024-002',
+        status: 'Submitted',
+        displayStatus: 'Action required',
+        submittedAt: '2024-01-15'
+      }
+    ])
+
+    const [, , , statusCell, , actionsCell] = cells
+
+    expect(statusCell).toEqual({
+      html: '<strong class="govuk-tag govuk-tag--red">Action required</strong>',
+      attributes: { 'data-sort-value': 'Action required' }
+    })
+    expect(actionsCell.html).toContain('/marine-licence/withdraw/abc123')
+  })
+
   test('Should format project with missing data', () => {
     const projects = [
       {

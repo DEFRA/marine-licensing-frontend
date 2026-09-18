@@ -1,0 +1,58 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}
+  {{ super() }}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <span class="govuk-caption-l">{{ pageCaption }}</span>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      <p class="govuk-body">Following consideration of your request, we've reviewed the information you asked us to withhold.</p>
+
+      {% for section in sections %}
+        <h2 class="govuk-heading-m">{{ section.heading }}</h2>
+
+        <p class="govuk-body">{{ section.decision }}</p>
+
+        {% for paragraph in section.paragraphs %}
+          <p class="govuk-body">{{ paragraph }}</p>
+        {% endfor %}
+      {% endfor %}
+
+      <h2 class="govuk-heading-m">What you can do</h2>
+
+      <p class="govuk-body">You can withdraw your application if you do not agree with our decision.</p>
+
+      <p class="govuk-body">We'd encourage you to do this as soon as possible, as we'll continue working on your application while you decide.</p>
+
+      <p class="govuk-body">If you do not want this information to be published, you can <a class="govuk-link" href="{{ dashboardLink }}">withdraw your application from your Submissions page</a>.</p>
+
+      <form method="POST" action="{{ withholdingNotificationRoute }}">
+        <input type="hidden" name="csrfToken" value="{{csrfToken}}">
+        <input type="hidden" name="marineLicenceId" value="{{ marineLicenceId }}">
+        <input type="hidden" name="taskId" value="{{ taskId }}">
+
+        {{ govukButton({
+          text: "Mark as read and continue",
+          preventDoubleClick: true,
+          attributes: {
+            "data-module": "govuk-button"
+          }
+        }) }}
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

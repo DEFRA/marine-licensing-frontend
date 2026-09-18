@@ -11,7 +11,8 @@ import {
   getTypeOptions,
   getUserOptions,
   getSelectedUsers,
-  addUsersToProjects
+  addUsersToProjects,
+  USER_CHOICE_VALUES
 } from '#src/server/dashboard/utils.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import {
@@ -32,7 +33,7 @@ export const errorMessages = {
 
 // left undefined when valid, so the layout does not prefix the page title
 const getOwnerErrors = (show, selectedUsers) => {
-  if (show !== 'specific-user' || selectedUsers) {
+  if (show !== USER_CHOICE_VALUES.SPECIFIC_USER || selectedUsers) {
     return undefined
   }
 
@@ -82,7 +83,7 @@ const buildDashboardViewModel = async (
     marineLicenceEnabled
   )
 
-  const filterCategories = getFilterCategories(searchParams)
+  const filterCategories = getFilterCategories(searchParams, users, userSession)
   const typeOptions = getTypeOptions(searchParams.type)
   const userOptions = getUserOptions(userSession, users, searchParams)
 

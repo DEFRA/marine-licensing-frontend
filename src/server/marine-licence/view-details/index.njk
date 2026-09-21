@@ -10,7 +10,7 @@
 {% from "marine-licence/marine-plan-policies-card/macro.njk" import appMarineLicenceMarinePlanPoliciesCard %}
 {% from "marine-licence/invoicing-card/macro.njk" import appMarineLicenceInvoicingCard %}
 {% from "marine-licence/fee-estimate-card/macro.njk" import appMarineLicenceFeeEstimateCard %}
-{% from "public-register-card/macro.njk" import appPublicRegisterCard %}
+{% from "marine-licence/public-register-card/macro.njk" import appMarineLicencePublicRegisterCard %}
 
 {% block beforeContent %}
   {{ super() }}
@@ -129,7 +129,7 @@
       {% endif %}
 
       {% if isApplicantView %}
-        {{ appPublicRegisterCard({
+        {{ appMarineLicencePublicRegisterCard({
           publicRegister: publicRegister,
           isReadOnly: isReadOnly
         }) }}

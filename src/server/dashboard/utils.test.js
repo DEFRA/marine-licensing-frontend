@@ -667,14 +667,82 @@ describe('#getStatusLabelText', () => {
 })
 
 describe('#getFilterCategories', () => {
+  const johnSmithUuid = crypto.randomUUID()
+  const janeDoeUuid = crypto.randomUUID()
+  const mockUsers = { [johnSmithUuid]: 'John Smith', [janeDoeUuid]: 'Jane Doe' }
+  const userSessionMock = { contactId: johnSmithUuid }
+
   it('returns an empty array when there is nothing to filter by', () => {
     expect(getFilterCategories()).toEqual([])
     expect(getFilterCategories(null)).toEqual([])
     expect(getFilterCategories({ show: 'my-projects' })).toEqual([])
   })
 
+  it('builds a Owner category with users', () => {
+    expect(
+      getFilterCategories(
+        { show: 'specific-user', user: [johnSmithUuid, janeDoeUuid] },
+        mockUsers,
+        userSessionMock
+      )
+    ).toEqual([
+      {
+        heading: { text: 'Owner' },
+        items: [
+          {
+            href: '#',
+            field: 'user',
+            value: johnSmithUuid,
+            text: 'Mine (John Smith)'
+          },
+          {
+            href: '#',
+            field: 'user',
+            value: janeDoeUuid,
+            text: 'Jane Doe'
+          }
+        ]
+      }
+    ])
+  })
+
+  it('ignores users if the user array is empty', () => {
+    expect(
+      getFilterCategories({ show: 'specific-user' }, mockUsers, userSessionMock)
+    ).toEqual([])
+  })
+
+  it('ignores user filter if not in user', () => {
+    expect(
+      getFilterCategories(
+        { show: 'my-projects', user: [johnSmithUuid, janeDoeUuid] },
+        mockUsers,
+        userSessionMock
+      )
+    ).toEqual([])
+  })
+
+  it('ignores users if the user cache is empty or missing', () => {
+    expect(
+      getFilterCategories(
+        { show: 'specific-user', user: [johnSmithUuid, janeDoeUuid] },
+        {},
+        userSessionMock
+      )
+    ).toEqual([])
+
+    expect(
+      getFilterCategories(
+        { show: 'specific-user', user: [johnSmithUuid, janeDoeUuid] },
+        undefined,
+        userSessionMock
+      )
+    ).toEqual([])
+  })
   it('builds a Status category from a single selected status, mapping Rejected to Unable to progress', () => {
-    expect(getFilterCategories({ status: 'REJECTED' })).toEqual([
+    expect(
+      getFilterCategories({ status: 'REJECTED' }, mockUsers, userSessionMock)
+    ).toEqual([
       {
         heading: { text: 'Status' },
         items: [
@@ -690,16 +758,20 @@ describe('#getFilterCategories', () => {
   })
 
   it('builds a Status category from multiple selected statuses, mapping each to its display text', () => {
-    const result = getFilterCategories({
-      status: [
-        'DRAFT',
-        'ACTIVE',
-        'SUBMITTED',
-        'TRANSFERRED',
-        'REJECTED',
-        'WITHDRAWN'
-      ]
-    })
+    const result = getFilterCategories(
+      {
+        status: [
+          'DRAFT',
+          'ACTIVE',
+          'SUBMITTED',
+          'TRANSFERRED',
+          'REJECTED',
+          'WITHDRAWN'
+        ]
+      },
+      mockUsers,
+      userSessionMock
+    )
 
     expect(result).toEqual([
       {
@@ -737,7 +809,9 @@ describe('#getFilterCategories', () => {
   })
 
   it('builds a Submission type category, single or multi-selected', () => {
-    expect(getFilterCategories({ type: 'exemption' })).toEqual([
+    expect(
+      getFilterCategories({ type: 'exemption' }, mockUsers, userSessionMock)
+    ).toEqual([
       {
         heading: { text: 'Submission type' },
         items: [
@@ -752,7 +826,11 @@ describe('#getFilterCategories', () => {
     ])
 
     expect(
-      getFilterCategories({ type: ['exemption', 'marine-licence'] })
+      getFilterCategories(
+        { type: ['exemption', 'marine-licence'] },
+        mockUsers,
+        userSessionMock
+      )
     ).toEqual([
       {
         heading: { text: 'Submission type' },
@@ -775,7 +853,11 @@ describe('#getFilterCategories', () => {
   })
 
   it('returns both categories, Status before Submission type, when both are selected', () => {
-    const result = getFilterCategories({ status: 'DRAFT', type: 'exemption' })
+    const result = getFilterCategories(
+      { status: 'DRAFT', type: 'exemption' },
+      mockUsers,
+      userSessionMock
+    )
 
     expect(result).toHaveLength(2)
     expect(result[0].heading.text).toBe('Status')

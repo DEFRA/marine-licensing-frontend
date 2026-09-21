@@ -98,4 +98,53 @@ describe('Marine Licence Water Framework Directive Component', () => {
       '/marine-licence/water-framework-directive-review-your-answers?from=check-your-answers'
     )
   })
+
+  describe('redaction', () => {
+    const waterFrameworkDirectiveData = {
+      nauticalMile: {
+        key: { text: NAUTICAL_MILE_HEADING },
+        value: { text: 'Yes' }
+      },
+      excludedActivities: {
+        key: { text: EXCLUDED_ACTIVITIES_HEADING },
+        value: { text: 'No' }
+      }
+    }
+
+    const render = (overrides = {}) =>
+      renderComponent('marine-licence/water-framework-directive-card', {
+        waterFrameworkDirectiveData,
+        isReadOnly: true,
+        enableRedaction: true,
+        redactions: {},
+        redactionSaveUrl: '/view-marine-licence-details/test-id/redact',
+        csrfToken: 'test-crumb-token',
+        ...overrides
+      })
+
+    test.each([
+      ['nauticalMile', 'Yes'],
+      ['excludedActivities', 'No']
+    ])('renders a redaction field for %s', (fieldName, text) => {
+      const $component = render()
+
+      const $field = $component(
+        `#redaction-field-waterFrameworkDirective-${fieldName}`
+      )
+      expect($field).toHaveLength(1)
+      expect($field.find('input[name="fieldKey"]').attr('value')).toBe(
+        `waterFrameworkDirective.${fieldName}`
+      )
+      expect($field.find('.app-redaction-field__input').attr('value')).toBe(
+        text
+      )
+    })
+
+    test('renders plain text when redaction is not enabled', () => {
+      const $component = render({ enableRedaction: false })
+
+      expect($component('.app-redaction-field')).toHaveLength(0)
+      expect($component.html()).toContain(NAUTICAL_MILE_HEADING)
+    })
+  })
 })

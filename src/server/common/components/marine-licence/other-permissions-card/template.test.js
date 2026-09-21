@@ -209,4 +209,47 @@ describe('Marine Licence Other Permissions Card Component', () => {
       )
     })
   })
+
+  describe('redaction', () => {
+    const redactableParams = {
+      isReadOnly: true,
+      enableRedaction: true,
+      specialLegalPowers: { agree: 'yes', details: 'Statutory powers detail.' },
+      harbourAuthority: { area: 'no', details: 'Harbour detail.' },
+      otherAuthorities: { agree: 'yes', details: 'Other authorities detail.' },
+      publicConsultation: { consulted: 'no', details: 'Consultation detail.' },
+      redactions: {},
+      redactionSaveUrl: '/view-marine-licence-details/test-id/redact',
+      csrfToken: 'test-crumb-token'
+    }
+
+    const render = (overrides = {}) =>
+      renderComponent('marine-licence/other-permissions-card', {
+        ...redactableParams,
+        ...overrides
+      })
+
+    test.each([
+      ['specialLegalPowers', 'Statutory powers detail.'],
+      ['harbourAuthority', 'No'],
+      ['otherAuthorities', 'Other authorities detail.'],
+      ['publicConsultation', 'No']
+    ])('renders a redaction field for %s', (fieldId, text) => {
+      const $component = render()
+
+      const $field = $component(`#redaction-field-${fieldId}`)
+      expect($field).toHaveLength(1)
+      expect($field.find('input[name="fieldKey"]').attr('value')).toBe(fieldId)
+      expect($field.find('.app-redaction-field__input').attr('value')).toBe(
+        text
+      )
+    })
+
+    test('renders plain text when redaction is not enabled', () => {
+      const $component = render({ enableRedaction: false })
+
+      expect($component('.app-redaction-field')).toHaveLength(0)
+      expect($component.html()).toContain('Statutory powers detail.')
+    })
+  })
 })

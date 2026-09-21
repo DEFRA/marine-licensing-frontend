@@ -11,13 +11,15 @@ import {
   getTypeOptions,
   getUserOptions,
   getSelectedUsers,
-  addUsersToProjects
+  addUsersToProjects,
+  USER_CHOICE_VALUES
 } from '#src/server/dashboard/utils.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
+import { isClientSideFetchRequest } from '#src/server/common/helpers/is-client-side-fetch-request.js'
 
 export const DASHBOARD_VIEW_ROUTE = 'dashboard/index.njk'
 export const DASHBOARD_RESULTS_VIEW_ROUTE =
@@ -31,7 +33,7 @@ export const errorMessages = {
 
 // left undefined when valid, so the layout does not prefix the page title
 const getOwnerErrors = (show, selectedUsers) => {
-  if (show !== 'specific-user' || selectedUsers) {
+  if (show !== USER_CHOICE_VALUES.SPECIFIC_USER || selectedUsers) {
     return undefined
   }
 
@@ -46,9 +48,6 @@ const getOwnerErrors = (show, selectedUsers) => {
 export const FILTER_SEARCH_FLASH_KEY = 'dashboardFilterSearch'
 
 const FETCH_ERROR = 'Error fetching projects'
-
-const isClientSideFetchRequest = (request) =>
-  request.headers['x-requested-with'] === 'XMLHttpRequest'
 
 const dashboardPayloadFailAction = (request, h, error) => {
   request.logger.error({ err: error }, 'Invalid dashboard filter payload')
@@ -84,7 +83,7 @@ const buildDashboardViewModel = async (
     marineLicenceEnabled
   )
 
-  const filterCategories = getFilterCategories(searchParams)
+  const filterCategories = getFilterCategories(searchParams, users, userSession)
   const typeOptions = getTypeOptions(searchParams.type)
   const userOptions = getUserOptions(userSession, users, searchParams)
 

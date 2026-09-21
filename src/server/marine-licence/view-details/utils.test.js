@@ -1,4 +1,7 @@
-import { buildApplicationDetailsCardData } from '#src/server/marine-licence/view-details/utils.js'
+import {
+  buildApplicationDetailsCardData,
+  buildRedactionsForView
+} from '#src/server/marine-licence/view-details/utils.js'
 import {
   PROJECT_STATUS,
   UNABLE_TO_PROGRESS
@@ -94,4 +97,87 @@ describe('#buildApplicationDetailsCardData', () => {
 
     expect(result.statusTag).not.toContain('<script>')
   })
+})
+
+describe('#buildRedactionsForView', () => {
+  const labelHtml = '<span class="app-redaction-label">***REDACTED***</span>'
+
+  const build = (redactedText) =>
+    buildRedactionsForView({
+      preferredDates: { redactedText, redactedBy: 'Test User' }
+    }).preferredDates
+
+  test('wraps every redaction label in a span', () => {
+    expect(build('From ***REDACTED*** until ***REDACTED***').redactedText).toBe(
+      `From ${labelHtml} until ${labelHtml}`
+    )
+  })
+
+  test('keeps the raw text for the edit form', () => {
+    expect(build('From ***REDACTED***').redactedTextValue).toBe(
+      'From ***REDACTED***'
+    )
+  })
+
+  test('leaves text without a label untouched', () => {
+    expect(build('July 2026 to August 2027').redactedText).toBe(
+      'July 2026 to August 2027'
+    )
+  })
+
+  test('escapes html in the surrounding text', () => {
+    const result = build('<script>alert(1)</script> ***REDACTED***')
+
+    expect(result.redactedText).not.toContain('<script>')
+    expect(result.redactedText).toContain(labelHtml)
+  })
+
+  test('wraps redactions nested one level by a dotted field key', () => {
+    const result = buildRedactionsForView({
+      specialLegalPowers: { details: { redactedText: '***REDACTED***' } }
+    })
+
+    expect(result.specialLegalPowers.details).toEqual({
+      redactedText: labelHtml,
+      redactedTextValue: '***REDACTED***'
+    })
+  })
+
+  test('wraps site redactions nested by index and field', () => {
+    const result = buildRedactionsForView({
+      siteDetails: {
+        0: { siteName: { redactedText: 'Berth ***REDACTED***' } }
+      }
+    })
+
+    expect(result.siteDetails[0].siteName).toEqual({
+      redactedText: `Berth ${labelHtml}`,
+      redactedTextValue: 'Berth ***REDACTED***'
+    })
+  })
+
+  test('preserves the other redaction fields', () => {
+    expect(build('***REDACTED***').redactedBy).toBe('Test User')
+  })
+
+  test('keeps a withhold flag alongside a text redaction on the same site', () => {
+    const result = buildRedactionsForView({
+      siteDetails: {
+        0: {
+          siteName: { redactedText: '***REDACTED***' },
+          withholdLocation: true
+        }
+      }
+    })
+
+    expect(result.siteDetails[0].siteName.redactedText).toBe(labelHtml)
+    expect(result.siteDetails[0].withholdLocation).toBe(true)
+  })
+
+  test.each([[null], [undefined], [{}]])(
+    'returns an empty object for %s',
+    (redactions) => {
+      expect(buildRedactionsForView(redactions)).toEqual({})
+    }
+  )
 })

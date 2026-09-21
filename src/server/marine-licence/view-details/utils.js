@@ -1,9 +1,60 @@
+import escapeHtml from 'lodash/escape.js'
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { getStatusLabelText } from '#src/server/dashboard/utils.js'
 
 const APPLICATION_DATE_FORMAT = 'd MMMM yyyy'
+
+export const REDACTION_LABEL = '***REDACTED***'
+const REDACTION_LABEL_HTML = `<span class="app-redaction-label">${REDACTION_LABEL}</span>`
+
+const wrapRedactionLabels = (text) =>
+  escapeHtml(text ?? '').replaceAll(REDACTION_LABEL, REDACTION_LABEL_HTML)
+
+const isObject = (value) => typeof value === 'object' && value !== null
+
+const isTextRedaction = (value) => isObject(value) && 'redactedText' in value
+
+const buildRedaction = (redaction) => {
+  return {
+    ...redaction,
+    redactedText: wrapRedactionLabels(redaction.redactedText),
+    redactedTextValue: redaction.redactedText
+  }
+}
+
+const buildRedactionValue = (value) => {
+  if (!isObject(value)) {
+    return value
+  }
+
+  if (isTextRedaction(value)) {
+    return buildRedaction(value)
+  }
+
+  return buildRedactionsForView(value)
+}
+
+/**
+ * Redactions are stored under the dotted fieldKey the backend was sent, so they
+ * nest as deeply as that key goes:
+ *
+ *   projectName                  -> redactions.projectName
+ *   specialLegalPowers.details   -> redactions.specialLegalPowers.details
+ *   siteDetails.siteName         -> redactions.siteDetails.0.siteName
+ *
+ * Walk down through the groups until a redaction is reached, and build that.
+ */
+export const buildRedactionsForView = (group) => {
+  const result = {}
+
+  for (const [key, value] of Object.entries(group ?? {})) {
+    result[key] = buildRedactionValue(value)
+  }
+
+  return result
+}
 
 export const buildApplicationDetailsCardData = (marineLicence) => {
   const {

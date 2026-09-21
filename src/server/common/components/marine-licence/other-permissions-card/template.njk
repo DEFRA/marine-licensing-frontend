@@ -1,17 +1,33 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "marine-licence/redaction-field/macro.njk" import appMarineLicenceRedactionField %}
 
 {% set rows = [] %}
 
 {% if params.specialLegalPowers %}
   {% if params.specialLegalPowers.agree === 'yes' %}
     {% set value = { text: params.specialLegalPowers.details } %}
+    {% set specialLegalPowersText = params.specialLegalPowers.details %}
   {% else %}
     {% set value = { text: "No" } %}
+    {% set specialLegalPowersText = "No" %}
   {% endif %}
 
   {% set _ = rows.push({
     key: { text: "Special legal powers to do any of this project" },
-    value: value,
+    value: {
+      html: appMarineLicenceRedactionField({
+        fieldId: "specialLegalPowers",
+        marineLicenceId: params.marineLicenceId,
+        fieldKey: "specialLegalPowers",
+        label: "special legal powers",
+        originalText: specialLegalPowersText,
+        redaction: params.redactions.specialLegalPowers,
+        isRedacted: params.redactions.specialLegalPowers,
+        saveUrl: params.redactionSaveUrl,
+        csrfToken: params.csrfToken
+      }),
+      classes: "govuk-summary-list__value--full-width"
+    } if params.enableRedaction else value,
     actions: {
         items: [
           {
@@ -26,9 +42,30 @@
 {% endif %}
 
 {% if params.harbourAuthority %}
+  {% if params.harbourAuthority.area === 'yes' %}
+    {% set harbourAuthorityText = params.harbourAuthority.details %}
+  {% else %}
+    {% set harbourAuthorityText = "No" %}
+  {% endif %}
+
   {% set _ = rows.push({
     key: { text: "Located in a harbour authority area" },
-    value: { text: params.harbourAuthority.details if params.harbourAuthority.area === 'yes' else "No" },
+    value: {
+      html: appMarineLicenceRedactionField({
+        fieldId: "harbourAuthority",
+        marineLicenceId: params.marineLicenceId,
+        fieldKey: "harbourAuthority",
+        label: "harbour authority area",
+        originalText: harbourAuthorityText,
+        redaction: params.redactions.harbourAuthority,
+        isRedacted: params.redactions.harbourAuthority,
+        saveUrl: params.redactionSaveUrl,
+        csrfToken: params.csrfToken
+      }),
+      classes: "govuk-summary-list__value--full-width"
+    } if params.enableRedaction else {
+      text: harbourAuthorityText
+    },
     actions: {
         items: [
           {
@@ -45,13 +82,28 @@
 {% if params.otherAuthorities %}
   {% if params.otherAuthorities.agree === 'yes' %}
     {% set value = { text: params.otherAuthorities.details } %}
+    {% set otherAuthoritiesText = params.otherAuthorities.details %}
   {% else %}
     {% set value = { text: "No" } %}
+    {% set otherAuthoritiesText = "No" %}
   {% endif %}
 
   {% set _ = rows.push({
     key: { text: "Permission from any other authorities in relation to this project" },
-    value: value,
+    value: {
+      html: appMarineLicenceRedactionField({
+        fieldId: "otherAuthorities",
+        marineLicenceId: params.marineLicenceId,
+        fieldKey: "otherAuthorities",
+        label: "other authorities",
+        originalText: otherAuthoritiesText,
+        redaction: params.redactions.otherAuthorities,
+        isRedacted: params.redactions.otherAuthorities,
+        saveUrl: params.redactionSaveUrl,
+        csrfToken: params.csrfToken
+      }),
+      classes: "govuk-summary-list__value--full-width"
+    } if params.enableRedaction else value,
     actions: {
         items: [
           {
@@ -65,11 +117,30 @@
   }) %}
 {% endif %}
 
-
+{% if params.publicConsultation.consulted === 'yes' %}
+  {% set publicConsultationText = params.publicConsultation.details %}
+{% else %}
+  {% set publicConsultationText = "No" %}
+{% endif %}
 
 {% set _ = rows.push({
      key: { text:  "Pre-application public groups or organisations consultation" },
-     value: { text: params.publicConsultation.details if params.publicConsultation.consulted === 'yes' else "No" },
+     value: {
+       html: appMarineLicenceRedactionField({
+         fieldId: "publicConsultation",
+         marineLicenceId: params.marineLicenceId,
+         fieldKey: "publicConsultation",
+         label: "public consultation",
+         originalText: publicConsultationText,
+         redaction: params.redactions.publicConsultation,
+         isRedacted: params.redactions.publicConsultation,
+         saveUrl: params.redactionSaveUrl,
+         csrfToken: params.csrfToken
+       }),
+       classes: "govuk-summary-list__value--full-width"
+     } if params.enableRedaction else {
+       text: publicConsultationText
+     },
      classes: "govuk-summary-list__row--no-border",
        actions: {
       items: [
@@ -91,12 +162,12 @@
       title: {
         text: "Other permissions"
     },
-      
+
       attributes: {
         id: "other-permissions-card"
       }
     },
     rows: rows
   }) }}
-  
+
 {% endif %}

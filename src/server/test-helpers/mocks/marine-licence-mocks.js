@@ -105,6 +105,7 @@ export const mockMarineLicenceApplication = {
     feeBand: '2A'
   },
   specialLegalPowers: { agree: 'yes', details: 'Test reason' },
+  publicRegister: { withholdConsent: 'no' },
   harbourAuthority: { details: 'Harbour details', area: 'yes' },
   invoicing: {
     invoiceAddressType: 'uk',
@@ -185,6 +186,19 @@ export const mockSubmittedMarineLicenceApplication = {
   status: 'Submitted',
   applicationReference: 'MLA/2026/10264',
   submittedAt: '2026-05-26T10:00:00Z'
+}
+
+export const mockRedactions = {
+  preferredDates: {
+    redactedText: 'Redacted preferred dates',
+    redactedAt: '2026-06-01T09:30:00Z',
+    redactedBy: 'Test Internal User'
+  }
+}
+
+export const mockRedactedMarineLicenceApplication = {
+  ...mockSubmittedMarineLicenceApplication,
+  redactions: mockRedactions
 }
 
 export const mockTransferredMarineLicenceApplication = {

@@ -5,11 +5,7 @@ import {
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import {
-  isInternalUserView as getIsInternalUserView,
-  isProjectViewable
-} from '#src/server/common/helpers/view-details/utils.js'
-import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
+import { isProjectViewable } from '#src/server/common/helpers/view-details/utils.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
@@ -39,16 +35,11 @@ export const viewDetailsController = {
   async handler(request, h) {
     const { marineLicenceId } = request.params
 
-    const isInternalUserView = getIsInternalUserView(
-      request,
-      MARINE_LICENCE_KEY
-    )
-
     const isPublicView = request.path.startsWith(
       marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_PUBLIC
     )
 
-    const isApplicantView = !isInternalUserView && !isPublicView
+    const isApplicantView = !isPublicView
 
     try {
       const service = getMarineLicenceService(request)
@@ -102,7 +93,6 @@ export const viewDetailsController = {
         backLink: isApplicantView
           ? getApplicantBackLink(marineLicence.status, marineLicenceId)
           : null,
-        isInternalUserView,
         isApplicantView,
         marineLicenceId,
         waterFrameworkDirectiveData,

@@ -1,5 +1,6 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "marine-licence/policy-wording/macro.njk" import appMarineLicencePolicyWording %}
+{% from "marine-licence/redaction-field/macro.njk" import appMarineLicenceRedactionField %}
 
 {% if params.policies and params.policies.length %}
 {% set rows = [] %}
@@ -10,7 +11,22 @@
     
     <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">{% if params.isApplicant %}Your consideration{% else %}Applicant's consideration{% endif %}</p>
 
-    <p class="govuk-body govuk-!-margin-bottom-0">{{ policy.response }}</p>
+    {% if params.enableRedaction %}
+      {{ appMarineLicenceRedactionField({
+        fieldId: "marinePlanPolicyResponse-" + policy.policyCode,
+        marineLicenceId: params.marineLicenceId,
+        fieldKey: "marinePlanPolicyResponses",
+        policyCode: policy.policyCode,
+        label: "marine plan policy " + policy.policyCode + " consideration",
+        originalText: policy.response,
+        redaction: params.redactions.marinePlanPolicyResponses[policy.policyCode],
+        isRedacted: params.redactions.marinePlanPolicyResponses[policy.policyCode],
+        saveUrl: params.redactionSaveUrl,
+        csrfToken: params.csrfToken
+      }) }}
+    {% else %}
+      <p class="govuk-body govuk-!-margin-bottom-0">{{ policy.response }}</p>
+    {% endif %}
   {% endset %}
   {% set rows = (rows.push({
     key: {

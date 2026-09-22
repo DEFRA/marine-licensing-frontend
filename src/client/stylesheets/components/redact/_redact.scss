@@ -4,6 +4,23 @@
   display: none;
 }
 
+.app-redaction-field,
+.app-withhold-location__form {
+  .govuk-button-group {
+    align-items: start;
+  }
+}
+
+.app-redaction-field__panel {
+  .govuk-button-group {
+    align-items: baseline;
+  }
+}
+
+.govuk-button-group .app-redaction-field__trigger {
+  margin-bottom: 0;
+}
+
 .app-redaction-label {
   background: govuk-colour('black');
   color: govuk-colour('white');

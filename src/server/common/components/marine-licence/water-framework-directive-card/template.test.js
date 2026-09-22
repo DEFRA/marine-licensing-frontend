@@ -118,6 +118,8 @@ describe('Marine Licence Water Framework Directive Component', () => {
         enableRedaction: true,
         redactions: {},
         redactionSaveUrl: '/view-marine-licence-details/test-id/redact',
+        replaceDocumentUrl:
+          '/marine-licence/redaction/MLA-2026-10264/replace-document',
         csrfToken: 'test-crumb-token',
         ...overrides
       })
@@ -145,6 +147,126 @@ describe('Marine Licence Water Framework Directive Component', () => {
 
       expect($component('.app-redaction-field')).toHaveLength(0)
       expect($component.html()).toContain(NAUTICAL_MILE_HEADING)
+    })
+
+    describe('withhold uploaded file', () => {
+      const uploadedFile = {
+        key: { text: FILE_UPLOAD_HEADING },
+        value: { text: 'assessment.pdf' }
+      }
+
+      const renderWithFile = (overrides = {}) =>
+        render({
+          waterFrameworkDirectiveData: {
+            ...waterFrameworkDirectiveData,
+            uploadedFile
+          },
+          ...overrides
+        })
+
+      const withheld = {
+        waterFrameworkDirective: { withholdDocument: { withhold: true } }
+      }
+
+      const withheldWithReplacement = {
+        waterFrameworkDirective: {
+          withholdDocument: {
+            withhold: true,
+            redactedDocument: {
+              filename: 'redacted-assessment.odt',
+              url: '/download/redacted-assessment.odt'
+            }
+          }
+        }
+      }
+
+      const withholdForm = ($component) =>
+        $component('input[name="withhold"]').closest('form')
+
+      test('posts the withhold field key and flag to the redact url', () => {
+        const $form = withholdForm(renderWithFile())
+
+        expect($form.attr('action')).toBe(
+          '/view-marine-licence-details/test-id/redact'
+        )
+        expect($form.find('input[name="fieldKey"]').attr('value')).toBe(
+          'waterFrameworkDirective.withholdDocument'
+        )
+        expect($form.find('input[name="withhold"]').attr('value')).toBe('true')
+        expect($form.find('input[name="csrfToken"]').attr('value')).toBe(
+          'test-crumb-token'
+        )
+      })
+
+      test('renders the filename and a Withhold document button when not withheld', () => {
+        const $component = renderWithFile()
+
+        expect($component.html()).toContain('assessment.pdf')
+        expect(withholdForm($component).find('button').text()).toContain(
+          'Withhold document'
+        )
+        expect($component('[data-module="withhold-location"]')).toHaveLength(1)
+      })
+
+      test('hides the filename and offers Remove redaction when withheld', () => {
+        const $component = renderWithFile({ redactions: withheld })
+        const $button = withholdForm($component).find('button')
+
+        expect($component.html()).not.toContain('assessment.pdf')
+        expect($button.text()).toContain('Remove redaction')
+        expect($button.text()).not.toContain('Withhold document')
+        expect(
+          withholdForm($component).find('input[name="withhold"]').attr('value')
+        ).toBe('false')
+      })
+
+      test('links the replacement document above Remove redaction', () => {
+        const $component = renderWithFile({
+          redactions: withheldWithReplacement
+        })
+
+        const $link = $component('.app-withhold__redacted-document')
+        expect($link.text()).toBe('redacted-assessment.odt')
+      })
+
+      test('renders no replacement link when nothing has replaced the document', () => {
+        const $component = renderWithFile({ redactions: withheld })
+
+        expect($component('.app-withhold__redacted-document')).toHaveLength(0)
+      })
+
+      test('links Replace document at the assessment upload', () => {
+        const $component = renderWithFile()
+
+        const $link = $component('a:contains("Replace document")')
+
+        expect($link.attr('href')).toBe(
+          '/marine-licence/redaction/MLA-2026-10264/replace-document?type=water-framework-directive'
+        )
+      })
+
+      test('renders no withhold control when redaction is not enabled', () => {
+        const $component = renderWithFile({ enableRedaction: false })
+
+        expect($component.html()).toContain('assessment.pdf')
+        expect($component('input[name="withhold"]')).toHaveLength(0)
+        expect($component('[data-module="withhold-location"]')).toHaveLength(0)
+      })
+
+      test('hides the file row when withheld and redaction is not enabled', () => {
+        const $component = renderWithFile({
+          enableRedaction: false,
+          redactions: withheld
+        })
+
+        expect($component.html()).not.toContain('assessment.pdf')
+      })
+
+      test('adds no withhold module when there is no uploaded file', () => {
+        const $component = render()
+
+        expect($component('[data-module="withhold-location"]')).toHaveLength(0)
+      })
     })
   })
 })

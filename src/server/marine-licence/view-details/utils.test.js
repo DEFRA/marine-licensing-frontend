@@ -165,13 +165,13 @@ describe('#buildRedactionsForView', () => {
       siteDetails: {
         0: {
           siteName: { redactedText: '***REDACTED***' },
-          withholdLocation: true
+          withholdLocation: { withhold: true }
         }
       }
     })
 
     expect(result.siteDetails[0].siteName.redactedText).toBe(labelHtml)
-    expect(result.siteDetails[0].withholdLocation).toBe(true)
+    expect(result.siteDetails[0].withholdLocation.withhold).toBe(true)
   })
 
   test.each([[null], [undefined], [{}]])(

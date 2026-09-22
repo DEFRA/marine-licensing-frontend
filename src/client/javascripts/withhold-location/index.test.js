@@ -29,7 +29,7 @@ const buildCard = ({ withheld = false } = {}) => `
       <input type="hidden" name="index" value="1" />
       <input type="hidden" name="withhold" value="${withheld ? 'false' : 'true'}" />
       <input type="hidden" name="csrfToken" value="test-token" />
-      <button type="submit" class="app-withhold-location__button">
+      <button type="submit" class="app-withhold__button">
         ${withheld ? 'Display location' : 'Withhold location'}
       </button>
     </form>
@@ -72,7 +72,7 @@ describe('WithholdLocation', () => {
 
     await vi.waitFor(() =>
       expect(
-        cardOf().querySelector('.app-withhold-location__button').textContent
+        cardOf().querySelector('.app-withhold__button').textContent
       ).toContain('Display location')
     )
     expect(fetchMock).toHaveBeenCalledWith(
@@ -103,7 +103,7 @@ describe('WithholdLocation', () => {
 
     await vi.waitFor(() =>
       expect(document.activeElement).toBe(
-        cardOf().querySelector('.app-withhold-location__button')
+        cardOf().querySelector('.app-withhold__button')
       )
     )
   })

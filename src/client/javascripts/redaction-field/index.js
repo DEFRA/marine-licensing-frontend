@@ -12,6 +12,9 @@ export class RedactionField extends Component {
     this.$trigger = this.$root.querySelector('.app-redaction-field__trigger')
     this.$redactPanel = this.$root.querySelector('.app-redaction-field__panel')
     this.$form = this.$root.querySelector('.app-redaction-field__form')
+    this.$removeForm = this.$root.querySelector(
+      '.app-redaction-field__remove-form'
+    )
     this.$input = this.$root.querySelector('.app-redaction-field__input')
     this.$copyButton = this.$root.querySelector(
       '.app-redaction-field__copy-button'
@@ -39,6 +42,12 @@ export class RedactionField extends Component {
     )
     this.$copyButton.addEventListener('click', () => this.onCopyClick())
     this.$form.addEventListener('submit', (event) => this.onSaveSubmit(event))
+
+    if (this.$removeForm) {
+      this.$removeForm.addEventListener('submit', (event) =>
+        this.onSaveSubmit(event, 'remove')
+      )
+    }
   }
 
   onRedactClick(event) {
@@ -47,6 +56,9 @@ export class RedactionField extends Component {
     this.$trigger.setAttribute('aria-expanded', 'true')
     this.$trigger.hidden = true
     this.$redactedTextContainer.hidden = true
+    if (this.$removeForm) {
+      this.$removeForm.hidden = true
+    }
     this.$input.focus()
   }
 
@@ -67,6 +79,9 @@ export class RedactionField extends Component {
     this.$trigger.setAttribute('aria-expanded', 'false')
     this.$trigger.hidden = false
     this.$redactedTextContainer.hidden = false
+    if (this.$removeForm) {
+      this.$removeForm.hidden = false
+    }
 
     if (focusTrigger) {
       this.$trigger.focus()
@@ -84,7 +99,7 @@ export class RedactionField extends Component {
     this.$status.textContent = message
   }
 
-  async onSaveSubmit(event) {
+  async onSaveSubmit(event, form) {
     event.preventDefault()
 
     if (this.$saveButton.disabled) {
@@ -94,11 +109,13 @@ export class RedactionField extends Component {
     this.setSaving(true)
     this.announce('')
 
+    const $targetForm = form === 'remove' ? this.$removeForm : this.$form
+
     try {
-      const response = await fetch(this.$form.action, {
+      const response = await fetch($targetForm.action, {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        body: new URLSearchParams(new FormData(this.$form)),
+        body: new URLSearchParams(new FormData($targetForm)),
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
       })
 

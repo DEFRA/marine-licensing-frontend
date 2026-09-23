@@ -128,7 +128,13 @@ const processStatus = async (status, context) => {
   }
 
   request.logger.warn(
-    { status: status.status },
+    {
+      event: {
+        action: 'replace-document-unknown-upload-status',
+        outcome: 'failure',
+        reason: status.status
+      }
+    },
     'ReplaceDocument: Unknown upload status'
   )
 
@@ -171,7 +177,15 @@ export const createReplaceWaitController = (documentConfig) => ({
       })
     } catch (error) {
       request.logger.error(
-        { err: error, uploadId: upload.uploadId },
+        {
+          event: {
+            action: 'replace-document-check-upload-status-failed',
+            outcome: 'failure',
+            reference: upload.uploadId,
+            reason: 'Failed to check upload status'
+          },
+          err: error
+        },
         'ReplaceDocument: Failed to check upload status'
       )
 

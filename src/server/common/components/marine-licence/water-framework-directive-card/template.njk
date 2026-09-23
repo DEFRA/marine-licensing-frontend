@@ -1,8 +1,11 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "marine-licence/redaction-field/macro.njk" import appMarineLicenceRedactionField %}
+{% from "marine-licence/withhold-document/macro.njk" import appMarineLicenceWithholdDocument %}
 
 {% if params.waterFrameworkDirectiveData.nauticalMile %}
 {% set rows = [] %}
+
+{% set isFileWithheld = params.redactions.waterFrameworkDirective.withholdDocument.withhold %}
 
 {% set rows = (rows.push({
   key: params.waterFrameworkDirectiveData.nauticalMile.key,
@@ -43,7 +46,32 @@
 {% endif %}
 
 {% if params.waterFrameworkDirectiveData.uploadedFile %}
+  {% if params.enableRedaction %}
+    {% set rows = (rows.push({
+      key: params.waterFrameworkDirectiveData.uploadedFile.key,
+      value: {
+        html: appMarineLicenceWithholdDocument({
+          isWithheld: isFileWithheld,
+          filename: params.waterFrameworkDirectiveData.uploadedFile.value.text,
+          label: "the Water Framework Directive assessment",
+          fieldKey: "waterFrameworkDirective.withholdDocument",
+          redactedDocument: params.redactions.waterFrameworkDirective.withholdDocument.redactedDocument,
+          marineLicenceId: params.marineLicenceId,
+          saveUrl: params.redactionSaveUrl,
+          replaceDocumentUrl: params.replaceDocumentUrl + "?type=water-framework-directive",
+          csrfToken: params.csrfToken
+        }),
+        classes: "govuk-summary-list__value--full-width"
+      }
+    }), rows) %}
+  {% elif not isFileWithheld %}
     {% set rows = (rows.push(params.waterFrameworkDirectiveData.uploadedFile), rows) %}
+  {% endif %}
+{% endif %}
+
+{% set cardAttributes = { id: "water-framework-directive-card" } %}
+{% if params.enableRedaction and params.waterFrameworkDirectiveData.uploadedFile %}
+  {% set cardAttributes = { id: "water-framework-directive-card", "data-module": "withhold-location" } %}
 {% endif %}
 
 {{ govukSummaryList({
@@ -51,9 +79,7 @@
     title: {
       text: "Water Framework Directive assessment"
     },
-    attributes: {
-      id: "water-framework-directive-card"
-    },
+    attributes: cardAttributes,
     actions: {
       items: [
         {

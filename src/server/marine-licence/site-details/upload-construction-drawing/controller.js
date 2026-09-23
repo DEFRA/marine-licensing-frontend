@@ -17,7 +17,7 @@ import {
 export const UPLOAD_CONSTRUCTION_DRAWING_VIEW_ROUTE =
   'marine-licence/site-details/upload-construction-drawing/index'
 
-const TEN_MB = 10 * 1024 * 1024
+export const CONSTRUCTION_DRAWING_MAX_FILE_SIZE = 10 * 1024 * 1024
 
 export const uploadConstructionDrawingController = {
   options: {
@@ -52,7 +52,7 @@ export const uploadConstructionDrawingController = {
       redirectUrl: `${marineLicenceRoutes.MARINE_LICENCE_UPLOAD_CONSTRUCTION_DRAWING_WAIT}?site=${siteNumber}`,
       s3Path: CONSTRUCTION_DRAWING_S3_PATH,
       s3Bucket,
-      maxFileSize: TEN_MB
+      maxFileSize: CONSTRUCTION_DRAWING_MAX_FILE_SIZE
     })
 
     await updateMarineLicenceSiteDetails(

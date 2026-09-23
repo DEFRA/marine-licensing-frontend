@@ -14,6 +14,24 @@
   }) }}
 {% endset %}
 
+{% set formFields %}
+
+  <input type="hidden" name="fieldKey" value="{{ params.fieldKey or params.fieldId }}">
+  <input type="hidden" name="marineLicenceId" value="{{ params.marineLicenceId }}">
+
+  {% if params.index is defined %}
+    <input type="hidden" name="index" value="{{ params.index }}">
+  {% endif %}
+  {% if params.activityIndex is defined %}
+    <input type="hidden" name="activityIndex" value="{{ params.activityIndex }}">
+  {% endif %}
+  {% if params.policyCode is defined %}
+    <input type="hidden" name="policyCode" value="{{ params.policyCode }}">
+  {% endif %}
+  <input type="hidden" name="csrfToken" value="{{ params.csrfToken }}">
+
+{% endset %}
+
 {% set publishedText = params.redaction.redactedText or (params.originalText | escape) %}
 
 {% set applicantsTextHeading %}
@@ -25,7 +43,7 @@
 {% endset %}
 
 <div class="app-redaction-field" id="redaction-field-{{ params.fieldId }}" data-module="redaction-field">
-  <div {%if params.isRedacted %}class="app-redaction-inset"{% endif %}>
+  <div {%if params.isRedacted %}class="app-redaction-inset govuk-!-margin-bottom-2"{% endif %}>
     
   {% if params.isRedacted %}
         <div class="app-redaction-field__published-text" hidden>
@@ -48,19 +66,38 @@
 
     {% endif %}
 
-    <a
-      class="govuk-link app-redaction-field__trigger"
-      href="#"
-      aria-expanded="false"
-      aria-controls="redaction-panel-{{ params.fieldId }}"
-      hidden
-    >
-    {% if params.isRedacted %}
-      Change redaction
-    {% else %}
-      Redact{% endif %}
-      <span class="govuk-visually-hidden"> {{ params.label }}</span>
-    </a>
+    <div class="govuk-button-group govuk-!-margin-bottom-0">
+
+        <a
+        class="govuk-link govuk-link--no-visited-state app-redaction-field__trigger govuk-!-margin-bottom-2"
+        href="#"
+        aria-expanded="false"
+        aria-controls="redaction-panel-{{ params.fieldId }}"
+        hidden
+      >
+      {% if params.isRedacted %}
+        Change redaction
+      {% else %}
+        Redact{% endif %}
+        <span class="govuk-visually-hidden"> {{ params.label }}</span>
+      </a>
+
+      {% if params.isRedacted %}
+        <form class="app-redaction-field__remove-form" method="post" action="{{ params.saveUrl }}">
+
+          {{ formFields | safe }}
+
+          <input type="hidden" name="remove" value="true">
+
+          {{ govukButton({
+            text: "Remove redaction",
+            type: "submit",
+            classes: "govuk-link govuk-button--as-link govuk-!-margin-bottom-0 app-redaction-field__remove-trigger"
+          }) }}
+      </form>
+    {% endif %}
+    </div>
+
   </div>
 
   <div class="app-redaction-field__panel app-redaction-inset" id="redaction-panel-{{ params.fieldId }}">
@@ -83,18 +120,7 @@
         classes: "app-redaction-field__input"
       }) }}
 
-      <input type="hidden" name="fieldKey" value="{{ params.fieldKey or params.fieldId }}">
-      {% if params.index is defined %}
-        <input type="hidden" name="index" value="{{ params.index }}">
-      {% endif %}
-      {% if params.activityIndex is defined %}
-        <input type="hidden" name="activityIndex" value="{{ params.activityIndex }}">
-      {% endif %}
-      {% if params.policyCode is defined %}
-        <input type="hidden" name="policyCode" value="{{ params.policyCode }}">
-      {% endif %}
-      <input type="hidden" name="marineLicenceId" value="{{ params.marineLicenceId }}">
-      <input type="hidden" name="csrfToken" value="{{ params.csrfToken }}">
+      {{ formFields | safe }}
 
       <p class="govuk-body app-redaction-field__status govuk-visually-hidden" aria-live="polite"></p>
 
@@ -106,7 +132,7 @@
           type: "submit"
         }) }}
 
-        <a class="govuk-link app-redaction-field__cancel-button" href="#" hidden>Cancel</a>
+        <a class="govuk-link govuk-link--no-visited-state app-redaction-field__cancel-button" href="#" hidden>Cancel</a>
 
       </div>
     </form>

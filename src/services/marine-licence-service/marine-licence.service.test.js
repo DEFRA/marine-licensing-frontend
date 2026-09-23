@@ -446,7 +446,7 @@ describe('MarineLicenceService', () => {
       )
     })
 
-    test('should send withhold %j with no text for a location flag', async () => {
+    test('should send withhold with no text for a location flag', async () => {
       vi.mocked(authenticatedPostRequest).mockResolvedValue({
         payload: { message: 'success' }
       })
@@ -466,6 +466,90 @@ describe('MarineLicenceService', () => {
           fieldKey: 'siteDetails.withholdLocation',
           siteIndex: 0,
           withhold: true
+        }
+      )
+    })
+
+    test('should send drawingIndex if available', async () => {
+      vi.mocked(authenticatedPostRequest).mockResolvedValue({
+        payload: { message: 'success' }
+      })
+
+      await service.saveRedaction(
+        validId,
+        'siteDetails.constructionDrawings.withholdDocument',
+        undefined,
+        { siteIndex: 0, drawingIndex: 1, withhold: true }
+      )
+
+      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+        mockRequest,
+        apiRoutes.REDACT_TEXT,
+        {
+          id: validId,
+          fieldKey: 'siteDetails.constructionDrawings.withholdDocument',
+          siteIndex: 0,
+          drawingIndex: 1,
+          withhold: true
+        }
+      )
+    })
+
+    test('should send file upload information if available', async () => {
+      vi.mocked(authenticatedPostRequest).mockResolvedValue({
+        payload: { message: 'success' }
+      })
+
+      await service.saveRedaction(
+        validId,
+        'siteDetails.constructionDrawings.withholdDocument',
+        undefined,
+        {
+          filename: 'test-file',
+          withhold: true,
+          s3Location: {
+            checksumSha256: 'test-checksum',
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key'
+          }
+        }
+      )
+
+      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+        mockRequest,
+        apiRoutes.REDACT_TEXT,
+        {
+          id: validId,
+          fieldKey: 'siteDetails.constructionDrawings.withholdDocument',
+          filename: 'test-file',
+          withhold: true,
+          s3Location: {
+            checksumSha256: 'test-checksum',
+            s3Bucket: 'test-bucket',
+            s3Key: 'test-key'
+          }
+        }
+      )
+    })
+
+    test('should send remove with no text for a location flag', async () => {
+      vi.mocked(authenticatedPostRequest).mockResolvedValue({
+        payload: { message: 'success' }
+      })
+
+      await service.saveRedaction(validId, 'siteDetails.siteName', undefined, {
+        siteIndex: 0,
+        remove: true
+      })
+
+      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+        mockRequest,
+        apiRoutes.REDACT_TEXT,
+        {
+          id: validId,
+          fieldKey: 'siteDetails.siteName',
+          siteIndex: 0,
+          remove: true
         }
       )
     })

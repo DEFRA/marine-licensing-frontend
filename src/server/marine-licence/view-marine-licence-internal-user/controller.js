@@ -12,6 +12,7 @@ import {
   buildRedactionsForView
 } from '#src/server/marine-licence/view-details/utils.js'
 import { toApplicationReferenceUrlSegment } from '#src/server/common/helpers/marine-licence/application-reference-url-segment.js'
+import { getReplaceDocumentUrl } from '#src/server/marine-licence/view-marine-licence-internal-user/replace-document/index.js'
 
 export const VIEW_DETAILS_INTERNAL_USER_VIEW_ROUTE =
   'marine-licence/view-marine-licence-internal-user/index'
@@ -68,6 +69,7 @@ export const viewDetailsInternalUserController = {
         projectName: formattedMarineLicence.projectName,
         projectBackground: formattedMarineLicence.projectBackground,
         publicConsultation: formattedMarineLicence.publicConsultation,
+        publicRegister: formattedMarineLicence.publicRegister,
         coordinatesType,
         summaryData,
         isReadOnly: true,
@@ -75,6 +77,9 @@ export const viewDetailsInternalUserController = {
         backLink: null,
         marineLicenceId: marineLicence.id,
         redactionSaveUrl: getRedactionSaveUrl(
+          marineLicence.applicationReference
+        ),
+        replaceDocumentUrl: getReplaceDocumentUrl(
           marineLicence.applicationReference
         ),
         csrfToken: request.plugins.crumb,

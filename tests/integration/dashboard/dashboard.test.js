@@ -462,89 +462,128 @@ describe('Dashboard', () => {
       })
 
       it('should render table with moj-filter module for employees', async () => {
-        mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
-        const doc = await loadDashboardPage()
-        const filter = doc.querySelector('.moj-filter')
-        expect(filter).toHaveAttribute('data-module', 'moj-filter')
+        vi.mocked(getUserSession).mockResolvedValue({
+          ...employeeSession,
+          organisationName: "Test'Org"
+        })
 
-        expect(
-          queryAllByRole(filter, 'button', { name: 'Clear filters' })
-        ).toHaveLength(1)
+        try {
+          mockEmployeeExemptions(
+            mockDashboardServerResponse(employeeExemptions)
+          )
+          const doc = await loadDashboardPage()
+          const filter = doc.querySelector('.moj-filter')
+          expect(filter).toHaveAttribute('data-module', 'moj-filter')
 
-        expect(
-          getByRole(filter, 'button', { name: 'Apply filters' })
-        ).toBeInTheDocument()
+          expect(
+            queryAllByRole(filter, 'button', { name: 'Clear filters' })
+          ).toHaveLength(1)
 
-        expect(
-          getByRole(filter, 'heading', {
-            name: 'Selected filters'
+          expect(
+            getByRole(filter, 'button', { name: 'Apply filters' })
+          ).toBeInTheDocument()
+
+          expect(
+            getByRole(filter, 'heading', {
+              name: 'Selected filters'
+            })
+          ).toBeInTheDocument()
+
+          expect(filter.querySelectorAll('.moj-filter__tag').length).toBe(0)
+
+          expect(
+            getByRole(filter, 'group', {
+              name: 'Show'
+            })
+          ).toBeInTheDocument()
+
+          const orgSubmissionRadio = getByRole(filter, 'radio', {
+            name: "All Test'Org submissions"
           })
-        ).toBeInTheDocument()
 
-        expect(filter.querySelectorAll('.moj-filter__tag').length).toBe(0)
-
-        expect(
-          getByRole(filter, 'group', {
-            name: 'Show'
+          const mySubmissionRadio = getByRole(filter, 'radio', {
+            name: 'My submissions'
           })
-        ).toBeInTheDocument()
 
-        const orgSubmissionRadio = getByRole(filter, 'radio', {
-          name: 'All Test Org submissions'
-        })
-
-        const mySubmissionRadio = getByRole(filter, 'radio', {
-          name: 'My submissions'
-        })
-
-        const userSubmissionRadio = getByRole(filter, 'radio', {
-          name: 'Submissions by owner'
-        })
-
-        expect(orgSubmissionRadio).not.toBeChecked()
-        expect(mySubmissionRadio).toBeChecked()
-        expect(userSubmissionRadio).not.toBeChecked()
-
-        expect(
-          getByRole(filter, 'checkbox', { name: 'Mine (Test User)' })
-        ).toBeInTheDocument()
-
-        expect(
-          getByRole(filter, 'checkbox', { name: 'John Smith' })
-        ).toBeInTheDocument()
-
-        const statusGroup = getByRole(filter, 'group', {
-          name: 'Status'
-        })
-        expect(statusGroup).toBeInTheDocument()
-
-        const statuses = [
-          'Active',
-          'Draft',
-          'Submitted',
-          'Transferred',
-          'Unable to progress',
-          'Withdrawn'
-        ]
-
-        statuses.forEach((status) => {
-          const checkbox = getByRole(statusGroup, 'checkbox', {
-            name: status
+          const userSubmissionRadio = getByRole(filter, 'radio', {
+            name: 'Submissions by owner'
           })
-          expect(checkbox).not.toBeChecked()
-        })
 
-        const typeGroup = getByRole(filter, 'group', {
-          name: 'Submission type'
-        })
-        expect(typeGroup).toBeInTheDocument()
+          expect(orgSubmissionRadio).not.toBeChecked()
+          expect(mySubmissionRadio).toBeChecked()
+          expect(userSubmissionRadio).not.toBeChecked()
 
-        const typeValues = [EXEMPTION_TYPE, MARINE_LICENCE_TYPE]
+          expect(
+            getByRole(filter, 'checkbox', { name: 'Mine (Test User)' })
+          ).toBeInTheDocument()
 
-        typeValues.forEach((type) => {
-          const checkbox = getByRole(typeGroup, 'checkbox', { name: type })
-          expect(checkbox).not.toBeChecked()
-        })
+          expect(
+            getByRole(filter, 'checkbox', { name: 'John Smith' })
+          ).toBeInTheDocument()
+
+          const statusGroup = getByRole(filter, 'group', {
+            name: 'Status'
+          })
+          expect(statusGroup).toBeInTheDocument()
+
+          const statuses = [
+            'Active',
+            'Draft',
+            'Submitted',
+            'Transferred',
+            'Unable to progress',
+            'Withdrawn'
+          ]
+
+          statuses.forEach((status) => {
+            const checkbox = getByRole(statusGroup, 'checkbox', {
+              name: status
+            })
+            expect(checkbox).not.toBeChecked()
+          })
+
+          const typeGroup = getByRole(filter, 'group', {
+            name: 'Submission type'
+          })
+          expect(typeGroup).toBeInTheDocument()
+
+          const typeValues = [EXEMPTION_TYPE, MARINE_LICENCE_TYPE]
+
+          typeValues.forEach((type) => {
+            const checkbox = getByRole(typeGroup, 'checkbox', { name: type })
+            expect(checkbox).not.toBeChecked()
+          })
+
+          const postResponse = await makePostRequest({
+            url: routes.DASHBOARD,
+            server: getServer(),
+            formData: { show: 'all-projects' }
+          })
+
+          expect(postResponse.statusCode).toBe(302)
+
+          const sessionCookie = Array.isArray(
+            postResponse.headers['set-cookie']
+          )
+            ? postResponse.headers['set-cookie'].join('; ')
+            : postResponse.headers['set-cookie']
+
+          const getResponse = await makeGetRequest({
+            url: routes.DASHBOARD,
+            server: getServer(),
+            headers: { cookie: sessionCookie }
+          })
+
+          const { document } = new JSDOM(getResponse.result).window
+
+          expect(
+            getByRole(document, 'heading', {
+              name: "4 results found in 'All Test'Org submissions'"
+            })
+          ).toBeInTheDocument()
+        } finally {
+          vi.mocked(getUserSession).mockResolvedValue(employeeSession)
+        }
       })
 
       it('should check the "Submissions by owner" radio after filtering by a user', async () => {

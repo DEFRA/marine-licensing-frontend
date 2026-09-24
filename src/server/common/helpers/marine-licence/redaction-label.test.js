@@ -23,7 +23,9 @@ describe('wrapRedactionLabels', () => {
   })
 
   test('escapes html in the surrounding text', () => {
-    const result = wrapRedactionLabels('<script>alert(1)</script> ***REDACTED***')
+    const result = wrapRedactionLabels(
+      '<script>alert(1)</script> ***REDACTED***'
+    )
 
     expect(result).not.toContain('<script>')
     expect(result).toContain('&lt;script&gt;')

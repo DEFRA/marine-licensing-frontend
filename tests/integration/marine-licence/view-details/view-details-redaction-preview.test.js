@@ -372,7 +372,9 @@ describe('Marine licence redaction preview', () => {
         field: 'excluded activities',
         redactions: {
           waterFrameworkDirective: {
-            excludedActivities: { redactedText: `Limited to ${REDACTION_LABEL}` }
+            excludedActivities: {
+              redactedText: `Limited to ${REDACTION_LABEL}`
+            }
           }
         },
         card: '#water-framework-directive-card',

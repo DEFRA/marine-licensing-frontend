@@ -250,7 +250,8 @@ export const mockRedactions = {
         filename: 'replacement-assessment.pdf',
         s3Location: {
           s3Bucket: 'test-bucket',
-          s3Key: 'marine-licence/water-framework-directive/replacement-assessment.pdf',
+          s3Key:
+            'marine-licence/water-framework-directive/replacement-assessment.pdf',
           checksumSha256: 'test-checksum'
         }
       }

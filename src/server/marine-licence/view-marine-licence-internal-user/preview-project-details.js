@@ -6,7 +6,9 @@ import { wrapRedactionLabels } from '#src/server/common/helpers/marine-licence/r
 
 const publishedText = (redaction, value) =>
   redaction && 'redactedText' in redaction
-    ? new nunjucks.runtime.SafeString(wrapRedactionLabels(redaction.redactedText))
+    ? new nunjucks.runtime.SafeString(
+        wrapRedactionLabels(redaction.redactedText)
+      )
     : value
 
 const publishedActivity = (activity, redactions = {}) => ({
@@ -31,10 +33,7 @@ const publishedActivity = (activity, redactions = {}) => ({
     redactions.activityMonths,
     activity.activityMonths
   ),
-  workingHours: publishedText(
-    redactions.workingHours,
-    activity.workingHours
-  ),
+  workingHours: publishedText(redactions.workingHours, activity.workingHours),
   activities:
     redactions.activities && 'redactedText' in redactions.activities
       ? [publishedText(redactions.activities, activity.activities)]
@@ -77,7 +76,8 @@ export const buildRedactedOtherPermissions = (marineLicence) => {
           }
         : marineLicence.specialLegalPowers,
     harbourAuthority:
-      redactions.harbourAuthority && 'redactedText' in redactions.harbourAuthority
+      redactions.harbourAuthority &&
+      'redactedText' in redactions.harbourAuthority
         ? {
             ...marineLicence.harbourAuthority,
             area: 'yes',
@@ -88,7 +88,8 @@ export const buildRedactedOtherPermissions = (marineLicence) => {
           }
         : marineLicence.harbourAuthority,
     otherAuthorities:
-      redactions.otherAuthorities && 'redactedText' in redactions.otherAuthorities
+      redactions.otherAuthorities &&
+      'redactedText' in redactions.otherAuthorities
         ? {
             ...marineLicence.otherAuthorities,
             agree: 'yes',

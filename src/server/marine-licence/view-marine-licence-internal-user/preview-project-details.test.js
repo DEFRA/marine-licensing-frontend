@@ -46,7 +46,9 @@ describe('buildRedactedPreviewProjectDetails', () => {
       })
 
       expect(result[field].val).toBe(wrapRedactionLabels(redactedText))
-      expect({ ...result, [field]: marineLicence[field] }).toEqual(marineLicence)
+      expect({ ...result, [field]: marineLicence[field] }).toEqual(
+        marineLicence
+      )
     }
   )
 })
@@ -154,13 +156,21 @@ describe('buildRedactedSiteDetails', () => {
     expect(activity.activitySubType.val).toBe(
       wrapRedactionLabels('***REDACTED*** works')
     )
-    expect(activity.activities[0].val).toBe(wrapRedactionLabels('***REDACTED***'))
+    expect(activity.activities[0].val).toBe(
+      wrapRedactionLabels('***REDACTED***')
+    )
     expect(activity.activityDescription.val).toBe(
       wrapRedactionLabels('Digging ***REDACTED***')
     )
-    expect(activity.activityDuration.val).toBe(wrapRedactionLabels('***REDACTED***'))
-    expect(activity.completionDate.val).toBe(wrapRedactionLabels('***REDACTED***'))
-    expect(activity.activityMonths.val).toBe(wrapRedactionLabels('***REDACTED***'))
+    expect(activity.activityDuration.val).toBe(
+      wrapRedactionLabels('***REDACTED***')
+    )
+    expect(activity.completionDate.val).toBe(
+      wrapRedactionLabels('***REDACTED***')
+    )
+    expect(activity.activityMonths.val).toBe(
+      wrapRedactionLabels('***REDACTED***')
+    )
     expect(activity.workingHours.val).toBe(
       wrapRedactionLabels('***REDACTED*** hours')
     )

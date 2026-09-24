@@ -5,7 +5,10 @@ import { isProjectViewable } from '#src/server/common/helpers/view-details/utils
 import { wrapRedactionLabels } from '#src/server/common/helpers/marine-licence/redaction-label.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 import { buildApplicationDetailsCardData } from '#src/server/marine-licence/view-details/utils.js'
-import { buildPreviewProjectDetails } from '#src/server/marine-licence/view-marine-licence-internal-user/preview-project-details.js'
+import {
+  buildRedactedPreviewProjectDetails,
+  buildRedactedSiteDetails
+} from '#src/server/marine-licence/view-marine-licence-internal-user/preview-project-details.js'
 
 export const PREVIEW_VIEW_ROUTE =
   'marine-licence/view-marine-licence-internal-user/preview'
@@ -23,9 +26,11 @@ export const previewController = {
         throw Boom.forbidden(errorMessages.MARINE_LICENCE_NOT_SUBMITTED)
       }
 
-      const projectDetails = buildPreviewProjectDetails(
-        buildSummaryData(marineLicence)
-      )
+      const summaryData = buildSummaryData(marineLicence)
+
+      const projectDetails = buildRedactedPreviewProjectDetails(summaryData)
+
+      const siteData = buildRedactedSiteDetails(summaryData)
 
       return h.view(PREVIEW_VIEW_ROUTE, {
         pageTitle: projectDetails.projectName,
@@ -33,7 +38,9 @@ export const previewController = {
         headingHtml: wrapRedactionLabels(projectDetails.projectName),
         isReadOnly: true,
         ...projectDetails,
-        ...buildApplicationDetailsCardData(marineLicence)
+        ...buildApplicationDetailsCardData(marineLicence),
+        siteData,
+        redactions: marineLicence.redactions
       })
     } catch (error) {
       if (error.isBoom) {

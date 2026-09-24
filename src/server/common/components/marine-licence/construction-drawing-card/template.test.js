@@ -142,6 +142,7 @@ describe('Marine Licence Construction Drawing Card', () => {
           { filename: 'drawing-two.pdf' }
         ],
         isReadOnly: true,
+        enableRedaction: true,
         redactions: {},
         marineLicenceId: '123',
         redactionSaveUrl: '/view-marine-licence-details/test-id/redact',
@@ -265,6 +266,25 @@ describe('Marine Licence Construction Drawing Card', () => {
       const $component = render({ constructionDrawings: [] })
 
       expect($component('.govuk-summary-card')).toHaveLength(0)
+    })
+
+    test('shows the filename without withhold or replace when redaction is off', () => {
+      const $component = render({
+        enableRedaction: false,
+        redactions: withheldSecondDrawing
+      })
+
+      expect($component('#construction-drawing-site-2-1').text()).toContain(
+        'drawing-one.pdf'
+      )
+      expect(
+        $component('#construction-drawing-site-2-2 .app-redaction-label').text()
+      ).toBe('***REDACTED***')
+      expect($component('#construction-drawing-site-2-2').text()).not.toContain(
+        'drawing-two.pdf'
+      )
+      expect($component.html()).not.toContain('Withhold document')
+      expect($component.html()).not.toContain('Replace document')
     })
 
     test('renders no withhold control when not read only', () => {

@@ -25,37 +25,71 @@
 
     {% set isFileWithheld = params.redactions.siteDetails[siteIndex].constructionDrawings[drawingIndex].withholdDocument.withhold %}
 
-    {{ govukSummaryList({
-      card: {
-        attributes: {
-          id: "construction-drawing-site-" + params.siteNumber + "-" + drawingNumber,
-          "data-module": "withhold-location"
+    {% if params.enableRedaction %}
+      {{ govukSummaryList({
+        card: {
+          attributes: {
+            id: "construction-drawing-site-" + params.siteNumber + "-" + drawingNumber,
+            "data-module": "withhold-location"
+          },
+          title: {
+            text: "Site " + params.siteNumber + " - Construction drawing " + drawingNumber
+          }
         },
-        title: {
-          text: "Site " + params.siteNumber + " - Construction drawing " + drawingNumber
-        }
-      },
-      classes: "govuk-summary-list--full-width",
-      rows: [{
-        key: { text: "File upload" },
-        value: {
-          html: appMarineLicenceWithholdDocument({
-            isWithheld: isFileWithheld,
-            filename: drawing.filename,
-            label: "site " + params.siteNumber + " construction drawing " + drawingNumber,
-            fieldKey: "siteDetails.constructionDrawings.withholdDocument",
-            redactedDocument: params.redactions.siteDetails[siteIndex].constructionDrawings[drawingIndex].withholdDocument.redactedDocument,
-            marineLicenceId: params.marineLicenceId,
-            index: siteIndex,
-            drawingIndex: drawingIndex,
-            saveUrl: params.redactionSaveUrl,
-            replaceDocumentUrl: params.replaceDocumentUrl + "?type=construction-drawing&site=" + params.siteNumber + "&drawing=" + drawingNumber,
-            csrfToken: params.csrfToken
-          }),
-          classes: "govuk-summary-list__value--full-width"
-        }
-      }]
-    }) }}
+        classes: "govuk-summary-list--full-width",
+        rows: [{
+          key: { text: "File upload" },
+          value: {
+            html: appMarineLicenceWithholdDocument({
+              isWithheld: isFileWithheld,
+              filename: drawing.filename,
+              label: "site " + params.siteNumber + " construction drawing " + drawingNumber,
+              fieldKey: "siteDetails.constructionDrawings.withholdDocument",
+              redactedDocument: params.redactions.siteDetails[siteIndex].constructionDrawings[drawingIndex].withholdDocument.redactedDocument,
+              marineLicenceId: params.marineLicenceId,
+              index: siteIndex,
+              drawingIndex: drawingIndex,
+              saveUrl: params.redactionSaveUrl,
+              replaceDocumentUrl: params.replaceDocumentUrl + "?type=construction-drawing&site=" + params.siteNumber + "&drawing=" + drawingNumber,
+              csrfToken: params.csrfToken
+            }),
+            classes: "govuk-summary-list__value--full-width"
+          }
+        }]
+      }) }}
+    {% elif isFileWithheld %}
+      {{ govukSummaryList({
+        card: {
+          attributes: {
+            id: "construction-drawing-site-" + params.siteNumber + "-" + drawingNumber
+          },
+          title: {
+            text: "Site " + params.siteNumber + " - Construction drawing " + drawingNumber
+          }
+        },
+        classes: "govuk-summary-list--full-width",
+        rows: [{
+          key: { text: "File upload" },
+          value: { html: "***REDACTED***" | wrapRedactionLabels }
+        }]
+      }) }}
+    {% else %}
+      {{ govukSummaryList({
+        card: {
+          attributes: {
+            id: "construction-drawing-site-" + params.siteNumber + "-" + drawingNumber
+          },
+          title: {
+            text: "Site " + params.siteNumber + " - Construction drawing " + drawingNumber
+          }
+        },
+        classes: "govuk-summary-list--full-width",
+        rows: [{
+          key: { text: "File upload" },
+          value: { text: drawing.filename }
+        }]
+      }) }}
+    {% endif %}
   {% endfor %}
   {% else %}
 

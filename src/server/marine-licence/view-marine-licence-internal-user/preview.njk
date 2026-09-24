@@ -1,5 +1,9 @@
 {% from "marine-licence/application-details-card/macro.njk" import appMarineLicenceApplicationDetailsCard %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
+{% from "marine-licence/site-location-card/macro.njk" import appMarineLicenceSiteLocationCard %}
+{% from "marine-licence/site-details-card/macro.njk" import appMarineLicenceSiteDetailsCard %}
+{% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
+{% from "marine-licence/construction-drawing-card/macro.njk" import appMarineLicenceConstructionDrawingCard %}
 {% extends 'layouts/page.njk' %}
 
 {% set rejectedReasonsOutput %}
@@ -42,12 +46,57 @@
       {{ appMarineLicenceProjectDetailsCard({
         projectName: projectName,
         projectBackground: projectBackground,
-        isReadOnly: isReadOnly,
+        isReadOnly: true,
         preferredDates: preferredDates,
         marineLicenceId: marineLicenceId,
-        redactionSaveUrl: redactionSaveUrl,
         csrfToken: csrfToken
       }) }}
+        
+      {% if siteData.summaryData and siteData.summaryData.length %}
+        {{ appMarineLicenceSiteLocationCard({
+          coordinatesType: siteData.coordinatesType
+        }) }}
+
+        {% for site in siteData.summaryData %}
+          {% set siteIndex0 = loop.index0 %}
+          {{ appMarineLicenceSiteDetailsCard({
+            site: site,
+            loopIndex0: loop.index0,
+            coordinatesType: siteData.coordinatesType,
+            redactions: redactions,
+            cspNonce: cspNonce,
+            marineLicenceId: marineLicenceId,
+            csrfToken: csrfToken,
+            isReadOnly: true
+          }) }}
+
+          {% for activityDetails in site.activityDetails %}
+            {{ appMarineLicenceActivityDetailsCard({
+              activityDetails: activityDetails,
+              siteNumber: site.siteNumber,
+              index: loop.index,
+              siteIndex0: siteIndex0,
+              activityIndex0: loop.index0,
+              isReadOnly: true,
+              isApplicant: false,
+              marineLicenceId: marineLicenceId,
+              csrfToken: csrfToken
+            }) }}
+
+          {% endfor %}
+
+          {{ appMarineLicenceConstructionDrawingCard({
+            isReadOnly: true,
+            siteNumber: site.siteNumber,
+            activityDetails: site.activityDetails,
+            constructionDrawings: site.constructionDrawings,
+            redactions: redactions,
+            marineLicenceId: marineLicenceId,
+            csrfToken: csrfToken
+          }) }}
+
+        {% endfor %}
+      {% endif %}
 
     </div>
   </div>

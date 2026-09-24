@@ -6,6 +6,7 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import {
+  mockCircularMarineLicence,
   mockRejectedMarineLicenceApplication,
   mockSubmittedMarineLicenceApplication,
   mockTransferredMarineLicenceApplication
@@ -27,11 +28,10 @@ vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 const referenceUrl = toApplicationReferenceUrlSegment(
   mockSubmittedMarineLicenceApplication.applicationReference
 )
-const previewUrl =
-  marineLicenceRoutes.MARINE_LICENCE_REDACTION_PREVIEW.replace(
-    '{applicationReference}',
-    referenceUrl
-  )
+const previewUrl = marineLicenceRoutes.MARINE_LICENCE_REDACTION_PREVIEW.replace(
+  '{applicationReference}',
+  referenceUrl
+)
 
 describe('Marine licence redaction preview', () => {
   const getServer = setupTestServer()
@@ -55,7 +55,9 @@ describe('Marine licence redaction preview', () => {
     expect(document.querySelector('.govuk-caption-l').textContent).toBe(
       mockSubmittedMarineLicenceApplication.applicationReference
     )
-    expect(document.querySelector('#redaction-preview-notice').textContent).toContain(
+    expect(
+      document.querySelector('#redaction-preview-notice').textContent
+    ).toContain(
       'This is a preview of how the application will appear on the public register.'
     )
     expect(document.querySelector('.app-redaction-label')).toBeNull()
@@ -83,9 +85,21 @@ describe('Marine licence redaction preview', () => {
   })
 
   test.each([
-    ['submitted', mockSubmittedMarineLicenceApplication, expectedSubmittedApplicationDetailsCard],
-    ['transferred', mockTransferredMarineLicenceApplication, expectedTransferredApplicationDetailsCard],
-    ['rejected', mockRejectedMarineLicenceApplication, expectedRejectedApplicationDetailsCard]
+    [
+      'submitted',
+      mockSubmittedMarineLicenceApplication,
+      expectedSubmittedApplicationDetailsCard
+    ],
+    [
+      'transferred',
+      mockTransferredMarineLicenceApplication,
+      expectedTransferredApplicationDetailsCard
+    ],
+    [
+      'rejected',
+      mockRejectedMarineLicenceApplication,
+      expectedRejectedApplicationDetailsCard
+    ]
   ])(
     'renders the application overview for a %s licence',
     async (_status, marineLicence, expectedCard) => {
@@ -142,14 +156,144 @@ describe('Marine licence redaction preview', () => {
         card: '#project-details-card',
         row: 'Preferred start and end dates of the licence',
         published: `From ${REDACTION_LABEL}`
-      }
+      },
+      {
+        field: 'site name',
+        redactions: {
+          siteDetails: {
+            0: { siteName: { redactedText: `Bridge ${REDACTION_LABEL}` } }
+          }
+        },
+        card: '#site-details-1',
+        row: 'Site name',
+        published: `Bridge ${REDACTION_LABEL}`
+      },
+      {
+        field: 'circle width',
+        licence: {
+          ...mockSubmittedMarineLicenceApplication,
+          siteDetails: mockCircularMarineLicence.siteDetails
+        },
+        redactions: {
+          siteDetails: {
+            0: { circleWidth: { redactedText: `100 ${REDACTION_LABEL}` } }
+          }
+        },
+        card: '#site-details-1',
+        row: 'Width of circular site',
+        published: `100 ${REDACTION_LABEL}`
+      },
+      {
+        field: 'withheld location',
+        licence: {
+          ...mockSubmittedMarineLicenceApplication,
+          siteDetails: mockCircularMarineLicence.siteDetails
+        },
+        redactions: {
+          siteDetails: {
+            0: { withholdLocation: { withhold: true } }
+          }
+        },
+        card: '#site-details-1',
+        row: 'Site location',
+        published: REDACTION_LABEL,
+        hiddenRow: 'Coordinates at centre of site'
+      },
+      {
+        field: 'withheld construction drawing',
+        licence: {
+          ...mockSubmittedMarineLicenceApplication,
+          siteDetails: [
+            {
+              ...mockSubmittedMarineLicenceApplication.siteDetails[0],
+              constructionDrawings: [{ filename: 'drawing.pdf' }]
+            }
+          ]
+        },
+        redactions: {
+          siteDetails: {
+            0: {
+              constructionDrawings: {
+                0: { withholdDocument: { withhold: true } }
+              }
+            }
+          }
+        },
+        card: '#construction-drawing-site-1-1',
+        row: 'File upload',
+        published: REDACTION_LABEL
+      },
+      ...[
+        [
+          'activity type',
+          'activitySubType',
+          'Type of activity',
+          `Harbour ${REDACTION_LABEL}`
+        ],
+        [
+          'activities',
+          'activities',
+          'What is being constructed',
+          REDACTION_LABEL
+        ],
+        [
+          'activity description',
+          'activityDescription',
+          'Activity description',
+          `Works at ${REDACTION_LABEL}`
+        ],
+        [
+          'activity duration',
+          'activityDuration',
+          'Maximum duration of activity',
+          REDACTION_LABEL
+        ],
+        [
+          'completion date',
+          'completionDate',
+          'Completion date',
+          REDACTION_LABEL
+        ],
+        [
+          'activity months',
+          'activityMonths',
+          'Activity limited to specific months',
+          REDACTION_LABEL
+        ],
+        [
+          'working hours',
+          'workingHours',
+          'Proposed working hours',
+          `9 to ${REDACTION_LABEL}`
+        ]
+      ].map(([field, key, row, published]) => ({
+        field,
+        redactions: {
+          siteDetails: {
+            0: {
+              activityDetails: { 0: { [key]: { redactedText: published } } }
+            }
+          }
+        },
+        card: '#activity-details-site-1-activity-1',
+        row,
+        published
+      }))
     ]
 
     test.each(redactedCriteria)(
       'publishes the redacted $field',
-      async ({ redactions, card, row, published, heading }) => {
+      async ({
+        redactions,
+        card,
+        row,
+        published,
+        heading,
+        licence,
+        hiddenRow
+      }) => {
         const document = await loadPreview({
-          ...mockSubmittedMarineLicenceApplication,
+          ...(licence ?? mockSubmittedMarineLicenceApplication),
           redactions
         })
         const value = cardValue(document, card, row)
@@ -159,8 +303,16 @@ describe('Marine licence redaction preview', () => {
           REDACTION_LABEL
         )
 
+        if (hiddenRow) {
+          expect(
+            getCardRow(document.querySelector(card), hiddenRow)
+          ).toBeUndefined()
+        }
+
         if (heading) {
-          const pageHeading = document.querySelector('#redaction-preview-heading')
+          const pageHeading = document.querySelector(
+            '#redaction-preview-heading'
+          )
 
           expect(pageHeading.textContent).toBe(published)
           expect(

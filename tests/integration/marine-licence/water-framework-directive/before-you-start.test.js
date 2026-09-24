@@ -101,7 +101,7 @@ describe('Water Framework Directive before you start page (marine licence)', () 
     })
     expect(templateLink).toHaveAttribute(
       'href',
-      'https://assets.publishing.service.gov.uk/media/5a7f3831e5274a2e8ab4ad9b/wfd_scoping_template.odt'
+      'https://assets.publishing.service.gov.uk/media/6ab4e3b9fceb6fb3a650110e/wfd_scoping_template__1_.odt'
     )
 
     const guidanceLink = getByRole(document, 'link', {

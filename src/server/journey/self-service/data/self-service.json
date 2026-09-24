@@ -7169,8 +7169,8 @@
         {
           "id": "marineLitter",
           "text": "Marine litter recovered during the course of diving activities",
-          "nextQuestionRoute": "/exemption/removal/waste/marine-litter",
-          "hint": "Any persistent, manufactured or processed solid material discarded, disposed of or abandoned in the marine and coastal environment"
+          "nextQuestionRoute": "/exemption/removal/waste/marine-litter/historic-interest",
+          "hint": "This includes any solid manufactured or processed waste and lost or discarded fishing gear."
         },
         {
           "id": "litterSeaweed",
@@ -7307,23 +7307,6 @@
           "id": "otherDeadAnimals",
           "text": "Unlikely to affect any of the listed sites",
           "outcomeRoute": "/exemption/licence-not-required-exemption-available-article-21"
-        }
-      ]
-    },
-    {
-      "route": "/exemption/removal/waste/marine-litter",
-      "text": "Will the activity involve removing marine litter or fishing gear that was discarded or lost during a dive?",
-      "section": "removal",
-      "answers": [
-        {
-          "id": "yes",
-          "text": "Yes",
-          "nextQuestionRoute": "/exemption/removal/waste/marine-litter/historic-interest"
-        },
-        {
-          "id": "no",
-          "text": "No",
-          "outcomeRoute": "/exemption/removal-exe-not-available-continue"
         }
       ]
     },

@@ -132,6 +132,150 @@ describe('Marine Licence Construction Drawing Card', () => {
     expect(form.find('input[name="siteNumber"]').attr('value')).toBe('1')
   })
 
+  describe('withhold document', () => {
+    const render = (overrides = {}) =>
+      renderComponent('marine-licence/construction-drawing-card', {
+        siteNumber: 2,
+        activityDetails: [{ requiresConstructionDrawing: true }],
+        constructionDrawings: [
+          { filename: 'drawing-one.pdf' },
+          { filename: 'drawing-two.pdf' }
+        ],
+        isReadOnly: true,
+        redactions: {},
+        marineLicenceId: '123',
+        redactionSaveUrl: '/view-marine-licence-details/test-id/redact',
+        replaceDocumentUrl:
+          '/marine-licence/redaction/MLA-2026-10264/replace-document',
+        csrfToken: 'test-crumb-token',
+        ...overrides
+      })
+
+    const withheldSecondDrawing = {
+      siteDetails: {
+        1: {
+          constructionDrawings: {
+            1: { withholdDocument: { withhold: true } }
+          }
+        }
+      }
+    }
+
+    const withholdForm = ($component, drawingNumber) =>
+      $component(`#construction-drawing-site-2-${drawingNumber}`).find(
+        '.app-withhold-location__form'
+      )
+
+    test('posts the withhold field key, site index, drawing index and flag to the redact url', () => {
+      const $form = withholdForm(render(), 2)
+
+      expect($form.attr('action')).toBe(
+        '/view-marine-licence-details/test-id/redact'
+      )
+      expect($form.find('input[name="fieldKey"]').attr('value')).toBe(
+        'siteDetails.constructionDrawings.withholdDocument'
+      )
+      expect($form.find('input[name="index"]').attr('value')).toBe('1')
+      expect($form.find('input[name="drawingIndex"]').attr('value')).toBe('1')
+      expect($form.find('input[name="withhold"]').attr('value')).toBe('true')
+      expect($form.find('input[name="csrfToken"]').attr('value')).toBe(
+        'test-crumb-token'
+      )
+    })
+
+    test('renders the filename and a Withhold document button when not withheld', () => {
+      const $component = render()
+      const $card = $component('#construction-drawing-site-2-1')
+
+      expect($card.text()).toContain('drawing-one.pdf')
+      expect(withholdForm($component, 1).find('button').text()).toContain(
+        'Withhold document'
+      )
+      expect($card.attr('data-module')).toBe('withhold-location')
+    })
+
+    test('hides the filename and offers Remove redaction on the withheld drawing only', () => {
+      const $component = render({ redactions: withheldSecondDrawing })
+      const $button = withholdForm($component, 2).find('button')
+
+      expect($component('#construction-drawing-site-2-2').text()).not.toContain(
+        'drawing-two.pdf'
+      )
+      expect($button.text()).toContain('Remove redaction')
+      expect(
+        withholdForm($component, 2).find('input[name="withhold"]').attr('value')
+      ).toBe('false')
+
+      expect($component('#construction-drawing-site-2-1').text()).toContain(
+        'drawing-one.pdf'
+      )
+      expect(withholdForm($component, 1).find('button').text()).toContain(
+        'Withhold document'
+      )
+    })
+
+    test('renders not withheld', () => {
+      const $component = render({
+        redactions: {
+          siteDetails: {
+            1: {
+              constructionDrawings: {
+                1: { withholdDocument: { withhold: false } }
+              }
+            }
+          }
+        }
+      })
+
+      expect($component('#construction-drawing-site-2-2').text()).toContain(
+        'drawing-two.pdf'
+      )
+      expect(withholdForm($component, 2).find('button').text()).toContain(
+        'Withhold document'
+      )
+
+      expect($component('.govuk-summary-list__actions a')).toHaveLength(0)
+      expect($component('.govuk-summary-card__actions a')).toHaveLength(0)
+      expect(
+        $component('#add-another-construction-drawing-site-2')
+      ).toHaveLength(0)
+    })
+
+    test('links Replace document at the drawing being replaced', () => {
+      const $component = render()
+
+      const $link = $component('#construction-drawing-site-2-2').find(
+        'a:contains("Replace document")'
+      )
+
+      expect($link.attr('href')).toBe(
+        '/marine-licence/redaction/MLA-2026-10264/replace-document?type=construction-drawing&site=2&drawing=2'
+      )
+    })
+
+    test('renders a card per uploaded drawing only', () => {
+      const $component = render({
+        constructionDrawings: [{ filename: 'drawing-one.pdf' }]
+      })
+
+      expect($component('.govuk-summary-card')).toHaveLength(1)
+    })
+
+    test('renders nothing when read only with no drawings uploaded', () => {
+      const $component = render({ constructionDrawings: [] })
+
+      expect($component('.govuk-summary-card')).toHaveLength(0)
+    })
+
+    test('renders no withhold control when not read only', () => {
+      const $component = render({ isReadOnly: false })
+
+      expect($component('input[name="withhold"]')).toHaveLength(0)
+      expect($component('[data-module="withhold-location"]')).toHaveLength(0)
+      expect($component.html()).not.toContain('Withhold document')
+    })
+  })
+
   test('renders nothing when no activity requires a drawing', () => {
     const $component = renderComponent(
       'marine-licence/construction-drawing-card',

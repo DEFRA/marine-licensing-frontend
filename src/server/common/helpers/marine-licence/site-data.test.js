@@ -73,6 +73,51 @@ describe('#buildSiteData', () => {
     })
   })
 
+  test('contains construction drawings through for file upload sites', () => {
+    vi.mocked(getSiteDetailsBySite).mockReturnValue({ coordinatesType: 'file' })
+    vi.mocked(getFileUploadSummaryData).mockReturnValue({ coordinates: [] })
+    vi.mocked(createSiteDetailsDataJson).mockReturnValue('{}')
+    vi.mocked(parseActivityDetails).mockReturnValue([])
+
+    const constructionDrawings = [{ filename: 'drawing.pdf' }]
+
+    const result = buildSiteData({
+      ...mockFileUploadMarineLicence,
+      siteDetails: [
+        { ...mockFileUploadMarineLicence.siteDetails[0], constructionDrawings }
+      ]
+    })
+
+    expect(result.summaryData[0].constructionDrawings).toEqual(
+      constructionDrawings
+    )
+  })
+
+  test('contains construction drawings through for manual coordinate sites', () => {
+    vi.mocked(getSiteDetailsBySite).mockReturnValue({
+      coordinatesType: 'coordinates'
+    })
+    vi.mocked(buildManualCoordinateSummaryData).mockReturnValue([
+      { siteNumber: 1, siteName: 'Test site name' }
+    ])
+
+    const constructionDrawings = [{ filename: 'drawing.pdf' }]
+
+    const result = buildSiteData({
+      ...mockManualCoordinatesMarineLicence,
+      siteDetails: [
+        {
+          ...mockManualCoordinatesMarineLicence.siteDetails[0],
+          constructionDrawings
+        }
+      ]
+    })
+
+    expect(result.summaryData[0].constructionDrawings).toEqual(
+      constructionDrawings
+    )
+  })
+
   test('returns empty data when coordinatesType is unrecognised', () => {
     vi.mocked(getSiteDetailsBySite).mockReturnValue({
       coordinatesType: 'unknown'

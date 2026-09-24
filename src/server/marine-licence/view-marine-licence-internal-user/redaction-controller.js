@@ -6,19 +6,26 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { isClientSideFetchRequest } from '#src/server/common/helpers/is-client-side-fetch-request.js'
 import { viewDetailsInternalUserController } from '#src/server/marine-licence/view-marine-licence-internal-user/controller.js'
 import { REDACTION_LABEL } from '#src/server/marine-licence/view-details/utils.js'
+import {
+  replaceDocumentUrls,
+  REPLACE_DOCUMENT_TYPES
+} from '#src/server/marine-licence/view-marine-licence-internal-user/replace-document/index.js'
 
 const redactionPayloadSchema = joi.object({
   marineLicenceId: joi.string().optional(),
   fieldKey: joi.string().required(),
   index: joi.number().integer().min(0).optional(),
   activityIndex: joi.number().integer().min(0).optional(),
+  drawingIndex: joi.number().integer().min(0).optional(),
   policyCode: joi.string().optional(),
   withhold: joi.boolean().optional(),
-  text: joi.string().allow('').when('withhold', {
-    is: joi.exist(),
-    then: joi.optional(),
-    otherwise: joi.required()
-  })
+  remove: joi.boolean().optional(),
+  text: joi
+    .string()
+    .allow('')
+    .required()
+    .when('withhold', { is: joi.exist(), then: joi.optional() })
+    .when('remove', { is: joi.exist(), then: joi.optional() })
 })
 
 // no text when we are withholding
@@ -27,7 +34,7 @@ const resolveRedactionText = (text, withhold) => {
   if (withhold !== undefined) {
     return undefined
   }
-  return text.trim() === '' ? REDACTION_LABEL : text
+  return !text || text.trim() === '' ? REDACTION_LABEL : text
 }
 
 const failAction = (request, h, error) => {
@@ -48,9 +55,11 @@ export const saveRedactionController = {
       fieldKey,
       index,
       activityIndex,
+      drawingIndex,
       marineLicenceId,
       policyCode,
       text,
+      remove,
       withhold
     } = request.payload
 
@@ -64,7 +73,9 @@ export const saveRedactionController = {
       await service.saveRedaction(marineLicenceId, fieldKey, redactionText, {
         siteIndex: index,
         activityIndex,
+        drawingIndex,
         policyCode,
+        remove,
         withhold
       })
     } catch (error) {
@@ -82,5 +93,40 @@ export const saveRedactionController = {
     }
 
     return viewDetailsInternalUserController.handler(request, h)
+  }
+}
+
+const onlyForConstructionDrawing = joi.number().integer().min(1).when('type', {
+  is: REPLACE_DOCUMENT_TYPES.CONSTRUCTION_DRAWING,
+  then: joi.required(),
+  otherwise: joi.forbidden()
+})
+
+const replaceDocumentQuerySchema = joi.object({
+  type: joi
+    .string()
+    .valid(...Object.values(REPLACE_DOCUMENT_TYPES))
+    .required(),
+  site: onlyForConstructionDrawing,
+  drawing: onlyForConstructionDrawing
+})
+
+export const replaceDocumentController = {
+  options: {
+    validate: {
+      query: replaceDocumentQuerySchema,
+      failAction
+    }
+  },
+  handler(request, h) {
+    const { applicationReference } = request.params
+    const { type, site, drawing } = request.query
+
+    const { uploadUrl } = replaceDocumentUrls(applicationReference, type, {
+      site,
+      drawing
+    })
+
+    return h.redirect(uploadUrl)
   }
 }

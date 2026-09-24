@@ -1,0 +1,52 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set withholdButtonHtml %}
+  {% if not params.isWithheld %}
+     Withhold document
+     {% else %}
+     Remove redaction
+  {% endif %}
+  <span class="govuk-visually-hidden"> for {{ params.label }}</span>
+{% endset %}
+
+{% set withholdButtonClasses %}{{ "" if params.isWithheld else "govuk-!-margin-top-4 govuk-!-margin-bottom-0" }}{% endset %}
+
+{% if not params.isWithheld %}
+  <p class="govuk-body">{{ params.filename }}</p>
+{% endif %}
+
+<form class="app-withhold-location__form" method="post" action="{{ params.saveUrl }}">
+  <input type="hidden" name="fieldKey" value="{{ params.fieldKey }}">
+  <input type="hidden" name="marineLicenceId" value="{{ params.marineLicenceId }}">
+  {% if params.index is defined %}
+    <input type="hidden" name="index" value="{{ params.index }}">
+  {% endif %}
+  {% if params.drawingIndex is defined %}
+    <input type="hidden" name="drawingIndex" value="{{ params.drawingIndex }}">
+  {% endif %}
+  <input type="hidden" name="withhold" value="{{ "false" if params.isWithheld else "true" }}">
+  <input type="hidden" name="csrfToken" value="{{ params.csrfToken }}">
+
+  <div {%if params.isWithheld %}class="app-redaction-inset"{% endif %}>
+    {% if params.isWithheld %}
+        <span class="app-redaction-label">***REDACTED***</span>
+        <p class="govuk-body govuk-!-margin-top-1">This document will not be published on the public register.</p>
+
+        {% if params.redactedDocument.filename %}
+          <p class="govuk-body app-withhold__redacted-document">{{ params.redactedDocument.filename }}</p>
+        {% endif %}
+    {% endif %}
+
+    <div class="govuk-button-group {{ withholdButtonClasses }}">
+      {{ govukButton({
+        html: withholdButtonHtml,
+        type: "submit",
+        classes: "govuk-link govuk-button--as-link govuk-!-margin-bottom-0 app-withhold__button"
+      }) }}
+
+      {% if not params.isWithheld %}
+        <a class="govuk-link" href="{{ params.replaceDocumentUrl }}">Replace document</a>
+      {% endif %}
+    </div>
+  </div>
+</form>

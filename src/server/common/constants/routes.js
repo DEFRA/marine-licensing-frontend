@@ -58,8 +58,22 @@ export const marineLicenceInvoicingRoutes = {
     '/marine-licence/check-invoicing-details'
 }
 
+export const marineLicenceRedactionRoutes = {
+  MARINE_LICENCE_REDACTION_REPLACE_DOCUMENT:
+    '/marine-licence/redaction/{applicationReference}/replace-document',
+  MARINE_LICENCE_REDACTION_UPLOAD_CONSTRUCTION_DRAWING:
+    '/marine-licence/redaction/{applicationReference}/upload-construction-drawing',
+  MARINE_LICENCE_REDACTION_UPLOAD_CONSTRUCTION_DRAWING_WAIT:
+    '/marine-licence/redaction/{applicationReference}/upload-construction-drawing-wait',
+  MARINE_LICENCE_REDACTION_WFD_FILE_UPLOAD:
+    '/marine-licence/redaction/{applicationReference}/water-framework-directive-file-upload',
+  MARINE_LICENCE_REDACTION_WFD_UPLOAD_AND_WAIT:
+    '/marine-licence/redaction/{applicationReference}/water-framework-directive-upload-and-wait'
+}
+
 export const marineLicenceRoutes = {
   ...marineLicenceInvoicingRoutes,
+  ...marineLicenceRedactionRoutes,
   MARINE_LICENCE_ACTIVITY_DESCRIPTION: '/marine-licence/activity-description',
   MARINE_LICENCE_COMPLETION_DATE: '/marine-licence/completion-date',
   MARINE_LICENCE_CHECK_YOUR_ANSWERS: '/marine-licence/check-your-answers',

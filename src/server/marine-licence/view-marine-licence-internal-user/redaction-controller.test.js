@@ -2,7 +2,10 @@ import { vi } from 'vitest'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { viewDetailsInternalUserController } from '#src/server/marine-licence/view-marine-licence-internal-user/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { saveRedactionController } from './redaction-controller.js'
+import {
+  replaceDocumentController,
+  saveRedactionController
+} from './redaction-controller.js'
 import { REDACTION_LABEL } from '../view-details/utils.js'
 
 vi.mock('#src/services/marine-licence-service/index.js')
@@ -288,5 +291,41 @@ describe('saveRedactionController', () => {
       expect(mockH.redirect).toHaveBeenCalledWith(VIEW_URL)
       expect(viewDetailsInternalUserController.handler).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe('replaceDocumentController', () => {
+  const callHandler = (query) => {
+    const mockH = createMockH()
+
+    replaceDocumentController.handler(
+      createMockRequest({
+        params: { applicationReference: 'test-ref' },
+        query
+      }),
+      mockH
+    )
+
+    return mockH
+  }
+
+  test('sends a construction drawing replacement to its upload page', () => {
+    const mockH = callHandler({
+      type: 'construction-drawing',
+      site: '1',
+      drawing: '2'
+    })
+
+    expect(mockH.redirect).toHaveBeenCalledWith(
+      '/marine-licence/redaction/test-ref/upload-construction-drawing?site=1&drawing=2'
+    )
+  })
+
+  test('sends a water framework directive replacement to its upload page', () => {
+    const mockH = callHandler({ type: 'water-framework-directive' })
+
+    expect(mockH.redirect).toHaveBeenCalledWith(
+      '/marine-licence/redaction/test-ref/water-framework-directive-file-upload'
+    )
   })
 })

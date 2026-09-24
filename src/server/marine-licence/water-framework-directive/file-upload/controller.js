@@ -22,12 +22,13 @@ import {
 export const WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD_VIEW_ROUTE =
   'marine-licence/water-framework-directive/file-upload/index'
 
-const PAGE_HEADING = 'Upload your Water Framework Directive assessment'
+export const WFD_FILE_UPLOAD_PAGE_HEADING =
+  'Upload your Water Framework Directive assessment'
 
 const waterFrameworkDirectiveUploadAndWaitPageSettings = {
   ...fileUploadPageSettings,
-  pageTitle: PAGE_HEADING,
-  heading: PAGE_HEADING
+  pageTitle: WFD_FILE_UPLOAD_PAGE_HEADING,
+  heading: WFD_FILE_UPLOAD_PAGE_HEADING
 }
 
 export const waterFrameworkFileUploadController = {

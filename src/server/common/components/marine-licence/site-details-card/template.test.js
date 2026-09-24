@@ -150,7 +150,9 @@ describe('Marine Licence Site Details Card - withhold location', () => {
     csrfToken: 'test-crumb-token'
   }
 
-  const withheld = { siteDetails: { 1: { withholdLocation: true } } }
+  const withheld = {
+    siteDetails: { 1: { withholdLocation: { withhold: true } } }
+  }
 
   const renderCard = (params) =>
     renderComponent('marine-licence/site-details-card', {

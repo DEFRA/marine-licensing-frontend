@@ -8,11 +8,19 @@
   border-width: 0;
   background: none;
   box-shadow: none;
+  vertical-align: baseline;
+  text-align: left;
 
   &:hover {
     background: none;
     color: govuk-functional-colour(link-hover);
     text-decoration: underline;
     text-decoration-thickness: 3px;
+  }
+}
+
+.govuk-button-group {
+  .govuk-button--as-link {
+    text-align: left;
   }
 }

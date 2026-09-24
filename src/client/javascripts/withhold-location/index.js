@@ -25,7 +25,7 @@ export class WithholdLocation extends Component {
     super($root)
 
     this.$form = this.$root.querySelector('.app-withhold-location__form')
-    this.$button = this.$root.querySelector('.app-withhold-location__button')
+    this.$button = this.$root.querySelector('.app-withhold__button')
 
     this.$form.addEventListener('submit', (event) => this.onSubmit(event))
   }

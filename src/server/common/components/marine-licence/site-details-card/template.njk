@@ -5,7 +5,7 @@
 
 {% set summaryRows = [] %}
 
-{% set isLocationWithheld = params.redactions.siteDetails[params.loopIndex0].withholdLocation %}
+{% set isLocationWithheld = params.redactions.siteDetails[params.loopIndex0].withholdLocation.withhold %}
 
 {% set _ = summaryRows.push({
   key: { text: "Site name" },
@@ -116,7 +116,7 @@
           {{ govukButton({
             html: withholdButtonHtml,
             type: "submit",
-            classes: "govuk-link govuk-button--as-link govuk-!-margin-bottom-0 app-withhold-location__button"
+            classes: "govuk-link govuk-button--as-link govuk-!-margin-bottom-0 app-withhold__button"
           }) }}
         </div>
       </div>

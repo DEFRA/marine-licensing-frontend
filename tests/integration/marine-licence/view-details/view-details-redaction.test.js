@@ -38,7 +38,7 @@ describe('Marine Licence View Details Redaction', () => {
     document = await loadViewDetailsPage(getServer())
   })
 
-  test('renders the page in Dynamics view', async () => {
+  test('renders the page in Redact view', async () => {
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'Redact application for the public register'
     )
@@ -50,6 +50,12 @@ describe('Marine Licence View Details Redaction', () => {
     expect(document.querySelector('.app-redaction-label').textContent).toBe(
       '***REDACTED***'
     )
+  })
+
+  test('cards not required from other view details variants do not show here', () => {
+    expect(document.querySelector('#fee-estimate-card')).toBeFalsy()
+    expect(document.querySelector('#invoicing-card')).toBeFalsy()
+    expect(document.querySelector('#public-register-card')).toBeFalsy()
   })
 
   test('does not link to the preview when nothing has been redacted', () => {

@@ -2,8 +2,16 @@ import { vi } from 'vitest'
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { wrapRedactionLabels } from '#src/server/common/helpers/marine-licence/redaction-label.js'
 import {
+  EXCLUDED_ACTIVITIES_HEADING,
+  FILE_UPLOAD_HEADING,
+  NAUTICAL_MILE_HEADING
+} from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
+import {
+  buildRedactedMarinePlanPolicies,
+  buildRedactedOtherPermissions,
   buildRedactedPreviewProjectDetails,
-  buildRedactedSiteDetails
+  buildRedactedSiteDetails,
+  buildRedactedWaterFrameworkDirectiveData
 } from '#src/server/marine-licence/view-marine-licence-internal-user/preview-project-details.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/site-data.js', () => ({
@@ -159,5 +167,111 @@ describe('buildRedactedSiteDetails', () => {
     expect(result.summaryData[0].activityDetails[1].activityDescription).toBe(
       'Second activity'
     )
+  })
+})
+
+describe('buildRedactedOtherPermissions', () => {
+  const permissions = {
+    specialLegalPowers: { agree: 'no' },
+    harbourAuthority: { area: 'yes', details: 'Harbour details' },
+    otherAuthorities: { agree: 'yes', details: 'Council' },
+    publicConsultation: { consulted: 'yes', details: 'Fishing group' }
+  }
+
+  test('returns the same permissions when nothing is redacted', () => {
+    expect(buildRedactedOtherPermissions(permissions)).toEqual(permissions)
+  })
+
+  test('publishes each redacted permission as the displayed details', () => {
+    const result = buildRedactedOtherPermissions({
+      ...permissions,
+      redactions: {
+        specialLegalPowers: { redactedText: '***REDACTED*** powers' },
+        harbourAuthority: { redactedText: '***REDACTED*** harbour' }
+      }
+    })
+
+    expect(result.specialLegalPowers.agree).toBe('yes')
+    expect(result.specialLegalPowers.details.val).toBe(
+      wrapRedactionLabels('***REDACTED*** powers')
+    )
+    expect(result.harbourAuthority.area).toBe('yes')
+    expect(result.harbourAuthority.details.val).toBe(
+      wrapRedactionLabels('***REDACTED*** harbour')
+    )
+    expect(result.otherAuthorities).toEqual(permissions.otherAuthorities)
+    expect(result.publicConsultation).toEqual(permissions.publicConsultation)
+  })
+})
+
+describe('buildRedactedMarinePlanPolicies', () => {
+  const marineLicence = {
+    marinePlanPolicies: [
+      { policyCode: 'S-CC-1', policy: 'First wording' },
+      { policyCode: 'S-CC-2', policy: 'Second wording' }
+    ],
+    marinePlanPolicyResponses: {
+      'S-CC-1': 'First consideration',
+      'S-CC-2': 'Second consideration'
+    }
+  }
+
+  test('publishes the redacted consideration and leaves the other policy', () => {
+    const result = buildRedactedMarinePlanPolicies({
+      ...marineLicence,
+      redactions: {
+        marinePlanPolicyResponses: {
+          'S-CC-1': { redactedText: 'First ***REDACTED***' }
+        }
+      }
+    })
+
+    const first = result.find((policy) => policy.policyCode === 'S-CC-1')
+    const second = result.find((policy) => policy.policyCode === 'S-CC-2')
+
+    expect(first.wording).toBe('First wording')
+    expect(first.response.val).toBe(wrapRedactionLabels('First ***REDACTED***'))
+    expect(second.response).toBe('Second consideration')
+  })
+})
+
+describe('buildRedactedWaterFrameworkDirectiveData', () => {
+  const marineLicence = {
+    waterFrameworkDirective: {
+      nauticalMile: 'yes',
+      excludedActivities: 'no',
+      uploadedFile: { filename: 'assessment.pdf' }
+    }
+  }
+
+  test('returns the same display values when nothing is redacted', () => {
+    const result = buildRedactedWaterFrameworkDirectiveData(marineLicence)
+
+    expect(result.nauticalMile.value.text).toBe('Yes')
+    expect(result.excludedActivities.value.text).toBe('No')
+    expect(result.uploadedFile.value.text).toBe('assessment.pdf')
+  })
+
+  test('publishes the redacted nautical mile and excluded activities text', () => {
+    const result = buildRedactedWaterFrameworkDirectiveData({
+      ...marineLicence,
+      redactions: {
+        waterFrameworkDirective: {
+          nauticalMile: { redactedText: '***REDACTED*** mile' },
+          excludedActivities: { redactedText: '***REDACTED*** activities' }
+        }
+      }
+    })
+
+    expect(result.nauticalMile.key.text).toBe(NAUTICAL_MILE_HEADING)
+    expect(result.nauticalMile.value.text.val).toBe(
+      wrapRedactionLabels('***REDACTED*** mile')
+    )
+    expect(result.excludedActivities.key.text).toBe(EXCLUDED_ACTIVITIES_HEADING)
+    expect(result.excludedActivities.value.text.val).toBe(
+      wrapRedactionLabels('***REDACTED*** activities')
+    )
+    expect(result.uploadedFile.value.text).toBe('assessment.pdf')
+    expect(result.uploadedFile.key.text).toBe(FILE_UPLOAD_HEADING)
   })
 })

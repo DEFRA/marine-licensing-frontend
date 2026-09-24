@@ -2,12 +2,14 @@ import Boom from '@hapi/boom'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { isProjectViewable } from '#src/server/common/helpers/view-details/utils.js'
-import { wrapRedactionLabels } from '#src/server/common/helpers/marine-licence/redaction-label.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 import { buildApplicationDetailsCardData } from '#src/server/marine-licence/view-details/utils.js'
 import {
+  buildRedactedMarinePlanPolicies,
+  buildRedactedOtherPermissions,
   buildRedactedPreviewProjectDetails,
-  buildRedactedSiteDetails
+  buildRedactedSiteDetails,
+  buildRedactedWaterFrameworkDirectiveData
 } from '#src/server/marine-licence/view-marine-licence-internal-user/preview-project-details.js'
 
 export const PREVIEW_VIEW_ROUTE =
@@ -29,17 +31,21 @@ export const previewController = {
       const summaryData = buildSummaryData(marineLicence)
 
       const projectDetails = buildRedactedPreviewProjectDetails(summaryData)
-
       const siteData = buildRedactedSiteDetails(summaryData)
+      const otherPermissions = buildRedactedOtherPermissions(summaryData)
+      const marinePlanPolicies = buildRedactedMarinePlanPolicies(marineLicence)
+      const waterFrameworkDirectiveData =
+        buildRedactedWaterFrameworkDirectiveData(marineLicence)
 
       return h.view(PREVIEW_VIEW_ROUTE, {
-        pageTitle: projectDetails.projectName,
         pageCaption: marineLicence.applicationReference,
-        headingHtml: wrapRedactionLabels(projectDetails.projectName),
         isReadOnly: true,
         ...projectDetails,
+        ...otherPermissions,
         ...buildApplicationDetailsCardData(marineLicence),
         siteData,
+        marinePlanPolicies,
+        waterFrameworkDirectiveData,
         redactions: marineLicence.redactions
       })
     } catch (error) {

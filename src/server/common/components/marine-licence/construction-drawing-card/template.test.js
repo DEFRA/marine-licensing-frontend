@@ -287,6 +287,32 @@ describe('Marine Licence Construction Drawing Card', () => {
       expect($component.html()).not.toContain('Replace document')
     })
 
+    test('shows a replaced file as a normal filename', () => {
+      const $component = render({
+        enableRedaction: false,
+        redactions: {
+          siteDetails: {
+            1: {
+              constructionDrawings: {
+                1: {
+                  withholdDocument: {
+                    withhold: true,
+                    redactedDocument: { filename: 'replacement.png' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      })
+
+      expect($component('#construction-drawing-site-2-2').text()).toContain(
+        'replacement.png'
+      )
+      expect($component('.app-redaction-label')).toHaveLength(0)
+      expect($component.html()).not.toContain('Replace document')
+    })
+
     test('renders no withhold control when not read only', () => {
       const $component = render({ isReadOnly: false })
 

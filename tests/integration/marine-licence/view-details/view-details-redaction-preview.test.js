@@ -223,6 +223,36 @@ describe('Marine licence redaction preview', () => {
         row: 'File upload',
         published: REDACTION_LABEL
       },
+      {
+        field: 'replaced construction drawing',
+        licence: {
+          ...mockSubmittedMarineLicenceApplication,
+          siteDetails: [
+            {
+              ...mockSubmittedMarineLicenceApplication.siteDetails[0],
+              constructionDrawings: [{ filename: 'drawing.pdf' }]
+            }
+          ]
+        },
+        redactions: {
+          siteDetails: {
+            0: {
+              constructionDrawings: {
+                0: {
+                  withholdDocument: {
+                    withhold: true,
+                    redactedDocument: { filename: 'replacement.png' }
+                  }
+                }
+              }
+            }
+          }
+        },
+        card: '#construction-drawing-site-1-1',
+        row: 'File upload',
+        published: 'replacement.png',
+        plain: true
+      },
       ...[
         [
           'activity type',
@@ -278,7 +308,88 @@ describe('Marine licence redaction preview', () => {
         card: '#activity-details-site-1-activity-1',
         row,
         published
-      }))
+      })),
+      {
+        field: 'special legal powers',
+        redactions: {
+          specialLegalPowers: { redactedText: `Powers ${REDACTION_LABEL}` }
+        },
+        card: '#other-permissions-card',
+        row: 'Special legal powers to do any of this project',
+        published: `Powers ${REDACTION_LABEL}`
+      },
+      {
+        field: 'harbour authority',
+        redactions: {
+          harbourAuthority: { redactedText: `Harbour ${REDACTION_LABEL}` }
+        },
+        card: '#other-permissions-card',
+        row: 'Located in a harbour authority area',
+        published: `Harbour ${REDACTION_LABEL}`
+      },
+      {
+        field: 'other authorities',
+        redactions: {
+          otherAuthorities: { redactedText: `Authority ${REDACTION_LABEL}` }
+        },
+        card: '#other-permissions-card',
+        row: 'Permission from any other authorities in relation to this project',
+        published: `Authority ${REDACTION_LABEL}`
+      },
+      {
+        field: 'public consultation',
+        redactions: {
+          publicConsultation: { redactedText: `Consulted ${REDACTION_LABEL}` }
+        },
+        card: '#other-permissions-card',
+        row: 'Pre-application public groups or organisations consultation',
+        published: `Consulted ${REDACTION_LABEL}`
+      },
+      {
+        field: 'marine plan policy consideration',
+        redactions: {
+          marinePlanPolicyResponses: {
+            'S-CC-1': { redactedText: `First ${REDACTION_LABEL}` }
+          }
+        },
+        card: '#marine-plan-policies-card',
+        row: 'S-CC-1',
+        published: `First ${REDACTION_LABEL}`,
+        includes: true
+      },
+      {
+        field: 'nautical mile',
+        redactions: {
+          waterFrameworkDirective: {
+            nauticalMile: { redactedText: `Within ${REDACTION_LABEL}` }
+          }
+        },
+        card: '#water-framework-directive-card',
+        row: 'Project located within one nautical mile (1.85km) of low-water, in a tidal river or estuary',
+        published: `Within ${REDACTION_LABEL}`
+      },
+      {
+        field: 'excluded activities',
+        redactions: {
+          waterFrameworkDirective: {
+            excludedActivities: { redactedText: `Limited to ${REDACTION_LABEL}` }
+          }
+        },
+        card: '#water-framework-directive-card',
+        row: 'Project limited to one of the excluded activities',
+        published: `Limited to ${REDACTION_LABEL}`
+      },
+      {
+        field: 'withheld water framework directive assessment',
+        redactions: {
+          waterFrameworkDirective: {
+            withholdDocument: { withhold: true }
+          }
+        },
+        card: '#water-framework-directive-card',
+        row: 'Water Framework Directive assessment upload',
+        published: REDACTION_LABEL
+      }
     ]
 
     test.each(redactedCriteria)(
@@ -290,18 +401,30 @@ describe('Marine licence redaction preview', () => {
         published,
         heading,
         licence,
-        hiddenRow
+        hiddenRow,
+        includes,
+        plain
       }) => {
         const document = await loadPreview({
           ...(licence ?? mockSubmittedMarineLicenceApplication),
           redactions
         })
         const value = cardValue(document, card, row)
+        const text = value.textContent.trim()
 
-        expect(value.textContent.trim()).toBe(published)
-        expect(value.querySelector('.app-redaction-label').textContent).toBe(
-          REDACTION_LABEL
-        )
+        if (includes) {
+          expect(text).toContain(published)
+        } else {
+          expect(text).toBe(published)
+        }
+
+        if (plain) {
+          expect(value.querySelector('.app-redaction-label')).toBeNull()
+        } else {
+          expect(value.querySelector('.app-redaction-label').textContent).toBe(
+            REDACTION_LABEL
+          )
+        }
 
         if (hiddenRow) {
           expect(

@@ -211,7 +211,7 @@ export const entraIdRoutes = [
   routes.ADMIN_BACKFILL,
   routes.ADMIN_EMP,
   routes.ADMIN_REPORTS,
-  // marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER,
+  marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER,
   marineLicenceRoutes.MARINE_LICENCE_CSV_DOWNLOAD,
   routes.ADMIN_EXEMPTIONS
 ]

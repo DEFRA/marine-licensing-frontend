@@ -5,7 +5,8 @@
 {% if params.waterFrameworkDirectiveData.nauticalMile %}
 {% set rows = [] %}
 
-{% set isFileWithheld = params.redactions.waterFrameworkDirective.withholdDocument.withhold %}
+{% set withholdDocument = params.redactions.waterFrameworkDirective.withholdDocument %}
+{% set isFileWithheld = withholdDocument.withhold %}
 
 {% set rows = (rows.push({
   key: params.waterFrameworkDirectiveData.nauticalMile.key,
@@ -55,7 +56,7 @@
           filename: params.waterFrameworkDirectiveData.uploadedFile.value.text,
           label: "the Water Framework Directive assessment",
           fieldKey: "waterFrameworkDirective.withholdDocument",
-          redactedDocument: params.redactions.waterFrameworkDirective.withholdDocument.redactedDocument,
+          redactedDocument: withholdDocument.redactedDocument,
           marineLicenceId: params.marineLicenceId,
           saveUrl: params.redactionSaveUrl,
           replaceDocumentUrl: params.replaceDocumentUrl + "?type=water-framework-directive",
@@ -64,7 +65,15 @@
         classes: "govuk-summary-list__value--full-width"
       }
     }), rows) %}
-  {% elif not isFileWithheld %}
+  {% elif isFileWithheld %}
+    {% set replacementFilename = withholdDocument.redactedDocument.filename %}
+    {% set rows = (rows.push({
+      key: params.waterFrameworkDirectiveData.uploadedFile.key,
+      value: { text: replacementFilename } if replacementFilename else {
+        html: "***REDACTED***" | wrapRedactionLabels
+      }
+    }), rows) %}
+  {% else %}
     {% set rows = (rows.push(params.waterFrameworkDirectiveData.uploadedFile), rows) %}
   {% endif %}
 {% endif %}

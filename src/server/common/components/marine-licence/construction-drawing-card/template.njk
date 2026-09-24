@@ -23,7 +23,9 @@
     {% set drawingIndex = loop.index0 %}
     {% set drawingNumber = loop.index %}
 
-    {% set isFileWithheld = params.redactions.siteDetails[siteIndex].constructionDrawings[drawingIndex].withholdDocument.withhold %}
+    {% set withholdDocument = params.redactions.siteDetails[siteIndex].constructionDrawings[drawingIndex].withholdDocument %}
+    {% set isFileWithheld = withholdDocument.withhold %}
+    {% set replacementFilename = withholdDocument.redactedDocument.filename %}
 
     {% if params.enableRedaction %}
       {{ govukSummaryList({
@@ -45,7 +47,7 @@
               filename: drawing.filename,
               label: "site " + params.siteNumber + " construction drawing " + drawingNumber,
               fieldKey: "siteDetails.constructionDrawings.withholdDocument",
-              redactedDocument: params.redactions.siteDetails[siteIndex].constructionDrawings[drawingIndex].withholdDocument.redactedDocument,
+              redactedDocument: withholdDocument.redactedDocument,
               marineLicenceId: params.marineLicenceId,
               index: siteIndex,
               drawingIndex: drawingIndex,
@@ -70,7 +72,9 @@
         classes: "govuk-summary-list--full-width",
         rows: [{
           key: { text: "File upload" },
-          value: { html: "***REDACTED***" | wrapRedactionLabels }
+          value: { text: replacementFilename } if replacementFilename else {
+            html: "***REDACTED***" | wrapRedactionLabels
+          }
         }]
       }) }}
     {% else %}

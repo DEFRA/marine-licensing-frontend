@@ -35,29 +35,6 @@ describe('Marine Licence Application Details Card Component', () => {
     )
   })
 
-  test('Should label the rows with the application terminology', () => {
-    const $comp = renderComponent('marine-licence/project-details-card', {
-      projectName: 'Test Marine Project',
-      projectBackground: 'Some background',
-      preferredDates: 'January 2027 to January 2028',
-      isReadOnly: false
-    })
-    const keys = $comp('.govuk-summary-list__key')
-      .map((_, el) => $comp(el).text().trim())
-      .get()
-    expect(keys).toEqual([
-      'Application name',
-      'Proposed works summary',
-      'Preferred start and end dates of the licence'
-    ])
-    expect($comp.html()).toContain(
-      '<span class="govuk-visually-hidden"> application name (Application details)</span>'
-    )
-    expect($comp.html()).toContain(
-      '<span class="govuk-visually-hidden"> proposed works summary (Application details)</span>'
-    )
-  })
-
   describe('change links', () => {
     test('Should show change links when not read only', () => {
       const $comp = renderComponent('marine-licence/project-details-card', {

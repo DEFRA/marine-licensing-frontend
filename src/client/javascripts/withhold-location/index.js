@@ -65,7 +65,16 @@ export class WithholdLocation extends Component {
 
     this.$root.replaceWith($new)
     initCardComponents($new)
+    this.showRedactionPreview()
 
     new WithholdLocation($new).$button.focus()
+  }
+
+  showRedactionPreview = () => {
+    const $preview = document.getElementById('redaction-preview')
+
+    if ($preview) {
+      $preview.hidden = false
+    }
   }
 }

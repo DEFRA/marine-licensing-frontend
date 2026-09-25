@@ -156,13 +156,13 @@
         csrfToken: csrfToken
       }) }}
 
-      {% if redactions | length %}
+      <div id="redaction-preview"{% if not (redactions | length) %} hidden{% endif %}>
         {{ govukButton({
           text: "Preview with redactions",
           href: redactionPreviewUrl,
           classes: "govuk-button--secondary"
         }) }}
-      {% endif %}
+      </div>
 
 
     </div>

@@ -62,6 +62,7 @@ describe('Marine Licence View Details Redaction', () => {
     expect(
       queryByRole(document, 'button', { name: 'Preview with redactions' })
     ).toBeNull()
+    expect(document.querySelector('#redaction-preview').hidden).toBe(true)
   })
 
   describe('applicant withhold reason', () => {

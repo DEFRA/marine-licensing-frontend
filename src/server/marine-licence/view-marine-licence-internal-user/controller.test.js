@@ -15,6 +15,7 @@ import {
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
 import { toApplicationReferenceUrlSegment } from '#src/server/common/helpers/marine-licence/application-reference-url-segment.js'
+import { buildRedactionsForView } from '#src/server/marine-licence/view-details/utils.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/site-data.js', () => ({
   buildSiteData: vi
@@ -155,12 +156,7 @@ describe('marine-licence view details internal-user redaction controller', () =>
       VIEW_DETAILS_INTERNAL_USER_VIEW_ROUTE,
       expect.objectContaining({
         preferredDates: 'July 2026 to August 2027',
-        redactions: {
-          preferredDates: {
-            ...mockRedactions.preferredDates,
-            redactedTextValue: mockRedactions.preferredDates.redactedText
-          }
-        }
+        redactions: buildRedactionsForView(mockRedactions)
       })
     )
   })

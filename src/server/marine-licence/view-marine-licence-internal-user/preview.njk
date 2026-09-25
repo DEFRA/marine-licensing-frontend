@@ -1,14 +1,15 @@
-{% extends 'layouts/page.njk' %}
-{% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
 {% from "marine-licence/application-details-card/macro.njk" import appMarineLicenceApplicationDetailsCard %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
 {% from "marine-licence/site-location-card/macro.njk" import appMarineLicenceSiteLocationCard %}
 {% from "marine-licence/site-details-card/macro.njk" import appMarineLicenceSiteDetailsCard %}
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
+{% from "marine-licence/construction-drawing-card/macro.njk" import appMarineLicenceConstructionDrawingCard %}
 {% from "marine-licence/water-framework-directive-card/macro.njk" import appMarineLicenceWaterFrameworkDirectiveCard %}
 {% from "marine-licence/marine-plan-policies-card/macro.njk" import appMarineLicenceMarinePlanPoliciesCard %}
-{% from "marine-licence/construction-drawing-card/macro.njk" import appMarineLicenceConstructionDrawingCard %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% extends 'layouts/page.njk' %}
 
 {% set rejectedReasonsOutput %}
 
@@ -26,23 +27,20 @@
 
 {% endset %}
 
+{% block pageTitle %}
+  {{ projectName | striptags }} - {{ serviceName }}
+{% endblock %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+      <span class="govuk-caption-l">{{ pageCaption }}</span>
+      <h1 class="govuk-heading-l" id="redaction-preview-heading">{{ projectName }}</h1>
 
-      {% if pageCaption %}
-        <span class="govuk-caption-l">{{ pageCaption }}</span>
-      {% endif %}
-      <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
-
-      <p class="govuk-body">Check each answer and redact anything that must not appear on the public register. Replace whatever you redact with <span class="app-redaction-label">***REDACTED***</span>.</p>
-
-      {% if publicRegister.withholdConsent === 'yes' %}
-        <div class="govuk-inset-text" id="applicant-withhold-reason">
-          <h2 class="govuk-heading-s">The information the applicant wants withheld and why.</h2>
-          <p class="govuk-body">{{ publicRegister.reason }}</p>
-        </div>
-      {% endif %}
+      {{ govukInsetText({
+        id: "redaction-preview-notice",
+        html: "This is a preview of how the application will appear on the public register."
+      }) }}
 
       {{ appMarineLicenceApplicationDetailsCard({
         statusTag: statusTag,
@@ -59,32 +57,28 @@
       {{ appMarineLicenceProjectDetailsCard({
         projectName: projectName,
         projectBackground: projectBackground,
-        isReadOnly: isReadOnly,
+        isReadOnly: true,
         preferredDates: preferredDates,
-        enableRedaction: true,
-        redactions: redactions,
         marineLicenceId: marineLicenceId,
-        redactionSaveUrl: redactionSaveUrl,
         csrfToken: csrfToken
       }) }}
-
-      {% if summaryData and summaryData.length %}
+        
+      {% if siteData.summaryData and siteData.summaryData.length %}
         {{ appMarineLicenceSiteLocationCard({
-          coordinatesType: coordinatesType
+          coordinatesType: siteData.coordinatesType
         }) }}
 
-        {% for site in summaryData %}
+        {% for site in siteData.summaryData %}
           {% set siteIndex0 = loop.index0 %}
           {{ appMarineLicenceSiteDetailsCard({
             site: site,
             loopIndex0: loop.index0,
-            coordinatesType: coordinatesType,
-            cspNonce: cspNonce,
-            enableRedaction: true,
+            coordinatesType: siteData.coordinatesType,
             redactions: redactions,
+            cspNonce: cspNonce,
             marineLicenceId: marineLicenceId,
-            redactionSaveUrl: redactionSaveUrl,
-            csrfToken: csrfToken
+            csrfToken: csrfToken,
+            isReadOnly: true
           }) }}
 
           {% for activityDetails in site.activityDetails %}
@@ -96,10 +90,7 @@
               activityIndex0: loop.index0,
               isReadOnly: true,
               isApplicant: false,
-              enableRedaction: true,
-              redactions: redactions,
               marineLicenceId: marineLicenceId,
-              redactionSaveUrl: redactionSaveUrl,
               csrfToken: csrfToken
             }) }}
 
@@ -107,40 +98,28 @@
 
           {{ appMarineLicenceConstructionDrawingCard({
             isReadOnly: true,
-            enableRedaction: true,
             siteNumber: site.siteNumber,
             activityDetails: site.activityDetails,
             constructionDrawings: site.constructionDrawings,
-            marineLicenceId: marineLicenceId,
-            redactionSaveUrl: redactionSaveUrl,
-            replaceDocumentUrl: replaceDocumentUrl,
             redactions: redactions,
+            marineLicenceId: marineLicenceId,
             csrfToken: csrfToken
           }) }}
 
         {% endfor %}
       {% endif %}
+      
 
       {{ appMarineLicenceMarinePlanPoliciesCard({
         policies: marinePlanPolicies,
         isApplicant: false,
-        isReadOnly: true,
-        enableRedaction: true,
-        redactions: redactions,
-        marineLicenceId: marineLicenceId,
-        redactionSaveUrl: redactionSaveUrl,
-        csrfToken: csrfToken
+        isReadOnly: true
       }) }}
 
       {{ appMarineLicenceWaterFrameworkDirectiveCard({
         waterFrameworkDirectiveData: waterFrameworkDirectiveData,
-        isReadOnly: isReadOnly,
-        enableRedaction: true,
         redactions: redactions,
-        marineLicenceId: marineLicenceId,
-        redactionSaveUrl: redactionSaveUrl,
-        replaceDocumentUrl: replaceDocumentUrl,
-        csrfToken: csrfToken
+        isReadOnly: true
       }) }}
 
       {{ appMarineLicenceOtherPermissionsCard({
@@ -148,22 +127,8 @@
         harbourAuthority: harbourAuthority,
         otherAuthorities: otherAuthorities,
         publicConsultation: publicConsultation,
-        isReadOnly: isReadOnly,
-        enableRedaction: true,
-        redactions: redactions,
-        marineLicenceId: marineLicenceId,
-        redactionSaveUrl: redactionSaveUrl,
-        csrfToken: csrfToken
+        isReadOnly: true
       }) }}
-
-      <div id="redaction-preview"{% if not (redactions | length) %} hidden{% endif %}>
-        {{ govukButton({
-          text: "Preview with redactions",
-          href: redactionPreviewUrl,
-          classes: "govuk-button--secondary"
-        }) }}
-      </div>
-
 
     </div>
   </div>

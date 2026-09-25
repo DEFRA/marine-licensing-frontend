@@ -29,6 +29,12 @@ describe('isEntraIdRoute', () => {
     expect(isEntraIdRoute('/marine-licence/redaction/abc123')).toBe(true)
   })
 
+  test('should return true for the redaction preview route', () => {
+    expect(
+      isEntraIdRoute('/marine-licence/redaction/MLA-2026-10264/preview')
+    ).toBe(true)
+  })
+
   test('should return true for route starting with /marine-licence/location-csv-download', () => {
     expect(isEntraIdRoute('/marine-licence/location-csv-download')).toBe(true)
   })

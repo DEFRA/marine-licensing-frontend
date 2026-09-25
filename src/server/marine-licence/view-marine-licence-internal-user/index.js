@@ -4,6 +4,7 @@ import {
   replaceDocumentController,
   saveRedactionController
 } from '#src/server/marine-licence/view-marine-licence-internal-user/redaction-controller.js'
+import { previewController } from '#src/server/marine-licence/view-marine-licence-internal-user/preview-controller.js'
 
 export const viewMarineLicenceInternalUserRoutes = [
   {
@@ -15,6 +16,11 @@ export const viewMarineLicenceInternalUserRoutes = [
     method: 'POST',
     path: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/{applicationReference}/redact`,
     ...saveRedactionController
+  },
+  {
+    method: 'GET',
+    path: marineLicenceRoutes.MARINE_LICENCE_REDACTION_PREVIEW,
+    ...previewController
   },
   {
     method: 'GET',

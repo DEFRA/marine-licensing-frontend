@@ -20,7 +20,7 @@
     }),
     classes: "govuk-summary-list__value--full-width"
   } if params.enableRedaction else {
-    text: params.projectName
+    html: params.projectName | wrapRedactionLabels
   },
   actions: {
     items: [
@@ -49,7 +49,7 @@
     }),
     classes: "govuk-summary-list__value--full-width"
   } if params.enableRedaction else {
-    text: params.projectBackground
+    html: params.projectBackground | wrapRedactionLabels
   },
   actions: {
     items: [
@@ -78,7 +78,7 @@
     }),
     classes: "govuk-summary-list__value--full-width"
   } if params.enableRedaction else {
-    text: params.preferredDates
+    html: params.preferredDates | wrapRedactionLabels
   },
   actions: {
     items: [

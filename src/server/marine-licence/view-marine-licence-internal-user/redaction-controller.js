@@ -5,7 +5,7 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { isClientSideFetchRequest } from '#src/server/common/helpers/is-client-side-fetch-request.js'
 import { viewDetailsInternalUserController } from '#src/server/marine-licence/view-marine-licence-internal-user/controller.js'
-import { REDACTION_LABEL } from '#src/server/marine-licence/view-details/utils.js'
+import { REDACTION_LABEL } from '#src/server/common/helpers/marine-licence/redaction-label.js'
 import {
   replaceDocumentUrls,
   REPLACE_DOCUMENT_TYPES

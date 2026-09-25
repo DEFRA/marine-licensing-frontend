@@ -5191,9 +5191,9 @@
     },
     {
       "route": "/exemption/deposit/markers-moorings-pontoons-aids-to-navigation/temporary-markers24/mpa",
-      "text": "Will the activity take place within 200m of a marine protected area (MPA)?",
+      "text": "Will any activity take place within 200m of a Marine Protected Area (MPA)?",
       "section": "deposit",
-      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. Any activity within 200 metres of an MPA may need a marine licence.\n\n<p>To find out if the activity falls within 200 metres of an MPA, you can use the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">marine licensing interactive map (opens in new tab)</a>.",
+      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. You are responsible for making sure you understand the status of the location where the activity is proposed.</p><p>Marine Protected Areas include:<ul><li>Highly Protected Marine Areas (HPMA)</li><li>Marine Conservation Zones (MCZs)</li><li>Special Areas of Conservation (SACs)</li><li>Special Protection Areas (SPAs)</li><li>Ramsar sites</li><li>Sites of Special Scientific Interest (SSSIs)</li></ul></p><p>If you're unsure of whether the activity is within 200m of an MPA, check the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">MMO self-service GIS tool (opens in new tab)</a>.</p>",
       "answers": [
         {
           "id": "yes",
@@ -5271,9 +5271,9 @@
     },
     {
       "route": "/exemption/deposit/markers-moorings-pontoons-aids-to-navigation/temporary-markers/mpa",
-      "text": "Will the activity take place within 200m of a marine protected area (MPA)?",
+      "text": "Will any activity take place within 200m of a Marine Protected Area (MPA)?",
       "section": "deposit",
-      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. Any activity within 200 metres of an MPA may need a marine licence.\n\n<p>To find out if the activity falls within 200 metres of an MPA, you can use the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">marine licensing interactive map (opens in new tab)</a>.",
+      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. You are responsible for making sure you understand the status of the location where the activity is proposed.</p><p>Marine Protected Areas include:<ul><li>Highly Protected Marine Areas (HPMA)</li><li>Marine Conservation Zones (MCZs)</li><li>Special Areas of Conservation (SACs)</li><li>Special Protection Areas (SPAs)</li><li>Ramsar sites</li><li>Sites of Special Scientific Interest (SSSIs)</li></ul></p><p>If you're unsure of whether the activity is within 200m of an MPA, check the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">MMO self-service GIS tool (opens in new tab)</a>.</p>",
       "answers": [
         {
           "id": "yes",
@@ -5720,9 +5720,9 @@
     },
     {
       "route": "/exemption/deposit/scientific-research/scientific-equipment/mpa",
-      "text": "Will the activity take place within 200m of a marine protected area (MPA)?",
+      "text": "Will any activity take place within 200m of a Marine Protected Area (MPA)?",
       "section": "deposit",
-      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. Any activity within 200 metres of an MPA may need a marine licence.\n\n<p>To find out if the activity falls within 200 metres of an MPA, you can use the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">marine licensing interactive map (opens in new tab)</a>.",
+      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. You are responsible for making sure you understand the status of the location where the activity is proposed.</p><p>Marine Protected Areas include:<ul><li>Highly Protected Marine Areas (HPMA)</li><li>Marine Conservation Zones (MCZs)</li><li>Special Areas of Conservation (SACs)</li><li>Special Protection Areas (SPAs)</li><li>Ramsar sites</li><li>Sites of Special Scientific Interest (SSSIs)</li></ul></p><p>If you're unsure of whether the activity is within 200m of an MPA, check the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">MMO self-service GIS tool (opens in new tab)</a>.</p>",
       "answers": [
         {
           "id": "yes",
@@ -5834,9 +5834,9 @@
     },
     {
       "route": "/exemption/deposit/scientific-research/tracers-reagents/mpa",
-      "text": "Will the activity take place within 200m of a marine protected area (MPA)?",
+      "text": "Will any activity take place within 200m of a Marine Protected Area (MPA)?",
       "section": "deposit",
-      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. Any activity within 200 metres of an MPA may need a marine licence.\n\n<p>To find out if the activity falls within 200 metres of an MPA, you can use the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">marine licensing interactive map (opens in new tab)</a>.",
+      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. You are responsible for making sure you understand the status of the location where the activity is proposed.</p><p>Marine Protected Areas include:<ul><li>Highly Protected Marine Areas (HPMA)</li><li>Marine Conservation Zones (MCZs)</li><li>Special Areas of Conservation (SACs)</li><li>Special Protection Areas (SPAs)</li><li>Ramsar sites</li><li>Sites of Special Scientific Interest (SSSIs)</li></ul></p><p>If you're unsure of whether the activity is within 200m of an MPA, check the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">MMO self-service GIS tool (opens in new tab)</a>.</p>",
       "answers": [
         {
           "id": "yes",
@@ -6900,9 +6900,9 @@
     },
     {
       "route": "/exemption/removal/scientific-research/samples/mpa",
-      "text": "Will the activity take place within 200m of a marine protected area (MPA)?",
+      "text": "Will any activity take place within 200m of a Marine Protected Area (MPA)?",
       "section": "removal",
-      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. Any activity within 200 metres of an MPA may need a marine licence.\n\n<p>To find out if the activity falls within 200 metres of an MPA, you can use the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">marine licensing interactive map (opens in new tab)</a>.",
+      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. You are responsible for making sure you understand the status of the location where the activity is proposed.</p><p>Marine Protected Areas include:<ul><li>Highly Protected Marine Areas (HPMA)</li><li>Marine Conservation Zones (MCZs)</li><li>Special Areas of Conservation (SACs)</li><li>Special Protection Areas (SPAs)</li><li>Ramsar sites</li><li>Sites of Special Scientific Interest (SSSIs)</li></ul></p><p>If you're unsure of whether the activity is within 200m of an MPA, check the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">MMO self-service GIS tool (opens in new tab)</a>.</p>",
       "answers": [
         {
           "id": "yes",
@@ -7168,20 +7168,21 @@
         },
         {
           "id": "marineLitter",
-          "text": "Marine litter left by divers",
-          "nextQuestionRoute": "/exemption/removal/waste/marine-litter",
-          "hint": "Any persistent, manufactured or processed solid material discarded, disposed of or abandoned in the marine and coastal environment"
+          "text": "Marine litter recovered during the course of diving activities",
+          "nextQuestionRoute": "/exemption/removal/waste/marine-litter/historic-interest",
+          "hint": "This includes any solid manufactured or processed waste and lost or discarded fishing gear."
         },
         {
           "id": "litterSeaweed",
           "text": "Litter or seaweed",
-          "nextQuestionRoute": "/exemption/removal/waste/litter-seaweed"
+          "nextQuestionRoute": "/exemption/removal/waste/litter-seaweed",
+          "hint": "By or on behalf of a local authority."
         },
         {
           "id": "litterDebris",
           "text": "Marine litter and debris",
           "nextQuestionRoute": "/exemption/removal/waste/litter-debris",
-          "hint": "Debris includes remains of something destroyed or unwanted material left scattered around"
+          "hint": "By or on behalf of a harbour authority"
         },
         {
           "id": "other",
@@ -7306,23 +7307,6 @@
           "id": "otherDeadAnimals",
           "text": "Unlikely to affect any of the listed sites",
           "outcomeRoute": "/exemption/licence-not-required-exemption-available-article-21"
-        }
-      ]
-    },
-    {
-      "route": "/exemption/removal/waste/marine-litter",
-      "text": "Will the activity involve removing marine litter or fishing gear that was discarded or lost during a dive?",
-      "section": "removal",
-      "answers": [
-        {
-          "id": "yes",
-          "text": "Yes",
-          "nextQuestionRoute": "/exemption/removal/waste/marine-litter/historic-interest"
-        },
-        {
-          "id": "no",
-          "text": "No",
-          "outcomeRoute": "/exemption/removal-exe-not-available-continue"
         }
       ]
     },
@@ -8732,7 +8716,7 @@
     {
       "route": "/exemption/dredging/coastal-drainage-flood/maintenance/CPA/beach-replenishment",
       "text": "Does the activity involve beach replenishment?",
-      "hint": "<p>MPAs are designated areas of the sea protected from harmful human activity. Any activity within 200 metres of an MPA may need a marine licence.\n\n<p>To find out if the activity falls within 200 metres of an MPA, you can use the <a target=\"_blank\" href=\"https://defra.maps.arcgis.com/apps/webappviewer/index.html?id=28f91021979447d3b43dc83e6e93094c&showLayers=Marine%20Protected%20Areas\">marine licensing interactive map (opens in new tab)</a>.",
+      "hint": "<p>Beach replenishment means adding new material from outside sources on land, offshore or along the coast to replace material the beach has permanently lost.</p>",
       "section": "dredging",
       "answers": [
         {

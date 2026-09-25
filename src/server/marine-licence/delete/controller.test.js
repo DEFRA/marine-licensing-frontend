@@ -86,8 +86,8 @@ describe('#delete', () => {
         projectName: 'Test Project',
         marineLicenceType: MARINE_LICENCE_TYPE,
         marineLicenceId: 'test-project-id',
-        cancelLink: '/projects',
-        backLink: '/projects',
+        cancelLink: '/submissions',
+        backLink: '/submissions',
         routes
       })
       expect(result).toBe('view-response')

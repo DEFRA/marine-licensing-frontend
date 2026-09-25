@@ -82,12 +82,12 @@ export const transformOtherPermissionsTaskList = (taskList, isCitizen) => {
 
 export const transformProjectDetailsTaskList = (taskList) => [
   {
-    title: { text: 'Project name', classes: taskClasses },
+    title: { text: 'Application name', classes: taskClasses },
     href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
     status: setStatus(taskList.projectName)
   },
   {
-    title: { text: 'Project background', classes: taskClasses },
+    title: { text: 'Proposed works summary', classes: taskClasses },
     href: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
     status: setStatus(taskList.projectBackground)
   },

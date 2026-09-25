@@ -23,14 +23,14 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getBackLink } from './utils.js'
 
 const errorMessages = {
-  PROJECT_NAME_REQUIRED: 'Enter the project name',
-  PROJECT_NAME_MAX_LENGTH: 'Project name should be 250 characters or less'
+  PROJECT_NAME_REQUIRED: 'Enter the application name',
+  PROJECT_NAME_MAX_LENGTH: 'Application name must be 250 characters or fewer'
 }
 export const PROJECT_NAME_VIEW_ROUTE = 'marine-licence/project-name/index'
 
 const projectNameViewSettings = {
-  pageTitle: 'Project name',
-  heading: 'Project Name'
+  pageTitle: 'Application name',
+  heading: 'Application name'
 }
 
 const marineLicenceDisabledError = 'Marine Licence journey is not enabled'

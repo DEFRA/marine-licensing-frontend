@@ -14,7 +14,7 @@ export const homeController = {
     // if the user is already logged in,
     // AND there's no MCMS context in cache (it would be in cache if they'd just come from sign in)
     // AND the URL does not have an IAT query string
-    // then redirect to projects dashboard
+    // then redirect to the service home page
     if (
       request.auth?.isAuthenticated &&
       !getMcmsContextFromCache(request) &&

@@ -34,8 +34,20 @@ describe('Harbour authority', () => {
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Is your project located in a harbour authority area?'
+      'Are your proposed works located in a harbour authority area?'
     )
+    expect(
+      getByText(
+        document,
+        (_, element) =>
+          element.tagName === 'P' &&
+          element.textContent
+            .trim()
+            .endsWith(
+              'to find out if your proposed works are located in a harbour authority area.'
+            )
+      )
+    ).toBeInTheDocument()
     getByRole(document, 'button', { name: 'Save and continue' })
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
@@ -76,7 +88,8 @@ describe('Harbour authority', () => {
     expect(
       getInputInFieldset({
         document,
-        fieldsetLabel: 'Is your project located in a harbour authority area?',
+        fieldsetLabel:
+          'Are your proposed works located in a harbour authority area?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -85,7 +98,8 @@ describe('Harbour authority', () => {
     expect(
       getInputInFieldset({
         document,
-        fieldsetLabel: 'Is your project located in a harbour authority area?',
+        fieldsetLabel:
+          'Are your proposed works located in a harbour authority area?',
         inputLabel: 'No',
         findByHeading: true
       })
@@ -109,7 +123,8 @@ describe('Harbour authority', () => {
     expect(
       getInputInFieldset({
         document,
-        fieldsetLabel: 'Is your project located in a harbour authority area?',
+        fieldsetLabel:
+          'Are your proposed works located in a harbour authority area?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -135,9 +150,10 @@ describe('Harbour authority', () => {
 
     expectFieldsetError({
       document,
-      fieldsetLabel: 'Is your project located in a harbour authority area?',
+      fieldsetLabel:
+        'Are your proposed works located in a harbour authority area?',
       errorMessage:
-        'Select whether your project is located within a harbour authority area',
+        'Select whether your proposed works are located within a harbour authority area',
       findByHeading: true
     })
   })
@@ -156,7 +172,8 @@ describe('Harbour authority', () => {
 
     expectFieldsetError({
       document,
-      fieldsetLabel: 'Is your project located in a harbour authority area?',
+      fieldsetLabel:
+        'Are your proposed works located in a harbour authority area?',
       errorMessage: 'Enter details of the harbour authority',
       findByHeading: true
     })

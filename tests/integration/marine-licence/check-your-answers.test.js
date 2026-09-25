@@ -250,7 +250,10 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
 
     test('still renders the project details card', () => {
       expect(
-        getByRole(document, 'heading', { level: 2, name: 'Project details' })
+        getByRole(document, 'heading', {
+          level: 2,
+          name: 'Application details'
+        })
       ).toBeInTheDocument()
       validateWaterFrameworkDirective(document, expectedWfdContent)
     })

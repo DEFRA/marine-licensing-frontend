@@ -1,4 +1,9 @@
-import { getByRole, queryByRole, queryByText } from '@testing-library/dom'
+import {
+  getByRole,
+  getByText,
+  queryByRole,
+  queryByText
+} from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -35,6 +40,24 @@ describe('Marine plan policy guidance page (marine licence)', () => {
     ).toBeInTheDocument()
     expect(
       getByRole(document, 'heading', { name: 'Mitigation hierarchy' })
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        document,
+        'Avoiding may include changing the location, method, timing, of a proposal, potentially including buffers or exclusion zones. It is often easiest to achieve when designing a proposal so that the impact does not occur.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        document,
+        'Minimising impacts could include considering the location, methodology, timing, re-use of infrastructure, or layout of the proposal.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        document,
+        'The inclusion of this information does not indicate that approval of the proposal will follow by default. Approval will also depend on other material considerations which may include, for example, other plans.'
+      )
     ).toBeInTheDocument()
   })
 

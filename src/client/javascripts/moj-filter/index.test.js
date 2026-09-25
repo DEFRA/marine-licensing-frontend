@@ -19,7 +19,7 @@ const buildSelectedFiltersMarkup = ({
         </div>
         ${
           withClearLink
-            ? '<div class="moj-filter__heading-action"><p><a class="govuk-link govuk-link--no-visited-state" href="/projects">Clear filters</a></p></div>'
+            ? '<div class="moj-filter__heading-action"><p><a class="govuk-link govuk-link--no-visited-state" href="/submissions">Clear filters</a></p></div>'
             : ''
         }
       </div>
@@ -49,7 +49,7 @@ describe('MojFilter', () => {
   let originalLocation
 
   const buildFilterMarkup = ({ withClearLink = true } = {}) => `
-      <form class="app-filter-form" action="/projects">
+      <form class="app-filter-form" action="/submissions">
         <input type="hidden" name="csrfToken" value="test-token" />
         <div data-module="moj-filter">
           ${buildSelectedFiltersMarkup({ withClearLink })}
@@ -212,7 +212,7 @@ describe('MojFilter', () => {
 
     test('should swap in the filter options so the owner error appears without a reload', async () => {
       document.body.innerHTML = `
-        <form class="app-filter-form" action="/projects">
+        <form class="app-filter-form" action="/submissions">
           <input type="hidden" name="csrfToken" value="test-token" />
           <div data-module="moj-filter">
             ${buildSelectedFiltersMarkup()}
@@ -278,7 +278,7 @@ describe('MojFilter', () => {
       tagAttributes = 'data-field="status" data-value="ACTIVE"',
       checkboxAttributes = 'name="status" value="ACTIVE" checked'
     } = {}) => `
-      <form class="app-filter-form" action="/projects">
+      <form class="app-filter-form" action="/submissions">
         <input type="hidden" name="csrfToken" value="test-token" />
         <div data-module="moj-filter">
           <div class="moj-filter__selected">

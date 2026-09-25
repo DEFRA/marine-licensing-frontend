@@ -90,7 +90,7 @@ const baseExpectedContent = {
   pageTitle: 'Test Marine Activity Project',
   pageCaption: 'EXE/2025/00003',
   backLinkText: 'Back',
-  backLinkHref: '/projects',
+  backLinkHref: '/submissions',
   summaryCards: [
     'Application details',
     'Project summary',

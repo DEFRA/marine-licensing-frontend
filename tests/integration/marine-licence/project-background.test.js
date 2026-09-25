@@ -7,7 +7,7 @@ import {
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
 
-describe('Project background', () => {
+describe('Proposed works summary', () => {
   const getServer = setupTestServer()
   const marineLicence = {
     id: 'marine-licence-123',
@@ -37,8 +37,28 @@ describe('Project background', () => {
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Project background'
+      'Proposed works summary'
     )
+    expect(
+      getByText(
+        document,
+        'This summary will be displayed on the public register and on the licence. Give a summary of:'
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        document,
+        'which companies or organisations are involved, if applicable'
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(document, 'Proposed works summary examples')
+    ).toBeInTheDocument()
+    expect(
+      getByRole(document, 'textbox', {
+        name: 'Give a summary of the proposed works'
+      })
+    ).toBeInTheDocument()
     getByRole(document, 'button', { name: 'Save and continue' })
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
@@ -62,7 +82,7 @@ describe('Project background', () => {
     )
   })
 
-  test('project background form state when no data set', async () => {
+  test('proposed works summary form state when no data set', async () => {
     mockMarineLicence(marineLicence)
 
     const document = await loadPage({
@@ -73,7 +93,7 @@ describe('Project background', () => {
     expect(getByRole(document, 'textbox')).toHaveValue('')
   })
 
-  test('project background form state when data is set', async () => {
+  test('proposed works summary form state when data is set', async () => {
     mockMarineLicence({
       ...marineLicence,
       projectBackground: 'Some background text'
@@ -98,7 +118,7 @@ describe('Project background', () => {
       [
         {
           field: 'projectBackground',
-          message: 'Enter the project background'
+          message: 'Enter the proposed works summary'
         }
       ],
       document
@@ -116,7 +136,7 @@ describe('Project background', () => {
       [
         {
           field: 'projectBackground',
-          message: 'Project background must be 1000 characters or less'
+          message: 'Proposed works summary must be 1000 characters or fewer'
         }
       ],
       document

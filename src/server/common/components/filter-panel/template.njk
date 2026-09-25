@@ -5,7 +5,7 @@
 
   {{ govukButton({
     text: "Clear filters",
-    href: '/projects',
+    href: params.selectedFilters.clearLink.href,
     classes: "govuk-button--secondary govuk-!-margin-left-3 moj-filter__clear"
   }) }}
 

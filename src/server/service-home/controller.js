@@ -15,9 +15,9 @@ const serviceHomeViewSettings = {
 
 const cards = [
   {
-    title: 'View Projects',
+    title: 'View submissions',
     link: routes.DASHBOARD,
-    description: 'View all of the existing projects in this account.'
+    description: 'View all of the existing submissions in this account.'
   },
   {
     title: 'Check if I need a marine licence',
@@ -28,7 +28,7 @@ const cards = [
   {
     title: 'Sign in to the Marine Case Management System',
     link: MCMS_LOGIN_URL,
-    description: 'View or manage projects not available in this account.'
+    description: 'View or manage submissions not available in this account.'
   }
 ]
 

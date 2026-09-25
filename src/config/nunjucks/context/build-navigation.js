@@ -15,7 +15,7 @@ export const buildNavigation = (request) => {
         active: request?.path === routes.SERVICE_HOME
       },
       {
-        text: 'Projects',
+        text: 'Submissions',
         href: routes.DASHBOARD,
         active: request?.path === routes.DASHBOARD
       },

@@ -31,7 +31,7 @@ describe('Water Framework Directive Nautical mile', () => {
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START
     )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'
+      'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'
     )
 
     expect(
@@ -82,7 +82,7 @@ describe('Water Framework Directive Nautical mile', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
+          'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -91,7 +91,7 @@ describe('Water Framework Directive Nautical mile', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
+          'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
         inputLabel: 'No',
         findByHeading: true
       })
@@ -114,7 +114,7 @@ describe('Water Framework Directive Nautical mile', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
+          'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -174,9 +174,9 @@ describe('Water Framework Directive Nautical mile', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
+        'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
       errorMessage:
-        'Select whether your project is located within one nautical mile (1.85km) of the coast',
+        'Select whether your proposed works are located within one nautical mile (1.85km) of the coast',
       findByHeading: true
     })
   })

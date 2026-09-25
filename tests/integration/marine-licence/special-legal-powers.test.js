@@ -38,7 +38,7 @@ describe('Special legal powers', () => {
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Does your organisation have special legal powers to do any of this project?'
+      'Does your organisation have special legal powers to do any of these proposed works?'
     )
     getByRole(document, 'button', { name: 'Save and continue' })
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
@@ -71,7 +71,7 @@ describe('Special legal powers', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Does your organisation have special legal powers to do any of this project?',
+          'Does your organisation have special legal powers to do any of these proposed works?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -80,7 +80,7 @@ describe('Special legal powers', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Does your organisation have special legal powers to do any of this project?',
+          'Does your organisation have special legal powers to do any of these proposed works?',
         inputLabel: 'No',
         findByHeading: true
       })
@@ -100,7 +100,7 @@ describe('Special legal powers', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Does your organisation have special legal powers to do any of this project?',
+          'Does your organisation have special legal powers to do any of these proposed works?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -127,7 +127,7 @@ describe('Special legal powers', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Does your organisation have special legal powers to do any of this project?',
+        'Does your organisation have special legal powers to do any of these proposed works?',
       errorMessage: 'Select whether your organisation has special legal powers',
       findByHeading: true
     })
@@ -150,7 +150,7 @@ describe('Special legal powers', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Does your organisation have special legal powers to do any of this project?',
+        'Does your organisation have special legal powers to do any of these proposed works?',
       errorMessage: 'Provide details of the legal powers',
       findByHeading: true
     })

@@ -5,13 +5,13 @@
 
 {% set rows = (rows.push({
   key: {
-    text: "Project name"
+    text: "Application name"
   },
   value: {
     html: appMarineLicenceRedactionField({
       fieldId: "projectName",
       marineLicenceId: params.marineLicenceId,
-      label: "project name",
+      label: "application name",
       originalText: params.projectName,
       redaction: params.redactions.projectName,
       isRedacted: params.redactions.projectName,
@@ -25,22 +25,22 @@
   actions: {
     items: [
       {
-        href: "/marine-licence/project-name?from=check-your-answers",
+        href: "/marine-licence/application-name?from=check-your-answers",
         text: "Change",
-        visuallyHiddenText: "project name",
+        visuallyHiddenText: "application name",
         classes: "govuk-link--no-visited-state"
       }
     ]
   } if not params.isReadOnly
 } if params.projectName,{
   key: {
-    text: "Project background"
+    text: "Proposed works summary"
   },
   value: {
     html: appMarineLicenceRedactionField({
       fieldId: "projectBackground",
       marineLicenceId: params.marineLicenceId,
-      label: "project background",
+      label: "proposed works summary",
       originalText: params.projectBackground,
       redaction: params.redactions.projectBackground,
       isRedacted: params.redactions.projectBackground,
@@ -54,9 +54,9 @@
   actions: {
     items: [
       {
-        href: "/marine-licence/project-background?from=check-your-answers",
+        href: "/marine-licence/proposed-works-summary?from=check-your-answers",
         text: "Change",
-        visuallyHiddenText: "project background",
+        visuallyHiddenText: "proposed works summary",
         classes: "govuk-link--no-visited-state"
       }
     ]
@@ -96,7 +96,7 @@
 {{ govukSummaryList({
   card: {
     title: {
-      text: "Project details"
+      text: "Application details"
     },
     attributes: {
       id: "project-details-card"

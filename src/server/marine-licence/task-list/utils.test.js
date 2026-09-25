@@ -24,7 +24,7 @@ describe('taskList utils', () => {
           status: { text: 'Completed' },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Project name'
+            text: 'Application name'
           }
         },
         {
@@ -32,7 +32,7 @@ describe('taskList utils', () => {
           status: { text: 'Completed' },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Project background'
+            text: 'Proposed works summary'
           }
         },
         {
@@ -61,7 +61,7 @@ describe('taskList utils', () => {
           },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Project name'
+            text: 'Application name'
           }
         },
         {
@@ -71,7 +71,7 @@ describe('taskList utils', () => {
           },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Project background'
+            text: 'Proposed works summary'
           }
         },
         {
@@ -99,7 +99,7 @@ describe('taskList utils', () => {
               },
               title: {
                 classes: 'govuk-link--no-visited-state',
-                text: 'Project name'
+                text: 'Application name'
               }
             },
             {
@@ -109,7 +109,7 @@ describe('taskList utils', () => {
               },
               title: {
                 classes: 'govuk-link--no-visited-state',
-                text: 'Project background'
+                text: 'Proposed works summary'
               }
             },
             {

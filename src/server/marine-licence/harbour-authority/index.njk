@@ -17,7 +17,7 @@
 
   {% set harbourAuthorityHint %}
     <p class="govuk-body">A harbour authority is an organisation with legal powers to manage a harbour, and includes municipal, private and trust ports.</p>
-    <p class="govuk-body">Use the <a href="{{ mapUrl }}" class="govuk-link" target="_blank" rel="noopener noreferrer">marine licensing interactive map (opens in new tab)</a> to find out if your project is located in a harbour authority area.</p>
+    <p class="govuk-body">Use the <a href="{{ mapUrl }}" class="govuk-link" target="_blank" rel="noopener noreferrer">marine licensing interactive map (opens in new tab)</a> to find out if your proposed works are located in a harbour authority area.</p>
   {% endset %}
 
   {% set harbourAuthorityDetails %}
@@ -40,7 +40,7 @@
       name: "area",
       errorSummary: errorSummary,
       errors: errors,
-      heading: "Is your project located in a harbour authority area?",
+      heading: "Are your proposed works located in a harbour authority area?",
       isPageHeading: true,
       value: payload.area,
       errorMessage: errors['area'],

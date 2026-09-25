@@ -22,6 +22,11 @@ import {
   FEE_ESTIMATE_AMOUNT,
   FEE_ESTIMATE_MONITORING_AMOUNT
 } from '#src/server/common/validation/fee-estimate/constants.js'
+import {
+  NAUTICAL_MILE_HEADING,
+  EXCLUDED_ACTIVITIES_HEADING,
+  FILE_UPLOAD_HEADING
+} from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock(
@@ -39,7 +44,7 @@ const expectedInvoicingData = mockMarineLicenceApplication.invoicing
 const expectedWaterFrameworkDirectiveData = {
   excludedActivities: {
     key: {
-      text: 'Project limited to one of the excluded activities'
+      text: EXCLUDED_ACTIVITIES_HEADING
     },
     value: {
       text: 'No'
@@ -47,7 +52,7 @@ const expectedWaterFrameworkDirectiveData = {
   },
   nauticalMile: {
     key: {
-      text: 'Project located within one nautical mile (1.85km) of low-water, in a tidal river or estuary'
+      text: NAUTICAL_MILE_HEADING
     },
     value: {
       text: 'Yes'
@@ -55,7 +60,7 @@ const expectedWaterFrameworkDirectiveData = {
   },
   uploadedFile: {
     key: {
-      text: 'Water Framework Directive assessment upload'
+      text: FILE_UPLOAD_HEADING
     },
     value: {
       text: 'test-upload-id'

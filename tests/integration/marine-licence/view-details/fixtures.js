@@ -136,10 +136,10 @@ export const expectedExternalActivityCards = [
 ]
 
 export const expectedProjectDetailsCard = {
-  cardTitle: 'Project details',
+  cardTitle: 'Application details',
   rows: [
     {
-      key: 'Project background',
+      key: 'Proposed works summary',
       value: mockSubmittedMarineLicenceApplication.projectBackground
     },
     {

@@ -28,9 +28,9 @@ export const errorMessages = {
 
 const specialLegalPowersSettings = {
   pageTitle:
-    'Does your organisation have special legal powers to do any of this project?',
+    'Does your organisation have special legal powers to do any of these proposed works?',
   heading:
-    'Does your organisation have special legal powers to do any of this project?'
+    'Does your organisation have special legal powers to do any of these proposed works?'
 }
 
 export const specialLegalPowersController = {

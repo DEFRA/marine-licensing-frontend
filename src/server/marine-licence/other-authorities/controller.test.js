@@ -220,9 +220,9 @@ describe('#otherAuthorities', () => {
         expect(h.view).toHaveBeenCalledWith(OTHER_AUTHORITIES_VIEW_ROUTE, {
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           pageTitle:
-            'Have you applied to, or got permission from, any other authorities in relation to this project?',
+            'Have you applied to, or got permission from, any other authorities in relation to these proposed works?',
           heading:
-            'Have you applied to, or got permission from, any other authorities in relation to this project?',
+            'Have you applied to, or got permission from, any other authorities in relation to these proposed works?',
           projectName: mockLicence.projectName,
           payload,
           ...expectedExtra

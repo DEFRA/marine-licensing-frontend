@@ -41,7 +41,7 @@ describe('Water Framework Directive Excluded Activities', () => {
       marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE
     )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Is your project limited to one of the following excluded activities?'
+      'Are your proposed works limited to one of the following excluded activities?'
     )
 
     expect(
@@ -95,7 +95,7 @@ describe('Water Framework Directive Excluded Activities', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Is your project limited to one of the following excluded activities?',
+          'Are your proposed works limited to one of the following excluded activities?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -104,7 +104,7 @@ describe('Water Framework Directive Excluded Activities', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Is your project limited to one of the following excluded activities?',
+          'Are your proposed works limited to one of the following excluded activities?',
         inputLabel: 'No',
         findByHeading: true
       })
@@ -127,7 +127,7 @@ describe('Water Framework Directive Excluded Activities', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Is your project limited to one of the following excluded activities?',
+          'Are your proposed works limited to one of the following excluded activities?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -142,9 +142,9 @@ describe('Water Framework Directive Excluded Activities', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Is your project limited to one of the following excluded activities?',
+        'Are your proposed works limited to one of the following excluded activities?',
       errorMessage:
-        'Select whether your project is limited to one of the excluded activities',
+        'Select whether your proposed works are limited to one of the excluded activities',
       findByHeading: true
     })
   })

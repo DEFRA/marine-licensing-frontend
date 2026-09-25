@@ -25,6 +25,17 @@ export const previewController = {
         await service.getMarineLicenceByReference(applicationReference)
 
       if (!isProjectViewable(marineLicence)) {
+        request.logger.error(
+          {
+            event: {
+              action: 'view-details-internal-user-preview',
+              outcome: 'failure',
+              reference: applicationReference,
+              reason: errorMessages.MARINE_LICENCE_NOT_SUBMITTED
+            }
+          },
+          `${errorMessages.MARINE_LICENCE_NOT_SUBMITTED} for ${applicationReference}`
+        )
         throw Boom.forbidden(errorMessages.MARINE_LICENCE_NOT_SUBMITTED)
       }
 

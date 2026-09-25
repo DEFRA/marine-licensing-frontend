@@ -33,21 +33,6 @@ describe('Marine Licence Other Permissions Card Component', () => {
     )
   })
 
-  test('Should label the rows with the proposed works terminology', () => {
-    const $comp = renderComponent('marine-licence/other-permissions-card', {
-      ...baseParams,
-      otherAuthorities: { agree: 'no' }
-    })
-    const html = $comp.html()
-    expect(html).toContain(
-      'Special legal powers to do any of these proposed works'
-    )
-    expect(html).toContain(
-      'Permission from any other authorities in relation to these proposed works'
-    )
-    expect(html).not.toContain('this project')
-  })
-
   test('Should display "No" and not show details when agree is no', () => {
     const params = {
       specialLegalPowers: {

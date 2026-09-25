@@ -2,14 +2,9 @@ import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { getStatusLabelText } from '#src/server/dashboard/utils.js'
-import {
-  REDACTION_LABEL,
-  wrapRedactionLabels
-} from '#src/server/common/helpers/marine-licence/redaction-label.js'
+import { wrapRedactionLabels } from '#src/server/common/helpers/marine-licence/redaction-label.js'
 
 const APPLICATION_DATE_FORMAT = 'd MMMM yyyy'
-
-export { REDACTION_LABEL }
 
 const isObject = (value) => typeof value === 'object' && value !== null
 

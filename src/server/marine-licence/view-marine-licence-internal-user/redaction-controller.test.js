@@ -6,7 +6,7 @@ import {
   replaceDocumentController,
   saveRedactionController
 } from './redaction-controller.js'
-import { REDACTION_LABEL } from '../view-details/utils.js'
+import { REDACTION_LABEL } from '#src/server/common/helpers/marine-licence/redaction-label.js'
 
 vi.mock('#src/services/marine-licence-service/index.js')
 vi.mock(

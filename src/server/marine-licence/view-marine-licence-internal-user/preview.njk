@@ -7,6 +7,7 @@
 {% from "marine-licence/water-framework-directive-card/macro.njk" import appMarineLicenceWaterFrameworkDirectiveCard %}
 {% from "marine-licence/marine-plan-policies-card/macro.njk" import appMarineLicenceMarinePlanPoliciesCard %}
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% extends 'layouts/page.njk' %}
 
@@ -35,9 +36,11 @@
     <div class="govuk-grid-column-full">
       <span class="govuk-caption-l">{{ pageCaption }}</span>
       <h1 class="govuk-heading-l" id="redaction-preview-heading">{{ projectName }}</h1>
-      <div class="govuk-inset-text" id="redaction-preview-notice">
-        This is a preview of how the application will appear on the public register.
-      </div>
+
+      {{ govukInsetText({
+        id: "redaction-preview-notice",
+        html: "This is a preview of how the application will appear on the public register."
+      }) }}
 
       {{ appMarineLicenceApplicationDetailsCard({
         statusTag: statusTag,

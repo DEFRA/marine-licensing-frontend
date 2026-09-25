@@ -197,9 +197,9 @@ export const getActionButtons = (project) => {
       : getActiveActions(id, escapedProjectName, viewRoute, withdrawRoute)
   }
 
-  return project.status === PROJECT_STATUS.DRAFT
+  return status === PROJECT_STATUS.DRAFT
     ? ''
-    : `<a href="${viewRoute}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
+    : `<a href="${viewRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 }
 
 export const getStatusLabelText = (status) => {
@@ -212,7 +212,8 @@ export const getStatusLabelText = (status) => {
 
 export const formatProjectsForDisplay = (projects, isEmployee = false) =>
   projects.map((project) => {
-    const { status, projectType } = project
+    const { status, displayStatus, projectType } = project
+    const statusToShow = displayStatus ?? status
 
     const baseRow = [
       { text: project.projectName },
@@ -224,9 +225,9 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
       },
       { text: project.applicationReference || '-' },
       {
-        html: `<strong class="govuk-tag ${getTagStyle(status)}">${getStatusLabelText(project.status)}</strong>`,
+        html: `<strong class="govuk-tag ${getTagStyle(statusToShow)}">${getStatusLabelText(statusToShow)}</strong>`,
         attributes: {
-          'data-sort-value': project.status
+          'data-sort-value': statusToShow
         }
       },
       {

@@ -188,6 +188,33 @@ export const mockSubmittedMarineLicenceApplication = {
   submittedAt: '2026-05-26T10:00:00Z'
 }
 
+export const mockApplicationTaskContactId = 'contact-with-outstanding-task'
+
+export const mockMarineLicenceWithApplicationTask = {
+  ...mockSubmittedMarineLicenceApplication,
+  contactId: mockApplicationTaskContactId,
+  applicationTasks: [
+    {
+      taskId: '507f1f77bcf86cd799439012',
+      type: 'WITHHOLDING_NOTIFICATION',
+      receivedAt: '2026-08-14T10:00:00.000Z',
+      resolvedAt: null,
+      data: {
+        decisionDate: '2026-08-14T09:00:00.000Z',
+        nationalSecurity: {
+          decision: 'DISAGREE',
+          applicantMessage:
+            'We did not agree that publishing this would be a risk.'
+        },
+        commercialConfidentiality: {
+          decision: 'AGREE_IN_PART',
+          applicantMessage: 'We have withheld the contractor rates.'
+        }
+      }
+    }
+  ]
+}
+
 export const mockRedactions = {
   preferredDates: {
     redactedText: 'Redacted preferred dates',

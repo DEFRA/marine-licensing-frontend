@@ -60,6 +60,7 @@ export const buildApplicationDetailsCardData = (marineLicence) => {
   const {
     applicationReference,
     status,
+    displayStatus,
     submittedAt,
     rejectedDate,
     rejectedReasons,
@@ -71,6 +72,7 @@ export const buildApplicationDetailsCardData = (marineLicence) => {
   const isTransferred = status === PROJECT_STATUS.TRANSFERRED
   const isRejected = status === PROJECT_STATUS.REJECTED
   const isWithdrawn = status === PROJECT_STATUS.WITHDRAWN
+  const statusToShow = displayStatus ?? status
 
   return {
     applicationReference,
@@ -86,6 +88,6 @@ export const buildApplicationDetailsCardData = (marineLicence) => {
     isRejected,
     isWithdrawn,
     status,
-    statusTag: `<strong class="govuk-tag ${getTagStyle(status)}">${getStatusLabelText(status)}</strong>`
+    statusTag: `<strong class="govuk-tag ${getTagStyle(statusToShow)}">${getStatusLabelText(statusToShow)}</strong>`
   }
 }

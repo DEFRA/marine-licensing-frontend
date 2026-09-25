@@ -7,7 +7,10 @@ import {
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
-import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
+import {
+  DISPLAY_STATUS,
+  PROJECT_STATUS
+} from '#src/server/common/constants/projects.js'
 import * as marineLicenceServiceModule from '#src/services/marine-licence-service/index.js'
 
 import {
@@ -76,6 +79,20 @@ describe('#withdrawMarineLicence', () => {
         cancelLink: routes.DASHBOARD
       })
       expect(result).toBe('view-response')
+    })
+
+    it('should still offer withdrawal while an application task is outstanding', async () => {
+      mockedGetMarineLicenceCache.mockReturnValue({ id: marineLicenceId })
+      mockGetMarineLicenceById.mockResolvedValue({
+        ...submittedMarineLicence,
+        status: PROJECT_STATUS.SUBMITTED,
+        displayStatus: DISPLAY_STATUS.ACTION_REQUIRED
+      })
+
+      await withdrawMarineLicenceConfirmController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalled()
+      expect(mockH.redirect).not.toHaveBeenCalled()
     })
 
     it('should redirect to dashboard if no marine licence is selected in the cache', async () => {

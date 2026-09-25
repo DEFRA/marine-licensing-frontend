@@ -86,7 +86,7 @@
     "@axe-core/playwright": "^4.13.0",
     "@babel/preset-env": "^8.0.5",
     "@faker-js/faker": "^10.6.0",
-    "@testing-library/dom": "^10.4.1",
+    "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
     "@vitest/coverage-v8": "^4.1.4",
     "@vitest/runner": "^4.1.4",

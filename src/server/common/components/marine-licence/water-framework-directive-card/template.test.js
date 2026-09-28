@@ -253,12 +253,32 @@ describe('Marine Licence Water Framework Directive Component', () => {
         expect($component('[data-module="withhold-location"]')).toHaveLength(0)
       })
 
-      test('hides the file row when withheld and redaction is not enabled', () => {
+      test('shows the redacted label instead of the filename when withheld and redaction is off', () => {
         const $component = renderWithFile({
           enableRedaction: false,
           redactions: withheld
         })
 
+        expect($component('.app-redaction-label').text()).toBe('***REDACTED***')
+        expect($component.html()).not.toContain('assessment.pdf')
+        expect($component.html()).not.toContain('Withhold document')
+      })
+
+      test('shows a replaced assessment as a normal filename', () => {
+        const $component = renderWithFile({
+          enableRedaction: false,
+          redactions: {
+            waterFrameworkDirective: {
+              withholdDocument: {
+                withhold: true,
+                redactedDocument: { filename: 'replacement.pdf' }
+              }
+            }
+          }
+        })
+
+        expect($component.html()).toContain('replacement.pdf')
+        expect($component('.app-redaction-label')).toHaveLength(0)
         expect($component.html()).not.toContain('assessment.pdf')
       })
 

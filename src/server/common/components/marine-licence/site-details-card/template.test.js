@@ -208,6 +208,25 @@ describe('Marine Licence Site Details Card - withhold location', () => {
     expect($component('[data-module="withhold-location"]')).toHaveLength(0)
     expect($component.html()).not.toContain('Withhold location')
   })
+
+  test('shows a redacted site location instead of coordinates when withheld', () => {
+    const $component = renderCard({
+      enableRedaction: false,
+      redactions: withheld
+    })
+    const $row = $component('.govuk-summary-list__row').filter(
+      (_, row) =>
+        $component(row).find('.govuk-summary-list__key').text().trim() ===
+        'Site location'
+    )
+
+    expect($row.find('.app-redaction-label').text()).toBe('***REDACTED***')
+    expect($component('.govuk-summary-list__key').last().text().trim()).toBe(
+      'Site location'
+    )
+    expect($component.html()).not.toContain('50.9876, -1.2345')
+    expect($component.html()).not.toContain('Map view')
+  })
 })
 
 describe('Marine Licence Site Details Card - Change link', () => {

@@ -189,10 +189,155 @@ export const mockSubmittedMarineLicenceApplication = {
 }
 
 export const mockRedactions = {
+  projectName: {
+    redactedText: 'Harbour ***REDACTED*** works',
+    redactedAt: '2026-06-01T09:30:00Z',
+    redactedBy: 'Test Internal User'
+  },
+  projectBackground: {
+    redactedText: 'Works at ***REDACTED***',
+    redactedAt: '2026-06-01T09:30:00Z',
+    redactedBy: 'Test Internal User'
+  },
   preferredDates: {
     redactedText: 'Redacted preferred dates',
     redactedAt: '2026-06-01T09:30:00Z',
     redactedBy: 'Test Internal User'
+  },
+  specialLegalPowers: {
+    redactedText: 'Powers ***REDACTED***',
+    redactedAt: '2026-06-01T09:30:00Z',
+    redactedBy: 'Test Internal User'
+  },
+  harbourAuthority: {
+    redactedText: 'Harbour ***REDACTED***',
+    redactedAt: '2026-06-01T09:30:00Z',
+    redactedBy: 'Test Internal User'
+  },
+  otherAuthorities: {
+    redactedText: 'Authority ***REDACTED***',
+    redactedAt: '2026-06-01T09:30:00Z',
+    redactedBy: 'Test Internal User'
+  },
+  publicConsultation: {
+    redactedText: 'Consulted ***REDACTED***',
+    redactedAt: '2026-06-01T09:30:00Z',
+    redactedBy: 'Test Internal User'
+  },
+  marinePlanPolicyResponses: {
+    'S-CC-1': {
+      redactedText: 'First ***REDACTED***',
+      redactedAt: '2026-06-01T09:30:00Z',
+      redactedBy: 'Test Internal User'
+    }
+  },
+  waterFrameworkDirective: {
+    nauticalMile: {
+      redactedText: 'Within ***REDACTED***',
+      redactedAt: '2026-06-01T09:30:00Z',
+      redactedBy: 'Test Internal User'
+    },
+    excludedActivities: {
+      redactedText: 'Limited to ***REDACTED***',
+      redactedAt: '2026-06-01T09:30:00Z',
+      redactedBy: 'Test Internal User'
+    },
+    withholdDocument: {
+      withhold: true,
+      redactedAt: '2026-06-01T09:30:00Z',
+      redactedBy: 'Test Internal User',
+      redactedDocument: {
+        filename: 'replacement-assessment.pdf',
+        s3Location: {
+          s3Bucket: 'test-bucket',
+          s3Key:
+            'marine-licence/water-framework-directive/replacement-assessment.pdf',
+          checksumSha256: 'test-checksum'
+        }
+      }
+    }
+  },
+  siteDetails: {
+    0: {
+      siteName: {
+        redactedText: 'Berth ***REDACTED***',
+        redactedAt: '2026-06-01T09:30:00Z',
+        redactedBy: 'Test Internal User'
+      },
+      circleWidth: {
+        redactedText: '100 ***REDACTED***',
+        redactedAt: '2026-06-01T09:30:00Z',
+        redactedBy: 'Test Internal User'
+      },
+      withholdLocation: {
+        withhold: true,
+        redactedAt: '2026-06-01T09:30:00Z',
+        redactedBy: 'Test Internal User'
+      },
+      activityDetails: {
+        0: {
+          activitySubType: {
+            redactedText: '***REDACTED*** works',
+            redactedAt: '2026-06-01T09:30:00Z',
+            redactedBy: 'Test Internal User'
+          },
+          activities: {
+            redactedText: '***REDACTED***',
+            redactedAt: '2026-06-01T09:30:00Z',
+            redactedBy: 'Test Internal User'
+          },
+          activityDescription: {
+            redactedText: 'Digging ***REDACTED***',
+            redactedAt: '2026-06-01T09:30:00Z',
+            redactedBy: 'Test Internal User'
+          },
+          activityDuration: {
+            redactedText: '2 years, ***REDACTED***',
+            redactedAt: '2026-06-01T09:30:00Z',
+            redactedBy: 'Test Internal User'
+          },
+          completionDate: {
+            redactedText: '***REDACTED***',
+            redactedAt: '2026-06-01T09:30:00Z',
+            redactedBy: 'Test Internal User'
+          },
+          activityMonths: {
+            redactedText: '***REDACTED***',
+            redactedAt: '2026-06-01T09:30:00Z',
+            redactedBy: 'Test Internal User'
+          },
+          workingHours: {
+            redactedText: '9 to ***REDACTED***',
+            redactedAt: '2026-06-01T09:30:00Z',
+            redactedBy: 'Test Internal User'
+          }
+        }
+      },
+      constructionDrawings: {
+        0: {
+          withholdDocument: {
+            withhold: true,
+            redactedAt: '2026-06-01T09:30:00Z',
+            redactedBy: 'Test Internal User',
+            redactedDocument: {
+              filename: 'replacement.png',
+              s3Location: {
+                s3Bucket: 'test-bucket',
+                s3Key: 'marine-licence/construction-drawings/replacement.png',
+                checksumSha256: 'test-checksum'
+              }
+            }
+          }
+        },
+        1: {
+          withholdDocument: {
+            withhold: false,
+            redactedAt: '2026-06-01T09:30:00Z',
+            redactedBy: 'Test Internal User'
+          }
+        }
+      }
+    }
   }
 }
 

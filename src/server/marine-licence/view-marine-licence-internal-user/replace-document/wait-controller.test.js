@@ -224,4 +224,52 @@ describe('replace document wait controllers', () => {
       '/marine-licence/redaction/MLA-2026-10264#construction-drawing-site-1-2'
     )
   })
+
+  test('logs an ECS-compatible warning for an unknown upload status', async () => {
+    getStatus.mockResolvedValue({ status: 'unknown' })
+    const request = drawingRequest()
+    const h = createMockH()
+
+    await uploadConstructionDrawingWaitEntraUserController.handler(request, h)
+
+    expect(request.logger.warn).toHaveBeenCalledWith(
+      {
+        event: {
+          action: 'replace-document-unknown-upload-status',
+          outcome: 'failure',
+          reason: 'unknown'
+        }
+      },
+      'ReplaceDocument: Unknown upload status'
+    )
+    expect(h.redirect).toHaveBeenCalledWith(
+      '/marine-licence/redaction/MLA-2026-10264#construction-drawing-site-1-2'
+    )
+  })
+
+  test('logs an ECS-compatible error when checking upload status fails', async () => {
+    const error = new Error('status check failed')
+    getStatus.mockRejectedValue(error)
+    const request = drawingRequest()
+    const h = createMockH()
+
+    await uploadConstructionDrawingWaitEntraUserController.handler(request, h)
+
+    expect(request.logger.error).toHaveBeenCalledWith(
+      {
+        event: {
+          action: 'replace-document-check-upload-status-failed',
+          outcome: 'failure',
+          reference: 'test-upload-id',
+          reason: 'Failed to check upload status'
+        },
+        err: error
+      },
+      'ReplaceDocument: Failed to check upload status'
+    )
+    expect(redactionUpload.clearRedactionUpload).toHaveBeenCalled()
+    expect(h.redirect).toHaveBeenCalledWith(
+      '/marine-licence/redaction/MLA-2026-10264#construction-drawing-site-1-2'
+    )
+  })
 })

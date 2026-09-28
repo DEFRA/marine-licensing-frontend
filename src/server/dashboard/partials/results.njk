@@ -6,15 +6,13 @@
 
 {% set showTable = projects and projects.length > 0 %}
 
-{% set subTitle %}
-  {% if searchParams.show == "all-projects" %}
-    'All {{ organisationName }} submissions'
-  {% elif searchParams.show == "specific-user" %}
-     'Submissions by {{selectedUsers}}'
-  {% else %}
-    'My submissions'
-  {% endif %}
-{% endset %}
+{% if searchParams.show == "all-projects" %}
+  {% set subTitle = "'All " + organisationName + " submissions'" %}
+{% elif searchParams.show == "specific-user" %}
+  {% set subTitle = "'Submissions by " + selectedUsers + "'" %}
+{% else %}
+  {% set subTitle = "'My submissions'" %}
+{% endif %}
 
 {% if projects %}
   {% if isEmployee %}<div class="moj-scrollable-pane">{% endif %}

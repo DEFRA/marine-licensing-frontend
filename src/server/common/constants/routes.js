@@ -59,6 +59,8 @@ export const marineLicenceInvoicingRoutes = {
 }
 
 export const marineLicenceRedactionRoutes = {
+  MARINE_LICENCE_REDACTION_PREVIEW:
+    '/marine-licence/redaction/{applicationReference}/preview',
   MARINE_LICENCE_REDACTION_REPLACE_DOCUMENT:
     '/marine-licence/redaction/{applicationReference}/replace-document',
   MARINE_LICENCE_REDACTION_UPLOAD_CONSTRUCTION_DRAWING:

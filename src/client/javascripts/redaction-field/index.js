@@ -125,6 +125,10 @@ export class RedactionField extends Component {
 
       const responseText = await response.text()
       this.onSaveSuccess(responseText)
+
+      if (form !== 'remove') {
+        this.showRedactionPreview()
+      }
     } catch {
       this.announce('Error saving — please try again')
     } finally {
@@ -148,5 +152,13 @@ export class RedactionField extends Component {
   setSaving(isSaving) {
     this.$saveButton.disabled = isSaving
     this.$cancelButton.setAttribute('aria-disabled', String(isSaving))
+  }
+
+  showRedactionPreview = () => {
+    const $preview = document.getElementById('redaction-preview')
+
+    if ($preview) {
+      $preview.hidden = false
+    }
   }
 }

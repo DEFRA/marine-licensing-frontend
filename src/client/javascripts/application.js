@@ -20,6 +20,7 @@ import { IatAnswerPrint } from './iat-answer-print/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
 import { RedactionField } from './redaction-field/index.js'
 import { WithholdLocation } from './withhold-location/index.js'
+import { initCookieConsent } from './cookie-consent/index.js'
 
 createAll(Button)
 createAll(Checkboxes)
@@ -45,6 +46,8 @@ function syncClarityConsent() {
   }
 }
 document.addEventListener('DOMContentLoaded', () => {
+  initCookieConsent()
+
   if (globalThis.ENABLE_BROWSER_LOGGING) {
     const errorTracking = new ErrorTracking()
     errorTracking.init()

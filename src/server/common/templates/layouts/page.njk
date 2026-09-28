@@ -27,6 +27,15 @@
     window.dataLayer.push({ event: "cookie_consent", analytics_consent: {{ ("granted" if analyticsEnabled else "denied") | dump | safe }} });
     {% endif %}
   </script>
+  {% if googleTagManagerKey and analyticsEnabled %}
+    {% include "partials/google-tag-manager/head.njk" %}
+  {% endif %}
+{% endblock %}
+
+{% block bodyStart %}
+  {% if googleTagManagerKey and analyticsEnabled %}
+    {% include "partials/google-tag-manager/body.njk" %}
+  {% endif %}
 {% endblock %}
 
 {% block headerStart %}

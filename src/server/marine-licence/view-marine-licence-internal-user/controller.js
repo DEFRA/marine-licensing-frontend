@@ -22,6 +22,12 @@ const PAGE_TITLE = 'Redact application for the public register'
 const getRedactionSaveUrl = (applicationReference) =>
   `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${toApplicationReferenceUrlSegment(applicationReference)}/redact`
 
+const getRedactionPreviewUrl = (applicationReference) =>
+  marineLicenceRoutes.MARINE_LICENCE_REDACTION_PREVIEW.replace(
+    '{applicationReference}',
+    toApplicationReferenceUrlSegment(applicationReference)
+  )
+
 export const viewDetailsInternalUserController = {
   async handler(request, h) {
     const { marineLicenceId, applicationReference } = request.params
@@ -77,6 +83,9 @@ export const viewDetailsInternalUserController = {
         backLink: null,
         marineLicenceId: marineLicence.id,
         redactionSaveUrl: getRedactionSaveUrl(
+          marineLicence.applicationReference
+        ),
+        redactionPreviewUrl: getRedactionPreviewUrl(
           marineLicence.applicationReference
         ),
         replaceDocumentUrl: getReplaceDocumentUrl(

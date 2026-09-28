@@ -24,7 +24,7 @@
     }),
     classes: "govuk-summary-list__value--full-width"
   } if params.enableRedaction else {
-    text: params.site.siteName
+    html: params.site.siteName | wrapRedactionLabels
   }
 }) %}
 
@@ -74,7 +74,7 @@
         }),
         classes: "govuk-summary-list__value--full-width"
       } if params.enableRedaction else {
-        text: params.site.width
+        html: params.site.width | wrapRedactionLabels
       }
     }) %}
   {% endif %}
@@ -126,13 +126,22 @@
 
 {% endset %}
 
-{% set _ = summaryRows.push({
-  key: { text: "Map view" },
-  value: {
-    html: mapHtml,
-    classes: "govuk-summary-list__value--full-width"
-  }
-}) %}
+{% if not isLocationWithheld or params.enableRedaction %}
+  {% set _ = summaryRows.push({
+    key: { text: "Map view" },
+    value: {
+      html: mapHtml,
+      classes: "govuk-summary-list__value--full-width"
+    }
+  }) %}
+{% endif %}
+
+{% if isLocationWithheld and not params.enableRedaction %}
+  {% set _ = summaryRows.push({
+    key: { text: "Site location" },
+    value: { html: "***REDACTED***" | wrapRedactionLabels }
+  }) %}
+{% endif %}
 
 {% set siteCardHeading %}
   Site {{ params.site.siteNumber }}

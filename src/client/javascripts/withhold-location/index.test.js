@@ -98,6 +98,18 @@ describe('WithholdLocation', () => {
     expect(cardOf().querySelector('.app-site-details-map')).toBeNull()
   })
 
+  test('shows the preview button after a location is withheld', async () => {
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<div id="redaction-preview" hidden></div>'
+    )
+
+    submitForm(component.$form)
+    await vi.waitFor(() => expect(cardOf()).not.toBe($root))
+
+    expect(document.getElementById('redaction-preview').hidden).toBe(false)
+  })
+
   test('focuses the button on the swapped-in card', async () => {
     submitForm(component.$form)
 

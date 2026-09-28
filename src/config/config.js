@@ -5,6 +5,10 @@ import { configDotenv } from 'dotenv'
 import { requiredFromEnvInCdp } from './required-from-env-in-cdp.js'
 import { addressLookupSchema } from './address-lookup.js'
 import { publicRegisterSchema } from './public-register.js'
+import {
+  sanitiseGoogleTagManagerKey,
+  warnIfAnalyticsIdsMissing
+} from './analytics-config.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -458,6 +462,12 @@ export const config = convict({
     default: '',
     env: 'CLARITY_PROJECT_ID'
   },
+  googleTagManagerKey: {
+    doc: 'Google Tag Manager container ID (GTM-XXXXXXX) for the DEFRA central analytics container; empty disables Google Analytics',
+    format: String,
+    default: '',
+    env: 'GOOGLE_TAG_MANAGER_KEY'
+  },
   cdpEnvironment: {
     doc: 'The CDP environment the app is currently in, with the addition of "local"',
     format: ['local', 'dev', 'test', 'perf-test', 'ext-test', 'prod'],
@@ -473,13 +483,5 @@ export const config = convict({
 
 config.validate({ allowed: 'strict' })
 
-const environment = config.get('cdpEnvironment')
-if (
-  (environment === 'prod' || environment === 'perf-test') &&
-  !config.get('clarityProjectId')
-) {
-  // eslint-disable-next-line no-console
-  console.warn(
-    `\n⚠️  WARNING: CLARITY_PROJECT_ID is not set for ${environment} environment\n`
-  )
-}
+sanitiseGoogleTagManagerKey(config)
+warnIfAnalyticsIdsMissing(config)

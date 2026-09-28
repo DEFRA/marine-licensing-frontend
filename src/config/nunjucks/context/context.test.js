@@ -48,6 +48,8 @@ describe('#context', () => {
         assetPath: '/public/assets',
         breadcrumbs: [],
         clarityProjectId: '',
+        cookiePreferencesSet: false,
+        googleTagManagerKey: '',
         enableBrowserLogging: true,
         getAssetPath: expect.any(Function),
         isAuthenticated: false,
@@ -92,6 +94,14 @@ describe('#context', () => {
       expect(contextResult.getAssetPath('an-image.png')).toBe(
         '/public/an-image.png'
       )
+    })
+
+    test('Should report cookie preferences as set when the preferences cookie is present', () => {
+      contextResult = context({
+        ...mockRequest,
+        state: { cookies_preferences_set: 'true' }
+      })
+      expect(contextResult.cookiePreferencesSet).toBe(true)
     })
   })
 

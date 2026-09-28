@@ -17,24 +17,16 @@
 
 {% block head %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
-  {% if clarityProjectId or enableBrowserLogging %}
-    <script nonce='{{ cspNonce }}'>
-      {% if clarityProjectId %}
-      window.CLARITY_PROJECT_ID = "{{ clarityProjectId }}";
-      window.ANALYTICS_ENABLED = {{ analyticsEnabled | dump }};
-      {% endif %}
-      {% if enableBrowserLogging %}
-      window.ENABLE_BROWSER_LOGGING = {{ enableBrowserLogging }};
-      {% endif %}
-    </script>
-  {% endif %}
-
-  <noscript>
-    <style>
-      .hide-if-no-js {display:none !important;}
-    </style>
-  </noscript>
-
+  <script nonce="{{ cspNonce }}">
+    window.CLARITY_PROJECT_ID = {{ (clarityProjectId or "") | dump | safe }};
+    window.ANALYTICS_ENABLED = {{ analyticsEnabled | dump }};
+    window.COOKIE_PREFERENCES_SET = {{ cookiePreferencesSet | dump }};
+    window.ENABLE_BROWSER_LOGGING = {{ enableBrowserLogging | dump }};
+    {% if googleTagManagerKey %}
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: "cookie_consent", analytics_consent: {{ ("granted" if analyticsEnabled else "denied") | dump | safe }} });
+    {% endif %}
+  </script>
 {% endblock %}
 
 {% block headerStart %}

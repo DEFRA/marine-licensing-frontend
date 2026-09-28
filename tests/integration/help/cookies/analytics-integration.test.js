@@ -163,8 +163,8 @@ describe('MS Clarity Analytics Integration', () => {
 
       const { document } = new JSDOM(result).window
 
-      // Script should not be present when project ID is empty
-      expect(checkClarityScript(document)).toBe(false)
+      expect(getClarityProjectId(document)).toBe('')
+      expect(getAnalyticsEnabled(document)).toBe(true)
     })
 
     test('Should handle missing CLARITY_PROJECT_ID config', async () => {
@@ -188,8 +188,7 @@ describe('MS Clarity Analytics Integration', () => {
 
       const { document } = new JSDOM(result).window
 
-      // Script should not be present when project ID is undefined
-      expect(checkClarityScript(document)).toBe(false)
+      expect(getClarityProjectId(document)).toBe('')
     })
   })
 

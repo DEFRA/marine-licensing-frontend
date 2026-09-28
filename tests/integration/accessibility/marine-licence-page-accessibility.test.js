@@ -140,6 +140,11 @@ const marineLicencePages = [
     title: 'Water Framework Directive'
   },
   {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceApplication.id}`,
+    title: 'Display a site notice',
+    marineLicence: mockSubmittedMarineLicenceApplication
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
     title:
       'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'

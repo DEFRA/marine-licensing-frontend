@@ -1,7 +1,4 @@
-import {
-  DISPLAY_STATUS,
-  PROJECT_STATUS
-} from '#src/server/common/constants/projects.js'
+import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 
 export const getTagStyle = (status) => {
   switch (status) {
@@ -19,7 +16,7 @@ export const getTagStyle = (status) => {
       return 'govuk-tag--magenta'
     case PROJECT_STATUS.REJECTED:
       return 'govuk-tag--orange'
-    case DISPLAY_STATUS.ACTION_REQUIRED:
+    case PROJECT_STATUS.ACTION_REQUIRED:
       return 'govuk-tag--red'
     default:
       return 'govuk-tag--green'

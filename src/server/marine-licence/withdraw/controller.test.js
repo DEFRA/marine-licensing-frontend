@@ -7,10 +7,7 @@ import {
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
-import {
-  DISPLAY_STATUS,
-  PROJECT_STATUS
-} from '#src/server/common/constants/projects.js'
+import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import * as marineLicenceServiceModule from '#src/services/marine-licence-service/index.js'
 
 import {
@@ -81,12 +78,11 @@ describe('#withdrawMarineLicence', () => {
       expect(result).toBe('view-response')
     })
 
-    it('should still offer withdrawal while an application task is outstanding', async () => {
+    it('should still offer withdrawal while action is required', async () => {
       mockedGetMarineLicenceCache.mockReturnValue({ id: marineLicenceId })
       mockGetMarineLicenceById.mockResolvedValue({
         ...submittedMarineLicence,
-        status: PROJECT_STATUS.SUBMITTED,
-        displayStatus: DISPLAY_STATUS.ACTION_REQUIRED
+        status: PROJECT_STATUS.ACTION_REQUIRED
       })
 
       await withdrawMarineLicenceConfirmController.handler(mockRequest, mockH)

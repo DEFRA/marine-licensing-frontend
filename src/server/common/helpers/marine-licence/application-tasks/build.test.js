@@ -23,7 +23,6 @@ const build = (args) =>
   buildApplicationTasks({
     marineLicence: buildMarineLicence([buildTask()]),
     currentContactId: CONTACT_ID,
-    isApplicantView: true,
     ...args
   })
 
@@ -42,10 +41,6 @@ describe('buildApplicationTasks', () => {
 
   it('hides the section from another person in the same organisation', () => {
     expect(build({ currentContactId: 'someone-else' })).toEqual([])
-  })
-
-  it('hides the section from public and internal views', () => {
-    expect(build({ isApplicantView: false })).toEqual([])
   })
 
   it('hides the section when there is no signed-in user', () => {

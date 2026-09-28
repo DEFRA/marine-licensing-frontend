@@ -3,7 +3,6 @@ import {
   buildRedactionsForView
 } from '#src/server/marine-licence/view-details/utils.js'
 import {
-  DISPLAY_STATUS,
   PROJECT_STATUS,
   UNABLE_TO_PROGRESS
 } from '#src/server/common/constants/projects.js'
@@ -28,19 +27,15 @@ describe('#buildApplicationDetailsCardData', () => {
     expect(result.statusTag).toContain(PROJECT_STATUS.TRANSFERRED)
   })
 
-  test('tags an outstanding task as Action required while the transferred content still follows the stored status', () => {
+  test('renders a red Action required tag', () => {
     const result = buildApplicationDetailsCardData({
       applicationReference: 'ML-2026-001',
-      status: PROJECT_STATUS.TRANSFERRED,
-      displayStatus: DISPLAY_STATUS.ACTION_REQUIRED,
-      submittedAt: '2026-01-15',
-      transferredDate: '2026-02-20'
+      status: PROJECT_STATUS.ACTION_REQUIRED,
+      submittedAt: '2026-01-15'
     })
 
     expect(result.statusTag).toContain('govuk-tag--red')
-    expect(result.statusTag).toContain(DISPLAY_STATUS.ACTION_REQUIRED)
-    expect(result.isTransferred).toBe(true)
-    expect(result.transferredDate).toBe('20 February 2026')
+    expect(result.statusTag).toContain(PROJECT_STATUS.ACTION_REQUIRED)
   })
 
   test('returns the application details fields and a rendered rejected status tag', () => {

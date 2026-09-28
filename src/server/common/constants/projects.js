@@ -6,15 +6,16 @@ export const PROJECT_STATUS = {
   REJECTED: 'Rejected',
   SUBMITTED: 'Submitted',
   TRANSFERRED: 'Transferred',
-  WITHDRAWN: 'Withdrawn'
-}
-
-// Derived by the API from an outstanding application task and carried alongside
-// `status`, which is always the lifecycle status. Deliberately outside PROJECT_STATUS:
-// it is a label to render, not a status an application can be in.
-export const DISPLAY_STATUS = {
+  WITHDRAWN: 'Withdrawn',
   ACTION_REQUIRED: 'Action required'
 }
+
+// ACTION_REQUIRED sits on top of SUBMITTED while an application task is outstanding,
+// so a licence awaiting the applicant can still be withdrawn.
+export const WITHDRAWABLE_MARINE_LICENCE_STATUSES = [
+  PROJECT_STATUS.SUBMITTED,
+  PROJECT_STATUS.ACTION_REQUIRED
+]
 
 // An exemption whose activity period has ended can no longer be withdrawn.
 export const WITHDRAWABLE_EXEMPTION_STATUSES = [

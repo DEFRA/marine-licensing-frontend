@@ -6,7 +6,6 @@ const byReceivedAt = (a, b) =>
 const buildTaskItem = (task, marineLicenceId) => {
   const definition = applicationTaskRegistry[task.type]
 
-  // An older frontend must not break on a task type a newer API has started sending.
   if (!definition) {
     return null
   }
@@ -27,15 +26,11 @@ const buildTaskItem = (task, marineLicenceId) => {
   }
 }
 
-export const buildApplicationTasks = ({
-  marineLicence,
-  currentContactId,
-  isApplicantView
-}) => {
+export const buildApplicationTasks = ({ marineLicence, currentContactId }) => {
   const isOriginalSubmitter =
     Boolean(currentContactId) && currentContactId === marineLicence?.contactId
 
-  if (!isApplicantView || !isOriginalSubmitter) {
+  if (!isOriginalSubmitter) {
     return []
   }
 

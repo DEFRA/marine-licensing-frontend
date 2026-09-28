@@ -77,8 +77,7 @@ const buildViewModel = async ({
     marineLicence,
     currentContactId: isApplicantView
       ? await getCurrentContactId(request)
-      : null,
-    isApplicantView
+      : null
   })
 
   return {

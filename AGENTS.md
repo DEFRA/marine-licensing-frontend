@@ -1,8 +1,8 @@
 ## Code Standards
 
 - Don't add code comments unless there's complex logic to explain.
-- Read `.cursor/rules/javascript.mdc` before any non-trivial JS edit — it
-  contains the full ruleset that SonarCloud enforces on PRs.
+- Read `.cursor/rules/javascript.mdc` before planning or editing any `.js`
+  changes — it contains the full ruleset that SonarCloud enforces on PRs.
 
 ## Code Quality (enforced by SonarCloud — fix locally, don't ship and rely on PR feedback)
 

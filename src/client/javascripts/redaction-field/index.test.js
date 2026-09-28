@@ -178,6 +178,18 @@ describe('RedactionField', () => {
     ).toBe('Saved')
   })
 
+  test('shows the preview button after a redaction is saved', async () => {
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<div id="redaction-preview" hidden></div>'
+    )
+
+    submitForm(component.$form)
+    await vi.waitFor(() => expect(publishedTextOf()).toBe('Redacted text'))
+
+    expect(document.getElementById('redaction-preview').hidden).toBe(false)
+  })
+
   test('submits remove form', async () => {
     component.$input.value = 'Redacted text'
 

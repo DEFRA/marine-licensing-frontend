@@ -1,6 +1,5 @@
-// govuk-frontend's inline template script adds `js-enabled` to <body> before first paint,
+// govuk-frontend's inline template script adds `js-enabled` to the body class before first paint,
 // so this hides JS-only controls for users without JavaScript
-// stylelint-disable-next-line selector-no-qualifying-type -- body is the only element govuk-frontend adds js-enabled to
-body:not(.js-enabled) .hide-if-no-js {
+.govuk-template__body:not(.js-enabled) .hide-if-no-js {
   display: none;
 }

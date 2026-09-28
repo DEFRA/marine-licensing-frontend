@@ -1,5 +1,6 @@
 import { JSDOM } from 'jsdom'
 import { getByRole, getByText } from '@testing-library/dom'
+import Boom from '@hapi/boom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
@@ -99,6 +100,29 @@ describe('Error Pages Integration Tests', () => {
               pageTitle: 'Sorry, the service is unavailable'
             })
             .code(statusCodes.serviceUnavailable)
+        }
+      },
+      {
+        method: 'GET',
+        path: '/test-boom-500',
+        handler: () => {
+          throw Boom.internal('test failure')
+        }
+      },
+      {
+        method: 'GET',
+        path: '/test-boom-403',
+        handler: () => {
+          throw Boom.forbidden()
+        }
+      },
+      {
+        method: 'GET',
+        path: '/test-boom-redirect',
+        handler: () => {
+          const error = Boom.unauthorized()
+          error.redirectPath = '/home'
+          throw error
         }
       }
     ])
@@ -352,5 +376,60 @@ describe('Error Pages Integration Tests', () => {
         expectContactDetailsSection(document)
       }
     )
+  })
+
+  describe('Boom-derived error pages get the full response lifecycle', () => {
+    const NONCE_IN_HEADER = /'nonce-([a-f0-9]{32})'/
+
+    test.each([
+      {
+        url: '/test-boom-500',
+        status: statusCodes.internalServerError,
+        heading: 'There is a problem with the service'
+      },
+      {
+        url: '/test-boom-403',
+        status: statusCodes.forbidden,
+        heading: 'You do not have permission to view this page'
+      }
+    ])(
+      '$url carries the CSP header, a matching nonce, the cookie banner and no-store',
+      async ({ url, status, heading }) => {
+        const response = await makeGetRequest({ server: getServer(), url })
+
+        expect(response.statusCode).toBe(status)
+
+        const csp = response.headers['content-security-policy']
+        expect(csp).toContain("frame-ancestors 'none'")
+        const [, headerNonce] = csp.match(NONCE_IN_HEADER)
+        expect(response.result).toMatch(
+          new RegExp(`nonce=["']${headerNonce}["']`)
+        )
+        expect(response.headers['cache-control']).toContain('no-store')
+
+        const document = new JSDOM(response.result).window.document
+        expect(
+          getByRole(document, 'heading', { name: heading, level: 1 })
+        ).toBeInTheDocument()
+        expect(
+          document.querySelector('.govuk-cookie-banner')
+        ).toBeInTheDocument()
+      }
+    )
+
+    test('a Boom with redirectPath redirects and still commits the session and cache headers', async () => {
+      const response = await makeGetRequest({
+        server: getServer(),
+        url: '/test-boom-redirect'
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe('/home')
+      // Both headers come from extensions that a takeover would have skipped
+      expect(response.headers['cache-control']).toContain('no-store')
+      expect(response.headers['content-security-policy']).toContain(
+        "frame-ancestors 'none'"
+      )
+    })
   })
 })

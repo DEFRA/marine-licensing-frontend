@@ -142,6 +142,22 @@ describe('Error Pages Integration Tests', () => {
         path: '/test-read-redirect-flash',
         options: { auth: false },
         handler: (request) => request.yar.flash(redirectPathCacheKey)
+      },
+      {
+        method: 'GET',
+        path: '/test-sign-in',
+        options: { auth: false },
+        handler: async (request) => {
+          const sessionId = 'test-session-not-found-page'
+          await request.server.app.cache.set(sessionId, {
+            strategy: 'defra-id',
+            userId: 'test-user',
+            displayName: 'Test User',
+            expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+          })
+          request.cookieAuth.set({ sessionId })
+          return { signedIn: true }
+        }
       }
     ])
   })
@@ -501,16 +517,26 @@ describe('Error Pages Integration Tests', () => {
     test('signed-in: shows the service navigation', async () => {
       // authenticated-requests.js is auto-mocked for the whole suite (see the
       // vi.mock in test-setup-helpers.js), which replaces getAuthProvider with a
-      // stub that always returns undefined; restore its real behaviour here so
-      // buildNavigation can tell this request is signed in.
-      vi.mocked(getAuthProvider).mockImplementation(
-        (request) => request?.auth?.credentials?.strategy ?? null
+      // stub that always returns undefined; restore its real implementation here
+      // so buildNavigation can tell this request is signed in.
+      const { getAuthProvider: realGetAuthProvider } = await vi.importActual(
+        '~/src/server/common/helpers/authenticated-requests.js'
       )
+      vi.mocked(getAuthProvider).mockImplementation(realGetAuthProvider)
 
-      const response = await makeGetRequest({
-        server: getServer(),
+      const signIn = await getServer().inject({
+        method: 'GET',
+        url: '/test-sign-in'
+      })
+      const sessionCookie = []
+        .concat(signIn.headers['set-cookie'])
+        .find((cookie) => cookie.startsWith('userSession='))
+        .split(';')[0]
+
+      const response = await getServer().inject({
+        method: 'GET',
         url: unknownUrl,
-        auth: { credentials: { userId: 'test-user', strategy: 'defra-id' } }
+        headers: { cookie: sessionCookie }
       })
 
       expect(response.statusCode).toBe(statusCodes.notFound)

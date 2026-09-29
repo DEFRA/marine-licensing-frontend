@@ -52,11 +52,11 @@ The `@microsoft/clarity` npm loader is initialised from `application.js` on ever
 
 `src/server/common/helpers/content-security-policy.js` builds the header per response. Host groups are conditional:
 
-| Group                    | Condition                               | Directives                                          |
-| ------------------------ | --------------------------------------- | --------------------------------------------------- |
-| Clarity                  | `CLARITY_PROJECT_ID` set                | `script-src`, `connect-src`                         |
-| Google Tag Manager / GA4 | `GOOGLE_TAG_MANAGER_KEY` set            | `script-src`, `connect-src`, `img-src`, `frame-src` |
-| Tag Assistant preview    | key set and `ENVIRONMENT` is not `prod` | `script-src`, `style-src`, `img-src`, `font-src`    |
+| Group                    | Condition                                                    | Directives                                          |
+| ------------------------ | ------------------------------------------------------------ | --------------------------------------------------- |
+| Clarity                  | `CLARITY_PROJECT_ID` set                                     | `script-src`, `connect-src`                         |
+| Google Tag Manager / GA4 | `GOOGLE_TAG_MANAGER_KEY` set                                 | `script-src`, `connect-src`, `img-src`, `frame-src` |
+| Tag Assistant preview    | `GOOGLE_TAG_MANAGER_KEY` set and `ENVIRONMENT` is not `prod` | `script-src`, `style-src`, `img-src`, `font-src`    |
 
 `https://analytics.google.com` is listed alongside `https://*.analytics.google.com` because a wildcard does not match the apex host. There is no `'unsafe-inline'` or `'unsafe-eval'`: GTM Custom HTML tags rely on nonce propagation, and GTM Custom JavaScript variables evaluate to `undefined`. Any tag that needs another host (Google Ads, DoubleClick, third-party pixels) is a code change and a deploy.
 

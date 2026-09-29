@@ -36,6 +36,27 @@ describe('sanitiseGoogleTagManagerKey', () => {
     expect(warnSpy).not.toHaveBeenCalled()
   })
 
+  test('trims surrounding whitespace from a valid container ID', () => {
+    const config = fakeConfig({ googleTagManagerKey: ' GTM-ABC1234\n' })
+
+    sanitiseGoogleTagManagerKey(config)
+
+    expect(config.set).toHaveBeenCalledWith(
+      'googleTagManagerKey',
+      'GTM-ABC1234'
+    )
+    expect(warnSpy).not.toHaveBeenCalled()
+  })
+
+  test('treats a whitespace-only value as empty without warning', () => {
+    const config = fakeConfig({ googleTagManagerKey: '  ' })
+
+    sanitiseGoogleTagManagerKey(config)
+
+    expect(config.set).toHaveBeenCalledWith('googleTagManagerKey', '')
+    expect(warnSpy).not.toHaveBeenCalled()
+  })
+
   test.each([
     'not-a-real-ga4-container-id',
     'gtm-lowercase1',

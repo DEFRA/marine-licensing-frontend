@@ -19,13 +19,19 @@ const warn = (message) => {
 }
 
 export const sanitiseGoogleTagManagerKey = (config) => {
-  const key = config.get('googleTagManagerKey')
+  const rawKey = config.get('googleTagManagerKey') ?? ''
+  const key = rawKey.trim()
 
   if (key && !GOOGLE_TAG_MANAGER_KEY_PATTERN.test(key)) {
     warn(
       'GOOGLE_TAG_MANAGER_KEY is not a valid GTM container ID (expected GTM-XXXXXXX); Google Analytics is disabled'
     )
     config.set('googleTagManagerKey', '')
+    return
+  }
+
+  if (key !== rawKey) {
+    config.set('googleTagManagerKey', key)
   }
 }
 

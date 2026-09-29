@@ -29,11 +29,11 @@ window.dataLayer = window.dataLayer || []
 window.dataLayer.push({ event: 'cookie_consent', analytics_consent: 'granted' | 'denied' })
 ```
 
-When a container key is configured **and** analytics is accepted, the layout also includes Google's Part A snippet in `<head>` (`partials/google-tag-manager/head.njk`) and Part B noscript iframe as the first child of `<body>` (`partials/google-tag-manager/body.njk`). Neither renders for undecided or rejecting users, so no Google cookies are set before consent.
+When a container key is configured **and** analytics is accepted, the layout also includes Google's Part A snippet in `<head>` (`partials/google-tag-manager/head.njk`) and Part B noscript iframe immediately after govuk-frontend's own inline body script (the `bodyStart` block) (`partials/google-tag-manager/body.njk`). Neither renders for undecided or rejecting users, so no Google cookies are set before consent.
 
 Two departures from Google's paste-as-is snippets, both sanctioned by Google's CSP guide: Part A carries `nonce="{{ cspNonce }}"` and Google's nonce-aware line that copies the nonce onto the injected `gtm.js` element; Part B uses the `app-gtm-noscript` class instead of an inline `style` attribute, which `style-src 'self'` would block.
 
-The data-layer event name and shape are a default agreed with the central analytics team's onboarding guide; if their container is imported with a different trigger, only the push in `page.njk` changes.
+The data-layer event name and shape are a default, pending the central team's container import; if the imported container triggers on something else, only the push in `page.njk` changes.
 
 ## Client-side cleanup
 
@@ -65,6 +65,8 @@ The `@microsoft/clarity` npm loader is initialised from `application.js` on ever
 `catchAll` (`src/server/common/helpers/errors.js`) is registered as the **first** `onPreResponse` extension in `src/server/index.js`, so the error view it swaps in still passes through the CSP, CSRF, cookie-banner, session and cache-control extensions. hapi runs extensions in registration order; do not add `before:`/`after:` options here (crumb's group name is `@hapi/crumb`, and root-level extensions cannot be targeted).
 
 Unknown URLs are served by an explicit `GET /{any*}` route (`src/server/not-found/index.js`) rather than hapi's internal not-found handler, which skips cookie parsing, session, CSRF and the cookie-banner logic. The route uses `auth: { mode: 'try' }` so a signed-in user sees the signed-in page chrome, and disables the cookie scheme's `redirectTo` because that function runs before the auth mode is checked and would otherwise record the unknown URL as the post-sign-in destination.
+
+Because unknown URLs now run the normal lifecycle, each cookieless 404 creates a server-side session entry (the cookie-policy extension reads the yar flash on every request, which marks the session modified) and issues session and CSRF cookies, exactly as any other page does for a first-time visitor. This is an accepted cost: bursts of 404s from scanners create short-lived cache entries. Two consequences worth knowing: Entra ID (internal) users see the signed-out 404 page, because the session strategy only accepts Entra sessions on Entra routes, matching every other non-Entra route; and a throw inside a later `onPreResponse` extension is no longer converted to an HTML error page, because `catchAll` has already run (those extensions are small and do not throw in practice).
 
 ## Configuration
 

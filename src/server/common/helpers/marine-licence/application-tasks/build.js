@@ -1,7 +1,6 @@
 import { applicationTaskRegistry } from '#src/server/common/helpers/marine-licence/application-tasks/registry.js'
 
-const byReceivedAt = (a, b) =>
-  new Date(a.receivedAt ?? 0) - new Date(b.receivedAt ?? 0)
+const byRegistryOrder = (a, b) => a.sortOrder - b.sortOrder
 
 const buildTaskItem = (task, marineLicenceId) => {
   const definition = applicationTaskRegistry[task.type]
@@ -22,7 +21,8 @@ const buildTaskItem = (task, marineLicenceId) => {
             text: definition.outstandingLabel,
             classes: 'govuk-tag--red'
           }
-        }
+        },
+    sortOrder: definition.sortOrder
   }
 }
 
@@ -36,12 +36,12 @@ export const buildApplicationTasks = ({ marineLicence, currentContactId }) => {
 
   const tasks = marineLicence?.applicationTasks ?? []
 
-  const outstanding = tasks
-    .filter((task) => !task.resolvedAt)
-    .sort(byReceivedAt)
-  const resolved = tasks.filter((task) => task.resolvedAt).sort(byReceivedAt)
+  const outstanding = tasks.filter((task) => !task.resolvedAt)
+
+  const resolved = tasks.filter((task) => task.resolvedAt)
 
   return [...outstanding, ...resolved]
     .map((task) => buildTaskItem(task, marineLicence.id))
+    .sort(byRegistryOrder)
     .filter(Boolean)
 }

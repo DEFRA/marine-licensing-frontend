@@ -1,6 +1,7 @@
 import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
 import { faker } from '@faker-js/faker'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
+import { APPLICATION_TASK_TYPE } from '#src/server/common/helpers/marine-licence/application-tasks/registry.js'
 
 export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
@@ -196,7 +197,7 @@ export const mockMarineLicenceWithApplicationTask = {
   applicationTasks: [
     {
       taskId: '507f1f77bcf86cd799439012',
-      type: 'WITHHOLDING_NOTIFICATION',
+      type: APPLICATION_TASK_TYPE.WITHHOLDING_NOTIFICATION,
       receivedAt: '2026-08-14T10:00:00.000Z',
       resolvedAt: null,
       data: {
@@ -210,6 +211,20 @@ export const mockMarineLicenceWithApplicationTask = {
           decision: 'AGREE_IN_PART',
           applicantMessage: 'We have withheld the contractor rates.'
         }
+      }
+    },
+    {
+      taskId: '507f1f77bcf86cd799439013',
+      type: APPLICATION_TASK_TYPE.PUBLIC_SITE_NOTICE,
+      receivedAt: '2026-09-19T10:00:00.000Z',
+      resolvedAt: null,
+      data: {
+        publicNoticeRequirement: 'NONE',
+        summary: {
+          proposedWorksSummary: 'test proposed works summary',
+          siteNoticeSummary: 'test site notice summary'
+        },
+        requestRelatesTo: 'BOTH'
       }
     }
   ]

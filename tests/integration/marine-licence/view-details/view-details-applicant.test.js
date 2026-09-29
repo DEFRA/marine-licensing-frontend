@@ -210,6 +210,15 @@ describe('Marine Licence View Details', () => {
         `${marineLicenceRoutes.MARINE_LICENCE_WITHHOLDING_NOTIFICATION}/${mockMarineLicenceWithApplicationTask.id}`
       )
 
+      expect(
+        getByRole(document, 'link', {
+          name: 'Display a site notice'
+        })
+      ).toHaveAttribute(
+        'href',
+        `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`
+      )
+
       const status = document.querySelector('.govuk-task-list__status')
       expect(status.textContent.trim()).toBe('Not yet read')
       expect(status.querySelector('.govuk-tag--red')).toBeTruthy()

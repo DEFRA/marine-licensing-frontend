@@ -34,7 +34,8 @@ describe('buildApplicationTasks', () => {
         href: `/marine-licence/withholding-notification/${MARINE_LICENCE_ID}`,
         status: {
           tag: { text: 'Not yet read', classes: 'govuk-tag--red' }
-        }
+        },
+        sortOrder: 1
       }
     ])
   })

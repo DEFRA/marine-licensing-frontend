@@ -14,7 +14,7 @@ alwaysApply: true
 - govuk-frontend npm library
 - Nunjucks templates npm library
 - Webpack + Babel
-- Jest + ESLint + Prettier
+- Vitest + ESLint + Prettier
 - SCSS + PostCSS + Stylelint
 
 ## Code Standards
@@ -82,21 +82,21 @@ alwaysApply: true
   - Help text
 
 ## Testing
-- Write comprehensive Jest tests
+- Write comprehensive Vitest tests
 - Test functionality, not implementation
   - End-to-end coverage
   - API: test input/output
   - UI: test behavior + use data-testid
 - Use describe blocks and beforeEach for setup
 - Mock external dependencies
-- Don't add clearAllMocks or resetAllMocks to individual test files because it's already in jest.config.js
+- Don't add clearAllMocks or resetAllMocks to individual test files because it's already in vitest.config.js
 - Don't add restoreAllMocks to individual test files
 - Unit test files should be in the same folder as the main code they are testing
 
-### Jest Mocking Best Practices
+### Vitest Mocking Best Practices
 
-- **Prefer `jest.mocked()` over `spyOn`** for module-level mocking
-- Use `jest.mocked()` for type safety and better IntelliSense
+- **Prefer `vi.mocked()` over `spyOn`** for module-level mocking
+- Use `vi.mocked()` for type safety and better IntelliSense
 - Use `spyOn` for instance-specific mocking only
 
 ## Template Handling

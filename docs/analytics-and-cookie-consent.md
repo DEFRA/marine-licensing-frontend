@@ -77,14 +77,10 @@ Because unknown URLs now run the normal lifecycle, each cookieless 404 creates a
 
 Neither value lives in any repository. Non-production and production containers are separate; the analytics team keeps them in sync, and this team verifies on test only.
 
-## Journey tests and synthetic traffic
-
-The journey-test browser on CDP egresses through a Squid proxy whose allow-list excludes Google hosts, dev carries no container key, and local/GitHub runs have no key either, so journey runs never reach Google Analytics. Clarity is allowed on the test environment and does receive synthetic sessions. Do not add Google hosts to the journey-tests Squid allow-list.
-
 ## Handover to the performance analyst
 
 - Web data stream URLs: non-prod `https://marine-licensing-frontend.test.cdp-int.defra.cloud`; prod `https://get-permission-for-marine-work.defra.gov.uk`.
 - Unwanted referrals per stream: non-prod `your-account.cpdev.cui.defra.gov.uk`, `dcidmtest.b2clogin.com`, `login.microsoftonline.com`; prod `your-account.defra.gov.uk`, `dcidm.b2clogin.com`, `login.microsoftonline.com`. Do not exclude `marinemanagement.org.uk`.
-- Query parameters to redact: `ACTIVITY_TYPE`, `ARTICLE`, `pdfDownloadUrl`.
+- Query parameters to consider redacting: `ACTIVITY_TYPE`, `ARTICLE`, `pdfDownloadUrl`.
 - Validation re-renders prefix the page title with `Error: `.
 - Seven wait pages reload every two seconds while processing; each reload is a page_view.

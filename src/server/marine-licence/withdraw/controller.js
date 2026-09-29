@@ -9,7 +9,7 @@ import {
   clearMarineLicenceCache
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
-import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
+import { WITHDRAWABLE_MARINE_LICENCE_STATUSES } from '#src/server/common/constants/projects.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 
 const WITHDRAW_MARINE_LICENCE_VIEW_ROUTE = 'marine-licence/withdraw/index'
@@ -43,7 +43,9 @@ export const withdrawMarineLicenceConfirmController = {
         return h.redirect(routes.DASHBOARD)
       }
 
-      if (marineLicence.status !== PROJECT_STATUS.SUBMITTED) {
+      if (
+        !WITHDRAWABLE_MARINE_LICENCE_STATUSES.includes(marineLicence.status)
+      ) {
         request.logger.warn(
           { marineLicenceId, status: marineLicence.status },
           'Marine licence cannot be withdrawn'

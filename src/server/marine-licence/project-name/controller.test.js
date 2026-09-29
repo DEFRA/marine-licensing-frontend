@@ -216,7 +216,38 @@ describe('#marineLicence/projectName', () => {
       })
 
       expect(statusCode).toBe(statusCodes.ok)
-      expect(result).toContain('Project name')
+      expect(result).toContain('Application name')
+    })
+
+    test('Should map the API max-length error to the application name message', async () => {
+      mockMarineLicence({ projectName: 'Test Project' })
+
+      authenticatedPostRequestMock.mockRejectedValueOnce({
+        data: {
+          payload: {
+            validation: {
+              details: [
+                {
+                  path: ['projectName'],
+                  message: 'PROJECT_NAME_MAX_LENGTH',
+                  type: 'string.max'
+                }
+              ]
+            }
+          }
+        }
+      })
+
+      const { result, statusCode } = await makePostRequest({
+        url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
+        server: getServer(),
+        formData: { projectName: 'a'.repeat(251) }
+      })
+
+      expect(statusCode).toBe(statusCodes.ok)
+      expect(result).toContain(
+        'Application name must be 250 characters or fewer'
+      )
     })
 
     test('Should correctly handle an incorrectly formed error object', () => {
@@ -237,8 +268,8 @@ describe('#marineLicence/projectName', () => {
       projectNameSubmitController.options.validate.failAction(request, h, err)
 
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
-        heading: 'Project Name',
-        pageTitle: 'Project name',
+        heading: 'Application name',
+        pageTitle: 'Application name',
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         payload: { projectName: '' }
       })
@@ -258,8 +289,8 @@ describe('#marineLicence/projectName', () => {
       projectNameSubmitController.options.validate.failAction(request, h, {})
 
       expect(h.view).toHaveBeenCalledWith(PROJECT_NAME_VIEW_ROUTE, {
-        heading: 'Project Name',
-        pageTitle: 'Project name',
+        heading: 'Application name',
+        pageTitle: 'Application name',
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         payload: { projectName: '' }
       })

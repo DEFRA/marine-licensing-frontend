@@ -54,8 +54,8 @@ describe('#dashboard', () => {
         {}
       )
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects',
-        heading: 'Projects',
+        pageTitle: 'Submissions',
+        heading: 'Submissions',
         projects: [],
         isEmployee: false,
         organisationName: '',
@@ -95,8 +95,8 @@ describe('#dashboard', () => {
         flashedsearchParams
       )
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects',
-        heading: 'Projects',
+        pageTitle: 'Submissions',
+        heading: 'Submissions',
         projects: [],
         isEmployee: true,
         organisationName: '',
@@ -163,8 +163,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects',
-        heading: 'Projects',
+        pageTitle: 'Submissions',
+        heading: 'Submissions',
         projects: expectedFormattedProjects,
         isEmployee: false,
         organisationName: '',
@@ -199,8 +199,8 @@ describe('#dashboard', () => {
       )
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects',
-        heading: 'Projects',
+        pageTitle: 'Submissions',
+        heading: 'Submissions',
         projects: [],
         isEmployee: false,
         searchParams: {}
@@ -222,8 +222,8 @@ describe('#dashboard', () => {
       await dashboardController.handler(request, h)
 
       expect(h.view).toHaveBeenCalledWith(DASHBOARD_VIEW_ROUTE, {
-        pageTitle: 'Projects',
-        heading: 'Projects',
+        pageTitle: 'Submissions',
+        heading: 'Submissions',
         projects: [],
         isEmployee: false,
         organisationName: '',
@@ -360,7 +360,7 @@ describe('#dashboard', () => {
         )
         expect(request.yar.flash).not.toHaveBeenCalled()
         expect(h.view).toHaveBeenCalledWith(DASHBOARD_RESULTS_VIEW_ROUTE, {
-          heading: 'Projects',
+          heading: 'Submissions',
           projects: formatProjectsForDisplay(serverResponse.projects, true),
           isEmployee: true,
           organisationName: '',

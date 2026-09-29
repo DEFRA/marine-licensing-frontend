@@ -391,7 +391,7 @@ describe('save-site-details', () => {
       const expectedError = Boom.unauthorized(
         'Exemption ID is required to save site details'
       )
-      expectedError.redirectPath = '/projects'
+      expectedError.redirectPath = '/submissions'
 
       await expect(
         saveSiteDetailsToBackend(mockRequest, mockH)

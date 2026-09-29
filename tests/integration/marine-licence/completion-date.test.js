@@ -127,7 +127,7 @@ describe('Completion date (marine licence)', () => {
       document,
       fieldsetLabel,
       errorMessage:
-        'Select whether any part of the project needs to be completed by a certain date',
+        'Select whether any part of the proposed works need to be completed by a certain date',
       findByHeading: true
     })
   })

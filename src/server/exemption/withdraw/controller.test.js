@@ -85,7 +85,7 @@ describe('#withdraw', () => {
         projectName: 'Test Project',
         exemptionType: EXEMPTION_TYPE,
         exemptionId: 'test-project-id',
-        backLink: '/projects',
+        backLink: '/submissions',
         routes
       })
       expect(result).toBe('view-response')

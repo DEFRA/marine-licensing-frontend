@@ -108,11 +108,9 @@ export const withholdingNotificationSubmitController = {
         {}
       )
     } catch (error) {
-      // The applicant has read the notification either way, so a failure here must not
-      // strand them on an error page.
       request.logger.error(
-        { err: error, marineLicenceId, taskId },
-        'Error marking application task as read'
+        { err: error },
+        `Error marking application task ${taskId} as read for marine licence ${marineLicenceId}`
       )
     }
 

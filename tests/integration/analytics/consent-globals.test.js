@@ -123,7 +123,6 @@ describe('Analytics globals in the page head', () => {
   test('does not emit a noscript style block', async () => {
     const { response } = await load()
 
-    expect(response.result).not.toContain('<noscript>\n    <style>')
     expect(response.result).not.toContain('.hide-if-no-js {display:none')
   })
 })

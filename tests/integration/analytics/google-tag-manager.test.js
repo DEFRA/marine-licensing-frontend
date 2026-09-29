@@ -87,7 +87,7 @@ describe('Google Tag Manager snippets', () => {
       const { document } = await load({ cookie: cookieHeader(true) })
 
       const iframe = gtmIframe(document)
-      expect(iframe).toBeDefined()
+      expect(iframe).not.toBeNull()
       expect(iframe.getAttribute('src')).toBe(
         `https://www.googletagmanager.com/ns.html?id=${CONTAINER_ID}`
       )

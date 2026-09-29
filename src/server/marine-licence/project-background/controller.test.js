@@ -32,8 +32,8 @@ describe('#projectBackground', () => {
       const h = { view: vi.fn() }
       await projectBackgroundController.handler({ query: {} }, h)
       expect(h.view).toHaveBeenCalledWith(PROJECT_BACKGROUND_VIEW_ROUTE, {
-        pageTitle: 'Project background',
-        heading: 'Project background',
+        pageTitle: 'Proposed works summary',
+        heading: 'Proposed works summary',
         projectName: mockLicence.projectName,
         payload: { projectBackground: mockLicence.projectBackground },
         backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
@@ -226,8 +226,8 @@ describe('#projectBackground', () => {
         )
         expect(h.view).toHaveBeenCalledWith(PROJECT_BACKGROUND_VIEW_ROUTE, {
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-          pageTitle: 'Project background',
-          heading: 'Project background',
+          pageTitle: 'Proposed works summary',
+          heading: 'Proposed works summary',
           projectName: mockLicence.projectName,
           payload,
           ...expectedExtra

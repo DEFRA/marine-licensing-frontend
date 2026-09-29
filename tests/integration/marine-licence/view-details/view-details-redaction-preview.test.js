@@ -68,7 +68,7 @@ describe('Marine licence redaction preview', () => {
     const card = document.querySelector('#project-details-card')
 
     expect(
-      getCardRow(card, 'Project name')
+      getCardRow(card, 'Application name')
         .querySelector('.govuk-summary-list__value')
         .textContent.trim()
     ).toBe(mockSubmittedMarineLicenceApplication.projectName)
@@ -135,7 +135,7 @@ describe('Marine licence redaction preview', () => {
           projectName: { redactedText: `Harbour ${REDACTION_LABEL} works` }
         },
         card: '#project-details-card',
-        row: 'Project name',
+        row: 'Application name',
         published: `Harbour ${REDACTION_LABEL} works`,
         heading: true
       },
@@ -145,7 +145,7 @@ describe('Marine licence redaction preview', () => {
           projectBackground: { redactedText: `Works at ${REDACTION_LABEL}` }
         },
         card: '#project-details-card',
-        row: 'Project background',
+        row: 'Proposed works summary',
         published: `Works at ${REDACTION_LABEL}`
       },
       {
@@ -315,7 +315,7 @@ describe('Marine licence redaction preview', () => {
           specialLegalPowers: { redactedText: `Powers ${REDACTION_LABEL}` }
         },
         card: '#other-permissions-card',
-        row: 'Special legal powers to do any of this project',
+        row: 'Special legal powers to do any of these proposed works',
         published: `Powers ${REDACTION_LABEL}`
       },
       {
@@ -333,7 +333,7 @@ describe('Marine licence redaction preview', () => {
           otherAuthorities: { redactedText: `Authority ${REDACTION_LABEL}` }
         },
         card: '#other-permissions-card',
-        row: 'Permission from any other authorities in relation to this project',
+        row: 'Permission from any other authorities in relation to these proposed works',
         published: `Authority ${REDACTION_LABEL}`
       },
       {
@@ -365,7 +365,7 @@ describe('Marine licence redaction preview', () => {
           }
         },
         card: '#water-framework-directive-card',
-        row: 'Project located within one nautical mile (1.85km) of low-water, in a tidal river or estuary',
+        row: 'Proposed works located within one nautical mile (1.85km) of low-water, in a tidal river or estuary',
         published: `Within ${REDACTION_LABEL}`
       },
       {
@@ -378,7 +378,7 @@ describe('Marine licence redaction preview', () => {
           }
         },
         card: '#water-framework-directive-card',
-        row: 'Project limited to one of the excluded activities',
+        row: 'Proposed works limited to one of the excluded activities',
         published: `Limited to ${REDACTION_LABEL}`
       },
       {

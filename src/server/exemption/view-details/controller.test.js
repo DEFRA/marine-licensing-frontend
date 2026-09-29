@@ -274,7 +274,7 @@ describe('view details controller', () => {
             isApplicantView: true,
             pageTitle: submittedExemption.projectName,
             pageCaption: 'EXE/2025/00003',
-            backLink: '/projects',
+            backLink: '/submissions',
             isReadOnly: true,
             projectName: submittedExemption.projectName,
             activityDates: submittedExemption.activityDates,

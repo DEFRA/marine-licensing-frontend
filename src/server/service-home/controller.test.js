@@ -43,9 +43,10 @@ describe('#serviceHome', () => {
         marineLicenceEnabled: false,
         cards: [
           {
-            description: 'View all of the existing projects in this account.',
-            link: '/projects',
-            title: 'View Projects'
+            description:
+              'View all of the existing submissions in this account.',
+            link: '/submissions',
+            title: 'View submissions'
           },
           {
             description:
@@ -55,7 +56,7 @@ describe('#serviceHome', () => {
           },
           {
             description:
-              'View or manage projects not available in this account.',
+              'View or manage submissions not available in this account.',
             link: MCMS_LOGIN_URL,
             title: 'Sign in to the Marine Case Management System'
           }

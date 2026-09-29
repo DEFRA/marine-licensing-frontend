@@ -16,14 +16,14 @@ export const PROJECT_BACKGROUND_VIEW_ROUTE =
   'marine-licence/project-background/index'
 
 export const errorMessages = {
-  PROJECT_BACKGROUND_REQUIRED: 'Enter the project background',
+  PROJECT_BACKGROUND_REQUIRED: 'Enter the proposed works summary',
   PROJECT_BACKGROUND_MAX_LENGTH:
-    'Project background must be 1000 characters or less'
+    'Proposed works summary must be 1000 characters or fewer'
 }
 
 const projectBackgroundSettings = {
-  pageTitle: 'Project background',
-  heading: 'Project background'
+  pageTitle: 'Proposed works summary',
+  heading: 'Proposed works summary'
 }
 
 export const projectBackgroundController = {

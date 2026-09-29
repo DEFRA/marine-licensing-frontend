@@ -1,7 +1,7 @@
 import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 import { mockRedactions } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
-describe('Marine Licence Project Details Card Component', () => {
+describe('Marine Licence Application Details Card Component', () => {
   let $component
 
   beforeEach(() => {
@@ -10,32 +10,29 @@ describe('Marine Licence Project Details Card Component', () => {
     })
   })
 
-  test('Should render project details card component', () => {
+  test('Should render application details card component', () => {
     expect($component('#project-details-card')).toHaveLength(1)
   })
 
-  test('Should display project name', () => {
+  test('Should display application name', () => {
     const htmlContent = $component.html()
     expect(htmlContent).toContain('Test Marine Project')
   })
 
-  test('Should not display project name row when not present', () => {
+  test('Should not display application name row when not present', () => {
     const $componentNoProjectName = renderComponent(
       'marine-licence/project-details-card'
     )
     const htmlContent = $componentNoProjectName.html()
 
-    expect(htmlContent).not.toContain('Project name')
+    expect(htmlContent).not.toContain('Application name')
     expect(htmlContent).not.toContain('Test Marine Project')
   })
 
   test('Should have correct card title', () => {
-    const $componentWithoutProjectName = renderComponent(
-      'marine-licence/project-details-card'
+    expect($component('.govuk-summary-card__title').text().trim()).toBe(
+      'Application details'
     )
-    const htmlContent = $componentWithoutProjectName.html()
-
-    expect(htmlContent).not.toContain('Project name')
   })
 
   describe('change links', () => {
@@ -45,10 +42,10 @@ describe('Marine Licence Project Details Card Component', () => {
         isReadOnly: false
       })
       expect($comp.html()).toContain(
-        '/marine-licence/project-name?from=check-your-answers'
+        '/marine-licence/application-name?from=check-your-answers'
       )
       expect($comp.html()).toContain(
-        '/marine-licence/project-background?from=check-your-answers'
+        '/marine-licence/proposed-works-summary?from=check-your-answers'
       )
       expect($comp.html()).toContain(
         '/marine-licence/start-and-end-dates?from=check-your-answers'
@@ -61,10 +58,10 @@ describe('Marine Licence Project Details Card Component', () => {
         isReadOnly: true
       })
       expect($comp.html()).not.toContain(
-        '/marine-licence/project-name?from=check-your-answers'
+        '/marine-licence/application-name?from=check-your-answers'
       )
       expect($comp.html()).not.toContain(
-        '/marine-licence/project-background?from=check-your-answers'
+        '/marine-licence/proposed-works-summary?from=check-your-answers'
       )
     })
   })

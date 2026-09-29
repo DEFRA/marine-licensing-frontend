@@ -29,6 +29,10 @@ describe('getTagStyle', () => {
     expect(getTagStyle('Rejected')).toBe('govuk-tag--orange')
   })
 
+  it('should return red for Action required', () => {
+    expect(getTagStyle('Action required')).toBe('govuk-tag--red')
+  })
+
   it('should return green for unknown status, so marine licences are unaffected', () => {
     expect(getTagStyle('Submitted')).toBe('govuk-tag--green')
   })

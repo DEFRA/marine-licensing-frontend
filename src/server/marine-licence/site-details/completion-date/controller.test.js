@@ -78,7 +78,7 @@ describe('#completionDateSubmitController', () => {
         {
           path: ['date'],
           message:
-            'Select whether any part of the project needs to be completed by a certain date',
+            'Select whether any part of the proposed works need to be completed by a certain date',
           type: 'any.required'
         }
       ]
@@ -91,7 +91,7 @@ describe('#completionDateSubmitController', () => {
       expect.objectContaining({
         errors: expect.objectContaining({
           date: expect.objectContaining({
-            text: 'Select whether any part of the project needs to be completed by a certain date'
+            text: 'Select whether any part of the proposed works need to be completed by a certain date'
           })
         })
       })

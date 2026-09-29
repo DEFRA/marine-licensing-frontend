@@ -25,9 +25,9 @@ export const errorMessages = {
 
 const otherAuthoritiesSettings = {
   pageTitle:
-    'Have you applied to, or got permission from, any other authorities in relation to this project?',
+    'Have you applied to, or got permission from, any other authorities in relation to these proposed works?',
   heading:
-    'Have you applied to, or got permission from, any other authorities in relation to this project?'
+    'Have you applied to, or got permission from, any other authorities in relation to these proposed works?'
 }
 
 export const otherAuthoritiesController = {

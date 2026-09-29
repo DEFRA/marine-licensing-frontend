@@ -16,6 +16,8 @@ export const getTagStyle = (status) => {
       return 'govuk-tag--magenta'
     case PROJECT_STATUS.REJECTED:
       return 'govuk-tag--orange'
+    case PROJECT_STATUS.ACTION_REQUIRED:
+      return 'govuk-tag--red'
     default:
       return 'govuk-tag--green'
   }

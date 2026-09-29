@@ -39,7 +39,7 @@ describe('Task List', () => {
     ).toBeInTheDocument()
 
     expect(
-      getByRole(document, 'heading', { level: 2, name: 'Project details' })
+      getByRole(document, 'heading', { level: 2, name: 'Application details' })
     ).toBeInTheDocument()
 
     expect(

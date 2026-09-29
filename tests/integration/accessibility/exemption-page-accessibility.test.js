@@ -24,7 +24,7 @@ vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
 }))
 
 const exemptionPages = [
-  { url: routes.DASHBOARD, title: 'Projects' },
+  { url: routes.DASHBOARD, title: 'Submissions' },
   { url: routes.TASK_LIST, title: 'Task list' },
   { url: routes.PROJECT_NAME, title: 'Project name' },
   { url: routes.SITE_DETAILS, title: 'Site details' },

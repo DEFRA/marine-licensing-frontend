@@ -78,6 +78,19 @@ describe('#withdrawMarineLicence', () => {
       expect(result).toBe('view-response')
     })
 
+    it('should still offer withdrawal while action is required', async () => {
+      mockedGetMarineLicenceCache.mockReturnValue({ id: marineLicenceId })
+      mockGetMarineLicenceById.mockResolvedValue({
+        ...submittedMarineLicence,
+        status: PROJECT_STATUS.ACTION_REQUIRED
+      })
+
+      await withdrawMarineLicenceConfirmController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalled()
+      expect(mockH.redirect).not.toHaveBeenCalled()
+    })
+
     it('should redirect to dashboard if no marine licence is selected in the cache', async () => {
       mockedGetMarineLicenceCache.mockReturnValue({ id: undefined })
 

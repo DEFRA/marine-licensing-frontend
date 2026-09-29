@@ -19,11 +19,11 @@ export const EXCLUDED_ACTIVITIES_VIEW_ROUTE =
   'marine-licence/water-framework-directive/excluded-activities/index'
 
 const EXCLUDED_ACTIVITIES_HEADING =
-  'Is your project limited to one of the following excluded activities?'
+  'Are your proposed works limited to one of the following excluded activities?'
 
 export const errorMessages = {
   EXCLUDED_ACTIVITIES_REQUIRED:
-    'Select whether your project is limited to one of the excluded activities'
+    'Select whether your proposed works are limited to one of the excluded activities'
 }
 
 const excludedActivitiesSettings = {

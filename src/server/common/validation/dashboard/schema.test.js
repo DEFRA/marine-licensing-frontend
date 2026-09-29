@@ -44,6 +44,14 @@ describe('#dashboardFilterSchema', () => {
     expect(error).toBeDefined()
   })
 
+  test('should accept ACTION_REQUIRED as a status filter', () => {
+    const { error } = dashboardFilterSchema.validate({
+      status: 'ACTION_REQUIRED'
+    })
+
+    expect(error).toBeUndefined()
+  })
+
   test('should validate a valid type value', () => {
     const { error } = dashboardFilterSchema.validate({
       type: 'marine-licence'

@@ -8,13 +8,15 @@ import {
   mockSubmittedMarineLicenceApplication,
   mockWithdrawnMarineLicenceApplication,
   mockTransferredMarineLicenceApplication,
-  mockRejectedMarineLicenceApplication
+  mockRejectedMarineLicenceApplication,
+  mockMarineLicenceWithApplicationTask,
+  mockApplicationTaskContactId
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   mockMarineLicence,
   setupTestServer
 } from '../shared/test-setup-helpers.js'
-import { agentSession } from '../shared/session-fixtures.js'
+import { agentSession, citizenUserSession } from '../shared/session-fixtures.js'
 import { selectActivityVariants } from '~/src/server/common/constants/activity-variants.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 import { toApplicationReferenceUrlSegment } from '~/src/server/common/helpers/marine-licence/application-reference-url-segment.js'
@@ -29,6 +31,11 @@ vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
   getUserSession: vi.fn()
 }))
 
+const applicationTaskOwnerSession = {
+  ...citizenUserSession,
+  contactId: mockApplicationTaskContactId
+}
+
 const marineLicencePages = [
   {
     url: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
@@ -36,11 +43,11 @@ const marineLicencePages = [
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_NAME,
-    title: 'Project name'
+    title: 'Application name'
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_PROJECT_BACKGROUND,
-    title: 'Project background'
+    title: 'Proposed works summary'
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
@@ -53,17 +60,17 @@ const marineLicencePages = [
   {
     url: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
     title:
-      'Does your organisation have special legal powers to do any of this project?',
+      'Does your organisation have special legal powers to do any of these proposed works?',
     session: agentSession
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_OTHER_AUTHORITIES,
     title:
-      'Have you applied to, or got permission from, any other authorities in relation to this project?'
+      'Have you applied to, or got permission from, any other authorities in relation to these proposed works?'
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_HARBOUR_AUTHORITY,
-    title: 'Is your project located in a harbour authority area?'
+    title: 'Are your proposed works located in a harbour authority area?'
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_IS_INVOICE_ADDRESS_UK_OR_INTERNATIONAL,
@@ -142,12 +149,12 @@ const marineLicencePages = [
   {
     url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
     title:
-      'Is your project within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'
+      'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
     title:
-      'Is your project limited to one of the following excluded activities?'
+      'Are your proposed works limited to one of the following excluded activities?'
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
@@ -284,6 +291,18 @@ const marineLicencePages = [
     url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockSubmittedMarineLicenceApplication.id}`,
     title: mockSubmittedMarineLicenceApplication.projectName,
     marineLicence: mockSubmittedMarineLicenceApplication
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`,
+    title: mockMarineLicenceWithApplicationTask.projectName,
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_WITHHOLDING_NOTIFICATION}/${mockMarineLicenceWithApplicationTask.id}`,
+    title: 'Update on the information you asked us to withhold',
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
   },
   {
     url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${toApplicationReferenceUrlSegment(mockSubmittedMarineLicenceApplication.applicationReference)}`,

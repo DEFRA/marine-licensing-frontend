@@ -106,7 +106,7 @@ describe('Dashboard', () => {
     mockExemptions(mockDashboardServerResponse(exemptions))
     const doc = await loadDashboardPage()
     expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent(
-      'Projects'
+      'Submissions'
     )
   })
 
@@ -250,7 +250,7 @@ describe('Dashboard', () => {
   it('should render a message if there are no projects', async () => {
     mockExemptions({ projects: [], users: [] })
     const doc = await loadDashboardPage()
-    const table = queryByRole(doc, 'table', { name: 'Projects' })
+    const table = queryByRole(doc, 'table', { name: 'Submissions' })
 
     const row = table.querySelectorAll('tbody tr')
     expect(row.length).toBe(0)
@@ -264,14 +264,14 @@ describe('Dashboard', () => {
     it('should render table with moj-sortable-table data-module', async () => {
       mockExemptions(mockDashboardServerResponse(exemptions))
       const doc = await loadDashboardPage()
-      const table = getByRole(doc, 'table', { name: 'Projects' })
+      const table = getByRole(doc, 'table', { name: 'Submissions' })
       expect(table).toHaveAttribute('data-module', 'moj-sortable-table')
     })
 
     it('should set aria-sort on sortable column headers', async () => {
       mockExemptions(mockDashboardServerResponse(exemptions))
       const doc = await loadDashboardPage()
-      const table = getByRole(doc, 'table', { name: 'Projects' })
+      const table = getByRole(doc, 'table', { name: 'Submissions' })
 
       const nameHeader = getByRole(table, 'columnheader', {
         name: 'Name'
@@ -295,7 +295,7 @@ describe('Dashboard', () => {
     it('should not set aria-sort on Actions column', async () => {
       mockExemptions(mockDashboardServerResponse(exemptions))
       const doc = await loadDashboardPage()
-      const table = getByRole(doc, 'table', { name: 'Projects' })
+      const table = getByRole(doc, 'table', { name: 'Submissions' })
 
       const actionsHeader = getByRole(table, 'columnheader', {
         name: 'Actions'
@@ -344,7 +344,7 @@ describe('Dashboard', () => {
       ]
       mockExemptions({ projects: unsortedExemptions, users: [] })
       const doc = await loadDashboardPage()
-      const table = getByRole(doc, 'table', { name: 'Projects' })
+      const table = getByRole(doc, 'table', { name: 'Submissions' })
       const rows = table.querySelectorAll('tbody tr')
 
       expect(rows[0]).toHaveTextContent('Draft Project')
@@ -356,7 +356,7 @@ describe('Dashboard', () => {
     it('should render Owner column header for employee users', async () => {
       mockEmployeeExemptions(mockDashboardServerResponse(employeeExemptions))
       const doc = await loadDashboardPage()
-      const table = getByRole(doc, 'table', { name: 'Projects' })
+      const table = getByRole(doc, 'table', { name: 'Submissions' })
 
       const ownerHeader = getByRole(table, 'columnheader', { name: 'Owner' })
       expect(ownerHeader).toBeInTheDocument()
@@ -365,7 +365,7 @@ describe('Dashboard', () => {
     it('should not render Owner column header for non-employee users', async () => {
       mockExemptions(mockDashboardServerResponse(exemptions))
       const doc = await loadDashboardPage()
-      const table = getByRole(doc, 'table', { name: 'Projects' })
+      const table = getByRole(doc, 'table', { name: 'Submissions' })
 
       const headers = getAllByRole(table, 'columnheader')
       const headerTexts = headers.map((h) => h.textContent.trim())
@@ -475,9 +475,14 @@ describe('Dashboard', () => {
           const filter = doc.querySelector('.moj-filter')
           expect(filter).toHaveAttribute('data-module', 'moj-filter')
 
-          expect(
-            queryAllByRole(filter, 'button', { name: 'Clear filters' })
-          ).toHaveLength(1)
+          const clearFiltersButtons = queryAllByRole(filter, 'button', {
+            name: 'Clear filters'
+          })
+          expect(clearFiltersButtons).toHaveLength(1)
+          expect(clearFiltersButtons[0]).toHaveAttribute(
+            'href',
+            routes.DASHBOARD
+          )
 
           expect(
             getByRole(filter, 'button', { name: 'Apply filters' })

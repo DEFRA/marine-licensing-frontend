@@ -83,7 +83,7 @@ describe('Google Tag Manager snippets', () => {
       )
     })
 
-    test('renders Part B as the first child of the body with a title and the hiding class', async () => {
+    test('renders Part B immediately after the govuk-frontend body script with a title and the hiding class', async () => {
       const { document } = await load({ cookie: cookieHeader(true) })
 
       const iframe = gtmIframe(document)

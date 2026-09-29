@@ -29,15 +29,19 @@ describe('#siteNoticeDisplay', () => {
       vi.mocked(getMarineLicenceService).mockReturnValue(mockService)
       const h = createMockH()
 
+      const marineLicenceId = '64f1a2b3c4d5e6f7a8b9c0d1'
+
       await siteNoticeDisplayController.handler(
-        { params: { marineLicenceId: '64f1a2b3c4d5e6f7a8b9c0d1' } },
+        { params: { marineLicenceId } },
         h
       )
 
+      const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+
       expect(h.view).toHaveBeenCalledWith(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
-        backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-        continueLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+        backLink: expectedViewDetailsUrl,
+        cancelLink: expectedViewDetailsUrl,
+        continueLink: expectedViewDetailsUrl,
         pageTitle: 'Display a site notice',
         heading: 'Display a site notice',
         pageCaption: 'MLA/2026/10264 - Test Project'

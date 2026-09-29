@@ -50,17 +50,19 @@ describe('Site notice display page (marine licence)', () => {
       server: getServer()
     })
 
+    const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicence.id}`
+
     expect(getByRole(document, 'button', { name: 'Continue' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      expectedViewDetailsUrl
     )
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      expectedViewDetailsUrl
     )
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      expectedViewDetailsUrl
     )
   })
 })

@@ -7,9 +7,6 @@ export const SITE_NOTICE_DISPLAY_VIEW_ROUTE =
   'marine-licence/site-notice/display/index'
 
 const siteNoticeDisplaySettings = {
-  backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-  cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-  continueLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
   pageTitle: 'Display a site notice',
   heading: 'Display a site notice'
 }
@@ -23,8 +20,13 @@ export const siteNoticeDisplayController = {
       const service = getMarineLicenceService(request)
       const marineLicence = await service.getMarineLicenceById(marineLicenceId)
 
+      const viewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+
       return h.view(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         ...siteNoticeDisplaySettings,
+        backLink: viewDetailsUrl,
+        cancelLink: viewDetailsUrl,
+        continueLink: viewDetailsUrl,
         pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`
       })
     } catch (error) {

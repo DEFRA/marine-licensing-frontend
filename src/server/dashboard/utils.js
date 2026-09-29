@@ -11,7 +11,8 @@ import {
   PROJECT_STATUS,
   PROJECT_TYPE,
   UNABLE_TO_PROGRESS,
-  WITHDRAWABLE_EXEMPTION_STATUSES
+  WITHDRAWABLE_EXEMPTION_STATUSES,
+  WITHDRAWABLE_MARINE_LICENCE_STATUSES
 } from '#src/server/common/constants/projects.js'
 import { getTagStyle } from '#src/server/common/helpers/ui/get-tag-style.js'
 import escapeHtml from 'lodash/escape.js'
@@ -80,7 +81,8 @@ const getMarineLicenceActions = ({
     return getDraftActions(id, escapedProjectName, MARINE_LICENCE_KEY)
   }
 
-  const canWithdraw = status === PROJECT_STATUS.SUBMITTED && isOwnProject
+  const canWithdraw =
+    WITHDRAWABLE_MARINE_LICENCE_STATUSES.includes(status) && isOwnProject
 
   return getActiveActions(
     id,
@@ -197,9 +199,9 @@ export const getActionButtons = (project) => {
       : getActiveActions(id, escapedProjectName, viewRoute, withdrawRoute)
   }
 
-  return project.status === PROJECT_STATUS.DRAFT
+  return status === PROJECT_STATUS.DRAFT
     ? ''
-    : `<a href="${viewRoute}/${project.id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
+    : `<a href="${viewRoute}/${id}" class="govuk-link govuk-link--no-visited-state" aria-label="View details of ${escapedProjectName}">View details</a>`
 }
 
 export const getStatusLabelText = (status) => {
@@ -224,9 +226,9 @@ export const formatProjectsForDisplay = (projects, isEmployee = false) =>
       },
       { text: project.applicationReference || '-' },
       {
-        html: `<strong class="govuk-tag ${getTagStyle(status)}">${getStatusLabelText(project.status)}</strong>`,
+        html: `<strong class="govuk-tag ${getTagStyle(status)}">${getStatusLabelText(status)}</strong>`,
         attributes: {
-          'data-sort-value': project.status
+          'data-sort-value': status
         }
       },
       {
@@ -342,6 +344,7 @@ export const getFilterCategories = (searchParams, users, userSession = {}) => {
 }
 
 const MARINE_LICENCE_ONLY_STATUS_KEYS = new Set([
+  'ACTION_REQUIRED',
   'SUBMITTED',
   'TRANSFERRED',
   'REJECTED',

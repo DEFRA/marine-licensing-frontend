@@ -27,6 +27,17 @@ describe('#buildApplicationDetailsCardData', () => {
     expect(result.statusTag).toContain(PROJECT_STATUS.TRANSFERRED)
   })
 
+  test('renders a red Action required tag', () => {
+    const result = buildApplicationDetailsCardData({
+      applicationReference: 'ML-2026-001',
+      status: PROJECT_STATUS.ACTION_REQUIRED,
+      submittedAt: '2026-01-15'
+    })
+
+    expect(result.statusTag).toContain('govuk-tag--red')
+    expect(result.statusTag).toContain(PROJECT_STATUS.ACTION_REQUIRED)
+  })
+
   test('returns the application details fields and a rendered rejected status tag', () => {
     const marineLicence = {
       applicationReference: 'ML-2026-001',

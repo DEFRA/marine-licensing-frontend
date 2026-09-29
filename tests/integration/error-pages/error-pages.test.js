@@ -497,7 +497,7 @@ describe('Error Pages Integration Tests', () => {
         queryByRole(document, 'link', { name: 'Sign out' })
       ).not.toBeInTheDocument()
       expect(
-        queryByRole(document, 'link', { name: 'Projects' })
+        queryByRole(document, 'link', { name: 'Submissions' })
       ).not.toBeInTheDocument()
     })
 
@@ -545,7 +545,7 @@ describe('Error Pages Integration Tests', () => {
         getByRole(document, 'link', { name: 'Sign out' })
       ).toBeInTheDocument()
       expect(
-        getByRole(document, 'link', { name: 'Projects' })
+        getByRole(document, 'link', { name: 'Submissions' })
       ).toBeInTheDocument()
     })
 

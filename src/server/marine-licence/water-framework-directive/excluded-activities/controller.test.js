@@ -55,9 +55,9 @@ describe('#excludedActivities', () => {
           marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
         cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         pageTitle:
-          'Is your project limited to one of the following excluded activities?',
+          'Are your proposed works limited to one of the following excluded activities?',
         heading:
-          'Is your project limited to one of the following excluded activities?',
+          'Are your proposed works limited to one of the following excluded activities?',
         projectName: mockLicence.projectName,
         payload: { excludedActivities: undefined }
       })
@@ -152,9 +152,9 @@ describe('#excludedActivities', () => {
           marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
         cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
         pageTitle:
-          'Is your project limited to one of the following excluded activities?',
+          'Are your proposed works limited to one of the following excluded activities?',
         heading:
-          'Is your project limited to one of the following excluded activities?',
+          'Are your proposed works limited to one of the following excluded activities?',
         projectName: mockLicence.projectName,
         payload
       })

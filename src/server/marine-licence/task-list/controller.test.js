@@ -89,14 +89,17 @@ describe('#taskListController', () => {
       {
         href: '/',
         status: { text: 'Completed' },
-        title: { classes: 'govuk-link--no-visited-state', text: 'Project name' }
+        title: {
+          classes: 'govuk-link--no-visited-state',
+          text: 'Application name'
+        }
       },
       {
         href: '/',
         status: { text: 'Completed' },
         title: {
           classes: 'govuk-link--no-visited-state',
-          text: 'Project background'
+          text: 'Proposed works summary'
         }
       }
     ]

@@ -30,7 +30,15 @@ export function sharedBeforeYouStartSiteDetailsTests({
       getByRole(document, 'heading', { name: 'Defining the site boundary' })
     ).toBeInTheDocument()
     expect(
-      getByRole(document, 'heading', { name: 'Projects with multiple sites' })
+      getByRole(document, 'heading', {
+        name: 'Applications with multiple sites'
+      })
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        document,
+        'You need to give separate location details for each site if your application has multiple sites.'
+      )
     ).toBeInTheDocument()
 
     expect(

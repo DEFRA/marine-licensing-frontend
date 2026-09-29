@@ -22,7 +22,7 @@ describe('Service Home', () => {
       expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent('Home')
 
       const viewProjectsLink = getByRole(doc, 'link', {
-        name: /View Projects/i
+        name: /View submissions/i
       })
       expect(viewProjectsLink).toHaveAttribute('href', routes.DASHBOARD)
       expect(viewProjectsLink).toHaveClass('card')
@@ -32,9 +32,9 @@ describe('Service Home', () => {
       const viewProjectsHeading = getByRole(viewProjectsLink, 'heading', {
         level: 2
       })
-      expect(viewProjectsHeading).toHaveTextContent('View Projects')
+      expect(viewProjectsHeading).toHaveTextContent('View submissions')
       expect(viewProjectsLink).toHaveTextContent(
-        'View all of the existing projects in this account.'
+        'View all of the existing submissions in this account.'
       )
 
       const checkLicenceLink = getByRole(doc, 'link', {
@@ -71,7 +71,7 @@ describe('Service Home', () => {
         'Sign in to the Marine Case Management System'
       )
       expect(signInLink).toHaveTextContent(
-        'View or manage projects not available in this account.'
+        'View or manage submissions not available in this account.'
       )
 
       const applyForLicenceLink = queryByRole(doc, 'link', {

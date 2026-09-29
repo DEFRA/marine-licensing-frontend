@@ -7,6 +7,15 @@ import {
 import { waterFrameworkDirective } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('waterFrameworkReviewData', () => {
+  test('exposes the proposed works summary labels', () => {
+    expect(NAUTICAL_MILE_HEADING).toBe(
+      'Proposed works located within one nautical mile (1.85km) of low-water, in a tidal river or estuary'
+    )
+    expect(EXCLUDED_ACTIVITIES_HEADING).toBe(
+      'Proposed works limited to one of the excluded activities'
+    )
+  })
+
   test('maps nauticalMile "yes" to correct heading and display value', () => {
     const result = waterFrameworkReviewData({ nauticalMile: 'yes' })
 

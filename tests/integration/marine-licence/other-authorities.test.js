@@ -33,7 +33,7 @@ describe('Other authorities', () => {
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Have you applied to, or got permission from, any other authorities in relation to this project?'
+      'Have you applied to, or got permission from, any other authorities in relation to these proposed works?'
     )
     getByRole(document, 'button', { name: 'Save and continue' })
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
@@ -70,7 +70,7 @@ describe('Other authorities', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Have you applied to, or got permission from, any other authorities in relation to this project?',
+          'Have you applied to, or got permission from, any other authorities in relation to these proposed works?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -79,7 +79,7 @@ describe('Other authorities', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Have you applied to, or got permission from, any other authorities in relation to this project?',
+          'Have you applied to, or got permission from, any other authorities in relation to these proposed works?',
         inputLabel: 'No',
         findByHeading: true
       })
@@ -104,7 +104,7 @@ describe('Other authorities', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Have you applied to, or got permission from, any other authorities in relation to this project?',
+          'Have you applied to, or got permission from, any other authorities in relation to these proposed works?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -134,7 +134,7 @@ describe('Other authorities', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Have you applied to, or got permission from, any other authorities in relation to this project?',
+        'Have you applied to, or got permission from, any other authorities in relation to these proposed works?',
       errorMessage:
         'Select whether you have applied to, or got permission from, any other authorities',
       findByHeading: true
@@ -161,7 +161,7 @@ describe('Other authorities', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Have you applied to, or got permission from, any other authorities in relation to this project?',
+        'Have you applied to, or got permission from, any other authorities in relation to these proposed works?',
       errorMessage: 'Provide details of the other authorities',
       findByHeading: true
     })

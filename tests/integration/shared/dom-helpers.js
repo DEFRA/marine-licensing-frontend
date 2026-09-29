@@ -56,7 +56,7 @@ export const getFieldsetByLabel = ({ document, fieldsetLabel }) =>
     .closest('fieldset')
 
 export const getProjectsTableRow = ({ document, name }) => {
-  const table = getByRole(document, 'table', { name: 'Projects' })
+  const table = getByRole(document, 'table', { name: 'Submissions' })
   expect(table).toBeInTheDocument()
   const row = getByRole(table, 'cell', {
     name

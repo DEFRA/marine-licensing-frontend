@@ -31,11 +31,11 @@
 
       <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-      <p class="govuk-body">The project background will be displayed on the public register and on the licence. Give a summary of:</p>
+      <p class="govuk-body">This summary will be displayed on the public register and on the licence. Give a summary of:</p>
       <ul class="govuk-list govuk-list--bullet">
         <li>what activities you're doing and why</li>
         <li>where the work will take place</li>
-        <li>which companies or organisations are involved (if applicable)</li>
+        <li>which companies or organisations are involved, if applicable</li>
       </ul>
       <p class="govuk-body">You'll be asked to go into further detail about these later in the application.</p>
 
@@ -54,7 +54,7 @@
 
       {{ govukDetails({
           html: helperHtml,
-          summaryText: "Project background examples"
+          summaryText: "Proposed works summary examples"
       }) }}
 
       <form method="POST">
@@ -64,7 +64,7 @@
           id: "projectBackground",
           name: "projectBackground",
           label: {
-            text: "Give a background summary of your project",
+            text: "Give a summary of the proposed works",
             classes: "govuk-label--s"
           },
           hint: {

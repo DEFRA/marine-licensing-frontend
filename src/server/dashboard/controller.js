@@ -25,7 +25,7 @@ export const DASHBOARD_VIEW_ROUTE = 'dashboard/index.njk'
 export const DASHBOARD_RESULTS_VIEW_ROUTE =
   'dashboard/partials/fetch-response.njk'
 
-const DASHBOARD_PAGE_TITLE = 'Projects'
+const DASHBOARD_PAGE_TITLE = 'Submissions'
 
 export const errorMessages = {
   DASHBOARD_OWNER_REQUIRED: 'Select an owner to view their submissions'

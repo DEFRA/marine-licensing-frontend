@@ -38,7 +38,7 @@ describe('#siteNoticeDisplay', () => {
       vi.mocked(getMarineLicenceService).mockReturnValue(mockService)
       const h = createMockH()
 
-      const r = await siteNoticeDisplayController.handler(
+      await siteNoticeDisplayController.handler(
         createMockRequest({
           params: {
             marineLicenceId: mockMarineLicenceWithApplicationTask.id

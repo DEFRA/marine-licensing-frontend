@@ -70,15 +70,7 @@ describe('Site notice display page (marine licence)', () => {
 
     const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`
 
-    expect(getByRole(document, 'button', { name: 'Continue' })).toHaveAttribute(
-      'href',
-      expectedViewDetailsUrl
-    )
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
-      'href',
-      expectedViewDetailsUrl
-    )
-    expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
       expectedViewDetailsUrl
     )

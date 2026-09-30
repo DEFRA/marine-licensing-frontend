@@ -51,8 +51,6 @@ describe('#siteNoticeDisplay', () => {
 
       expect(h.view).toHaveBeenCalledWith(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         backLink: expectedViewDetailsUrl,
-        cancelLink: expectedViewDetailsUrl,
-        continueLink: expectedViewDetailsUrl,
         pageTitle: 'Display a site notice',
         heading: 'Display a site notice',
         pageCaption: 'MLA/2026/10264 - Test Project',

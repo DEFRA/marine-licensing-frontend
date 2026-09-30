@@ -40,8 +40,6 @@ export const siteNoticeDisplayController = {
       return h.view(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         ...siteNoticeDisplaySettings,
         backLink: viewDetailsUrl,
-        cancelLink: viewDetailsUrl,
-        continueLink: viewDetailsUrl,
         pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`,
         ...displayConditions
       })

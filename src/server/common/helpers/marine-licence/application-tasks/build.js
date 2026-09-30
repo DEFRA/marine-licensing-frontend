@@ -34,14 +34,8 @@ export const buildApplicationTasks = ({ marineLicence, currentContactId }) => {
     return []
   }
 
-  const tasks = marineLicence?.applicationTasks ?? []
-
-  const outstanding = tasks.filter((task) => !task.resolvedAt)
-
-  const resolved = tasks.filter((task) => task.resolvedAt)
-
-  return [...outstanding, ...resolved]
+  return (marineLicence?.applicationTasks ?? [])
     .map((task) => buildTaskItem(task, marineLicence.id))
-    .sort(byRegistryOrder)
     .filter(Boolean)
+    .sort(byRegistryOrder)
 }

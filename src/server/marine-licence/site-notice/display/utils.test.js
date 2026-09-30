@@ -15,8 +15,8 @@ describe('getDisplayConditions', () => {
 
   test('returns true correctly for correct BOTH values and multi sites', () => {
     const data = getDisplayConditions(
-      task,
-      mockMultiSiteMarineLicenceApplication
+      mockMultiSiteMarineLicenceApplication,
+      task
     )
 
     expect(data.showCommunityUserSection).toBe(true)
@@ -31,8 +31,8 @@ describe('getDisplayConditions', () => {
     }
 
     const data = getDisplayConditions(
-      modifiedTask,
-      mockMultiSiteMarineLicenceApplication
+      mockMultiSiteMarineLicenceApplication,
+      modifiedTask
     )
 
     expect(data.showCommunityUserSection).toBe(true)
@@ -47,8 +47,8 @@ describe('getDisplayConditions', () => {
     }
 
     const data = getDisplayConditions(
-      modifiedTask,
-      mockMultiSiteMarineLicenceApplication
+      mockMultiSiteMarineLicenceApplication,
+      modifiedTask
     )
 
     expect(data.showCommunityUserSection).toBe(false)
@@ -58,12 +58,18 @@ describe('getDisplayConditions', () => {
 
   test('returns false correctly for empty data', () => {
     const data = getDisplayConditions(
-      undefined,
-      mockMarineLicenceWithApplicationTask
+      mockMarineLicenceWithApplicationTask,
+      undefined
     )
 
     expect(data.showCommunityUserSection).toBeFalsy()
     expect(data.showMarineUserSection).toBeFalsy()
     expect(data.showMultipleSitesSection).toBeFalsy()
+  })
+
+  test('hides multiple sites section when siteDetails is absent', () => {
+    const data = getDisplayConditions({}, task)
+
+    expect(data.showMultipleSitesSection).toBe(false)
   })
 })

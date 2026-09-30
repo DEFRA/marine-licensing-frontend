@@ -56,6 +56,48 @@ describe('#siteNoticeDisplay', () => {
       })
     })
 
+    test('redirects to view details when there is no site notice task', async () => {
+      vi.mocked(getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          ...mockMarineLicenceWithApplicationTask,
+          applicationTasks: []
+        })
+      })
+      const h = createMockH()
+
+      await siteNoticeDisplayController.handler(
+        createMockRequest({
+          params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id }
+        }),
+        h
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`
+      )
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
+    test('rethrows forbidden for anyone who did not submit the application', async () => {
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+        contactId: 'someone-else'
+      })
+      vi.mocked(getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi
+          .fn()
+          .mockResolvedValue(mockMarineLicenceWithApplicationTask)
+      })
+
+      await expect(
+        siteNoticeDisplayController.handler(
+          createMockRequest({
+            params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id }
+          }),
+          createMockH()
+        )
+      ).rejects.toMatchObject({ output: { statusCode: 403 } })
+    })
+
     test('Should handle API errors in catch block', async () => {
       const h = createMockH()
 

@@ -68,22 +68,40 @@ describe('buildApplicationTasks', () => {
     expect(item.status).toEqual({ text: 'Read' })
   })
 
-  it('lists outstanding tasks above resolved ones', () => {
+  it('orders tasks by registry order regardless of resolved state', () => {
     const items = build({
       marineLicence: buildMarineLicence([
-        buildTask({
-          taskId: 'resolved',
-          receivedAt: '2026-08-01T10:00:00.000Z',
-          resolvedAt: '2026-08-02T10:00:00.000Z'
-        }),
-        buildTask({ taskId: 'outstanding' })
+        buildTask({ type: 'PUBLIC_SITE_NOTICE' }),
+        buildTask({ resolvedAt: '2026-08-02T10:00:00.000Z' })
       ])
     })
 
-    expect(items.map((item) => item.status)).toEqual([
-      { tag: { text: 'Not yet read', classes: 'govuk-tag--red' } },
-      { text: 'Read' }
+    expect(items.map((item) => item.title.text)).toEqual([
+      'Notification about withholding information',
+      'Display a site notice'
     ])
+  })
+
+  it('orders tasks by registry order', () => {
+    const items = build({
+      marineLicence: buildMarineLicence([
+        buildTask({ type: 'PUBLIC_SITE_NOTICE' }),
+        buildTask()
+      ])
+    })
+
+    expect(items.map((item) => item.sortOrder)).toEqual([1, 2])
+  })
+
+  it('skips an unrecognised task type alongside known ones', () => {
+    const items = build({
+      marineLicence: buildMarineLicence([
+        buildTask(),
+        buildTask({ type: 'SOMETHING_NEW' })
+      ])
+    })
+
+    expect(items).toHaveLength(1)
   })
 
   it('skips a task type it does not recognise', () => {

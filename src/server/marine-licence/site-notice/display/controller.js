@@ -33,7 +33,7 @@ export const siteNoticeDisplayController = {
         return h.redirect(getViewDetailsUrl(marineLicenceId))
       }
 
-      const displayConditions = getDisplayConditions(task.data, marineLicence)
+      const displayConditions = getDisplayConditions(marineLicence, task.data)
 
       const viewDetailsUrl = getViewDetailsUrl(marineLicenceId)
 

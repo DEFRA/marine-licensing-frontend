@@ -1,7 +1,10 @@
 import Boom from '@hapi/boom'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { validateMarineLicenceIdParams } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
+import {
+  getSiteNoticeViewDetailsUrl,
+  assertIsOriginalSubmitter
+} from '#src/server/common/helpers/view-details/utils.js'
 
 export const SITE_NOTICE_DISPLAY_VIEW_ROUTE =
   'marine-licence/site-notice/display/index'
@@ -20,7 +23,9 @@ export const siteNoticeDisplayController = {
       const service = getMarineLicenceService(request)
       const marineLicence = await service.getMarineLicenceById(marineLicenceId)
 
-      const viewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+      await assertIsOriginalSubmitter(request, marineLicence)
+
+      const viewDetailsUrl = getSiteNoticeViewDetailsUrl(marineLicenceId)
 
       return h.view(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         ...siteNoticeDisplaySettings,
@@ -30,6 +35,9 @@ export const siteNoticeDisplayController = {
         pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`
       })
     } catch (error) {
+      if (error.isBoom) {
+        throw error
+      }
       request.logger.error(error, 'Error displaying site notice display page')
       throw Boom.internal('Error displaying site notice display page')
     }

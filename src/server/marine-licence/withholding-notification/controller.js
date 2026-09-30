@@ -5,12 +5,15 @@ import {
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import {
   marineLicenceIdSchema,
   validateMarineLicenceIdParams
 } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
+import {
+  getSiteNoticeViewDetailsUrl,
+  assertIsOriginalSubmitter
+} from '#src/server/common/helpers/view-details/utils.js'
 import {
   WITHHOLDING_NOTIFICATION_PAGE_TITLE,
   WITHHOLDING_NOTIFICATION_VIEW_ROUTE
@@ -19,22 +22,6 @@ import {
   buildWithholdingSections,
   findWithholdingTask
 } from '#src/server/marine-licence/withholding-notification/utils.js'
-
-const viewDetailsUrl = (marineLicenceId) =>
-  `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
-
-const assertIsOriginalSubmitter = async (request, marineLicence) => {
-  const userSession = await getUserSession(request, request.state?.userSession)
-
-  if (
-    !userSession?.contactId ||
-    userSession.contactId !== marineLicence.contactId
-  ) {
-    throw Boom.forbidden(
-      'Only the person who submitted the application can view its notifications'
-    )
-  }
-}
 
 export const withholdingNotificationController = {
   options: validateMarineLicenceIdParams,
@@ -50,7 +37,7 @@ export const withholdingNotificationController = {
       const task = findWithholdingTask(marineLicence)
 
       if (!task) {
-        return h.redirect(viewDetailsUrl(marineLicenceId))
+        return h.redirect(getSiteNoticeViewDetailsUrl(marineLicenceId))
       }
 
       return h.view(WITHHOLDING_NOTIFICATION_VIEW_ROUTE, {
@@ -64,7 +51,7 @@ export const withholdingNotificationController = {
         dashboardLink: routes.DASHBOARD,
         withholdingNotificationRoute:
           marineLicenceRoutes.MARINE_LICENCE_WITHHOLDING_NOTIFICATION,
-        backLink: viewDetailsUrl(marineLicenceId)
+        backLink: getSiteNoticeViewDetailsUrl(marineLicenceId)
       })
     } catch (error) {
       if (error.isBoom) {
@@ -114,6 +101,6 @@ export const withholdingNotificationSubmitController = {
       )
     }
 
-    return h.redirect(viewDetailsUrl(marineLicenceId))
+    return h.redirect(getSiteNoticeViewDetailsUrl(marineLicenceId))
   }
 }

@@ -149,7 +149,8 @@ const marineLicencePages = [
   {
     url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceApplication.id}`,
     title: 'Display a site notice',
-    marineLicence: mockSubmittedMarineLicenceApplication
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,

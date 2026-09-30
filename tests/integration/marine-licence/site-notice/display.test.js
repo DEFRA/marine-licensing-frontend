@@ -5,14 +5,32 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
+import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+import { mockApplicationTaskContactId } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+
+vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 describe('Site notice display page (marine licence)', () => {
   const getServer = setupTestServer()
   const marineLicence = {
     id: '64f1a2b3c4d5e6f7a8b9c0d1',
     projectName: 'Test Marine Project',
-    applicationReference: 'MLA/2026/10264'
+    applicationReference: 'MLA/2026/10264',
+    contactId: mockApplicationTaskContactId
   }
+
+  beforeEach(() => {
+    mockMarineLicence(marineLicence)
+    vi.mocked(getUserSession).mockResolvedValue({
+      contactId: mockApplicationTaskContactId
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
 
   test('should display the correct content', async () => {
     mockMarineLicence(marineLicence)
@@ -64,5 +82,16 @@ describe('Site notice display page (marine licence)', () => {
       'href',
       expectedViewDetailsUrl
     )
+  })
+
+  test('forbids anyone who did not submit the application', async () => {
+    vi.mocked(getUserSession).mockResolvedValue({ contactId: 'someone-else' })
+
+    const { statusCode } = await makeGetRequest({
+      url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicence.id}`,
+      server: getServer()
+    })
+
+    expect(statusCode).toBe(statusCodes.forbidden)
   })
 })

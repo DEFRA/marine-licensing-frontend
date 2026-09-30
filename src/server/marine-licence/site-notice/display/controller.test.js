@@ -10,8 +10,10 @@ import {
   createMockH,
   createMockRequest
 } from '#src/server/test-helpers/mocks/helpers.js'
+import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 
 vi.mock('#src/services/marine-licence-service/index.js')
+vi.mock('#src/server/common/plugins/auth/utils.js')
 
 describe('#siteNoticeDisplay', () => {
   const marineLicenceId = '64f1a2b3c4d5e6f7a8b9c0d1'
@@ -19,8 +21,19 @@ describe('#siteNoticeDisplay', () => {
   const marineLicence = {
     ...mockMarineLicenceApplication,
     applicationReference: 'MLA/2026/10264',
-    id: marineLicenceId
+    id: marineLicenceId,
+    contactId: 'test-contact-id'
   }
+
+  beforeEach(() => {
+    vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
+      contactId: marineLicence.contactId
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
 
   describe('#siteNoticeDisplayController', () => {
     test('handler should render with correct context', async () => {
@@ -31,7 +44,7 @@ describe('#siteNoticeDisplay', () => {
       const h = createMockH()
 
       await siteNoticeDisplayController.handler(
-        { params: { marineLicenceId } },
+        createMockRequest({ params: { marineLicenceId } }),
         h
       )
 

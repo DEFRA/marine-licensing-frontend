@@ -1,9 +1,4 @@
-import {
-  getByRole,
-  getByText,
-  getAllByRole,
-  queryByText
-} from '@testing-library/dom'
+import { getByRole, getByText, queryByText } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,

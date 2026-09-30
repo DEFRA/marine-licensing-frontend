@@ -10,7 +10,6 @@ import {
   createMockH,
   createMockRequest
 } from '#src/server/test-helpers/mocks/helpers.js'
-import Boom from '@hapi/boom'
 
 vi.mock('#src/services/marine-licence-service/index.js')
 

@@ -7,36 +7,78 @@ describe('buildMarinePlanPoliciesData', () => {
     expect(buildMarinePlanPoliciesData(undefined)).toEqual([])
   })
 
-  test('maps and sorts policies alphabetically by policy code', () => {
+  test('groups policies into sections and sorts them by policy code', () => {
     const result = buildMarinePlanPoliciesData({
       marinePlanPolicies: [
-        { policyCode: 'S-CC-2', policy: 'Second wording' },
-        { policyCode: 'S-CC-1', policy: 'First wording' }
+        {
+          policyCode: 'S-CC-2',
+          title: 'South Climate change 2',
+          category: 'Cross-cutting',
+          policy: 'Second wording'
+        },
+        {
+          policyCode: 'S-CAB-1',
+          title: 'South Cables 1',
+          category: 'Economic',
+          policy: 'Cables wording'
+        },
+        {
+          policyCode: 'S-CC-1',
+          title: 'South Climate change 1',
+          category: 'Cross-cutting',
+          policy: 'First wording'
+        }
       ],
       marinePlanPolicyResponses: { 'S-CC-1': 'My consideration' }
     })
 
     expect(result).toEqual([
       {
-        policyCode: 'S-CC-1',
-        wording: 'First wording',
-        response: 'My consideration',
-        changeHref: getMarinePlanPolicyLink('S-CC-1')
+        section: 'Cross-cutting',
+        slug: 'cross-cutting',
+        policies: [
+          {
+            policyCode: 'S-CC-1',
+            title: 'South Climate change 1',
+            wording: 'First wording',
+            response: 'My consideration',
+            changeHref: getMarinePlanPolicyLink('S-CC-1')
+          },
+          {
+            policyCode: 'S-CC-2',
+            title: 'South Climate change 2',
+            wording: 'Second wording',
+            response: '',
+            changeHref: getMarinePlanPolicyLink('S-CC-2')
+          }
+        ]
       },
       {
-        policyCode: 'S-CC-2',
-        wording: 'Second wording',
-        response: '',
-        changeHref: getMarinePlanPolicyLink('S-CC-2')
+        section: 'Economic',
+        slug: 'economic',
+        policies: [
+          {
+            policyCode: 'S-CAB-1',
+            title: 'South Cables 1',
+            wording: 'Cables wording',
+            response: '',
+            changeHref: getMarinePlanPolicyLink('S-CAB-1')
+          }
+        ]
       }
     ])
   })
 
-  test('defaults missing wording and response to empty strings', () => {
-    const result = buildMarinePlanPoliciesData({
+  test('defaults missing title, wording and response', () => {
+    const [section] = buildMarinePlanPoliciesData({
       marinePlanPolicies: [{ policyCode: 'S-CC-1' }]
     })
 
-    expect(result[0]).toMatchObject({ wording: '', response: '' })
+    expect(section.section).toBe('Other')
+    expect(section.policies[0]).toMatchObject({
+      title: null,
+      wording: '',
+      response: ''
+    })
   })
 })

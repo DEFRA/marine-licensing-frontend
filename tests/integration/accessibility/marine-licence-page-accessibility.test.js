@@ -120,7 +120,7 @@ const marineLicencePages = [
   },
   {
     url: getMarinePlanPolicyLink('SW-BIO-1'),
-    title: 'SW-BIO-1',
+    title: 'South West Biodiversity 1 (SW-BIO-1)',
     marineLicence: mockMarineLicenceWithMarinePlanPolicies
   },
   {

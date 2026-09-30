@@ -3,33 +3,88 @@ import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 const policies = [
   {
     policyCode: 'S-CC-1',
+    title: 'South Climate change 1',
     wording: 'First policy wording.',
     response: 'My first consideration.',
     changeHref: '/marine-licence/marine-plan-policy/S-CC-1'
   },
   {
     policyCode: 'S-CC-2',
+    title: 'South Climate change 2',
     wording: 'Second policy wording.',
     response: 'My second consideration.',
     changeHref: '/marine-licence/marine-plan-policy/S-CC-2'
   }
 ]
 
+const crossCutting = (sectionPolicies = policies) => [
+  { section: 'Cross-cutting', slug: 'cross-cutting', policies: sectionPolicies }
+]
+
+const sections = crossCutting()
+
 describe('Marine Licence Marine Plan Policies Component', () => {
-  test('renders a card headed "Marine plan policies"', () => {
+  test('renders one card per section headed with the section name', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
-      policies
+      sections: [
+        ...sections,
+        {
+          section: 'Economic',
+          slug: 'economic',
+          policies: [{ ...policies[0], policyCode: 'S-CAB-1' }]
+        }
+      ]
     })
 
-    expect($('#marine-plan-policies-card')).toHaveLength(1)
-    expect($('.govuk-summary-card__title').text().trim()).toBe(
-      'Marine plan policies'
+    expect($('.govuk-summary-card')).toHaveLength(2)
+    expect($('#marine-plan-policies-card-cross-cutting')).toHaveLength(1)
+    expect($('#marine-plan-policies-card-economic')).toHaveLength(1)
+    expect(
+      $('.govuk-summary-card__title')
+        .map((_, el) => $(el).text().trim())
+        .get()
+    ).toEqual([
+      'Marine plan policies – Cross-cutting',
+      'Marine plan policies – Economic'
+    ])
+  })
+
+  test('shows the plain-English title with the code on a new line', () => {
+    const $ = renderComponent('marine-licence/marine-plan-policies-card', {
+      sections
+    })
+
+    const $key = $('.govuk-summary-list__key').first()
+    expect($key.find('br')).toHaveLength(1)
+    expect($key.text().trim()).toBe('South Climate change 1(S-CC-1)')
+  })
+
+  test('shows only the code when a policy has no title', () => {
+    const $ = renderComponent('marine-licence/marine-plan-policies-card', {
+      sections: crossCutting([{ ...policies[0], title: null }])
+    })
+
+    const $key = $('.govuk-summary-list__key').first()
+    expect($key.find('br')).toHaveLength(0)
+    expect($key.text().trim()).toBe('S-CC-1')
+  })
+
+  test('escapes the policy title', () => {
+    const $ = renderComponent('marine-licence/marine-plan-policies-card', {
+      sections: crossCutting([
+        { ...policies[0], title: '<script>alert(1)</script>' }
+      ])
+    })
+
+    expect($('.govuk-summary-list__key script')).toHaveLength(0)
+    expect($('.govuk-summary-list__key').text()).toContain(
+      '<script>alert(1)</script>'
     )
   })
 
   test('renders one row per policy with code, wording and consideration for applicant', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
-      policies,
+      sections,
       isApplicant: true
     })
 
@@ -44,7 +99,7 @@ describe('Marine Licence Marine Plan Policies Component', () => {
 
   test('renders one row per policy with code, wording and consideration for public view', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
-      policies
+      sections
     })
 
     expect($('.govuk-summary-list__row')).toHaveLength(2)
@@ -58,7 +113,7 @@ describe('Marine Licence Marine Plan Policies Component', () => {
 
   test('shows a Change link per policy when not read only', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
-      policies
+      sections
     })
 
     expect($('.govuk-summary-list__actions a')).toHaveLength(2)
@@ -70,7 +125,7 @@ describe('Marine Licence Marine Plan Policies Component', () => {
 
   test('hides Change links when read only', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
-      policies,
+      sections,
       isReadOnly: true
     })
 
@@ -79,14 +134,14 @@ describe('Marine Licence Marine Plan Policies Component', () => {
 
   test('escapes user-provided consideration text', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
-      policies: [
+      sections: crossCutting([
         {
           policyCode: 'S-CC-1',
           wording: 'w',
           response: '<script>alert(1)</script>',
           changeHref: '/x'
         }
-      ]
+      ])
     })
 
     expect($.html()).not.toContain('<script>alert(1)</script>')
@@ -95,14 +150,14 @@ describe('Marine Licence Marine Plan Policies Component', () => {
 
   test('renders policy wording HTML as formatted markup', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
-      policies: [
+      sections: crossCutting([
         {
           policyCode: 'S-CC-1',
           wording: '<p>Intro</p><ul><li>item one</li><li>item two</li></ul>',
           response: 'My consideration',
           changeHref: '/marine-licence/marine-plan-policy/S-CC-1'
         }
-      ]
+      ])
     })
 
     expect($('.app-policy-wording p').first().text()).toBe('Intro')
@@ -110,25 +165,25 @@ describe('Marine Licence Marine Plan Policies Component', () => {
     expect($.html()).not.toContain('&lt;p&gt;')
   })
 
-  test('does not render the card when there are no policies', () => {
+  test('renders no cards when there are no sections', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
-      policies: []
+      sections: []
     })
 
-    expect($('#marine-plan-policies-card')).toHaveLength(0)
+    expect($('.govuk-summary-card')).toHaveLength(0)
   })
 
   describe('redaction', () => {
     const redactableParams = {
       isReadOnly: true,
       enableRedaction: true,
-      policies: [
+      sections: crossCutting([
         {
           policyCode: 'E-AGG-3',
           wording: '<p>Wording</p>',
           response: 'My consideration'
         }
-      ],
+      ]),
       redactions: {},
       redactionSaveUrl: '/view-marine-licence-details/test-id/redact',
       csrfToken: 'test-crumb-token'

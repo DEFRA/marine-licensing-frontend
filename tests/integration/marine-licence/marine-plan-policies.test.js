@@ -42,23 +42,52 @@ describe('Marine plan policies (policy list) page', () => {
     expect(document.body).toHaveTextContent('1 policy to complete')
   })
 
-  test('lists policy codes sorted alphabetically', async () => {
+  test('lists policies as "title (code)" under alphabetical section headings, sorted by code', async () => {
     const document = await loadPolicyListPage()
 
-    const codes = [
-      ...document.querySelectorAll('.govuk-task-list__name-and-hint')
-    ].map((el) => el.textContent.trim())
+    const sections = [...document.querySelectorAll('.govuk-task-list')].map(
+      (taskList) => ({
+        heading: taskList.previousElementSibling.textContent.trim(),
+        policies: [
+          ...taskList.querySelectorAll('.govuk-task-list__name-and-hint')
+        ].map((el) => el.textContent.trim())
+      })
+    )
 
-    expect(codes).toEqual(['SW-AGG-2', 'SW-BIO-1', 'SW-MPA-1'])
+    expect(sections).toEqual([
+      { heading: 'Economic', policies: ['South West Aggregates 2 (SW-AGG-2)'] },
+      {
+        heading: 'Environmental',
+        policies: [
+          'South West Biodiversity 1 (SW-BIO-1)',
+          'South West Marine protected areas 1 (SW-MPA-1)'
+        ]
+      }
+    ])
   })
 
-  test('renders each policy code as a link to its consideration page', async () => {
+  test('shows every policy as "Not yet started" before it is considered', async () => {
     const document = await loadPolicyListPage()
 
-    expect(getByRole(document, 'link', { name: 'SW-AGG-2' })).toHaveAttribute(
-      'href',
-      getMarinePlanPolicyLink('SW-AGG-2')
-    )
+    const statuses = [
+      ...document.querySelectorAll('.govuk-task-list__status')
+    ].map((el) => el.textContent.trim())
+
+    expect(statuses).toEqual([
+      'Not yet started',
+      'Not yet started',
+      'Not yet started'
+    ])
+  })
+
+  test('links each policy to its consideration page', async () => {
+    const document = await loadPolicyListPage()
+
+    expect(
+      getByRole(document, 'link', {
+        name: 'South West Aggregates 2 (SW-AGG-2)'
+      })
+    ).toHaveAttribute('href', getMarinePlanPolicyLink('SW-AGG-2'))
     expect(document.querySelectorAll('.govuk-task-list__link')).toHaveLength(3)
   })
 

@@ -398,15 +398,19 @@ describe('Marine Licence View Details', () => {
     })
 
     test('renders the marine plan policies card with the correct title', () => {
-      const card = document.querySelector('#marine-plan-policies-card')
+      const card = document.querySelector(
+        '#marine-plan-policies-card-cross-cutting'
+      )
       expect(card).not.toBeNull()
       expect(
         card.querySelector('.govuk-summary-card__title').textContent.trim()
-      ).toBe('Marine plan policies')
+      ).toBe('Marine plan policies – Cross-cutting')
     })
 
     test('renders the policy code, wording and consideration', () => {
-      const card = document.querySelector('#marine-plan-policies-card')
+      const card = document.querySelector(
+        '#marine-plan-policies-card-cross-cutting'
+      )
       expect(card.textContent).toContain('S-CC-1')
       expect(card.textContent).toContain('First policy wording.')
       expect(card.textContent).toContain('My first consideration.')
@@ -414,7 +418,9 @@ describe('Marine Licence View Details', () => {
     })
 
     test('does not render a Change link for any row', () => {
-      const card = document.querySelector('#marine-plan-policies-card')
+      const card = document.querySelector(
+        '#marine-plan-policies-card-cross-cutting'
+      )
       expect(
         card.querySelectorAll('.govuk-summary-list__actions a')
       ).toHaveLength(0)

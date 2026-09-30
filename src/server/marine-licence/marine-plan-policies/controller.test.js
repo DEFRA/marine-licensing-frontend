@@ -16,6 +16,34 @@ vi.mock('~/src/services/marine-licence-service/index.js')
 describe('#marinePlanPoliciesController', () => {
   const mockRequest = createMockRequest()
 
+  const policies = [
+    {
+      policyCode: 'SW-MPA-1',
+      title: 'South West Marine protected areas 1',
+      category: 'Environmental'
+    },
+    {
+      policyCode: 'SW-AGG-2',
+      title: 'South West Aggregates 2',
+      category: 'Economic'
+    },
+    {
+      policyCode: 'SW-BIO-1',
+      title: 'South West Biodiversity 1',
+      category: 'Environmental'
+    }
+  ]
+
+  const notYetStarted = {
+    tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+  }
+
+  const row = (policyCode, text, status = notYetStarted) => ({
+    title: { text, classes: 'govuk-link--no-visited-state' },
+    href: getMarinePlanPolicyLink(policyCode),
+    status
+  })
+
   beforeEach(() => {
     vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValue({
       id: 'test-id'
@@ -24,11 +52,7 @@ describe('#marinePlanPoliciesController', () => {
       getMarineLicenceById: vi.fn().mockResolvedValue({
         projectName: 'Test Project',
         marinePlanPoliciesCount: 3,
-        marinePlanPolicies: [
-          { policyCode: 'SW-MPA-1' },
-          { policyCode: 'SW-AGG-2' },
-          { policyCode: 'SW-BIO-1' }
-        ]
+        marinePlanPolicies: policies
       })
     })
   })
@@ -55,7 +79,7 @@ describe('#marinePlanPoliciesController', () => {
     expect(request.yar.flash).not.toHaveBeenCalled()
   })
 
-  test('renders policies sorted by code as plain rows with a "Not yet started" tag', async () => {
+  test('renders policies as "title (code)" rows under alphabetical section headings, sorted by code, all "Not yet started"', async () => {
     const h = { view: vi.fn() }
 
     await marinePlanPoliciesController.handler(mockRequest, h)
@@ -69,36 +93,19 @@ describe('#marinePlanPoliciesController', () => {
       taskListLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       marinePlanPolicyGuidanceLink:
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
-      policies: [
+      sections: [
         {
-          title: {
-            text: 'SW-AGG-2',
-            classes: 'govuk-link--no-visited-state'
-          },
-          href: getMarinePlanPolicyLink('SW-AGG-2'),
-          status: {
-            tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
-          }
+          heading: 'Economic',
+          slug: 'economic',
+          items: [row('SW-AGG-2', 'South West Aggregates 2 (SW-AGG-2)')]
         },
         {
-          title: {
-            text: 'SW-BIO-1',
-            classes: 'govuk-link--no-visited-state'
-          },
-          href: getMarinePlanPolicyLink('SW-BIO-1'),
-          status: {
-            tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
-          }
-        },
-        {
-          title: {
-            text: 'SW-MPA-1',
-            classes: 'govuk-link--no-visited-state'
-          },
-          href: getMarinePlanPolicyLink('SW-MPA-1'),
-          status: {
-            tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
-          }
+          heading: 'Environmental',
+          slug: 'environmental',
+          items: [
+            row('SW-BIO-1', 'South West Biodiversity 1 (SW-BIO-1)'),
+            row('SW-MPA-1', 'South West Marine protected areas 1 (SW-MPA-1)')
+          ]
         }
       ]
     })
@@ -110,11 +117,7 @@ describe('#marinePlanPoliciesController', () => {
         getMarineLicenceById: vi.fn().mockResolvedValue({
           projectName: 'Test Project',
           marinePlanPoliciesCount: 3,
-          marinePlanPolicies: [
-            { policyCode: 'SW-MPA-1' },
-            { policyCode: 'SW-AGG-2' },
-            { policyCode: 'SW-BIO-1' }
-          ],
+          marinePlanPolicies: policies,
           marinePlanPolicyResponses: { 'SW-BIO-1': 'A considered answer' }
         })
       }
@@ -125,12 +128,31 @@ describe('#marinePlanPoliciesController', () => {
 
     const model = h.view.mock.calls[0][1]
     expect(model.policiesCountText).toBe('1 of 3 policies completed')
-    const bioRow = model.policies.find((row) => row.title.text === 'SW-BIO-1')
-    expect(bioRow.status).toEqual({ text: 'Completed' })
-    const aggRow = model.policies.find((row) => row.title.text === 'SW-AGG-2')
-    expect(aggRow.status).toEqual({
-      tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
-    })
+    expect(model.sections[1].items).toEqual([
+      row('SW-BIO-1', 'South West Biodiversity 1 (SW-BIO-1)', {
+        text: 'Completed'
+      }),
+      row('SW-MPA-1', 'South West Marine protected areas 1 (SW-MPA-1)')
+    ])
+  })
+
+  test('shows policies without a category under Other, by code alone when they have no title', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
+      {
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          projectName: 'Test Project',
+          marinePlanPoliciesCount: 1,
+          marinePlanPolicies: [{ policyCode: 'SW-AGG-2', title: 'SW-AGG-2' }]
+        })
+      }
+    )
+    const h = { view: vi.fn() }
+
+    await marinePlanPoliciesController.handler(mockRequest, h)
+
+    expect(h.view.mock.calls[0][1].sections).toEqual([
+      { heading: 'Other', slug: 'other', items: [row('SW-AGG-2', 'SW-AGG-2')] }
+    ])
   })
 
   test('renders an empty list does not crash when there are no policies', async () => {
@@ -149,7 +171,7 @@ describe('#marinePlanPoliciesController', () => {
     expect(h.view).toHaveBeenCalledWith(
       MARINE_PLAN_POLICIES_VIEW_ROUTE,
       expect.objectContaining({
-        policies: [],
+        sections: [],
         policiesCountText: '0 policies to complete'
       })
     )

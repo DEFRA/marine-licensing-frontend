@@ -4,7 +4,10 @@ import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { getMarinePlanPolicyLink } from '#src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 import { clearReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
-import { sortByPolicyCode } from '#src/server/common/helpers/marine-licence/sort-by-policy-code.js'
+import {
+  formatPolicyTitle,
+  groupPoliciesBySection
+} from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
 
 export const MARINE_PLAN_POLICIES_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/index'
@@ -18,7 +21,7 @@ const isCompleted = (responses, policyCode) => {
 
 const toPolicyRow = (responses) => (policy) => ({
   title: {
-    text: policy.policyCode,
+    text: formatPolicyTitle(policy),
     classes: 'govuk-link--no-visited-state'
   },
   href: getMarinePlanPolicyLink(policy.policyCode),
@@ -58,10 +61,15 @@ export const marinePlanPoliciesController = {
       marinePlanPolicyResponses
     } = await marineLicenceService.getMarineLicenceById(marineLicence.id)
 
-    const sortedPolicies = sortByPolicyCode(marinePlanPolicies ?? [])
-    const policies = sortedPolicies.map(toPolicyRow(marinePlanPolicyResponses))
+    const sections = groupPoliciesBySection(marinePlanPolicies ?? []).map(
+      ({ section, slug, policies }) => ({
+        heading: section,
+        slug,
+        items: policies.map(toPolicyRow(marinePlanPolicyResponses))
+      })
+    )
     const completedCount = countCompleted(
-      sortedPolicies,
+      marinePlanPolicies ?? [],
       marinePlanPolicyResponses
     )
 
@@ -77,7 +85,7 @@ export const marinePlanPoliciesController = {
       taskListLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
       marinePlanPolicyGuidanceLink:
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
-      policies
+      sections
     })
   }
 }

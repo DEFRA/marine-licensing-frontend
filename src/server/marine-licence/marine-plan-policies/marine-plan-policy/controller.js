@@ -12,6 +12,11 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
+import {
+  formatPolicyTitle,
+  getPolicySection,
+  getPolicySectionSlug
+} from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
 
 export const MARINE_PLAN_POLICY_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/marine-plan-policy/index'
@@ -27,11 +32,10 @@ export const errorMessages = {
     'Policy consideration must be 2000 characters or less'
 }
 
-const CHECK_YOUR_ANSWERS_RETURN_LINK = `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#marine-plan-policies-card`
-
-const getPolicyReturnLink = (returnTo) => {
+const getPolicyReturnLink = (returnTo, policy) => {
   if (returnTo) {
-    return CHECK_YOUR_ANSWERS_RETURN_LINK
+    const slug = getPolicySectionSlug(getPolicySection(policy))
+    return `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#marine-plan-policies-card-${slug}`
   }
   return marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
 }
@@ -73,12 +77,12 @@ const buildRenderModel = ({
   payload,
   returnTo
 }) => ({
-  pageTitle: policyCode,
-  heading: policyCode,
+  pageTitle: formatPolicyTitle(policy),
+  heading: formatPolicyTitle(policy),
   projectName,
   policyText: policy.policy,
   findOutMoreUrl: `${FIND_OUT_MORE_BASE}${encodeURIComponent(policyCode)}`,
-  backLink: getPolicyReturnLink(returnTo),
+  backLink: getPolicyReturnLink(returnTo, policy),
   marinePlanPolicyGuidanceLink:
     marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
   payload
@@ -138,7 +142,8 @@ export const marinePlanPolicySubmitController = {
     }
   },
   async handler(request, h) {
-    const { id, policyCode, returnTo } = await loadPolicyContext(request)
+    const { id, policyCode, policy, returnTo } =
+      await loadPolicyContext(request)
 
     await authenticatedPatchRequest(
       request,
@@ -150,6 +155,6 @@ export const marinePlanPolicySubmitController = {
       }
     )
 
-    return h.redirect(getPolicyReturnLink(returnTo))
+    return h.redirect(getPolicyReturnLink(returnTo, policy))
   }
 }

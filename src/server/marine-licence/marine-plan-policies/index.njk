@@ -35,10 +35,13 @@
 
       <p class="govuk-body">{{ policiesCountText }}</p>
 
-      {{ govukTaskList({
-        idPrefix: "marine-plan-policies",
-        items: policies
-      }) }}
+      {% for section in sections %}
+        <h2 class="govuk-heading-m">{{ section.heading }}</h2>
+        {{ govukTaskList({
+          idPrefix: "marine-plan-policies-" + section.slug,
+          items: section.items
+        }) }}
+      {% endfor %}
 
       {{ govukButton({
         text: "Continue",

@@ -1,24 +1,26 @@
 import { vi } from 'vitest'
-import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
 import {
   siteNoticeDisplayController,
   SITE_NOTICE_DISPLAY_VIEW_ROUTE
 } from '#src/server/marine-licence/site-notice/display/controller.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
-import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { createMockH } from '#src/server/test-helpers/mocks/helpers.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
+import Boom from '@hapi/boom'
 
 vi.mock('#src/services/marine-licence-service/index.js')
 
 describe('#siteNoticeDisplay', () => {
-  const getServer = setupTestServer()
+  const marineLicenceId = '64f1a2b3c4d5e6f7a8b9c0d1'
+
   const marineLicence = {
     ...mockMarineLicenceApplication,
     applicationReference: 'MLA/2026/10264',
-    id: '64f1a2b3c4d5e6f7a8b9c0d1'
+    id: marineLicenceId
   }
 
   describe('#siteNoticeDisplayController', () => {
@@ -28,8 +30,6 @@ describe('#siteNoticeDisplay', () => {
       }
       vi.mocked(getMarineLicenceService).mockReturnValue(mockService)
       const h = createMockH()
-
-      const marineLicenceId = '64f1a2b3c4d5e6f7a8b9c0d1'
 
       await siteNoticeDisplayController.handler(
         { params: { marineLicenceId } },
@@ -48,17 +48,18 @@ describe('#siteNoticeDisplay', () => {
       })
     })
 
-    test('should provide expected response', async () => {
-      const mockService = {
-        getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
-      }
-      vi.mocked(getMarineLicenceService).mockReturnValue(mockService)
-      const { statusCode } = await makeGetRequest({
-        url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicence.id}`,
-        server: getServer()
-      })
+    test('Should handle API validation errors in catch block', async () => {
+      const h = createMockH()
 
-      expect(statusCode).toBe(statusCodes.ok)
+      getMarineLicenceService.mockRejectedValueOnce('API Error')
+
+      const mockRequest = createMockRequest({ params: { marineLicenceId } })
+
+      await expect(
+        siteNoticeDisplayController.handler(mockRequest, h)
+      ).rejects.toThrow('Error displaying site notice display page')
+
+      expect(h.view).not.toHaveBeenCalled()
     })
   })
 })

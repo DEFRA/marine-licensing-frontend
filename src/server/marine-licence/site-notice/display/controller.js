@@ -30,10 +30,6 @@ export const siteNoticeDisplayController = {
         pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`
       })
     } catch (error) {
-      if (error.isBoom) {
-        throw error
-      }
-
       request.logger.error(error, 'Error displaying site notice display page')
       throw Boom.internal('Error displaying site notice display page')
     }

@@ -2,7 +2,7 @@ import Boom from '@hapi/boom'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { validateMarineLicenceIdParams } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
 import {
-  getSiteNoticeViewDetailsUrl,
+  getViewDetailsUrl,
   assertIsOriginalSubmitter
 } from '#src/server/common/helpers/view-details/utils.js'
 import { findSiteNoticeTask } from '#src/server/common/helpers/marine-licence/site-notice.js'
@@ -30,12 +30,12 @@ export const siteNoticeDisplayController = {
       const task = findSiteNoticeTask(marineLicence)
 
       if (!task) {
-        return h.redirect(getSiteNoticeViewDetailsUrl(marineLicenceId))
+        return h.redirect(getViewDetailsUrl(marineLicenceId))
       }
 
       const displayConditions = getDisplayConditions(task.data, marineLicence)
 
-      const viewDetailsUrl = getSiteNoticeViewDetailsUrl(marineLicenceId)
+      const viewDetailsUrl = getViewDetailsUrl(marineLicenceId)
 
       return h.view(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         ...siteNoticeDisplaySettings,

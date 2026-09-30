@@ -11,7 +11,7 @@ import {
   validateMarineLicenceIdParams
 } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
 import {
-  getSiteNoticeViewDetailsUrl,
+  getViewDetailsUrl,
   assertIsOriginalSubmitter
 } from '#src/server/common/helpers/view-details/utils.js'
 import {
@@ -37,7 +37,7 @@ export const withholdingNotificationController = {
       const task = findWithholdingTask(marineLicence)
 
       if (!task) {
-        return h.redirect(getSiteNoticeViewDetailsUrl(marineLicenceId))
+        return h.redirect(getViewDetailsUrl(marineLicenceId))
       }
 
       return h.view(WITHHOLDING_NOTIFICATION_VIEW_ROUTE, {
@@ -51,7 +51,7 @@ export const withholdingNotificationController = {
         dashboardLink: routes.DASHBOARD,
         withholdingNotificationRoute:
           marineLicenceRoutes.MARINE_LICENCE_WITHHOLDING_NOTIFICATION,
-        backLink: getSiteNoticeViewDetailsUrl(marineLicenceId)
+        backLink: getViewDetailsUrl(marineLicenceId)
       })
     } catch (error) {
       if (error.isBoom) {
@@ -101,6 +101,6 @@ export const withholdingNotificationSubmitController = {
       )
     }
 
-    return h.redirect(getSiteNoticeViewDetailsUrl(marineLicenceId))
+    return h.redirect(getViewDetailsUrl(marineLicenceId))
   }
 }

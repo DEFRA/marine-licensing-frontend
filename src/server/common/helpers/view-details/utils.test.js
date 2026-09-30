@@ -9,7 +9,7 @@ import {
 } from '#src/server/common/constants/routes.js'
 import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
 import {
-  getSiteNoticeViewDetailsUrl,
+  getViewDetailsUrl,
   assertIsOriginalSubmitter
 } from '#src/server/common/helpers/view-details/utils.js'
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
@@ -106,9 +106,9 @@ describe('isInternalUserView', () => {
   })
 })
 
-describe('getSiteNoticeViewDetailsUrl', () => {
+describe('getViewDetailsUrl', () => {
   test('builds the view-details URL for a licence ID', () => {
-    expect(getSiteNoticeViewDetailsUrl('abc123')).toBe(
+    expect(getViewDetailsUrl('abc123')).toBe(
       `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/abc123`
     )
   })
@@ -117,10 +117,6 @@ describe('getSiteNoticeViewDetailsUrl', () => {
 describe('assertIsOriginalSubmitter', () => {
   beforeEach(() => {
     vi.spyOn(authUtils, 'getUserSession').mockResolvedValue(null)
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
   })
 
   test('resolves when user session matches the licence contactId', async () => {

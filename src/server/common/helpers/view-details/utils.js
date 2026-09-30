@@ -22,7 +22,7 @@ export const isInternalUserView = (request, projectType) =>
       : marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER
   ) && getAuthProvider(request) === AUTH_STRATEGIES.ENTRA_ID
 
-export const getSiteNoticeViewDetailsUrl = (marineLicenceId) =>
+export const getViewDetailsUrl = (marineLicenceId) =>
   `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
 
 export const assertIsOriginalSubmitter = async (request, marineLicence) => {

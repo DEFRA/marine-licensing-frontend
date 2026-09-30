@@ -24,10 +24,6 @@ describe('#siteNoticeDisplay', () => {
     })
   })
 
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
   describe('#siteNoticeDisplayController', () => {
     test('handler should render with correct context', async () => {
       const mockService = {
@@ -60,15 +56,19 @@ describe('#siteNoticeDisplay', () => {
       })
     })
 
-    test('Should handle API validation errors in catch block', async () => {
+    test('Should handle API errors in catch block', async () => {
       const h = createMockH()
 
-      getMarineLicenceService.mockRejectedValueOnce('API Error')
+      const mockError = new Error('API Error')
 
       const mockRequest = createMockRequest({
         params: {
           marineLicenceId: mockMarineLicenceWithApplicationTask.id
         }
+      })
+
+      getMarineLicenceService.mockReturnValue({
+        getMarineLicenceById: vi.fn().mockRejectedValue(mockError)
       })
 
       await expect(

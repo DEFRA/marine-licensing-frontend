@@ -32,10 +32,6 @@ describe('Site notice display page (marine licence)', () => {
     })
   })
 
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
   test('should display the correct content', async () => {
     const document = await loadPage({
       requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`,
@@ -106,10 +102,12 @@ describe('Site notice display page (marine licence)', () => {
 
     expect(getByText(document, 'Marine users')).toBeInTheDocument()
 
-    const text = getByText(document, 'Marine users')
-
-    const list = text.nextElementSibling.nextElementSibling
-    expect(getAllByRole(list, 'listitem').length).toBe(5)
+    const marineH2 = Array.from(
+      document.querySelectorAll('h2.govuk-heading-m')
+    ).find((h2) => h2.textContent === 'Marine users')
+    const marineUl = marineH2.nextElementSibling.nextElementSibling
+    const marineListItems = marineUl.querySelectorAll('li')
+    expect(marineListItems.length).toBe(5)
     expect(queryByText(document, 'Community users')).not.toBeInTheDocument()
   })
 
@@ -132,10 +130,12 @@ describe('Site notice display page (marine licence)', () => {
 
     expect(getByText(document, 'Community users')).toBeInTheDocument()
 
-    const text = getByText(document, 'Community users')
-
-    const list = text.nextElementSibling.nextElementSibling
-    expect(getAllByRole(list, 'listitem').length).toBe(4)
+    const communityH2 = Array.from(
+      document.querySelectorAll('h2.govuk-heading-m')
+    ).find((h2) => h2.textContent === 'Community users')
+    const communityUl = communityH2.nextElementSibling.nextElementSibling
+    const communityListItems = communityUl.querySelectorAll('li')
+    expect(communityListItems.length).toBe(4)
     expect(queryByText(document, 'Marine users')).not.toBeInTheDocument()
   })
 

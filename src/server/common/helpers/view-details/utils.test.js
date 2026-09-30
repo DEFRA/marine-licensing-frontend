@@ -11,7 +11,7 @@ import { getAuthProvider } from '#src/server/common/helpers/authenticated-reques
 import {
   getSiteNoticeViewDetailsUrl,
   assertIsOriginalSubmitter
-} from './site-notice.js'
+} from '#src/server/common/helpers/view-details/utils.js'
 import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 
 vi.mock('#src/server/common/plugins/auth/utils.js')

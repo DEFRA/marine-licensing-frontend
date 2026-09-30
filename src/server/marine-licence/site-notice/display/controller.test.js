@@ -1,10 +1,12 @@
-import { vi } from 'vitest'
 import {
   siteNoticeDisplayController,
   SITE_NOTICE_DISPLAY_VIEW_ROUTE
 } from '#src/server/marine-licence/site-notice/display/controller.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import { mockMarineLicenceApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockMarineLicenceWithApplicationTask,
+  mockApplicationTaskContactId
+} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   createMockH,
@@ -16,18 +18,9 @@ vi.mock('#src/services/marine-licence-service/index.js')
 vi.mock('#src/server/common/plugins/auth/utils.js')
 
 describe('#siteNoticeDisplay', () => {
-  const marineLicenceId = '64f1a2b3c4d5e6f7a8b9c0d1'
-
-  const marineLicence = {
-    ...mockMarineLicenceApplication,
-    applicationReference: 'MLA/2026/10264',
-    id: marineLicenceId,
-    contactId: 'test-contact-id'
-  }
-
   beforeEach(() => {
     vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
-      contactId: marineLicence.contactId
+      contactId: mockApplicationTaskContactId
     })
   })
 
@@ -38,17 +31,23 @@ describe('#siteNoticeDisplay', () => {
   describe('#siteNoticeDisplayController', () => {
     test('handler should render with correct context', async () => {
       const mockService = {
-        getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
+        getMarineLicenceById: vi
+          .fn()
+          .mockResolvedValue(mockMarineLicenceWithApplicationTask)
       }
       vi.mocked(getMarineLicenceService).mockReturnValue(mockService)
       const h = createMockH()
 
-      await siteNoticeDisplayController.handler(
-        createMockRequest({ params: { marineLicenceId } }),
+      const r = await siteNoticeDisplayController.handler(
+        createMockRequest({
+          params: {
+            marineLicenceId: mockMarineLicenceWithApplicationTask.id
+          }
+        }),
         h
       )
 
-      const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+      const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`
 
       expect(h.view).toHaveBeenCalledWith(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         backLink: expectedViewDetailsUrl,
@@ -56,7 +55,10 @@ describe('#siteNoticeDisplay', () => {
         continueLink: expectedViewDetailsUrl,
         pageTitle: 'Display a site notice',
         heading: 'Display a site notice',
-        pageCaption: 'MLA/2026/10264 - Test Project'
+        pageCaption: 'MLA/2026/10264 - Test Project',
+        showCommunityUserSection: true,
+        showMarineUserSection: true,
+        showMultipleSitesSection: false
       })
     })
 
@@ -65,7 +67,11 @@ describe('#siteNoticeDisplay', () => {
 
       getMarineLicenceService.mockRejectedValueOnce('API Error')
 
-      const mockRequest = createMockRequest({ params: { marineLicenceId } })
+      const mockRequest = createMockRequest({
+        params: {
+          marineLicenceId: mockMarineLicenceWithApplicationTask.id
+        }
+      })
 
       await expect(
         siteNoticeDisplayController.handler(mockRequest, h)

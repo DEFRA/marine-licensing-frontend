@@ -5,6 +5,8 @@ import {
   getSiteNoticeViewDetailsUrl,
   assertIsOriginalSubmitter
 } from '#src/server/common/helpers/view-details/utils.js'
+import { findSiteNoticeTask } from '#src/server/common/helpers/marine-licence/site-notice.js'
+import { getDisplayConditions } from '#src/server/marine-licence/site-notice/display/utils.js'
 
 export const SITE_NOTICE_DISPLAY_VIEW_ROUTE =
   'marine-licence/site-notice/display/index'
@@ -25,6 +27,14 @@ export const siteNoticeDisplayController = {
 
       await assertIsOriginalSubmitter(request, marineLicence)
 
+      const task = findSiteNoticeTask(marineLicence)
+
+      if (!task) {
+        return h.redirect(getSiteNoticeViewDetailsUrl(marineLicenceId))
+      }
+
+      const displayConditions = getDisplayConditions(task.data, marineLicence)
+
       const viewDetailsUrl = getSiteNoticeViewDetailsUrl(marineLicenceId)
 
       return h.view(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
@@ -32,7 +42,8 @@ export const siteNoticeDisplayController = {
         backLink: viewDetailsUrl,
         cancelLink: viewDetailsUrl,
         continueLink: viewDetailsUrl,
-        pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`
+        pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`,
+        ...displayConditions
       })
     } catch (error) {
       if (error.isBoom) {

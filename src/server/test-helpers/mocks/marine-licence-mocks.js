@@ -2,6 +2,7 @@ import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.
 import { faker } from '@faker-js/faker'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { APPLICATION_TASK_TYPE } from '#src/server/common/helpers/marine-licence/application-tasks/registry.js'
+import { PUBLIC_NOTICE_REQUEST_RELATES_TO } from '#src/server/common/constants/site-notice.js'
 
 export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
@@ -224,7 +225,7 @@ export const mockMarineLicenceWithApplicationTask = {
           proposedWorksSummary: 'test proposed works summary',
           siteNoticeSummary: 'test site notice summary'
         },
-        requestRelatesTo: 'BOTH'
+        requestRelatesTo: PUBLIC_NOTICE_REQUEST_RELATES_TO.BOTH
       }
     }
   ]

@@ -1,5 +1,6 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/task-list/macro.njk" import govukTaskList %}
 {% from "marine-licence/other-permissions-card/macro.njk" import appMarineLicenceOtherPermissionsCard %}
 {% from "marine-licence/application-details-card/macro.njk" import appMarineLicenceApplicationDetailsCard %}
 {% from "marine-licence/project-details-card/macro.njk" import appMarineLicenceProjectDetailsCard %}
@@ -48,6 +49,14 @@
         <span class="govuk-caption-l">{{ pageCaption }}</span>
       {% endif %}
       <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
+
+      {% if applicationTasks and applicationTasks.length %}
+        <h2 class="govuk-heading-m" id="application-tasks-heading">Things that require your attention</h2>
+        {{ govukTaskList({
+          items: applicationTasks,
+          idPrefix: "application-task"
+        }) }}
+      {% endif %}
 
       {{ appMarineLicenceApplicationDetailsCard({
         statusTag: statusTag,

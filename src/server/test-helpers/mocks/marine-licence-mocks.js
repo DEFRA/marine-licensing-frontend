@@ -1,6 +1,8 @@
 import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
 import { faker } from '@faker-js/faker'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
+import { APPLICATION_TASK_TYPE } from '#src/server/common/helpers/marine-licence/application-tasks/registry.js'
+import { PUBLIC_NOTICE_REQUEST_RELATES_TO } from '#src/server/common/constants/site-notice.js'
 
 export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
@@ -196,6 +198,46 @@ export const mockSubmittedMarineLicenceApplication = {
   status: 'Submitted',
   applicationReference: 'MLA/2026/10264',
   submittedAt: '2026-05-26T10:00:00Z'
+}
+
+export const mockApplicationTaskContactId = 'contact-with-outstanding-task'
+
+export const mockMarineLicenceWithApplicationTask = {
+  ...mockSubmittedMarineLicenceApplication,
+  contactId: mockApplicationTaskContactId,
+  applicationTasks: [
+    {
+      taskId: '507f1f77bcf86cd799439012',
+      type: APPLICATION_TASK_TYPE.WITHHOLDING_NOTIFICATION,
+      receivedAt: '2026-08-14T10:00:00.000Z',
+      resolvedAt: null,
+      data: {
+        decisionDate: '2026-08-14T09:00:00.000Z',
+        nationalSecurity: {
+          decision: 'DISAGREE',
+          applicantMessage:
+            'We did not agree that publishing this would be a risk.'
+        },
+        commercialConfidentiality: {
+          decision: 'AGREE_IN_PART',
+          applicantMessage: 'We have withheld the contractor rates.'
+        }
+      }
+    },
+    {
+      taskId: '507f1f77bcf86cd799439013',
+      type: APPLICATION_TASK_TYPE.PUBLIC_SITE_NOTICE,
+      receivedAt: '2026-09-19T10:00:00.000Z',
+      resolvedAt: null,
+      data: {
+        summary: {
+          proposedWorksSummary: 'test proposed works summary',
+          siteNoticeSummary: 'test site notice summary'
+        },
+        requestRelatesTo: PUBLIC_NOTICE_REQUEST_RELATES_TO.BOTH
+      }
+    }
+  ]
 }
 
 export const mockRedactions = {

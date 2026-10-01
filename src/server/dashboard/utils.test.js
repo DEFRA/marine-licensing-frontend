@@ -291,6 +291,27 @@ describe('#formatProjectsForDisplay', () => {
     ])
   })
 
+  test('renders Action required as a red tag and still offers withdrawal', () => {
+    const [{ cells }] = formatProjectsForDisplay([
+      {
+        id: 'abc123',
+        projectName: 'Awaiting Applicant',
+        projectType: 'MARINE_LICENCE',
+        applicationReference: 'ML-2024-002',
+        status: 'Action required',
+        submittedAt: '2024-01-15'
+      }
+    ])
+
+    const [, , , statusCell, , actionsCell] = cells
+
+    expect(statusCell).toEqual({
+      html: '<strong class="govuk-tag govuk-tag--red">Action required</strong>',
+      attributes: { 'data-sort-value': 'Action required' }
+    })
+    expect(actionsCell.html).toContain('/marine-licence/withdraw/abc123')
+  })
+
   test('Should format project with missing data', () => {
     const projects = [
       {
@@ -631,6 +652,20 @@ describe('getActionButtons', () => {
     )
   })
 
+  it('returns View details and Withdraw links for a marine licence where action is required', () => {
+    const actionRequired = {
+      id: 'ml123',
+      projectName: 'Marine Licence Project',
+      projectType: 'MARINE_LICENCE',
+      status: PROJECT_STATUS.ACTION_REQUIRED,
+      isOwnProject: true
+    }
+    const result = getActionButtons(actionRequired)
+    expect(result).toBe(
+      `<a href="${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="View details of Marine Licence Project">View details</a><a href="${marineLicenceRoutes.MARINE_LICENCE_WITHDRAW}/ml123" class="govuk-link govuk-link--no-visited-state" aria-label="Withdraw Marine Licence Project">Withdraw</a>`
+    )
+  })
+
   it('returns rejected page link for rejected marine licence', () => {
     const rejected = {
       id: 'ml123',
@@ -868,6 +903,7 @@ describe('#getFilterCategories', () => {
 describe('#getStatusOptions', () => {
   test('returns one option per PROJECT_STATUS, sorted alphabetically by text, with only the given status checked', () => {
     expect(getStatusOptions('SUBMITTED')).toEqual([
+      { value: 'ACTION_REQUIRED', text: 'Action required', checked: false },
       { value: 'ACTIVE', text: 'Active', checked: false },
       { value: 'DRAFT', text: 'Draft', checked: false },
       { value: 'EXPIRED', text: 'Expired', checked: false },
@@ -881,6 +917,7 @@ describe('#getStatusOptions', () => {
 
   test('correctly checks options when multiple checkboxes are checked', () => {
     expect(getStatusOptions(['DRAFT', 'ACTIVE'])).toEqual([
+      { value: 'ACTION_REQUIRED', text: 'Action required', checked: false },
       { value: 'ACTIVE', text: 'Active', checked: true },
       { value: 'DRAFT', text: 'Draft', checked: true },
       { value: 'EXPIRED', text: 'Expired', checked: false },

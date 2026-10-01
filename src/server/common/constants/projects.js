@@ -6,8 +6,16 @@ export const PROJECT_STATUS = {
   REJECTED: 'Rejected',
   SUBMITTED: 'Submitted',
   TRANSFERRED: 'Transferred',
-  WITHDRAWN: 'Withdrawn'
+  WITHDRAWN: 'Withdrawn',
+  ACTION_REQUIRED: 'Action required'
 }
+
+// ACTION_REQUIRED sits on top of SUBMITTED while an application task is outstanding,
+// so a licence awaiting the applicant can still be withdrawn.
+export const WITHDRAWABLE_MARINE_LICENCE_STATUSES = [
+  PROJECT_STATUS.SUBMITTED,
+  PROJECT_STATUS.ACTION_REQUIRED
+]
 
 // An exemption whose activity period has ended can no longer be withdrawn.
 export const WITHDRAWABLE_EXEMPTION_STATUSES = [

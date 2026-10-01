@@ -153,7 +153,7 @@ export class MojFilter {
     )
 
     if ($checkbox) {
-      $checkbox.checked = false
+      $checkbox.checked = false 
       this.$form.requestSubmit()
     }
   }
@@ -165,11 +165,11 @@ export class MojFilter {
       return
     }
 
-    $clearLink.addEventListener('click', (event) => {
+    $clearLink.addEventListener('click', async (event) => {
       event.preventDefault()
 
       this.resetForm()
-      this.onSubmit(event, { clear: true })
+      await this.onSubmit(event, { clear: true })
     })
   }
 

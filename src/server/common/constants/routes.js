@@ -150,6 +150,7 @@ export const marineLicenceRoutes = {
     '/marine-licence/water-framework-directive-upload-and-wait',
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS:
     '/marine-licence/water-framework-directive-review-your-answers',
+  MARINE_LICENCE_SITE_NOTICE_DISPLAY: '/marine-licence/site-notice/display',
   MARINE_LICENCE_FEE_ESTIMATE: '/marine-licence/fee-estimate',
   MARINE_LICENCE_FEE_ESTIMATE_ARE_YOU_SURE:
     '/marine-licence/fee-estimate-are-you-sure',

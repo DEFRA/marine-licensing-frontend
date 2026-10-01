@@ -43,13 +43,20 @@ describe('#siteNoticeDisplay', () => {
         h
       )
 
-      const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`
+      const licenceId = mockMarineLicenceWithApplicationTask.id
+      const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${licenceId}`
 
       expect(h.view).toHaveBeenCalledWith(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         backLink: expectedViewDetailsUrl,
         pageTitle: 'Display a site notice',
         heading: 'Display a site notice',
         pageCaption: 'MLA/2026/10264 - Test Project',
+        evidenceLinks: {
+          locationName: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}`,
+          dateDisplayed: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${licenceId}`,
+          closeUpPhoto: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${licenceId}`,
+          positionPhoto: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}`
+        },
         showCommunityUserSection: true,
         showMarineUserSection: true,
         showMultipleSitesSection: false

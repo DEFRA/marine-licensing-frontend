@@ -1,5 +1,8 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -89,6 +92,55 @@
       </ul>
 
       <p class="govuk-body">We aim to give you this in one update, so you do not need to be contacted more than once.</p>
+
+      <h2 class="govuk-heading-m">Send us evidence</h2>
+
+      {% set evidenceWarning %}
+        You must complete all sections marked {{ appIncompleteField() }} before you can send your evidence.
+      {% endset %}
+
+      <p class="govuk-body">Add the details and photographs for each location where you displayed a site notice.</p>
+
+      {{ govukInsetText({
+        html: evidenceWarning
+      }) }}
+
+      </div>
+      
+      <div class="govuk-grid-column-full">
+
+      {% set evidenceIndex = 1 %}
+      {% set evidenceRows = [] %}
+
+      {% set _ = evidenceRows.push({
+        key: { text: "Location name" },
+        value: { html: appIncompleteField() },
+        actions: setSiteDetailsAction("", evidenceLinks.locationName, null, "location name", { skipAction: true, evidenceIndex: evidenceIndex })
+      }) %}
+      {% set _ = evidenceRows.push({
+        key: { text: "Date you displayed the notice" },
+        value: { html: appIncompleteField() },
+        actions: setSiteDetailsAction("", evidenceLinks.dateDisplayed, null, " date you displayed the notice", { skipAction: true, evidenceIndex: evidenceIndex })
+      }) %}
+      {% set _ = evidenceRows.push({
+        key: { text: "Close-up photo of notice" },
+        value: { html: appIncompleteField() },
+        actions: setSiteDetailsAction("", evidenceLinks.closeUpPhoto, null, "close-up photo of notice", { skipAction: true, evidenceIndex: evidenceIndex })
+      }) %}
+      {% set _ = evidenceRows.push({
+        key: { text: "Photo evidencing notice position and location" },
+        value: { html: appIncompleteField() },
+        actions: setSiteDetailsAction("", evidenceLinks.positionPhoto, null, "photo evidencing notice position and location", { skipAction: true, evidenceIndex: evidenceIndex })
+      }) %}
+
+      {{ govukSummaryList({
+        card: {
+          title: {
+            text: "Location 1 evidence"
+          }
+        },
+        rows: evidenceRows
+      }) }}
     </div>
   </div>
 {% endblock %}

@@ -67,6 +67,62 @@ describe('Site notice display page (marine licence)', () => {
     )
   })
 
+  test('links to the evidence pages for location 1', async () => {
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`,
+      server: getServer()
+    })
+
+    const licenceId = mockMarineLicenceWithApplicationTask.id
+
+    expect(
+      getByRole(document, 'heading', { name: 'Send us evidence' })
+    ).toBeInTheDocument()
+    expect(
+      getByRole(document, 'heading', { name: 'Location 1 evidence' })
+    ).toBeInTheDocument()
+
+    expect(document.body).toHaveTextContent(
+      'Add the details and photographs for each location where you displayed a site notice.'
+    )
+
+    expect(document.body).toHaveTextContent(
+      'You must complete all sections marked Incomplete before you can send your evidence.'
+    )
+    expect(
+      getByRole(document, 'link', {
+        name: 'Add location name (Location 1 evidence)'
+      })
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}?evidence=1`
+    )
+    expect(
+      getByRole(document, 'link', {
+        name: 'Add date you displayed the notice (Location 1 evidence)'
+      })
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${licenceId}?evidence=1`
+    )
+    expect(
+      getByRole(document, 'link', {
+        name: 'Add close-up photo of notice (Location 1 evidence)'
+      })
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${licenceId}?evidence=1`
+    )
+    expect(
+      getByRole(document, 'link', {
+        name: 'Add photo evidencing notice position and location (Location 1 evidence)'
+      })
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}?evidence=1`
+    )
+  })
+
   test('forbids anyone who did not submit the application', async () => {
     vi.mocked(getUserSession).mockResolvedValue({ contactId: 'someone-else' })
 

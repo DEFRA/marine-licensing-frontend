@@ -6,6 +6,7 @@ import {
   assertIsOriginalSubmitter
 } from '#src/server/common/helpers/view-details/utils.js'
 import { findSiteNoticeTask } from '#src/server/common/helpers/marine-licence/site-notice.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getDisplayConditions } from '#src/server/marine-licence/site-notice/display/utils.js'
 
 export const SITE_NOTICE_DISPLAY_VIEW_ROUTE =
@@ -15,6 +16,13 @@ const siteNoticeDisplaySettings = {
   pageTitle: 'Display a site notice',
   heading: 'Display a site notice'
 }
+
+const getEvidenceLinks = (marineLicenceId) => ({
+  locationName: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${marineLicenceId}`,
+  dateDisplayed: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${marineLicenceId}`,
+  closeUpPhoto: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${marineLicenceId}`,
+  positionPhoto: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${marineLicenceId}`
+})
 
 export const siteNoticeDisplayController = {
   options: validateMarineLicenceIdParams,
@@ -41,6 +49,7 @@ export const siteNoticeDisplayController = {
         ...siteNoticeDisplaySettings,
         backLink: viewDetailsUrl,
         pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`,
+        evidenceLinks: getEvidenceLinks(marineLicenceId),
         ...displayConditions
       })
     } catch (error) {

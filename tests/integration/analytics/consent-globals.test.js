@@ -81,7 +81,7 @@ describe('Analytics globals in the page head', () => {
     expect(script.getAttribute('nonce')).toBe(headerNonce)
   })
 
-  test('reports accepted analytics and pushes a granted consent state to the data layer', async () => {
+  test('reports accepted analytics and grants analytics storage through Consent Mode', async () => {
     const { script } = await load({ cookie: cookieHeader(true) })
 
     expect(script.textContent).toContain('window.ANALYTICS_ENABLED = true')
@@ -90,24 +90,33 @@ describe('Analytics globals in the page head', () => {
       'window.dataLayer = window.dataLayer || []'
     )
     expect(script.textContent).toContain(
-      'window.dataLayer.push({ event: "cookie_consent", analytics_consent: "granted" })'
+      'function gtag() { dataLayer.push(arguments); }'
+    )
+    expect(script.textContent).toContain("gtag('consent', 'default', {")
+    expect(script.textContent).toContain("ad_storage: 'denied'")
+    expect(script.textContent).toContain("analytics_storage: 'denied'")
+    expect(script.textContent).toContain(
+      "gtag('consent', 'update', { analytics_storage: 'granted' })"
     )
   })
 
-  test('reports rejected analytics and pushes a denied consent state', async () => {
+  test('reports rejected analytics and leaves every consent type denied', async () => {
     const { script } = await load({ cookie: cookieHeader(false) })
 
     expect(script.textContent).toContain('window.ANALYTICS_ENABLED = false')
     expect(script.textContent).toContain('window.COOKIE_PREFERENCES_SET = true')
-    expect(script.textContent).toContain('analytics_consent: "denied"')
+    expect(script.textContent).toContain("gtag('consent', 'default', {")
+    expect(script.textContent).toContain("analytics_storage: 'denied'")
+    expect(script.textContent).not.toContain("gtag('consent', 'update'")
   })
 
-  test('does not touch the data layer when no container key is configured', async () => {
+  test('issues no consent commands when no container key is configured', async () => {
     overrides.googleTagManagerKey = ''
 
     const { script } = await load({ cookie: cookieHeader(true) })
 
     expect(script.textContent).not.toContain('dataLayer')
+    expect(script.textContent).not.toContain('gtag(')
   })
 
   test('renders the Clarity project ID as a JSON string', async () => {

@@ -26,14 +26,17 @@ window.COOKIE_PREFERENCES_SET = <cookies_preferences_set === 'true'>
 window.ENABLE_BROWSER_LOGGING = <boolean>
 // only when GOOGLE_TAG_MANAGER_KEY is configured
 window.dataLayer = window.dataLayer || []
-window.dataLayer.push({ event: 'cookie_consent', analytics_consent: 'granted' | 'denied' })
+function gtag() { dataLayer.push(arguments) }
+gtag('consent', 'default', { ad_user_data: 'denied', ad_personalization: 'denied', ad_storage: 'denied', analytics_storage: 'denied' })
+// only when analytics cookies are accepted
+gtag('consent', 'update', { analytics_storage: 'granted' })
 ```
 
 When a container key is configured **and** analytics is accepted, the layout also includes Google's Part A snippet in `<head>` (`partials/google-tag-manager/head.njk`) and Part B noscript iframe immediately after govuk-frontend's own inline body script (the `bodyStart` block) (`partials/google-tag-manager/body.njk`). Neither renders for undecided or rejecting users, so no Google cookies are set before consent.
 
 Two departures from Google's paste-as-is snippets, both sanctioned by Google's CSP guide: Part A carries `nonce="{{ cspNonce }}"` and Google's nonce-aware line that copies the nonce onto the injected `gtm.js` element; Part B uses the `app-gtm-noscript` class instead of an inline `style` attribute, which `style-src 'self'` would block.
 
-The data-layer event name and shape are a default, pending the central team's container import; if the imported container triggers on something else, only the push in `page.njk` changes.
+Consent reaches the container through Google Consent Mode commands, not a custom event. `gtag()` here is only the one-line shim Google documents; it writes `arguments` objects into `dataLayer`, which GTM recognises as consent state and feeds to every Google tag's consent checks. The default denies all four consent types on every page; the update grants `analytics_storage` only when the user has accepted, and ad-related storage stays denied throughout. Because GTM is loaded only after consent, this is Consent Mode's "basic" form: tags are blocked outright rather than loaded in a denied state, so no cookieless pings are sent before consent.
 
 ## Client-side cleanup
 

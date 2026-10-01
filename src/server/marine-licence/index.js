@@ -13,11 +13,13 @@ import { invoicingRoutes } from '#src/server/marine-licence/invoicing/index.js'
 import { projectBackgroundRoutes } from '#src/server/marine-licence/project-background/index.js'
 import { siteDetailsRoutes } from '#src/server/marine-licence/site-details/index.js'
 import { viewDetailsRoutes } from '#src/server/marine-licence/view-details/index.js'
+import { withholdingNotificationRoutes } from '#src/server/marine-licence/withholding-notification/index.js'
 import { locationCsvDownloadRoutes } from '#src/server/marine-licence/location-csv-download/index.js'
 import { viewMarineLicencePublicUserRoutes } from '#src/server/marine-licence/view-marine-licence-public/index.js'
 import { viewMarineLicenceInternalUserRoutes } from '#src/server/marine-licence/view-marine-licence-internal-user/index.js'
 import { preferredDatesRoutes } from '#src/server/marine-licence/preferred-dates/index.js'
 import { waterDirectiveRoutes } from '#src/server/marine-licence/water-framework-directive/index.js'
+import { siteNoticeRoutes } from '#src/server/marine-licence/site-notice/index.js'
 import { marinePlanPolicyGuidanceRoutes } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-guidance/index.js'
 import { marinePlanPoliciesRoutes } from '#src/server/marine-licence/marine-plan-policies/index.js'
 import { feeEstimateRoutes } from '#src/server/marine-licence/fee-estimate/index.js'
@@ -47,10 +49,12 @@ export const marineLicence = {
         ...projectBackgroundRoutes,
         ...siteDetailsRoutes,
         ...viewDetailsRoutes,
+        ...withholdingNotificationRoutes,
         ...locationCsvDownloadRoutes,
         ...viewMarineLicencePublicUserRoutes,
         ...viewMarineLicenceInternalUserRoutes,
         ...waterDirectiveRoutes,
+        ...siteNoticeRoutes,
         ...marinePlanPolicyGuidanceRoutes,
         ...marinePlanPoliciesRoutes,
         ...feeEstimateRoutes,

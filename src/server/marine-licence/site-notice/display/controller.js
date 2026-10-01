@@ -7,7 +7,10 @@ import {
 } from '#src/server/common/helpers/view-details/utils.js'
 import { findSiteNoticeTask } from '#src/server/common/helpers/marine-licence/site-notice.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { getDisplayConditions } from '#src/server/marine-licence/site-notice/display/utils.js'
+import {
+  getDisplayConditions,
+  getSiteNoticeValues
+} from '#src/server/marine-licence/site-notice/display/utils.js'
 
 export const SITE_NOTICE_DISPLAY_VIEW_ROUTE =
   'marine-licence/site-notice/display/index'
@@ -45,11 +48,14 @@ export const siteNoticeDisplayController = {
 
       const viewDetailsUrl = getViewDetailsUrl(marineLicenceId)
 
+      const siteNoticeEvidence = getSiteNoticeValues(marineLicence)
+
       return h.view(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         ...siteNoticeDisplaySettings,
         backLink: viewDetailsUrl,
         pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`,
         evidenceLinks: getEvidenceLinks(marineLicenceId),
+        siteNoticeEvidence,
         ...displayConditions
       })
     } catch (error) {

@@ -1,4 +1,9 @@
-import { getByRole, getByText, queryByText } from '@testing-library/dom'
+import {
+  getByRole,
+  getByText,
+  queryByRole,
+  queryByText
+} from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -67,31 +72,63 @@ describe('Site notice display page (marine licence)', () => {
     )
   })
 
-  test('links to the evidence pages for location 1', async () => {
+  test('shows the evidence section without a location card when nothing is saved', async () => {
     const document = await loadPage({
       requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`,
       server: getServer()
     })
 
-    const licenceId = mockMarineLicenceWithApplicationTask.id
-
     expect(
       getByRole(document, 'heading', { name: 'Send us evidence' })
     ).toBeInTheDocument()
-    expect(
-      getByRole(document, 'heading', { name: 'Location 1 evidence' })
-    ).toBeInTheDocument()
-
     expect(document.body).toHaveTextContent(
       'Add the details and photographs for each location where you displayed a site notice.'
     )
-
     expect(document.body).toHaveTextContent(
       'You must complete all sections marked Incomplete before you can send your evidence.'
     )
     expect(
+      queryByRole(document, 'heading', { name: 'Location 1 evidence' })
+    ).not.toBeInTheDocument()
+  })
+
+  test('shows saved site notice evidence and links each location', async () => {
+    const marineLicence = {
+      ...mockMarineLicenceWithApplicationTask,
+      siteNoticeEvidence: [
+        {
+          locationName: 'Harbour wall',
+          dateDisplayed: { day: '5', month: '03', year: '2026' },
+          closeUpPhoto: { uploadedFile: { filename: 'close-up.jpg' } },
+          positionPhoto: { uploadedFile: { filename: 'position.jpg' } }
+        },
+        {
+          locationName: 'Slipway',
+          dateDisplayed: { day: '12', month: '04', year: '2026' },
+          closeUpPhoto: { uploadedFile: { filename: 'slipway-close-up.jpg' } },
+          positionPhoto: { uploadedFile: { filename: 'slipway-position.jpg' } }
+        }
+      ]
+    }
+
+    vi.mocked(authenticatedGetRequest).mockResolvedValue({
+      payload: { message: 'success', value: marineLicence }
+    })
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicence.id}`,
+      server: getServer()
+    })
+
+    const licenceId = marineLicence.id
+
+    expect(getByText(document, 'Harbour wall')).toBeInTheDocument()
+    expect(getByText(document, '5 March 2026')).toBeInTheDocument()
+    expect(getByText(document, 'close-up.jpg')).toBeInTheDocument()
+    expect(getByText(document, 'position.jpg')).toBeInTheDocument()
+    expect(
       getByRole(document, 'link', {
-        name: 'Add location name (Location 1 evidence)'
+        name: 'Change location name (Location 1 evidence)'
       })
     ).toHaveAttribute(
       'href',
@@ -99,27 +136,11 @@ describe('Site notice display page (marine licence)', () => {
     )
     expect(
       getByRole(document, 'link', {
-        name: 'Add date you displayed the notice (Location 1 evidence)'
+        name: 'Change photo evidencing notice position and location (Location 2 evidence)'
       })
     ).toHaveAttribute(
       'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${licenceId}?evidence=1`
-    )
-    expect(
-      getByRole(document, 'link', {
-        name: 'Add close-up photo of notice (Location 1 evidence)'
-      })
-    ).toHaveAttribute(
-      'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${licenceId}?evidence=1`
-    )
-    expect(
-      getByRole(document, 'link', {
-        name: 'Add photo evidencing notice position and location (Location 1 evidence)'
-      })
-    ).toHaveAttribute(
-      'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}?evidence=1`
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}?evidence=2`
     )
   })
 

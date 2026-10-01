@@ -109,38 +109,47 @@
       
       <div class="govuk-grid-column-full">
 
-      {% set evidenceIndex = 1 %}
-      {% set evidenceRows = [] %}
+      {% for evidence in siteNoticeEvidence %}
 
-      {% set _ = evidenceRows.push({
-        key: { text: "Location name" },
-        value: { html: appIncompleteField() },
-        actions: setSiteDetailsAction("", evidenceLinks.locationName, null, "location name", { skipAction: true, evidenceIndex: evidenceIndex })
-      }) %}
-      {% set _ = evidenceRows.push({
-        key: { text: "Date you displayed the notice" },
-        value: { html: appIncompleteField() },
-        actions: setSiteDetailsAction("", evidenceLinks.dateDisplayed, null, " date you displayed the notice", { skipAction: true, evidenceIndex: evidenceIndex })
-      }) %}
-      {% set _ = evidenceRows.push({
-        key: { text: "Close-up photo of notice" },
-        value: { html: appIncompleteField() },
-        actions: setSiteDetailsAction("", evidenceLinks.closeUpPhoto, null, "close-up photo of notice", { skipAction: true, evidenceIndex: evidenceIndex })
-      }) %}
-      {% set _ = evidenceRows.push({
-        key: { text: "Photo evidencing notice position and location" },
-        value: { html: appIncompleteField() },
-        actions: setSiteDetailsAction("", evidenceLinks.positionPhoto, null, "photo evidencing notice position and location", { skipAction: true, evidenceIndex: evidenceIndex })
-      }) %}
+        {% set evidenceIndex = loop.index  %}
+        {% set evidenceRows = [] %}
 
-      {{ govukSummaryList({
-        card: {
-          title: {
-            text: "Location 1 evidence"
-          }
-        },
-        rows: evidenceRows
-      }) }}
+        {% set _ = evidenceRows.push({
+          key: { text: "Location name" },
+          value: { html: appIncompleteField({text: evidence.locationName}) },
+          actions: setSiteDetailsAction(evidence.locationName, evidenceLinks.locationName, null, "location name", { skipAction: true, evidenceIndex: evidenceIndex })
+        }) %}
+    
+        {% set _ = evidenceRows.push({
+          key: { text: "Date you displayed the notice" },
+          value: { html: appIncompleteField({text: evidence.dateDisplayed}) },
+          actions: setSiteDetailsAction(evidence.dateDisplayed, evidenceLinks.dateDisplayed, null, " date you displayed the notice", { skipAction: true, evidenceIndex: evidenceIndex })
+        }) %}
+
+        {% set _ = evidenceRows.push({
+          key: { text: "Close-up photo of notice" },
+          value: { html: appIncompleteField({text: evidence.closeUpPhoto}) },
+          actions: setSiteDetailsAction(evidence.closeUpPhoto, evidenceLinks.closeUpPhoto, null, "close-up photo of notice", { skipAction: true, evidenceIndex: evidenceIndex })
+        }) %}
+
+        {% set _ = evidenceRows.push({
+          key: { text: "Photo evidencing notice position and location" },
+          value: { html: appIncompleteField({text: evidence.positionPhoto}) },
+          actions: setSiteDetailsAction(evidence.positionPhoto, evidenceLinks.positionPhoto, null, "photo evidencing notice position and location", { skipAction: true, evidenceIndex: evidenceIndex })
+        }) %}
+
+        {% set title %}Location {{loop.index}} evidence{% endset %}
+
+        {{ govukSummaryList({
+          card: {
+            title: {
+              text: title
+            }
+          },
+          rows: evidenceRows
+        }) }}
+
+      {% endfor %}
     </div>
   </div>
 {% endblock %}

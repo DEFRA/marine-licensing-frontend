@@ -59,7 +59,8 @@ describe('#siteNoticeDisplay', () => {
         },
         showCommunityUserSection: true,
         showMarineUserSection: true,
-        showMultipleSitesSection: false
+        showMultipleSitesSection: false,
+        siteNoticeEvidence: []
       })
     })
 

@@ -1,41 +1,11 @@
 import {
-  formatPolicyTitle,
   getPolicySection,
   getPolicySectionSlug,
-  getPolicyTitle,
   groupPoliciesBySection,
   UNCATEGORISED_SECTION
 } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
 
 describe('marine plan policy sections', () => {
-  describe('getPolicyTitle / formatPolicyTitle', () => {
-    test('formats a plain-English title followed by the code', () => {
-      const policy = { policyCode: 'S-CAB-2', title: 'South Cables 2' }
-
-      expect(getPolicyTitle(policy)).toBe('South Cables 2')
-      expect(formatPolicyTitle(policy)).toBe('South Cables 2 (S-CAB-2)')
-    })
-
-    test('trims the title', () => {
-      expect(
-        formatPolicyTitle({ policyCode: 'S-CAB-2', title: ' South Cables 2 ' })
-      ).toBe('South Cables 2 (S-CAB-2)')
-    })
-
-    test.each([
-      ['missing', undefined],
-      ['null', null],
-      ['empty', ''],
-      ['blank', '   '],
-      ['the code repeated', 'SW-DD-3 ']
-    ])('falls back to the code alone when the title is %s', (_, title) => {
-      const policy = { policyCode: 'SW-DD-3', title }
-
-      expect(getPolicyTitle(policy)).toBeNull()
-      expect(formatPolicyTitle(policy)).toBe('SW-DD-3')
-    })
-  })
-
   describe('getPolicySection', () => {
     test('uses the trimmed category', () => {
       expect(getPolicySection({ category: ' Economic ' })).toBe('Economic')
@@ -53,6 +23,7 @@ describe('marine plan policy sections', () => {
     expect(getPolicySectionSlug('Cross-cutting')).toBe('cross-cutting')
     expect(getPolicySectionSlug('Economic')).toBe('economic')
     expect(getPolicySectionSlug('Coastal & Marine')).toBe('coastal-marine')
+    expect(getPolicySectionSlug('Social (heritage)')).toBe('social-heritage')
   })
 
   describe('groupPoliciesBySection', () => {
@@ -71,25 +42,25 @@ describe('marine plan policy sections', () => {
       ])
 
       expect(
-        result.map(({ section, slug, policies }) => ({
-          section,
+        result.map(({ heading, slug, policies }) => ({
+          heading,
           slug,
           codes: policies.map((policy) => policy.policyCode)
         }))
       ).toEqual([
         {
-          section: 'Cross-cutting',
+          heading: 'Cross-cutting',
           slug: 'cross-cutting',
           codes: ['S-CC-1', 'S-CC-2']
         },
-        { section: 'Economic', slug: 'economic', codes: ['S-CAB-1'] },
+        { heading: 'Economic', slug: 'economic', codes: ['S-CAB-1'] },
         {
-          section: 'Environmental',
+          heading: 'Environmental',
           slug: 'environmental',
           codes: ['S-BIO-1']
         },
-        { section: 'Social', slug: 'social', codes: ['S-TR-1'] },
-        { section: 'Other', slug: 'other', codes: ['S-AGG-1'] }
+        { heading: 'Social', slug: 'social', codes: ['S-TR-1'] },
+        { heading: 'Other', slug: 'other', codes: ['S-AGG-1'] }
       ])
     })
 
@@ -98,7 +69,7 @@ describe('marine plan policy sections', () => {
         { policyCode: 'S-CAB-1', category: 'Economic' }
       ])
 
-      expect(result.map(({ section }) => section)).toEqual(['Economic'])
+      expect(result.map(({ heading }) => heading)).toEqual(['Economic'])
     })
   })
 })

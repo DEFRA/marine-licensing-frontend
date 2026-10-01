@@ -3,14 +3,14 @@ import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 const policies = [
   {
     policyCode: 'S-CC-1',
-    title: 'South Climate change 1',
+    displayTitle: 'South Climate change 1 (S-CC-1)',
     wording: 'First policy wording.',
     response: 'My first consideration.',
     changeHref: '/marine-licence/marine-plan-policy/S-CC-1'
   },
   {
     policyCode: 'S-CC-2',
-    title: 'South Climate change 2',
+    displayTitle: 'South Climate change 2 (S-CC-2)',
     wording: 'Second policy wording.',
     response: 'My second consideration.',
     changeHref: '/marine-licence/marine-plan-policy/S-CC-2'
@@ -18,7 +18,7 @@ const policies = [
 ]
 
 const crossCutting = (sectionPolicies = policies) => [
-  { section: 'Cross-cutting', slug: 'cross-cutting', policies: sectionPolicies }
+  { heading: 'Cross-cutting', slug: 'cross-cutting', policies: sectionPolicies }
 ]
 
 const sections = crossCutting()
@@ -29,7 +29,7 @@ describe('Marine Licence Marine Plan Policies Component', () => {
       sections: [
         ...sections,
         {
-          section: 'Economic',
+          heading: 'Economic',
           slug: 'economic',
           policies: [{ ...policies[0], policyCode: 'S-CAB-1' }]
         }
@@ -49,30 +49,20 @@ describe('Marine Licence Marine Plan Policies Component', () => {
     ])
   })
 
-  test('shows the plain-English title with the code on a new line', () => {
+  test('shows the display title as the row key', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
       sections
     })
 
-    const $key = $('.govuk-summary-list__key').first()
-    expect($key.find('br')).toHaveLength(1)
-    expect($key.text().trim()).toBe('South Climate change 1(S-CC-1)')
-  })
-
-  test('shows only the code when a policy has no title', () => {
-    const $ = renderComponent('marine-licence/marine-plan-policies-card', {
-      sections: crossCutting([{ ...policies[0], title: null }])
-    })
-
-    const $key = $('.govuk-summary-list__key').first()
-    expect($key.find('br')).toHaveLength(0)
-    expect($key.text().trim()).toBe('S-CC-1')
+    expect($('.govuk-summary-list__key').first().text().trim()).toBe(
+      'South Climate change 1 (S-CC-1)'
+    )
   })
 
   test('escapes the policy title', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
       sections: crossCutting([
-        { ...policies[0], title: '<script>alert(1)</script>' }
+        { ...policies[0], displayTitle: '<script>alert(1)</script>' }
       ])
     })
 

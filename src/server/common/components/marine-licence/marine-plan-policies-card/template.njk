@@ -5,9 +5,6 @@
 {% for section in params.sections %}
 {% set rows = [] %}
 {% for policy in section.policies %}
-  {% set policyKey %}
-    {% if policy.title %}{{ policy.title }}<br>({{ policy.policyCode }}){% else %}{{ policy.policyCode }}{% endif %}
-  {% endset %}
   {% set considerationValue %}
     <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Policy information</p>
     {{ appMarineLicencePolicyWording({ html: policy.wording }) }}
@@ -33,7 +30,7 @@
   {% endset %}
   {% set rows = (rows.push({
     key: {
-      html: policyKey
+      text: policy.displayTitle
     },
     value: {
       html: considerationValue
@@ -54,7 +51,7 @@
 {{ govukSummaryList({
   card: {
     title: {
-      text: "Marine plan policies – " + section.section
+      text: "Marine plan policies – " + section.heading
     },
     attributes: {
       id: "marine-plan-policies-card-" + section.slug

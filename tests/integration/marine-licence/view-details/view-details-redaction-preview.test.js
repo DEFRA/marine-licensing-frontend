@@ -353,7 +353,7 @@ describe('Marine licence redaction preview', () => {
           }
         },
         card: '#marine-plan-policies-card-cross-cutting',
-        row: 'South Climate change 1(S-CC-1)',
+        row: 'South Climate change 1 (S-CC-1)',
         published: `First ${REDACTION_LABEL}`,
         includes: true
       },

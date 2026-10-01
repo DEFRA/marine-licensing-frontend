@@ -13,10 +13,10 @@ import {
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 import {
-  formatPolicyTitle,
   getPolicySection,
   getPolicySectionSlug
 } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
+import { formatPolicyTitle } from '#src/server/common/helpers/marine-licence/marine-plan-policy-title.js'
 
 export const MARINE_PLAN_POLICY_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/marine-plan-policy/index'
@@ -76,17 +76,20 @@ const buildRenderModel = ({
   policy,
   payload,
   returnTo
-}) => ({
-  pageTitle: formatPolicyTitle(policy),
-  heading: formatPolicyTitle(policy),
-  projectName,
-  policyText: policy.policy,
-  findOutMoreUrl: `${FIND_OUT_MORE_BASE}${encodeURIComponent(policyCode)}`,
-  backLink: getPolicyReturnLink(returnTo, policy),
-  marinePlanPolicyGuidanceLink:
-    marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
-  payload
-})
+}) => {
+  const title = formatPolicyTitle(policy)
+  return {
+    pageTitle: title,
+    heading: title,
+    projectName,
+    policyText: policy.policy,
+    findOutMoreUrl: `${FIND_OUT_MORE_BASE}${encodeURIComponent(policyCode)}`,
+    backLink: getPolicyReturnLink(returnTo, policy),
+    marinePlanPolicyGuidanceLink:
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
+    payload
+  }
+}
 
 export const marinePlanPolicyController = {
   async handler(request, h) {

@@ -310,8 +310,7 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       expect(rows).toHaveLength(2)
       expect(
         rows[0].querySelector('.govuk-summary-list__key').textContent.trim()
-      ).toBe('South Climate change 1(S-CC-1)')
-      expect(rows[0].querySelector('.govuk-summary-list__key br')).toBeTruthy()
+      ).toBe('South Climate change 1 (S-CC-1)')
       expect(card.textContent).toContain('First policy wording.')
       expect(card.textContent).toContain('Policy information')
       expect(card.textContent).toContain('Your consideration')

@@ -37,14 +37,16 @@ export const checkYourAnswersController = {
 
     let siteData = { coordinatesType: null, summaryData: [] }
     let waterFrameworkDirective = cachedMarineLicence.waterFrameworkDirective
-    let marinePlanPolicies = []
+    let marinePlanPolicySections = []
 
     if (cachedMarineLicence.id) {
       const marineLicenceService = getMarineLicenceService(request)
       const completeMarineLicence =
         await marineLicenceService.getMarineLicenceById(cachedMarineLicence.id)
       siteData = buildSiteData(completeMarineLicence)
-      marinePlanPolicies = buildMarinePlanPoliciesData(completeMarineLicence)
+      marinePlanPolicySections = buildMarinePlanPoliciesData(
+        completeMarineLicence
+      )
 
       // A user may have cancelled out of the WFD flow part way and returned to this page
       // So it is necessary to reset the cache of this property to the server value
@@ -79,7 +81,7 @@ export const checkYourAnswersController = {
       invoicingChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
       feeEstimateChangeLink: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
-      marinePlanPolicies,
+      marinePlanPolicySections,
       amount: FEE_ESTIMATE_AMOUNT,
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })

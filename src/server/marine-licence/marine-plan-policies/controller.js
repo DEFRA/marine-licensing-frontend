@@ -4,10 +4,8 @@ import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { getMarinePlanPolicyLink } from '#src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 import { clearReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
-import {
-  formatPolicyTitle,
-  groupPoliciesBySection
-} from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
+import { groupPoliciesBySection } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
+import { formatPolicyTitle } from '#src/server/common/helpers/marine-licence/marine-plan-policy-title.js'
 
 export const MARINE_PLAN_POLICIES_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/index'
@@ -61,15 +59,16 @@ export const marinePlanPoliciesController = {
       marinePlanPolicyResponses
     } = await marineLicenceService.getMarineLicenceById(marineLicence.id)
 
-    const sections = groupPoliciesBySection(marinePlanPolicies ?? []).map(
-      ({ section, slug, policies }) => ({
-        heading: section,
+    const allPolicies = marinePlanPolicies ?? []
+    const sections = groupPoliciesBySection(allPolicies).map(
+      ({ heading, slug, policies }) => ({
+        heading,
         slug,
         items: policies.map(toPolicyRow(marinePlanPolicyResponses))
       })
     )
     const completedCount = countCompleted(
-      marinePlanPolicies ?? [],
+      allPolicies,
       marinePlanPolicyResponses
     )
 

@@ -263,5 +263,6 @@ export const apiRoutes = {
   CONFIRM_SITE_DETAILS: '/marine-licence/confirm-site-details',
   COPY_MARINE_LICENCE: '/marine-licence/copy-marine-licence',
   REDACT_TEXT: '/marine-licence/redact-text',
-  GET_USER_NAMES: '/projects/users'
+  GET_USER_NAMES: '/projects/users',
+  UPDATE_SITE_NOTICE_EVIDENCE: '/marine-licence/update-site-notice-evidence'
 }

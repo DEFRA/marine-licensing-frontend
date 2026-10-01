@@ -41,7 +41,8 @@ describe('#siteNoticeDateDisplayed', () => {
         createMockRequest({
           params: {
             marineLicenceId: mockMarineLicenceWithApplicationTask.id
-          }
+          },
+          query: { evidence: '1' }
         }),
         h
       )
@@ -52,7 +53,8 @@ describe('#siteNoticeDateDisplayed', () => {
           backLink: displayUrl,
           pageTitle: 'When did you first display the notice?',
           heading: 'When did you first display the notice?',
-          pageCaption: 'MLA/2026/10264 - Test Project'
+          projectName: 'Test Project',
+          locationIndex: 1
         }
       )
     })

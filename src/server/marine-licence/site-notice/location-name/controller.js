@@ -1,31 +1,43 @@
 import Boom from '@hapi/boom'
-import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { validateMarineLicenceIdParams } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
-import {
-  getViewDetailsUrl,
-  assertIsOriginalSubmitter
-} from '#src/server/common/helpers/view-details/utils.js'
+import { getViewDetailsUrl } from '#src/server/common/helpers/view-details/utils.js'
 import {
   findSiteNoticeTask,
+  getLocationIndex,
+  loadMarineLicence,
   validateEvidenceParam
 } from '#src/server/common/helpers/marine-licence/site-notice.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  errorDescriptionByFieldName,
+  mapErrorsForDisplay
+} from '#src/server/common/helpers/errors.js'
+import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
+import { locationNameSchema } from '#src/server/common/validation/location-name/schema.js'
+import {
+  locationNameErrorMessages,
+  locationNameSettings
+} from '#src/server/common/validation/location-name/constants.js'
 
 export const SITE_NOTICE_LOCATION_NAME_VIEW_ROUTE =
   'marine-licence/site-notice/location-name/index'
-
-const siteNoticeLocationNameSettings = {
-  pageTitle: 'Location name',
-  heading: 'Location name'
-}
-
-const siteNoticeDisplayUrl = (marineLicenceId) =>
-  `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
 
 const siteNoticeLocationNameOptions = {
   ...validateMarineLicenceIdParams,
   pre: [validateEvidenceParam]
 }
+
+const getBackLink = (marineLicenceId) =>
+  `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
+
+const captionContext = (request, marineLicence) => ({
+  projectName: marineLicence.projectName,
+  locationIndex: getLocationIndex(request)
+})
 
 export const siteNoticeLocationNameController = {
   options: siteNoticeLocationNameOptions,
@@ -33,19 +45,16 @@ export const siteNoticeLocationNameController = {
     const { marineLicenceId } = request.params
 
     try {
-      const service = getMarineLicenceService(request)
-      const marineLicence = await service.getMarineLicenceById(marineLicenceId)
-
-      await assertIsOriginalSubmitter(request, marineLicence)
+      const { marineLicence } = await loadMarineLicence(request)
 
       if (!findSiteNoticeTask(marineLicence)) {
         return h.redirect(getViewDetailsUrl(marineLicenceId))
       }
 
       return h.view(SITE_NOTICE_LOCATION_NAME_VIEW_ROUTE, {
-        ...siteNoticeLocationNameSettings,
-        backLink: siteNoticeDisplayUrl(marineLicenceId),
-        pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`
+        ...locationNameSettings,
+        backLink: getBackLink(marineLicenceId),
+        ...captionContext(request, marineLicence)
       })
     } catch (error) {
       if (error.isBoom) {
@@ -61,8 +70,71 @@ export const siteNoticeLocationNameController = {
 }
 
 export const siteNoticeLocationNameSubmitController = {
-  options: siteNoticeLocationNameOptions,
-  handler(request, h) {
-    return h.redirect(siteNoticeDisplayUrl(request.params.marineLicenceId))
+  options: {
+    ...siteNoticeLocationNameOptions,
+    validate: {
+      payload: locationNameSchema,
+      failAction: async (request, h, err) => {
+        const { marineLicence, marineLicenceId } =
+          await loadMarineLicence(request)
+
+        if (!findSiteNoticeTask(marineLicence)) {
+          return h.redirect(getViewDetailsUrl(marineLicenceId)).takeover()
+        }
+
+        return createFailAction({
+          viewRoute: SITE_NOTICE_LOCATION_NAME_VIEW_ROUTE,
+          settings: locationNameSettings,
+          errorMessages: locationNameErrorMessages,
+          backLink: getBackLink(marineLicenceId),
+          payload: request.payload,
+          params: captionContext(request, marineLicence)
+        })(request, h, err)
+      }
+    }
+  },
+  async handler(request, h) {
+    const { payload } = request
+    const { marineLicence, marineLicenceId } = await loadMarineLicence(request)
+
+    if (!findSiteNoticeTask(marineLicence)) {
+      return h.redirect(getViewDetailsUrl(marineLicenceId))
+    }
+
+    try {
+      await authenticatedPatchRequest(
+        request,
+        apiRoutes.UPDATE_SITE_NOTICE_EVIDENCE,
+        {
+          locationName: payload.locationName,
+          id: marineLicenceId,
+          evidenceIndex: Number.parseInt(request.query.evidence, 10) - 1
+        }
+      )
+
+      return h.redirect(getBackLink(marineLicenceId))
+    } catch (e) {
+      const validation = e.data?.payload?.validation
+      const details = validation?.details
+
+      if (!Array.isArray(details)) {
+        throw e
+      }
+
+      const errorSummary = mapErrorsForDisplay(
+        details,
+        locationNameErrorMessages
+      )
+      const errors = errorDescriptionByFieldName(errorSummary)
+
+      return h.view(SITE_NOTICE_LOCATION_NAME_VIEW_ROUTE, {
+        ...locationNameSettings,
+        payload,
+        backLink: getBackLink(marineLicenceId),
+        ...captionContext(request, marineLicence),
+        errors,
+        errorSummary
+      })
+    }
   }
 }

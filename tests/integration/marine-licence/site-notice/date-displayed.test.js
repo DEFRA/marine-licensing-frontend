@@ -39,9 +39,8 @@ describe('Site notice date displayed page', () => {
       })
     ).toBeInTheDocument()
 
-    expect(
-      getByText(document, 'MLA/2026/10264 - Test Project')
-    ).toBeInTheDocument()
+    expect(getByText(document, 'Test Project')).toBeInTheDocument()
+    expect(getByText(document, 'Location 1')).toBeInTheDocument()
 
     expect(
       getByRole(document, 'button', { name: 'Save and continue' })

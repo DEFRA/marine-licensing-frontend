@@ -37,9 +37,8 @@ describe('Site notice close-up photo page', () => {
       getByRole(document, 'heading', { name: 'Close-up photo upload' })
     ).toBeInTheDocument()
 
-    expect(
-      getByText(document, 'MLA/2026/10264 - Test Project')
-    ).toBeInTheDocument()
+    expect(getByText(document, 'Test Project')).toBeInTheDocument()
+    expect(getByText(document, 'Location 1')).toBeInTheDocument()
 
     expect(
       getByRole(document, 'button', { name: 'Save and continue' })

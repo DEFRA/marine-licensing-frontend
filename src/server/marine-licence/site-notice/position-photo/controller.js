@@ -7,6 +7,7 @@ import {
 } from '#src/server/common/helpers/view-details/utils.js'
 import {
   findSiteNoticeTask,
+  getLocationIndex,
   validateEvidenceParam
 } from '#src/server/common/helpers/marine-licence/site-notice.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -45,7 +46,8 @@ export const siteNoticePositionPhotoController = {
       return h.view(SITE_NOTICE_POSITION_PHOTO_VIEW_ROUTE, {
         ...siteNoticePositionPhotoSettings,
         backLink: siteNoticeDisplayUrl(marineLicenceId),
-        pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`
+        projectName: marineLicence.projectName,
+        locationIndex: getLocationIndex(request)
       })
     } catch (error) {
       if (error.isBoom) {

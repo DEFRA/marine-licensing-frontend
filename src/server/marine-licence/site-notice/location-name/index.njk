@@ -1,6 +1,8 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -15,11 +17,33 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <span class="govuk-caption-l">{{ pageCaption }}</span>
-      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      {% if errors %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <span class="govuk-caption-l">{{ projectName }}</span>
+      <span class="govuk-caption-l">Location {{ locationIndex }}</span>
 
       <form method="POST" novalidate>
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        {{ govukInput({
+          id: "locationName",
+          name: "locationName",
+          value: payload.locationName,
+          label: {
+            text: heading,
+            classes: "govuk-label--l",
+            isPageHeading: true
+          },
+          hint: {
+            text: "Give a specific description of where you displayed this notice, so we can tell it apart from any other locations. For example, 'Tynemouth harbour, noticeboard by north pier' rather than just 'Tynemouth harbour.'"
+          },
+          errorMessage: errors['locationName']
+        }) }}
 
         <div class="govuk-button-group">
           {{ govukButton({

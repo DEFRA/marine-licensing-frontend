@@ -41,7 +41,8 @@ describe('#siteNoticePositionPhoto', () => {
         createMockRequest({
           params: {
             marineLicenceId: mockMarineLicenceWithApplicationTask.id
-          }
+          },
+          query: { evidence: '1' }
         }),
         h
       )
@@ -52,7 +53,8 @@ describe('#siteNoticePositionPhoto', () => {
           backLink: displayUrl,
           pageTitle: 'Position and location photo upload',
           heading: 'Position and location photo upload',
-          pageCaption: 'MLA/2026/10264 - Test Project'
+          projectName: 'Test Project',
+          locationIndex: 1
         }
       )
     })

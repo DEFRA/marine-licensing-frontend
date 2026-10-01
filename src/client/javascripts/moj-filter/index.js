@@ -153,7 +153,7 @@ export class MojFilter {
     )
 
     if ($checkbox) {
-      $checkbox.checked = false 
+      $checkbox.checked = false
       this.$form.requestSubmit()
     }
   }

@@ -1,7 +1,8 @@
 const GOOGLE_ANALYTICS_COOKIE_PREFIXES = ['_ga', '_gid', '_gat', '_dc_gtm_']
+const CLARITY_COOKIE_NAMES = new Set(['_clck', '_clsk'])
 const EXPIRED = 'expires=Thu, 01 Jan 1970 00:00:00 GMT'
 
-// Google sets its cookies on the registrable domain (eTLD+1), which the page cannot read back,
+// Google and Clarity set their cookies on the registrable domain (eTLD+1), which the page cannot read back,
 // so a deletion is attempted on the host and on every parent domain
 export const buildDeletableDomains = (hostname) => {
   const domains = new Set([hostname, `.${hostname}`])
@@ -14,7 +15,8 @@ export const buildDeletableDomains = (hostname) => {
   return [...domains]
 }
 
-const isGoogleAnalyticsCookie = (name) =>
+const isAnalyticsCookie = (name) =>
+  CLARITY_COOKIE_NAMES.has(name) ||
   GOOGLE_ANALYTICS_COOKIE_PREFIXES.some((prefix) => name.startsWith(prefix))
 
 const cookieNames = () =>
@@ -30,9 +32,9 @@ const expireCookie = (name, domains) => {
   }
 }
 
-export const deleteGoogleAnalyticsCookies = () => {
+export const deleteAnalyticsCookies = () => {
   const domains = buildDeletableDomains(globalThis.location.hostname)
-  const names = cookieNames().filter(isGoogleAnalyticsCookie)
+  const names = cookieNames().filter(isAnalyticsCookie)
 
   for (const name of names) {
     expireCookie(name, domains)

@@ -2,8 +2,8 @@
 // @vitest-environment-options { "url": "https://service.example.com/some/page" }
 import {
   buildDeletableDomains,
-  deleteGoogleAnalyticsCookies
-} from './google-analytics-cookies.js'
+  deleteAnalyticsCookies
+} from './analytics-cookies.js'
 
 const EXPIRED = 'expires=Thu, 01 Jan 1970 00:00:00 GMT'
 
@@ -35,7 +35,7 @@ describe('buildDeletableDomains', () => {
   })
 })
 
-describe('deleteGoogleAnalyticsCookies', () => {
+describe('deleteAnalyticsCookies', () => {
   beforeEach(() => {
     clearAllCookies()
     document.cookie = 'cookies_preferences_set=true; path=/'
@@ -48,7 +48,7 @@ describe('deleteGoogleAnalyticsCookies', () => {
     document.cookie = '_gat_UA-1=1; path=/'
     document.cookie = '_dc_gtm_UA-1=1; path=/'
 
-    const removed = deleteGoogleAnalyticsCookies()
+    const removed = deleteAnalyticsCookies()
 
     expect(removed.sort()).toEqual(
       ['_dc_gtm_UA-1', '_ga', '_ga_ABC123', '_gat_UA-1', '_gid'].sort()
@@ -60,13 +60,39 @@ describe('deleteGoogleAnalyticsCookies', () => {
     document.cookie = '_ga=GA1.1.444; path=/; domain=.example.com'
     expect(document.cookie).toContain('_ga=GA1.1.444')
 
-    deleteGoogleAnalyticsCookies()
+    deleteAnalyticsCookies()
 
     expect(document.cookie).not.toContain('_ga=')
   })
 
-  test('returns an empty list when there are no Google Analytics cookies', () => {
-    expect(deleteGoogleAnalyticsCookies()).toEqual([])
+  test('removes host Microsoft Clarity cookies', () => {
+    document.cookie = '_clck=1e3cbzq^2^g9y^1^2466; path=/'
+    document.cookie = '_clsk=abc123^1^1^0^z.clarity.ms/collect; path=/'
+
+    const removed = deleteAnalyticsCookies()
+
+    expect(removed.sort()).toEqual(['_clck', '_clsk'])
+    expect(document.cookie).toBe('cookies_preferences_set=true')
+  })
+
+  test('removes a Microsoft Clarity cookie set on a parent domain', () => {
+    document.cookie = '_clck=1e3cbzq^2^g9y^1^2466; path=/; domain=.example.com'
+    expect(document.cookie).toContain('_clck=')
+
+    deleteAnalyticsCookies()
+
+    expect(document.cookie).not.toContain('_clck=')
+  })
+
+  test('leaves cookies that only share a prefix with a Microsoft Clarity cookie', () => {
+    document.cookie = '_clckother=1; path=/'
+
+    expect(deleteAnalyticsCookies()).toEqual([])
+    expect(document.cookie).toContain('_clckother=1')
+  })
+
+  test('returns an empty list when there are no analytics cookies', () => {
+    expect(deleteAnalyticsCookies()).toEqual([])
     expect(document.cookie).toBe('cookies_preferences_set=true')
   })
 })

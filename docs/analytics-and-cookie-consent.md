@@ -40,7 +40,7 @@ Consent reaches the container through Google Consent Mode commands, not a custom
 
 ## Client-side cleanup
 
-`src/client/javascripts/cookie-consent/` runs on every page. When `COOKIE_PREFERENCES_SET` is true and `ANALYTICS_ENABLED` is false it expires every cookie whose name starts `_ga`, `_gid`, `_gat` or `_dc_gtm_`, on the host and on every parent domain. It never runs while the user is undecided. It also reloads a page restored from the back/forward cache.
+`src/client/javascripts/cookie-consent/` runs on every page. When `COOKIE_PREFERENCES_SET` is true and `ANALYTICS_ENABLED` is false it expires every cookie whose name starts `_ga`, `_gid`, `_gat` or `_dc_gtm_`, and the Clarity cookies `_clck` and `_clsk`, on the host and on every parent domain. It never runs while the user is undecided. It also reloads a page restored from the back/forward cache.
 
 Why client-side only: Google sets `_ga*` on the registrable domain (`defra.gov.uk` in production, `defra.cloud` on CDP) with `Path=/`. hapi's `h.unstate()` emits a host-only cookie with no `Path`, which the browser treats as a different cookie, so a server-side deletion never matches. Consequences to be aware of:
 
@@ -49,7 +49,7 @@ Why client-side only: Google sets `_ga*` on the registrable domain (`defra.gov.u
 
 ## Microsoft Clarity
 
-The `@microsoft/clarity` npm loader is initialised from `application.js` on every page when `CLARITY_PROJECT_ID` is set, then told the consent state. The Clarity project requires consent (`"track": false` in the served tag), so it sets no cookies until consent is granted, and `consent(false)` after a prior grant deletes `_clck`/`_clsk` and ends the session.
+The `@microsoft/clarity` npm loader is initialised from `application.js` on every page when `CLARITY_PROJECT_ID` is set, then told the consent state. Clarity's own handling of `consent(false)` is not relied on to remove `_clck`/`_clsk`: whether it does depends on the project's Cookies setting in the Clarity dashboard and on the consent flag stored in an existing `_clck`, both of which can change without a deploy. The client-side cleanup above deletes them instead. It runs before `Clarity.init`, so Clarity then starts without a cookie and with tracking off, and continues collecting without cookies.
 
 ## Content-Security-Policy
 

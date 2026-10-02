@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { vi } from 'vitest'
 import { initCookieConsent } from './index.js'
-import { deleteGoogleAnalyticsCookies } from './google-analytics-cookies.js'
+import { deleteAnalyticsCookies } from './analytics-cookies.js'
 
-vi.mock('./google-analytics-cookies.js', () => ({
-  deleteGoogleAnalyticsCookies: vi.fn()
+vi.mock('./analytics-cookies.js', () => ({
+  deleteAnalyticsCookies: vi.fn()
 }))
 
 const setConsentGlobals = (preferencesSet, analyticsEnabled) => {
@@ -18,12 +18,12 @@ describe('initCookieConsent', () => {
     delete globalThis.ANALYTICS_ENABLED
   })
 
-  test('deletes Google Analytics cookies when the user has rejected analytics', () => {
+  test('deletes analytics cookies when the user has rejected analytics', () => {
     setConsentGlobals(true, false)
 
     initCookieConsent({ reload: vi.fn() })
 
-    expect(deleteGoogleAnalyticsCookies).toHaveBeenCalledTimes(1)
+    expect(deleteAnalyticsCookies).toHaveBeenCalledTimes(1)
   })
 
   test.each([
@@ -38,7 +38,7 @@ describe('initCookieConsent', () => {
 
       initCookieConsent({ reload: vi.fn() })
 
-      expect(deleteGoogleAnalyticsCookies).not.toHaveBeenCalled()
+      expect(deleteAnalyticsCookies).not.toHaveBeenCalled()
     }
   )
 

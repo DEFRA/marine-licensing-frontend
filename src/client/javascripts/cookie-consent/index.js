@@ -1,4 +1,4 @@
-import { deleteGoogleAnalyticsCookies } from './google-analytics-cookies.js'
+import { deleteAnalyticsCookies } from './analytics-cookies.js'
 
 const hasRejectedAnalytics = () =>
   globalThis.COOKIE_PREFERENCES_SET === true &&
@@ -6,12 +6,12 @@ const hasRejectedAnalytics = () =>
 
 const reloadPage = () => globalThis.location.reload()
 
-// Runs on every page. Deletes Google Analytics cookies once the user has rejected analytics
+// Runs on every page. Deletes Google Analytics and Clarity cookies once the user has rejected analytics
 // (never while undecided, so a sibling service's consent is respected) and re-renders a page
 // restored from the back/forward cache so it reflects the current consent state.
 export const initCookieConsent = ({ reload = reloadPage } = {}) => {
   if (hasRejectedAnalytics()) {
-    deleteGoogleAnalyticsCookies()
+    deleteAnalyticsCookies()
   }
 
   globalThis.addEventListener('pageshow', (event) => {

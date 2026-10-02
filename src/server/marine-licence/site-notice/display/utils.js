@@ -36,7 +36,11 @@ export const getSiteNoticeValues = (marineLicence) => {
   return siteNoticeEvidence.map((evidence) => ({
     locationName: evidence.locationName,
     dateDisplayed: formatDate(evidence.dateDisplayed),
-    closeUpPhoto: evidence.closeUpPhoto.uploadedFile.filename,
-    positionPhoto: evidence.positionPhoto.uploadedFile.filename
+    closeUpPhoto: evidence.closeUpPhoto
+      ? evidence.closeUpPhoto.uploadedFile.filename
+      : undefined,
+    positionPhoto: evidence.positionPhoto
+      ? evidence.positionPhoto.uploadedFile.filename
+      : undefined
   }))
 }

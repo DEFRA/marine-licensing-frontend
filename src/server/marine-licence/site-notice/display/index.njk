@@ -122,17 +122,20 @@
     
         {% set _ = evidenceRows.push({
           key: { text: "Date you displayed the notice" },
-          value: { html: appIncompleteField({text: evidence.dateDisplayed}) }
+          value: { html: appIncompleteField({text: evidence.dateDisplayed}) },
+          actions: setSiteDetailsAction(evidence.dateDisplayed, evidenceLinks.dateDisplayed, null, " date you displayed the notice", { skipAction: true, evidenceIndex: evidenceIndex })
         }) %}
 
         {% set _ = evidenceRows.push({
           key: { text: "Close-up photo of notice" },
-          value: { html: appIncompleteField({text: evidence.closeUpPhoto}) }
+          value: { html: appIncompleteField({text: evidence.closeUpPhoto}) },
+          actions: setSiteDetailsAction(evidence.closeUpPhoto, evidenceLinks.closeUpPhoto, null, "close-up photo of notice", { skipAction: true, evidenceIndex: evidenceIndex })
         }) %}
 
         {% set _ = evidenceRows.push({
           key: { text: "Photo evidencing notice position and location" },
-          value: { html: appIncompleteField({text: evidence.positionPhoto}) }
+          value: { html: appIncompleteField({text: evidence.positionPhoto}) },
+          actions: setSiteDetailsAction(evidence.positionPhoto, evidenceLinks.positionPhoto, null, "photo evidencing notice position and location", { skipAction: true, evidenceIndex: evidenceIndex })
         }) %}
 
         {% set title %}Location {{loop.index}} evidence{% endset %}

@@ -1,41 +1,28 @@
 import joi from 'joi'
-
-const monthSchema = (requiredCode, invalidCode) =>
-  joi
-    .string()
-    .required()
-    .pattern(/^(0?[1-9]|1[0-2])$/)
-    .messages({
-      'string.empty': requiredCode,
-      'any.required': requiredCode,
-      'string.pattern.base': invalidCode
-    })
-
-const yearSchema = (requiredCode, invalidCode) =>
-  joi
-    .string()
-    .required()
-    .pattern(/^\d{4}$/)
-    .messages({
-      'string.empty': requiredCode,
-      'any.required': requiredCode,
-      'string.pattern.base': invalidCode
-    })
+import {
+  MONTH_PATTERN,
+  YEAR_PATTERN,
+  datePartSchema
+} from '#src/server/common/validation/date-part/schema.js'
 
 export const preferredDatesSchema = joi.object({
-  'start-date-month': monthSchema(
+  'start-date-month': datePartSchema(
+    MONTH_PATTERN,
     'PREFERRED_START_MONTH_REQUIRED',
     'PREFERRED_START_MONTH_INVALID'
   ),
-  'start-date-year': yearSchema(
+  'start-date-year': datePartSchema(
+    YEAR_PATTERN,
     'PREFERRED_START_YEAR_REQUIRED',
     'PREFERRED_START_YEAR_INVALID'
   ),
-  'end-date-month': monthSchema(
+  'end-date-month': datePartSchema(
+    MONTH_PATTERN,
     'PREFERRED_END_MONTH_REQUIRED',
     'PREFERRED_END_MONTH_INVALID'
   ),
-  'end-date-year': yearSchema(
+  'end-date-year': datePartSchema(
+    YEAR_PATTERN,
     'PREFERRED_END_YEAR_REQUIRED',
     'PREFERRED_END_YEAR_INVALID'
   )

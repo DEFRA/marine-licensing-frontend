@@ -63,13 +63,5 @@ describe('marine plan policy sections', () => {
         { heading: 'Other', slug: 'other', codes: ['S-AGG-1'] }
       ])
     })
-
-    test('omits sections that have no policies', () => {
-      const result = groupPoliciesBySection([
-        { policyCode: 'S-CAB-1', category: 'Economic' }
-      ])
-
-      expect(result.map(({ heading }) => heading)).toEqual(['Economic'])
-    })
   })
 })

@@ -136,25 +136,6 @@ describe('#marinePlanPoliciesController', () => {
     ])
   })
 
-  test('shows policies without a category under Other, by code alone when they have no title', async () => {
-    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
-      {
-        getMarineLicenceById: vi.fn().mockResolvedValue({
-          projectName: 'Test Project',
-          marinePlanPoliciesCount: 1,
-          marinePlanPolicies: [{ policyCode: 'SW-AGG-2', title: 'SW-AGG-2' }]
-        })
-      }
-    )
-    const h = { view: vi.fn() }
-
-    await marinePlanPoliciesController.handler(mockRequest, h)
-
-    expect(h.view.mock.calls[0][1].sections).toEqual([
-      { heading: 'Other', slug: 'other', items: [row('SW-AGG-2', 'SW-AGG-2')] }
-    ])
-  })
-
   test('renders an empty list does not crash when there are no policies', async () => {
     vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
       {

@@ -11,6 +11,9 @@ export const getPolicySectionSlug = (section) =>
     .replaceAll(/[^a-z0-9]+/g, '-')
     .replaceAll(/^-|-$/g, '')
 
+export const getPolicySectionCardId = (slug) =>
+  `marine-plan-policies-card-${slug}`
+
 const compareSections = (a, b) => {
   if (a === UNCATEGORISED_SECTION) {
     return 1

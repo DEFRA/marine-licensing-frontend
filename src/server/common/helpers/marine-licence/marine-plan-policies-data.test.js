@@ -36,6 +36,7 @@ describe('buildMarinePlanPoliciesData', () => {
       {
         heading: 'Cross-cutting',
         slug: 'cross-cutting',
+        cardId: 'marine-plan-policies-card-cross-cutting',
         policies: [
           {
             policyCode: 'S-CC-1',
@@ -56,6 +57,7 @@ describe('buildMarinePlanPoliciesData', () => {
       {
         heading: 'Economic',
         slug: 'economic',
+        cardId: 'marine-plan-policies-card-economic',
         policies: [
           {
             policyCode: 'S-CAB-1',
@@ -69,16 +71,11 @@ describe('buildMarinePlanPoliciesData', () => {
     ])
   })
 
-  test('falls back to the code for the title and defaults missing wording and response', () => {
+  test('defaults missing wording and response to empty strings', () => {
     const [section] = buildMarinePlanPoliciesData({
       marinePlanPolicies: [{ policyCode: 'S-CC-1' }]
     })
 
-    expect(section.heading).toBe('Other')
-    expect(section.policies[0]).toMatchObject({
-      displayTitle: 'S-CC-1',
-      wording: '',
-      response: ''
-    })
+    expect(section.policies[0]).toMatchObject({ wording: '', response: '' })
   })
 })

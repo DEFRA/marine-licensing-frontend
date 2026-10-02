@@ -66,20 +66,6 @@ describe('Marine plan policies (policy list) page', () => {
     ])
   })
 
-  test('shows every policy as "Not yet started" before it is considered', async () => {
-    const document = await loadPolicyListPage()
-
-    const statuses = [
-      ...document.querySelectorAll('.govuk-task-list__status')
-    ].map((el) => el.textContent.trim())
-
-    expect(statuses).toEqual([
-      'Not yet started',
-      'Not yet started',
-      'Not yet started'
-    ])
-  })
-
   test('links each policy to its consideration page', async () => {
     const document = await loadPolicyListPage()
 

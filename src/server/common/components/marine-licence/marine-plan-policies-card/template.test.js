@@ -18,7 +18,12 @@ const policies = [
 ]
 
 const crossCutting = (sectionPolicies = policies) => [
-  { heading: 'Cross-cutting', slug: 'cross-cutting', policies: sectionPolicies }
+  {
+    heading: 'Cross-cutting',
+    slug: 'cross-cutting',
+    cardId: 'marine-plan-policies-card-cross-cutting',
+    policies: sectionPolicies
+  }
 ]
 
 const sections = crossCutting()
@@ -31,6 +36,7 @@ describe('Marine Licence Marine Plan Policies Component', () => {
         {
           heading: 'Economic',
           slug: 'economic',
+          cardId: 'marine-plan-policies-card-economic',
           policies: [{ ...policies[0], policyCode: 'S-CAB-1' }]
         }
       ]

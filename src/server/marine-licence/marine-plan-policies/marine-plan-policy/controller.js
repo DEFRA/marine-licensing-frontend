@@ -14,6 +14,7 @@ import { authenticatedPatchRequest } from '#src/server/common/helpers/authentica
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 import {
   getPolicySection,
+  getPolicySectionCardId,
   getPolicySectionSlug
 } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
 import { formatPolicyTitle } from '#src/server/common/helpers/marine-licence/marine-plan-policy-title.js'
@@ -35,7 +36,7 @@ export const errorMessages = {
 const getPolicyReturnLink = (returnTo, policy) => {
   if (returnTo) {
     const slug = getPolicySectionSlug(getPolicySection(policy))
-    return `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#marine-plan-policies-card-${slug}`
+    return `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#${getPolicySectionCardId(slug)}`
   }
   return marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
 }

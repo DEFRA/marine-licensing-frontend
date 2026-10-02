@@ -1,5 +1,4 @@
 import { ErrorTracking } from './error-tracking/error-tracking.js'
-import Clarity from '@microsoft/clarity'
 import {
   Button,
   Checkboxes,
@@ -21,6 +20,7 @@ import { SiteDetailsMap } from './site-details-map/index.js'
 import { RedactionField } from './redaction-field/index.js'
 import { WithholdLocation } from './withhold-location/index.js'
 import { initCookieConsent } from './cookie-consent/index.js'
+import { initClarity } from './clarity/index.js'
 
 createAll(Button)
 createAll(Checkboxes)
@@ -32,19 +32,6 @@ createAll(FileUpload)
 createAll(SortableTable)
 createAll(AccessibleAutocomplete)
 
-function syncClarityConsent() {
-  if (
-    globalThis.clarity &&
-    typeof globalThis.clarity === 'function' &&
-    typeof globalThis.ANALYTICS_ENABLED === 'boolean'
-  ) {
-    try {
-      globalThis.clarity('consent', globalThis.ANALYTICS_ENABLED)
-    } catch {
-      // Silently handle Clarity consent errors
-    }
-  }
-}
 document.addEventListener('DOMContentLoaded', () => {
   initCookieConsent()
 
@@ -52,10 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorTracking = new ErrorTracking()
     errorTracking.init()
   }
-  if (globalThis.CLARITY_PROJECT_ID) {
-    Clarity.init(globalThis.CLARITY_PROJECT_ID)
-    syncClarityConsent()
-  }
+  initClarity()
 
   const addAnotherElements = document.querySelectorAll(
     '[data-module="add-another-point"]'

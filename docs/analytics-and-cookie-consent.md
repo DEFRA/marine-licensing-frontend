@@ -49,7 +49,9 @@ Why client-side only: Google sets `_ga*` on the registrable domain (`defra.gov.u
 
 ## Microsoft Clarity
 
-The `@microsoft/clarity` npm loader is initialised from `application.js` on every page when `CLARITY_PROJECT_ID` is set, then told the consent state. Clarity's own handling of `consent(false)` is not relied on to remove `_clck`/`_clsk`: whether it does depends on the project's Cookies setting in the Clarity dashboard and on the consent flag stored in an existing `_clck`, both of which can change without a deploy. The client-side cleanup above deletes them instead. It runs before `Clarity.init`, so Clarity then starts without a cookie and with tracking off, and continues collecting without cookies.
+`src/client/javascripts/clarity/` loads the `@microsoft/clarity` npm loader only when `CLARITY_PROJECT_ID` is set **and** `ANALYTICS_ENABLED` is true, then grants consent. Undecided and rejecting users never load the Clarity script. Without that gate Clarity would run in its "no-consent mode", which sets no cookies but still records page views and sessions, and the cookies page tells users analytics is optional.
+
+Clarity's own handling of `consent(false)` is not relied on to remove `_clck`/`_clsk` after a withdrawal: whether it clears them depends on the project's Cookies setting in the Clarity dashboard and on the consent flag stored in an existing `_clck`, and in testing it did not. The client-side cleanup above deletes them instead, on the first page load after the user rejects.
 
 ## Content-Security-Policy
 

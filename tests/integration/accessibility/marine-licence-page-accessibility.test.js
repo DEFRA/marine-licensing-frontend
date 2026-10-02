@@ -159,24 +159,6 @@ const marineLicencePages = [
     session: applicationTaskOwnerSession
   },
   {
-    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${mockMarineLicenceApplication.id}?evidence=1`,
-    title: 'When did you first display the notice?',
-    marineLicence: mockMarineLicenceWithApplicationTask,
-    session: applicationTaskOwnerSession
-  },
-  {
-    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${mockMarineLicenceApplication.id}?evidence=1`,
-    title: 'Close-up photo upload',
-    marineLicence: mockMarineLicenceWithApplicationTask,
-    session: applicationTaskOwnerSession
-  },
-  {
-    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${mockMarineLicenceApplication.id}?evidence=1`,
-    title: 'Position and location photo upload',
-    marineLicence: mockMarineLicenceWithApplicationTask,
-    session: applicationTaskOwnerSession
-  },
-  {
     url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
     title:
       'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'

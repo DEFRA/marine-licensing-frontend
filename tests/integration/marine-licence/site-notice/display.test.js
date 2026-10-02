@@ -135,13 +135,20 @@ describe('Site notice display page (marine licence)', () => {
       `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}?evidence=1`
     )
     expect(
-      getByRole(document, 'link', {
-        name: 'Change photo evidencing notice position and location (Location 2 evidence)'
+      queryByRole(document, 'link', {
+        name: 'Change date you displayed the notice (Location 1 evidence)'
       })
-    ).toHaveAttribute(
-      'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}?evidence=2`
-    )
+    ).not.toBeInTheDocument()
+    expect(
+      queryByRole(document, 'link', {
+        name: 'Change close-up photo of notice (Location 1 evidence)'
+      })
+    ).not.toBeInTheDocument()
+    expect(
+      queryByRole(document, 'link', {
+        name: 'Change photo evidencing notice position and location (Location 1 evidence)'
+      })
+    ).not.toBeInTheDocument()
   })
 
   test('forbids anyone who did not submit the application', async () => {

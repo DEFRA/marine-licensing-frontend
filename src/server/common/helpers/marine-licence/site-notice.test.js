@@ -1,5 +1,6 @@
 import {
   findSiteNoticeTask,
+  getSiteNoticeEvidence,
   loadMarineLicence,
   validateEvidenceParam
 } from '#src/server/common/helpers/marine-licence/site-notice.js'
@@ -9,6 +10,7 @@ import { APPLICATION_TASK_TYPE } from '#src/server/common/helpers/marine-licence
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   mockApplicationTaskContactId,
+  mockMarineLicenceApplication,
   mockMarineLicenceWithApplicationTask
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
@@ -106,5 +108,30 @@ describe('validateEvidenceParam', () => {
     expect(h.redirect).toHaveBeenCalledWith(
       `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
     )
+  })
+})
+
+describe('getSiteNoticeEvidence', () => {
+  test('correctly returns evidence', () => {
+    const result = getSiteNoticeEvidence(
+      mockMarineLicenceWithApplicationTask,
+      1
+    )
+    expect(result).toEqual(
+      mockMarineLicenceWithApplicationTask.siteNoticeEvidence[0]
+    )
+  })
+
+  test('correctly returns empty object for incorrect index', () => {
+    const result = getSiteNoticeEvidence(
+      mockMarineLicenceWithApplicationTask,
+      10
+    )
+    expect(result).toEqual({})
+  })
+
+  test('correctly returns empty object for empty evidence array', () => {
+    const result = getSiteNoticeEvidence(mockMarineLicenceApplication, 1)
+    expect(result).toEqual({})
   })
 })

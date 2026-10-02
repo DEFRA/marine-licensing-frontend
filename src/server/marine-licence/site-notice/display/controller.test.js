@@ -60,7 +60,14 @@ describe('#siteNoticeDisplay', () => {
         showCommunityUserSection: true,
         showMarineUserSection: true,
         showMultipleSitesSection: false,
-        siteNoticeEvidence: []
+        siteNoticeEvidence: [
+          {
+            closeUpPhoto: 'test.jpg',
+            dateDisplayed: '22 May 2026',
+            locationName: 'North pier',
+            positionPhoto: 'test.jpg'
+          }
+        ]
       })
     })
 

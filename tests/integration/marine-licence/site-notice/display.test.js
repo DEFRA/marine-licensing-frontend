@@ -89,7 +89,7 @@ describe('Site notice display page (marine licence)', () => {
     )
     expect(
       queryByRole(document, 'heading', { name: 'Location 1 evidence' })
-    ).not.toBeInTheDocument()
+    ).toBeInTheDocument()
   })
 
   test('shows saved site notice evidence and links each location', async () => {

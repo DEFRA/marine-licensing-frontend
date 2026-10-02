@@ -169,7 +169,7 @@ export class MojFilter {
       event.preventDefault()
 
       this.resetForm()
-      this.onSubmit(event, { clear: true })
+      this.onSubmit(event, { clear: true }).catch(() => {})
     })
   }
 

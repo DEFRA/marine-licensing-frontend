@@ -59,7 +59,10 @@ describe('#siteNoticeLocationName', () => {
           pageTitle: 'Location name',
           heading: 'Location name',
           projectName: 'Test Project',
-          locationIndex: 1
+          locationIndex: 1,
+          payload: {
+            locationName: 'North pier'
+          }
         }
       )
     })

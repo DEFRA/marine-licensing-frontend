@@ -10,6 +10,7 @@ import {
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import {
+  mockSiteNoticeEvidence,
   mockApplicationTaskContactId,
   mockMarineLicenceWithApplicationTask
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
@@ -58,6 +59,12 @@ describe('Site notice location name page', () => {
     expect(document.body).toHaveTextContent(
       "Give a specific description of where you displayed this notice, so we can tell it apart from any other locations. For example, 'Tynemouth harbour, noticeboard by north pier' rather than just 'Tynemouth harbour.'"
     )
+
+    expect(
+      getByRole(document, 'textbox', {
+        name: /Location name/i
+      })
+    ).toHaveValue(mockSiteNoticeEvidence.locationName)
   })
 
   test('save and continue redirects to site notice display', async () => {

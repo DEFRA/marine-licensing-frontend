@@ -56,7 +56,11 @@ describe('Site notice date displayed page', () => {
     const { response } = await submitForm({
       requestUrl,
       server: getServer(),
-      formData: {}
+      formData: {
+        'date-displayed-day': '15',
+        'date-displayed-month': '3',
+        'date-displayed-year': '2026'
+      }
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)

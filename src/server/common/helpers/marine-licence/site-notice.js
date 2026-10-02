@@ -16,6 +16,13 @@ export const loadMarineLicence = async (request) => {
   return { marineLicence, marineLicenceId }
 }
 
+export const getSiteNoticeEvidence = (marineLicence, evidenceParam) => {
+  const siteNoticeEvidence = marineLicence.siteNoticeEvidence ?? []
+  const evidenceIndex = Number.parseInt(evidenceParam, 10) - 1
+  const existingEvidence = siteNoticeEvidence[evidenceIndex]
+  return existingEvidence || {}
+}
+
 export const findSiteNoticeTask = (marineLicence) =>
   (marineLicence?.applicationTasks ?? []).find(
     (task) => task.type === APPLICATION_TASK_TYPE.PUBLIC_SITE_NOTICE

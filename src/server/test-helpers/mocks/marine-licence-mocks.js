@@ -97,6 +97,13 @@ export const mockMarinePlanPolicyResponses = {
   'S-CC-2': 'My second consideration.'
 }
 
+export const mockSiteNoticeEvidence = {
+  locationName: 'North pier',
+  dateDisplayed: { day: '22', month: '05', year: '2026' },
+  closeUpPhoto: { uploadedFile: { filename: 'test.jpg' } },
+  positionPhoto: { uploadedFile: { filename: 'test.jpg' } }
+}
+
 export const mockMarineLicenceApplication = {
   id: faker.database.mongodbObjectId(),
   projectName: 'Test Project',
@@ -195,6 +202,7 @@ export const mockApplicationTaskContactId = 'contact-with-outstanding-task'
 export const mockMarineLicenceWithApplicationTask = {
   ...mockSubmittedMarineLicenceApplication,
   contactId: mockApplicationTaskContactId,
+  siteNoticeEvidence: [mockSiteNoticeEvidence],
   applicationTasks: [
     {
       taskId: '507f1f77bcf86cd799439012',

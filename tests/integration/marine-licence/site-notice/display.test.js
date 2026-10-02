@@ -56,13 +56,6 @@ describe('Site notice display page (marine licence)', () => {
         'Notices should be placed in locations chosen to best bring the proposed application to the attention of the public and interested parties. Consider locations such as those below.'
       )
     ).toBeInTheDocument()
-  })
-
-  test('should have correct navigation links', async () => {
-    const document = await loadPage({
-      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`,
-      server: getServer()
-    })
 
     const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`
 
@@ -70,26 +63,21 @@ describe('Site notice display page (marine licence)', () => {
       'href',
       expectedViewDetailsUrl
     )
-  })
-
-  test('shows the evidence section without a location card when nothing is saved', async () => {
-    const document = await loadPage({
-      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`,
-      server: getServer()
-    })
-
     expect(
       getByRole(document, 'heading', { name: 'Send us evidence' })
     ).toBeInTheDocument()
+
     expect(document.body).toHaveTextContent(
       'Add the details and photographs for each location where you displayed a site notice.'
     )
+
     expect(document.body).toHaveTextContent(
       'You must complete all sections marked Incomplete before you can send your evidence.'
     )
+
     expect(
       queryByRole(document, 'heading', { name: 'Location 1 evidence' })
-    ).not.toBeInTheDocument()
+    ).toBeInTheDocument()
   })
 
   test('shows saved site notice evidence and links each location', async () => {

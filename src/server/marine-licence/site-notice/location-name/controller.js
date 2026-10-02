@@ -4,6 +4,7 @@ import { getViewDetailsUrl } from '#src/server/common/helpers/view-details/utils
 import {
   findSiteNoticeTask,
   getLocationIndex,
+  getSiteNoticeEvidence,
   loadMarineLicence,
   validateEvidenceParam
 } from '#src/server/common/helpers/marine-licence/site-notice.js'
@@ -34,7 +35,7 @@ const siteNoticeLocationNameOptions = {
 const getBackLink = (marineLicenceId) =>
   `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
 
-const captionContext = (request, marineLicence) => ({
+const siteNoticeLocationNameSettings = (request, marineLicence) => ({
   projectName: marineLicence.projectName,
   locationIndex: getLocationIndex(request)
 })
@@ -51,10 +52,21 @@ export const siteNoticeLocationNameController = {
         return h.redirect(getViewDetailsUrl(marineLicenceId))
       }
 
+      const siteNoticeEvidence = getSiteNoticeEvidence(
+        marineLicence,
+        request.query.evidence
+      )
+
+      let payload = {}
+      if (siteNoticeEvidence.locationName) {
+        payload = { locationName: siteNoticeEvidence.locationName }
+      }
+
       return h.view(SITE_NOTICE_LOCATION_NAME_VIEW_ROUTE, {
         ...locationNameSettings,
         backLink: getBackLink(marineLicenceId),
-        ...captionContext(request, marineLicence)
+        ...siteNoticeLocationNameSettings(request, marineLicence),
+        payload
       })
     } catch (error) {
       if (error.isBoom) {
@@ -88,7 +100,7 @@ export const siteNoticeLocationNameSubmitController = {
           errorMessages: locationNameErrorMessages,
           backLink: getBackLink(marineLicenceId),
           payload: request.payload,
-          params: captionContext(request, marineLicence)
+          params: siteNoticeLocationNameSettings(request, marineLicence)
         })(request, h, err)
       }
     }
@@ -131,7 +143,7 @@ export const siteNoticeLocationNameSubmitController = {
         ...locationNameSettings,
         payload,
         backLink: getBackLink(marineLicenceId),
-        ...captionContext(request, marineLicence),
+        ...siteNoticeLocationNameSettings(request, marineLicence),
         errors,
         errorSummary
       })

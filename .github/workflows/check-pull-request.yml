@@ -40,7 +40,14 @@ jobs:
           npm run test:ci
       - name: Security audit
         run: |
-          npm audit --audit-level=high || (echo 'Vulnerabilities found!' && exit 1)
+          # Temporary braces allowlist in .audit-ci.jsonc — revisit/remove by this date
+          EXPIRES_ON=2026-10-12
+          TODAY=$(date -u +%F)
+          if ! [[ "$TODAY" < "$EXPIRES_ON" ]]; then
+            echo "::error::Temporary npm audit allowlist for GHSA-vfj7-8cjw-p6xm expired on ${EXPIRES_ON}. Revisit braces or extend the date with team agreement."
+            exit 1
+          fi
+          npm run audit
 
       - name: Test Docker Image Build
         run: |

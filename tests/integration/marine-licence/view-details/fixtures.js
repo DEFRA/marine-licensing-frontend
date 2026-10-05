@@ -30,7 +30,7 @@ export const expectedApplicationDetailsCard = {
     },
     {
       key: 'Who the marine licence is for',
-      value: 'Exmouth Oysters Ltd'
+      value: mockTransferredMarineLicenceApplication.whoMarineLicenceIsFor
     },
     {
       key: 'Date submitted',

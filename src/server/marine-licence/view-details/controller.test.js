@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 import Boom from '@hapi/boom'
 import { JSDOM } from 'jsdom'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
+import { getCardRow } from '#tests/integration/marine-licence/view-details/utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { viewDetailsController, VIEW_DETAILS_VIEW_ROUTE } from './controller.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
@@ -33,17 +34,11 @@ const createSubmittedMarineLicence = (overrides = {}) => ({
   ...overrides
 })
 
-const getOverviewRow = (html, keyText) => {
-  const { document } = new JSDOM(html).window
-  const rows = document.querySelectorAll(
-    '#application-overview-card .govuk-summary-list__row'
+const getOverviewRow = (html, keyText) =>
+  getCardRow(
+    new JSDOM(html).window.document.querySelector('#application-overview-card'),
+    keyText
   )
-  return [...rows].find(
-    (row) =>
-      row.querySelector('.govuk-summary-list__key').textContent.trim() ===
-      keyText
-  )
-}
 
 describe('marine-licence view details controller', () => {
   const getServer = setupTestServer()

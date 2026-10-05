@@ -43,7 +43,7 @@ describe('Marine Licence View Details', () => {
 
     expect(
       row.querySelector('.govuk-summary-list__value').textContent.trim()
-    ).toBe('Exmouth Oysters Ltd')
+    ).toBe(mockSubmittedMarineLicenceApplication.whoMarineLicenceIsFor)
   })
 
   describe('site details', () => {

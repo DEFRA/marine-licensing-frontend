@@ -1,0 +1,8 @@
+{
+  "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  // Temporary allowlist: braces GHSA-vfj7-8cjw-p6xm — no patched release (>3.0.3).
+  // Transitive via stylelint → micromatch. Expiry enforced in check-pull-request.yml (2026-10-12).
+  // Remove this entry once braces ships a fix.
+  "high": true,
+  "allowlist": ["GHSA-vfj7-8cjw-p6xm"]
+}

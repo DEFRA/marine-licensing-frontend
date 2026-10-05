@@ -35,7 +35,7 @@
     "prestart": "npm run build",
     "start": "NODE_ENV=production node --use-strict .",
     "iat": "node scripts/iat-query.js",
-    "audit": "node scripts/npm-audit.js",
+    "audit": "audit-ci --config .audit-ci.jsonc",
     "knip": "knip"
   },
   "author": "Defra DDTS",
@@ -94,6 +94,7 @@
     "@vitest/ui": "^4.1.10",
     "allure-commandline": "^2.43.0",
     "allure-vitest": "^3.6.0",
+    "audit-ci": "7.1.0",
     "autoprefixer": "^10.6.1",
     "babel-loader": "^10.1.1",
     "cheerio": "^1.2.0",

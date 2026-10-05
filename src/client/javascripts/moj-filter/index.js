@@ -165,13 +165,11 @@ export class MojFilter {
       return
     }
 
-    $clearLink.addEventListener('click', (event) => {
+    $clearLink.addEventListener('click', async (event) => {
       event.preventDefault()
 
       this.resetForm()
-      this.onSubmit(event, { clear: true }).catch(() =>
-        window.location.assign(this.$form.action)
-      )
+      await this.onSubmit(event, { clear: true })
     })
   }
 

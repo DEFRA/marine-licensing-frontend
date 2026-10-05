@@ -11,7 +11,6 @@ sudo nginx -s stop 2>/dev/null || echo "Nginx was not running"
 # Kill any running npm processes
 echo "Stopping development server..."
 pkill -f "npm run dev" 2>/dev/null || echo "No npm processes found"
-pkill -f "nodemon" 2>/dev/null || echo "No nodemon processes found"
 pkill -f "tsx" 2>/dev/null || echo "No tsx processes found"
 
 # Kill any processes on port 3000

@@ -3,6 +3,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 const expectedRoutes = [
   ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY],
+  ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY],
   ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME],
   ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME],
   ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED],

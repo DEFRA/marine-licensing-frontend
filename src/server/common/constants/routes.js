@@ -266,5 +266,7 @@ export const apiRoutes = {
   COPY_MARINE_LICENCE: '/marine-licence/copy-marine-licence',
   REDACT_TEXT: '/marine-licence/redact-text',
   GET_USER_NAMES: '/projects/users',
-  UPDATE_SITE_NOTICE_EVIDENCE: '/marine-licence/update-site-notice-evidence'
+  UPDATE_SITE_NOTICE_EVIDENCE: '/marine-licence/update-site-notice-evidence',
+  RESOLVE_APPLICATION_TASK:
+    '/marine-licence/{marineLicenceId}/application-tasks/{taskId}/resolve'
 }

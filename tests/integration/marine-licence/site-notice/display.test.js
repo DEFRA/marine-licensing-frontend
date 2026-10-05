@@ -9,7 +9,7 @@ import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
-import { loadPage } from '~/tests/integration/shared/app-server.js'
+import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import {
   mockApplicationTaskContactId,
@@ -18,7 +18,11 @@ import {
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { PUBLIC_NOTICE_REQUEST_RELATES_TO } from '~/src/server/common/constants/site-notice.js'
-import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import {
+  authenticatedGetRequest,
+  authenticatedPostRequest
+} from '~/src/server/common/helpers/authenticated-requests.js'
+import { findSiteNoticeTask } from '~/src/server/common/helpers/marine-licence/site-notice.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
@@ -221,5 +225,123 @@ describe('Site notice display page (marine licence)', () => {
     })
 
     expect(getByText(document, 'Multiple sites')).toBeInTheDocument()
+  })
+
+  describe('Send evidence', () => {
+    const marineLicenceId = mockMarineLicenceWithApplicationTask.id
+    const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
+    const viewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+    const incompleteMarineLicence = {
+      ...mockMarineLicenceWithApplicationTask,
+      siteNoticeEvidence: [{ locationName: 'Harbour wall' }]
+    }
+
+    const mockLicence = (marineLicence) =>
+      vi.mocked(authenticatedGetRequest).mockResolvedValue({
+        payload: { message: 'success', value: marineLicence }
+      })
+
+    test('sends evidence when all evidence is complete', async () => {
+      const { taskId } = findSiteNoticeTask(
+        mockMarineLicenceWithApplicationTask
+      )
+
+      const document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(document.body).toHaveTextContent(
+        'Check that you have added evidence for every location where you displayed a site notice.'
+      )
+      expect(
+        getByRole(document, 'button', { name: 'Send evidence' })
+      ).toBeInTheDocument()
+
+      const { response } = await submitForm({
+        requestUrl: displayUrl,
+        server: getServer(),
+        formData: {}
+      })
+
+      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+        expect.anything(),
+        `/marine-licence/${marineLicenceId}/application-tasks/${taskId}/resolve`,
+        {}
+      )
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(viewDetailsUrl)
+    })
+
+    test('does not send evidence when evidence is incomplete', async () => {
+      mockLicence(incompleteMarineLicence)
+
+      const document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(
+        queryByRole(document, 'button', { name: 'Send evidence' })
+      ).not.toBeInTheDocument()
+
+      const { response } = await submitForm({
+        requestUrl: displayUrl,
+        server: getServer(),
+        formData: {}
+      })
+
+      expect(authenticatedPostRequest).not.toHaveBeenCalled()
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(displayUrl)
+    })
+
+    test('shows a read only page once evidence has been sent', async () => {
+      const siteNoticeTask = findSiteNoticeTask(
+        mockMarineLicenceWithApplicationTask
+      )
+      mockLicence({
+        ...mockMarineLicenceWithApplicationTask,
+        applicationTasks:
+          mockMarineLicenceWithApplicationTask.applicationTasks.map((task) =>
+            task === siteNoticeTask
+              ? {
+                  ...task,
+                  resolvedAt: '2026-10-05T10:00:00.000Z',
+                  resolvedByName: 'Sam Evans'
+                }
+              : task
+          )
+      })
+
+      const document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(
+        getByText(
+          document,
+          'Evidence was submitted 5 October 2026 by Sam Evans'
+        )
+      ).toBeInTheDocument()
+      expect(
+        queryByRole(document, 'button', { name: 'Send evidence' })
+      ).not.toBeInTheDocument()
+      expect(
+        queryByRole(document, 'link', {
+          name: 'Change location name (Location 1 evidence)'
+        })
+      ).not.toBeInTheDocument()
+
+      const { response } = await submitForm({
+        requestUrl: displayUrl,
+        server: getServer(),
+        formData: {}
+      })
+
+      expect(authenticatedPostRequest).not.toHaveBeenCalled()
+      expect(response.headers.location).toBe(displayUrl)
+    })
   })
 })

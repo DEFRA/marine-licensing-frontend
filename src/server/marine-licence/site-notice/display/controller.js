@@ -6,11 +6,18 @@ import {
   assertIsOriginalSubmitter
 } from '#src/server/common/helpers/view-details/utils.js'
 import { findSiteNoticeTask } from '#src/server/common/helpers/marine-licence/site-notice.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
+import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import {
   getDisplayConditions,
-  getSiteNoticeValues
+  getEvidenceSubmission,
+  getSiteNoticeValues,
+  isSiteNoticeEvidenceComplete
 } from '#src/server/marine-licence/site-notice/display/utils.js'
+import { siteNoticeDisplayUrl } from '#src/server/marine-licence/site-notice/utils.js'
 
 export const SITE_NOTICE_DISPLAY_VIEW_ROUTE =
   'marine-licence/site-notice/display/index'
@@ -50,12 +57,19 @@ export const siteNoticeDisplayController = {
 
       const siteNoticeEvidence = getSiteNoticeValues(marineLicence)
 
+      const evidenceSubmission = getEvidenceSubmission(task)
+
+      const siteNoticeEvidenceComplete =
+        isSiteNoticeEvidenceComplete(siteNoticeEvidence)
+
       return h.view(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         ...siteNoticeDisplaySettings,
         backLink: viewDetailsUrl,
         pageCaption: `${marineLicence.applicationReference} - ${marineLicence.projectName}`,
         evidenceLinks: getEvidenceLinks(marineLicenceId),
         siteNoticeEvidence,
+        evidenceSubmission,
+        canSendEvidence: !evidenceSubmission && !!siteNoticeEvidenceComplete,
         ...displayConditions
       })
     } catch (error) {
@@ -65,5 +79,41 @@ export const siteNoticeDisplayController = {
       request.logger.error(error, 'Error displaying site notice display page')
       throw Boom.internal('Error displaying site notice display page')
     }
+  }
+}
+
+export const siteNoticeDisplaySubmitController = {
+  options: validateMarineLicenceIdParams,
+  async handler(request, h) {
+    const { marineLicenceId } = request.params
+
+    const service = getMarineLicenceService(request)
+    const marineLicence = await service.getMarineLicenceById(marineLicenceId)
+
+    await assertIsOriginalSubmitter(request, marineLicence)
+
+    const task = findSiteNoticeTask(marineLicence)
+
+    if (!task) {
+      return h.redirect(getViewDetailsUrl(marineLicenceId))
+    }
+
+    if (
+      task.resolvedAt ||
+      !isSiteNoticeEvidenceComplete(getSiteNoticeValues(marineLicence))
+    ) {
+      return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
+    }
+
+    await authenticatedPostRequest(
+      request,
+      apiRoutes.RESOLVE_APPLICATION_TASK.replace(
+        '{marineLicenceId}',
+        marineLicenceId
+      ).replace('{taskId}', task.taskId),
+      {}
+    )
+
+    return h.redirect(getViewDetailsUrl(marineLicenceId))
   }
 }

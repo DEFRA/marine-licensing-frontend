@@ -29,6 +29,10 @@ export const findSiteNoticeTask = (marineLicence) =>
   )
 
 const hasInvalidEvidenceNumber = (evidenceNumber, evidenceItems) => {
+  if (!Number.isInteger(evidenceNumber) || evidenceNumber < 1) {
+    return true
+  }
+
   const editingExistingEvidence = evidenceNumber <= evidenceItems.length
   const addingNewEvidence = evidenceNumber === evidenceItems.length + 1
 
@@ -36,11 +40,18 @@ const hasInvalidEvidenceNumber = (evidenceNumber, evidenceItems) => {
 }
 
 export const validateEvidenceParam = {
-  method(request, h) {
-    const evidenceNumber = Number.parseInt(request.query.evidence, 10)
-    const evidenceItems = []
+  method: async (request, h) => {
+    const { marineLicence } = await loadMarineLicence(request)
+    request.marineLicence = marineLicence
 
-    if (hasInvalidEvidenceNumber(evidenceNumber, evidenceItems)) {
+    const evidenceNumber = Number.parseInt(request.query.evidence, 10)
+
+    if (
+      hasInvalidEvidenceNumber(
+        evidenceNumber,
+        marineLicence.siteNoticeEvidence ?? []
+      )
+    ) {
       return h
         .redirect(
           `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${request.params.marineLicenceId}`

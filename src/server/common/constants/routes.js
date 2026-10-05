@@ -159,6 +159,8 @@ export const marineLicenceRoutes = {
     '/marine-licence/site-notice/close-up-photo',
   MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO:
     '/marine-licence/site-notice/position-photo',
+  MARINE_LICENCE_SITE_NOTICE_PHOTO_UPLOAD_AND_WAIT:
+    '/marine-licence/site-notice/photo-upload-and-wait',
   MARINE_LICENCE_FEE_ESTIMATE: '/marine-licence/fee-estimate',
   MARINE_LICENCE_FEE_ESTIMATE_ARE_YOU_SURE:
     '/marine-licence/fee-estimate-are-you-sure',

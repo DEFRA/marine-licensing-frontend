@@ -4,8 +4,9 @@ import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
-import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
+import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
+import * as cdpUploadService from '~/src/services/cdp-upload-service/index.js'
 import {
   mockApplicationTaskContactId,
   mockMarineLicenceWithApplicationTask
@@ -14,6 +15,7 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
+vi.mock('~/src/services/cdp-upload-service/index.js')
 
 describe('Site notice close-up photo page', () => {
   const getServer = setupTestServer()
@@ -24,6 +26,13 @@ describe('Site notice close-up photo page', () => {
     mockMarineLicence(mockMarineLicenceWithApplicationTask)
     vi.mocked(getUserSession).mockResolvedValue({
       contactId: mockApplicationTaskContactId
+    })
+    vi.mocked(cdpUploadService.getCdpUploadService).mockReturnValue({
+      initiate: vi.fn().mockResolvedValue({
+        uploadId: 'test-upload-id',
+        statusUrl: 'test-status-url',
+        uploadUrl: 'https://cdp/upload'
+      })
     })
   })
 
@@ -41,24 +50,17 @@ describe('Site notice close-up photo page', () => {
     expect(getByText(document, 'Location 1')).toBeInTheDocument()
 
     expect(
-      getByRole(document, 'button', { name: 'Save and continue' })
+      getByText(document, /all the text on the notice can be read/)
+    ).toBeInTheDocument()
+
+    expect(
+      getByRole(document, 'button', { name: 'Continue' })
     ).toBeInTheDocument()
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       displayUrl
     )
-  })
-
-  test('save and continue redirects to site notice display', async () => {
-    const { response } = await submitForm({
-      requestUrl,
-      server: getServer(),
-      formData: {}
-    })
-
-    expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(displayUrl)
   })
 
   test('forbids anyone who did not submit the application', async () => {

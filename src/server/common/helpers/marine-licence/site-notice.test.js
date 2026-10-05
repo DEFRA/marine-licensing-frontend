@@ -63,7 +63,7 @@ describe('loadMarineLicence', () => {
 })
 
 describe('findSiteNoticeTask', () => {
-  it('finds the site notice task among other task types', () => {
+  test('finds the site notice task among other task types', () => {
     const task = buildTask({})
     expect(
       findSiteNoticeTask({
@@ -72,43 +72,69 @@ describe('findSiteNoticeTask', () => {
     ).toBe(task)
   })
 
-  it('returns undefined when there is no site notice task', () => {
+  test('returns undefined when there is no site notice task', () => {
     expect(findSiteNoticeTask({ applicationTasks: [] })).toBeUndefined()
     expect(findSiteNoticeTask({})).toBeUndefined()
   })
 })
 
 describe('validateEvidenceParam', () => {
-  const marineLicenceId = '507f1f77bcf86cd799439011'
+  const marineLicenceId = mockMarineLicenceWithApplicationTask.id
+  const getMarineLicenceById = vi.fn()
 
-  it('continues when the evidence number is valid', () => {
+  beforeEach(() => {
+    getMarineLicenceById.mockResolvedValue(mockMarineLicenceWithApplicationTask)
+    vi.mocked(getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById
+    })
+    vi.mocked(getUserSession).mockResolvedValue({
+      contactId: mockApplicationTaskContactId
+    })
+  })
+
+  const runHandler = async (
+    evidence,
+    marineLicence = mockMarineLicenceWithApplicationTask
+  ) => {
+    getMarineLicenceById.mockResolvedValue(marineLicence)
+    const request = createMockRequest({
+      params: { marineLicenceId },
+      query: evidence === undefined ? {} : { evidence }
+    })
     const h = createMockH()
-    const result = validateEvidenceParam.method(
-      createMockRequest({
-        params: { marineLicenceId },
-        query: { evidence: '1' }
-      }),
-      h
-    )
+    const result = await validateEvidenceParam.method(request, h)
+
+    return { request, h, result }
+  }
+
+  test('continues for an existing row and stores the licence on the request', async () => {
+    const { request, h, result } = await runHandler('1')
+
+    expect(result).toBe(h.continue)
+    expect(request.marineLicence).toBe(mockMarineLicenceWithApplicationTask)
+    expect(getMarineLicenceById).toHaveBeenCalledTimes(1)
+  })
+
+  test('continues for a second saved row', async () => {
+    const marineLicence = {
+      ...mockMarineLicenceWithApplicationTask,
+      siteNoticeEvidence: [{}, {}]
+    }
+    const { h, result } = await runHandler('2', marineLicence)
 
     expect(result).toBe(h.continue)
   })
 
-  it('redirects when the evidence number is invalid', () => {
-    const h = createMockH()
+  it.each(['0', '99', undefined])(
+    'redirects when the evidence number is %s',
+    async (evidence) => {
+      const { h } = await runHandler(evidence)
 
-    validateEvidenceParam.method(
-      createMockRequest({
-        params: { marineLicenceId },
-        query: { evidence: '99' }
-      }),
-      h
-    )
-
-    expect(h.redirect).toHaveBeenCalledWith(
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
-    )
-  })
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
+      )
+    }
+  )
 })
 
 describe('getSiteNoticeEvidence', () => {

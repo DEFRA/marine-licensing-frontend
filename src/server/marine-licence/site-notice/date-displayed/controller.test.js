@@ -33,10 +33,11 @@ vi.mock('#src/server/common/helpers/dates/london-today.js', () => ({
 }))
 
 describe('#siteNoticeDateDisplayed', () => {
-  const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`
+  const marineLicenceId = mockMarineLicenceWithApplicationTask.id
+  const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
   const loadedLicence = {
     marineLicence: mockMarineLicenceWithApplicationTask,
-    marineLicenceId: mockMarineLicenceWithApplicationTask.id
+    marineLicenceId
   }
 
   beforeEach(() => {
@@ -52,9 +53,8 @@ describe('#siteNoticeDateDisplayed', () => {
 
       await siteNoticeDateDisplayedController.handler(
         createMockRequest({
-          params: {
-            marineLicenceId: mockMarineLicenceWithApplicationTask.id
-          },
+          marineLicence: mockMarineLicenceWithApplicationTask,
+          params: { marineLicenceId },
           query: { evidence: '1' }
         }),
         h
@@ -78,18 +78,15 @@ describe('#siteNoticeDateDisplayed', () => {
     })
 
     test('redirects to view details when there is no site notice task', async () => {
-      vi.mocked(loadMarineLicence).mockResolvedValue({
-        ...loadedLicence,
-        marineLicence: {
-          ...mockMarineLicenceWithApplicationTask,
-          applicationTasks: []
-        }
-      })
       const h = createMockH()
 
       await siteNoticeDateDisplayedController.handler(
         createMockRequest({
-          params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id }
+          marineLicence: {
+            ...mockMarineLicenceWithApplicationTask,
+            applicationTasks: []
+          },
+          params: { marineLicenceId }
         }),
         h
       )
@@ -100,24 +97,22 @@ describe('#siteNoticeDateDisplayed', () => {
       expect(h.view).not.toHaveBeenCalled()
     })
 
-    test('Should handle API errors in catch block', async () => {
+    test('Should handle unexpected errors in catch block', async () => {
       const h = createMockH()
-
-      const mockError = new Error('API Error')
-
-      const mockRequest = createMockRequest({
-        params: {
-          marineLicenceId: mockMarineLicenceWithApplicationTask.id
-        }
+      h.view.mockImplementation(() => {
+        throw new Error('render failed')
       })
 
-      vi.mocked(loadMarineLicence).mockRejectedValue(mockError)
-
       await expect(
-        siteNoticeDateDisplayedController.handler(mockRequest, h)
+        siteNoticeDateDisplayedController.handler(
+          createMockRequest({
+            marineLicence: mockMarineLicenceWithApplicationTask,
+            params: { marineLicenceId },
+            query: { evidence: '1' }
+          }),
+          h
+        )
       ).rejects.toThrow('Error displaying site notice date displayed page')
-
-      expect(h.view).not.toHaveBeenCalled()
     })
   })
 
@@ -135,9 +130,8 @@ describe('#siteNoticeDateDisplayed', () => {
     test('saves the date displayed and redirects to site notice display', async () => {
       const h = createMockH()
       const request = createMockRequest({
-        params: {
-          marineLicenceId: mockMarineLicenceWithApplicationTask.id
-        },
+        marineLicence: mockMarineLicenceWithApplicationTask,
+        params: { marineLicenceId },
         query: { evidence: '1' },
         payload: validPayload
       })
@@ -157,18 +151,15 @@ describe('#siteNoticeDateDisplayed', () => {
     })
 
     test('redirects to view details without saving when there is no site notice task', async () => {
-      vi.mocked(loadMarineLicence).mockResolvedValue({
-        ...loadedLicence,
-        marineLicence: {
-          ...mockMarineLicenceWithApplicationTask,
-          applicationTasks: []
-        }
-      })
       const h = createMockH()
 
       await siteNoticeDateDisplayedSubmitController.handler(
         createMockRequest({
-          params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id },
+          marineLicence: {
+            ...mockMarineLicenceWithApplicationTask,
+            applicationTasks: []
+          },
+          params: { marineLicenceId },
           query: { evidence: '1' },
           payload: validPayload
         }),
@@ -184,7 +175,7 @@ describe('#siteNoticeDateDisplayed', () => {
     test('failAction renders validation errors', async () => {
       const h = createMockH()
       const request = createMockRequest({
-        params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id },
+        params: { marineLicenceId },
         query: { evidence: '1' },
         payload: {
           'date-displayed-day': '',
@@ -256,7 +247,8 @@ describe('#siteNoticeDateDisplayed', () => {
 
       await siteNoticeDateDisplayedSubmitController.handler(
         createMockRequest({
-          params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id },
+          marineLicence: mockMarineLicenceWithApplicationTask,
+          params: { marineLicenceId },
           query: { evidence: '2' },
           payload: validPayload
         }),
@@ -277,7 +269,8 @@ describe('#siteNoticeDateDisplayed', () => {
     test('renders invalid date error when day/month/year combination is invalid', async () => {
       const h = createMockH()
       const request = createMockRequest({
-        params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id },
+        marineLicence: mockMarineLicenceWithApplicationTask,
+        params: { marineLicenceId },
         query: { evidence: '1' },
         payload: {
           'date-displayed-day': '32',
@@ -311,7 +304,8 @@ describe('#siteNoticeDateDisplayed', () => {
       )
       const h = createMockH()
       const request = createMockRequest({
-        params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id },
+        marineLicence: mockMarineLicenceWithApplicationTask,
+        params: { marineLicenceId },
         query: { evidence: '1' },
         payload: {
           'date-displayed-day': '15',

@@ -1,15 +1,17 @@
-import Boom from '@hapi/boom'
-import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { validateMarineLicenceIdParams } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
-import {
-  getViewDetailsUrl,
-  assertIsOriginalSubmitter
-} from '#src/server/common/helpers/view-details/utils.js'
+import { getViewDetailsUrl } from '#src/server/common/helpers/view-details/utils.js'
 import {
   findSiteNoticeTask,
   getLocationIndex,
   validateEvidenceParam
 } from '#src/server/common/helpers/marine-licence/site-notice.js'
+import {
+  getPhotoUploadErrorDisplay,
+  initiatePhotoUpload,
+  PHOTO_ACCEPT_ATTRIBUTE,
+  siteNoticeDisplayUrl,
+  siteNoticeEvidenceUrl
+} from '#src/server/marine-licence/site-notice/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE =
@@ -20,51 +22,46 @@ const siteNoticeCloseUpPhotoSettings = {
   heading: 'Close-up photo upload'
 }
 
-const siteNoticeDisplayUrl = (marineLicenceId) =>
-  `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
-
-const siteNoticeCloseUpPhotoOptions = {
-  ...validateMarineLicenceIdParams,
-  pre: [validateEvidenceParam]
-}
-
 export const siteNoticeCloseUpPhotoController = {
-  options: siteNoticeCloseUpPhotoOptions,
+  options: {
+    ...validateMarineLicenceIdParams,
+    pre: [validateEvidenceParam]
+  },
   async handler(request, h) {
     const { marineLicenceId } = request.params
+    const marineLicence = request.marineLicence
+
+    if (!findSiteNoticeTask(marineLicence)) {
+      return h.redirect(getViewDetailsUrl(marineLicenceId))
+    }
+
+    const { errorSummary, errors } = getPhotoUploadErrorDisplay(request)
 
     try {
-      const service = getMarineLicenceService(request)
-      const marineLicence = await service.getMarineLicenceById(marineLicenceId)
-
-      await assertIsOriginalSubmitter(request, marineLicence)
-
-      if (!findSiteNoticeTask(marineLicence)) {
-        return h.redirect(getViewDetailsUrl(marineLicenceId))
-      }
+      const uploadConfig = await initiatePhotoUpload(request, h, {
+        field: 'closeUpPhoto',
+        uploadPageUrl: siteNoticeEvidenceUrl(
+          marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO,
+          request
+        )
+      })
 
       return h.view(SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE, {
         ...siteNoticeCloseUpPhotoSettings,
-        backLink: siteNoticeDisplayUrl(marineLicenceId),
         projectName: marineLicence.projectName,
-        locationIndex: getLocationIndex(request)
+        locationIndex: getLocationIndex(request),
+        uploadUrl: uploadConfig.uploadUrl,
+        acceptAttribute: PHOTO_ACCEPT_ATTRIBUTE,
+        backLink: siteNoticeDisplayUrl(marineLicenceId),
+        errorSummary,
+        errors
       })
     } catch (error) {
-      if (error.isBoom) {
-        throw error
-      }
       request.logger.error(
-        error,
-        'Error displaying site notice close-up photo page'
+        { err: error },
+        'Failed to initialise site notice close-up photo upload'
       )
-      throw Boom.internal('Error displaying site notice close-up photo page')
+      return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
     }
-  }
-}
-
-export const siteNoticeCloseUpPhotoSubmitController = {
-  options: siteNoticeCloseUpPhotoOptions,
-  handler(request, h) {
-    return h.redirect(siteNoticeDisplayUrl(request.params.marineLicenceId))
   }
 }

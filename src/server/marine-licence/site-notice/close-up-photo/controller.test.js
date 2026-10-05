@@ -1,123 +1,89 @@
 import {
   siteNoticeCloseUpPhotoController,
-  siteNoticeCloseUpPhotoSubmitController,
   SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE
 } from '#src/server/marine-licence/site-notice/close-up-photo/controller.js'
-import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import {
-  mockMarineLicenceWithApplicationTask,
-  mockApplicationTaskContactId
-} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import * as photoUpload from '#src/server/marine-licence/site-notice/utils.js'
+import { mockMarineLicenceWithApplicationTask } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   createMockH,
   createMockRequest
 } from '#src/server/test-helpers/mocks/helpers.js'
-import * as authUtils from '#src/server/common/plugins/auth/utils.js'
 
-vi.mock('#src/services/marine-licence-service/index.js')
-vi.mock('#src/server/common/plugins/auth/utils.js')
+const marineLicenceId = mockMarineLicenceWithApplicationTask.id
+const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
 
-describe('#siteNoticeCloseUpPhoto', () => {
-  const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`
-
+describe('#siteNoticeCloseUpPhotoController', () => {
   beforeEach(() => {
-    vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
-      contactId: mockApplicationTaskContactId
+    vi.spyOn(photoUpload, 'getPhotoUploadErrorDisplay').mockReturnValue({})
+    vi.spyOn(photoUpload, 'initiatePhotoUpload').mockResolvedValue({
+      uploadUrl: 'https://cdp/upload'
     })
   })
 
-  describe('#siteNoticeCloseUpPhotoController', () => {
-    test('handler should render with correct context', async () => {
-      const mockService = {
-        getMarineLicenceById: vi
-          .fn()
-          .mockResolvedValue(mockMarineLicenceWithApplicationTask)
-      }
-      vi.mocked(getMarineLicenceService).mockReturnValue(mockService)
-      const h = createMockH()
-
-      await siteNoticeCloseUpPhotoController.handler(
-        createMockRequest({
-          params: {
-            marineLicenceId: mockMarineLicenceWithApplicationTask.id
-          },
-          query: { evidence: '1' }
-        }),
-        h
-      )
-
-      expect(h.view).toHaveBeenCalledWith(
-        SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE,
-        {
-          backLink: displayUrl,
-          pageTitle: 'Close-up photo upload',
-          heading: 'Close-up photo upload',
-          projectName: 'Test Project',
-          locationIndex: 1
-        }
-      )
+  test('starts a close-up photo upload and renders the page', async () => {
+    const request = createMockRequest({
+      marineLicence: mockMarineLicenceWithApplicationTask,
+      params: { marineLicenceId },
+      query: { evidence: '1' }
     })
+    const h = createMockH()
 
-    test('redirects to view details when there is no site notice task', async () => {
-      vi.mocked(getMarineLicenceService).mockReturnValue({
-        getMarineLicenceById: vi.fn().mockResolvedValue({
+    await siteNoticeCloseUpPhotoController.handler(request, h)
+
+    expect(photoUpload.initiatePhotoUpload).toHaveBeenCalledWith(request, h, {
+      field: 'closeUpPhoto',
+      uploadPageUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${marineLicenceId}?evidence=1`
+    })
+    expect(h.view).toHaveBeenCalledWith(
+      SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE,
+      expect.objectContaining({
+        heading: 'Close-up photo upload',
+        projectName: 'Test Project',
+        locationIndex: 1,
+        uploadUrl: 'https://cdp/upload',
+        acceptAttribute: photoUpload.PHOTO_ACCEPT_ATTRIBUTE,
+        backLink: displayUrl
+      })
+    )
+  })
+
+  test('redirects to view details when there is no site notice task', async () => {
+    const h = createMockH()
+
+    await siteNoticeCloseUpPhotoController.handler(
+      createMockRequest({
+        marineLicence: {
           ...mockMarineLicenceWithApplicationTask,
           applicationTasks: []
-        })
-      })
-      const h = createMockH()
+        },
+        params: { marineLicenceId },
+        query: { evidence: '1' }
+      }),
+      h
+    )
 
-      await siteNoticeCloseUpPhotoController.handler(
-        createMockRequest({
-          params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id }
-        }),
-        h
-      )
-
-      expect(h.redirect).toHaveBeenCalledWith(
-        `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`
-      )
-      expect(h.view).not.toHaveBeenCalled()
-    })
-
-    test('Should handle API errors in catch block', async () => {
-      const h = createMockH()
-
-      const mockError = new Error('API Error')
-
-      const mockRequest = createMockRequest({
-        params: {
-          marineLicenceId: mockMarineLicenceWithApplicationTask.id
-        }
-      })
-
-      getMarineLicenceService.mockReturnValue({
-        getMarineLicenceById: vi.fn().mockRejectedValue(mockError)
-      })
-
-      await expect(
-        siteNoticeCloseUpPhotoController.handler(mockRequest, h)
-      ).rejects.toThrow('Error displaying site notice close-up photo page')
-
-      expect(h.view).not.toHaveBeenCalled()
-    })
+    expect(photoUpload.initiatePhotoUpload).not.toHaveBeenCalled()
+    expect(h.redirect).toHaveBeenCalledWith(
+      `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+    )
   })
 
-  describe('#siteNoticeCloseUpPhotoSubmitController', () => {
-    test('redirects to site notice display', () => {
-      const h = createMockH()
+  test('redirects to the site notice page when the upload cannot be started', async () => {
+    vi.mocked(photoUpload.initiatePhotoUpload).mockRejectedValue(
+      new Error('CDP down')
+    )
+    const h = createMockH()
 
-      siteNoticeCloseUpPhotoSubmitController.handler(
-        createMockRequest({
-          params: {
-            marineLicenceId: mockMarineLicenceWithApplicationTask.id
-          }
-        }),
-        h
-      )
+    await siteNoticeCloseUpPhotoController.handler(
+      createMockRequest({
+        marineLicence: mockMarineLicenceWithApplicationTask,
+        params: { marineLicenceId },
+        query: { evidence: '1' }
+      }),
+      h
+    )
 
-      expect(h.redirect).toHaveBeenCalledWith(displayUrl)
-    })
+    expect(h.redirect).toHaveBeenCalledWith(displayUrl)
   })
 })

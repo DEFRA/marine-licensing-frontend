@@ -3,11 +3,13 @@ import { siteNoticeLocationNameRoutes } from '#src/server/marine-licence/site-no
 import { siteNoticeDateDisplayedRoutes } from '#src/server/marine-licence/site-notice/date-displayed/index.js'
 import { siteNoticeCloseUpPhotoRoutes } from '#src/server/marine-licence/site-notice/close-up-photo/index.js'
 import { siteNoticePositionPhotoRoutes } from '#src/server/marine-licence/site-notice/position-photo/index.js'
+import { siteNoticePhotoUploadAndWaitRoutes } from '#src/server/marine-licence/site-notice/photo-upload-and-wait/index.js'
 
 export const siteNoticeRoutes = [
   ...siteNoticeDisplayRoutes,
   ...siteNoticeLocationNameRoutes,
   ...siteNoticeDateDisplayedRoutes,
   ...siteNoticeCloseUpPhotoRoutes,
-  ...siteNoticePositionPhotoRoutes
+  ...siteNoticePositionPhotoRoutes,
+  ...siteNoticePhotoUploadAndWaitRoutes
 ]

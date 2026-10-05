@@ -46,7 +46,7 @@ export const siteNoticeLocationNameController = {
     const { marineLicenceId } = request.params
 
     try {
-      const { marineLicence } = await loadMarineLicence(request)
+      const marineLicence = request.marineLicence
 
       if (!findSiteNoticeTask(marineLicence)) {
         return h.redirect(getViewDetailsUrl(marineLicenceId))
@@ -107,7 +107,8 @@ export const siteNoticeLocationNameSubmitController = {
   },
   async handler(request, h) {
     const { payload } = request
-    const { marineLicence, marineLicenceId } = await loadMarineLicence(request)
+    const { marineLicenceId } = request.params
+    const marineLicence = request.marineLicence
 
     if (!findSiteNoticeTask(marineLicence)) {
       return h.redirect(getViewDetailsUrl(marineLicenceId))

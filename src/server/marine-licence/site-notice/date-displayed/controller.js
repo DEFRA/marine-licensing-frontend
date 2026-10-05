@@ -46,7 +46,7 @@ export const siteNoticeDateDisplayedController = {
     const { marineLicenceId } = request.params
 
     try {
-      const { marineLicence } = await loadMarineLicence(request)
+      const marineLicence = request.marineLicence
 
       if (!findSiteNoticeTask(marineLicence)) {
         return h.redirect(getViewDetailsUrl(marineLicenceId))
@@ -114,7 +114,7 @@ export const siteNoticeDateDisplayedSubmitController = {
   },
   async handler(request, h) {
     const { marineLicenceId } = request.params
-    const { marineLicence } = await loadMarineLicence(request)
+    const marineLicence = request.marineLicence
 
     if (!findSiteNoticeTask(marineLicence)) {
       return h.redirect(getViewDetailsUrl(marineLicenceId))

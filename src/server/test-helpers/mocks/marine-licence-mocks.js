@@ -187,7 +187,8 @@ export const mockSubmittedMarineLicenceApplication = {
   ...mockMarineLicenceApplication,
   status: 'Submitted',
   applicationReference: 'MLA/2026/10264',
-  submittedAt: '2026-05-26T10:00:00Z'
+  submittedAt: '2026-05-26T10:00:00Z',
+  whoMarineLicenceIsFor: 'Exmouth Oysters Ltd'
 }
 
 export const mockApplicationTaskContactId = 'contact-with-outstanding-task'

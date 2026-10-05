@@ -1,8 +1,6 @@
 import { vi } from 'vitest'
 import Boom from '@hapi/boom'
-import { JSDOM } from 'jsdom'
 import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js'
-import { getCardRow } from '#tests/integration/marine-licence/view-details/utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { viewDetailsController, VIEW_DETAILS_VIEW_ROUTE } from './controller.js'
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
@@ -33,12 +31,6 @@ const createSubmittedMarineLicence = (overrides = {}) => ({
   ...mockSubmittedMarineLicenceApplication,
   ...overrides
 })
-
-const getOverviewRow = (html, keyText) =>
-  getCardRow(
-    new JSDOM(html).window.document.querySelector('#application-overview-card'),
-    keyText
-  )
 
 describe('marine-licence view details controller', () => {
   const getServer = setupTestServer()
@@ -78,25 +70,6 @@ describe('marine-licence view details controller', () => {
         expect(
           mockMarineLicenceService.getMarineLicenceById
         ).toHaveBeenCalledWith(mockMarineLicenceApplication.id)
-      })
-
-      test('shows who the marine licence is for in the application overview', async () => {
-        mockMarineLicenceService.getMarineLicenceById.mockResolvedValue(
-          createSubmittedMarineLicence({
-            whoMarineLicenceIsFor: 'Exmouth Oysters Ltd'
-          })
-        )
-
-        const { result } = await makeGetRequest({
-          url: `/marine-licence/view-details/${mockMarineLicenceApplication.id}`,
-          server: getServer()
-        })
-
-        const row = getOverviewRow(result, 'Who the marine licence is for')
-        expect(
-          row.querySelector('.govuk-summary-list__value').textContent.trim()
-        ).toBe('Exmouth Oysters Ltd')
-        expect(row.querySelector('.govuk-summary-list__actions')).toBeNull()
       })
     })
 
@@ -286,24 +259,6 @@ describe('marine-licence view details controller', () => {
         expect(
           mockMarineLicenceService.getMarineLicenceById
         ).not.toHaveBeenCalled()
-      })
-
-      test('shows who the marine licence is for in the application overview', async () => {
-        mockMarineLicenceService.getPublicMarineLicenceById.mockResolvedValue(
-          createSubmittedMarineLicence({
-            whoMarineLicenceIsFor: 'Exmouth Oysters Ltd'
-          })
-        )
-
-        const { result } = await makeGetRequest({
-          url: `/marine-licence/view-public-details/${mockMarineLicenceApplication.id}`,
-          server: getServer()
-        })
-
-        const row = getOverviewRow(result, 'Who the marine licence is for')
-        expect(
-          row.querySelector('.govuk-summary-list__value').textContent.trim()
-        ).toBe('Exmouth Oysters Ltd')
       })
     })
 

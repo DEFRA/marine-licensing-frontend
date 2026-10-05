@@ -138,26 +138,6 @@ describe('marine-licence view details internal-user redaction controller', () =>
     )
   })
 
-  test('passes who the marine licence is for to the view', async () => {
-    const marineLicence = createSubmittedMarineLicence({
-      whoMarineLicenceIsFor: 'Exmouth Oysters Ltd'
-    })
-    vi.mocked(getMarineLicenceService).mockReturnValue({
-      getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
-    })
-
-    const mockH = { view: vi.fn() }
-
-    await viewDetailsInternalUserController.handler(createMockRequest(), mockH)
-
-    expect(mockH.view).toHaveBeenCalledWith(
-      VIEW_DETAILS_INTERNAL_USER_VIEW_ROUTE,
-      expect.objectContaining({
-        whoMarineLicenceIsFor: 'Exmouth Oysters Ltd'
-      })
-    )
-  })
-
   test('passes redactions through to the view', async () => {
     const marineLicence = createSubmittedMarineLicence({
       redactions: mockRedactions

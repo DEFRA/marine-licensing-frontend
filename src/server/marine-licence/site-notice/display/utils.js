@@ -1,4 +1,5 @@
 import { PUBLIC_NOTICE_REQUEST_RELATES_TO } from '#src/server/common/constants/site-notice.js'
+import dayjs from 'dayjs'
 
 export const getDisplayConditions = (marineLicence, taskData = {}) => {
   const { requestRelatesTo } = taskData
@@ -18,4 +19,24 @@ export const getDisplayConditions = (marineLicence, taskData = {}) => {
     showMarineUserSection,
     showMultipleSitesSection
   }
+}
+
+const formatDate = (date) => {
+  if (!date) {
+    return null
+  }
+
+  const { day, month, year } = date
+  return dayjs(`${year}-${month}-${day}`).format('D MMMM YYYY')
+}
+
+export const getSiteNoticeValues = (marineLicence) => {
+  const siteNoticeEvidence = marineLicence.siteNoticeEvidence ?? []
+
+  return siteNoticeEvidence.map((evidence) => ({
+    locationName: evidence.locationName,
+    dateDisplayed: formatDate(evidence.dateDisplayed),
+    closeUpPhoto: evidence.closeUpPhoto.uploadedFile.filename,
+    positionPhoto: evidence.positionPhoto.uploadedFile.filename
+  }))
 }

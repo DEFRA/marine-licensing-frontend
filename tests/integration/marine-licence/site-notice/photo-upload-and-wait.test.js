@@ -172,4 +172,14 @@ describe('Site notice photo upload and wait page', () => {
     expect(statusCode).toBe(statusCodes.redirect)
     expect(headers.location).toBe(displayUrl)
   })
+
+  test('should return to the upload page when the status is "error"', async () => {
+    const { response } = await checkStatus({
+      status: 'error',
+      message: 'Something went wrong'
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(closeUpPhotoUrl)
+  })
 })

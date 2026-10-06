@@ -68,4 +68,21 @@ describe('#siteNoticePositionPhotoController', () => {
       `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
     )
   })
+  test('redirects to the site notice page when the upload cannot be started', async () => {
+    vi.mocked(photoUpload.initiatePhotoUpload).mockRejectedValue(
+      new Error('CDP down')
+    )
+    const h = createMockH()
+
+    await siteNoticePositionPhotoController.handler(
+      createMockRequest({
+        marineLicence: mockMarineLicenceWithApplicationTask,
+        params: { marineLicenceId },
+        query: { evidence: '1' }
+      }),
+      h
+    )
+
+    expect(h.redirect).toHaveBeenCalledWith(displayUrl)
+  })
 })

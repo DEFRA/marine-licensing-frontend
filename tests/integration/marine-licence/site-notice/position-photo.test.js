@@ -84,4 +84,17 @@ describe('Site notice position photo page', () => {
 
     expect(statusCode).toBe(statusCodes.redirect)
   })
+
+  test('redirects to the site notice page when the upload cannot be started', async () => {
+    vi.mocked(cdpUploadService.getCdpUploadService).mockReturnValue({
+      initiate: vi.fn().mockRejectedValue(new Error('CDP down'))
+    })
+
+    const { statusCode } = await makeGetRequest({
+      url: requestUrl,
+      server: getServer()
+    })
+
+    expect(statusCode).toBe(statusCodes.redirect)
+  })
 })

@@ -135,6 +135,18 @@ describe('validateEvidenceParam', () => {
       )
     }
   )
+
+  test('redirects when the licence has no siteNoticeEvidence property', async () => {
+    const licenceWithoutEvidence = {
+      ...mockMarineLicenceWithApplicationTask,
+      siteNoticeEvidence: undefined
+    }
+    const { h } = await runHandler('2', licenceWithoutEvidence)
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
+    )
+  })
 })
 
 describe('getSiteNoticeEvidence', () => {

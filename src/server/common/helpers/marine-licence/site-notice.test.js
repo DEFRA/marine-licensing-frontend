@@ -125,7 +125,7 @@ describe('validateEvidenceParam', () => {
     expect(result).toBe(h.continue)
   })
 
-  it.each(['0', '99', undefined])(
+  test.each(['0', '99', undefined])(
     'redirects when the evidence number is %s',
     async (evidence) => {
       const { h } = await runHandler(evidence)

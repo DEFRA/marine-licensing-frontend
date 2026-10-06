@@ -60,7 +60,8 @@ export const viewDetailsInternalUserController = {
         formattedMarineLicence.waterFrameworkDirective
       )
 
-      const marinePlanPolicies = buildMarinePlanPoliciesData(marineLicence)
+      const marinePlanPolicySections =
+        buildMarinePlanPoliciesData(marineLicence)
 
       const applicationDetailsCardData =
         buildApplicationDetailsCardData(marineLicence)
@@ -93,7 +94,7 @@ export const viewDetailsInternalUserController = {
         ),
         csrfToken: request.plugins.crumb,
         waterFrameworkDirectiveData,
-        marinePlanPolicies,
+        marinePlanPolicySections,
         ...applicationDetailsCardData
       })
     } catch (error) {

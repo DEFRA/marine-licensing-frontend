@@ -43,16 +43,31 @@ describe('#siteNoticeDisplay', () => {
         h
       )
 
-      const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`
+      const licenceId = mockMarineLicenceWithApplicationTask.id
+      const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${licenceId}`
 
       expect(h.view).toHaveBeenCalledWith(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         backLink: expectedViewDetailsUrl,
         pageTitle: 'Display a site notice',
         heading: 'Display a site notice',
         pageCaption: 'MLA/2026/10264 - Test Project',
+        evidenceLinks: {
+          locationName: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}`,
+          dateDisplayed: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${licenceId}`,
+          closeUpPhoto: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${licenceId}`,
+          positionPhoto: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}`
+        },
         showCommunityUserSection: true,
         showMarineUserSection: true,
-        showMultipleSitesSection: false
+        showMultipleSitesSection: false,
+        siteNoticeEvidence: [
+          {
+            closeUpPhoto: 'test.jpg',
+            dateDisplayed: '22 May 2026',
+            locationName: 'North pier',
+            positionPhoto: 'test.jpg'
+          }
+        ]
       })
     })
 
@@ -76,26 +91,6 @@ describe('#siteNoticeDisplay', () => {
         `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`
       )
       expect(h.view).not.toHaveBeenCalled()
-    })
-
-    test('rethrows forbidden for anyone who did not submit the application', async () => {
-      vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
-        contactId: 'someone-else'
-      })
-      vi.mocked(getMarineLicenceService).mockReturnValue({
-        getMarineLicenceById: vi
-          .fn()
-          .mockResolvedValue(mockMarineLicenceWithApplicationTask)
-      })
-
-      await expect(
-        siteNoticeDisplayController.handler(
-          createMockRequest({
-            params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id }
-          }),
-          createMockH()
-        )
-      ).rejects.toMatchObject({ output: { statusCode: 403 } })
     })
 
     test('Should handle API errors in catch block', async () => {

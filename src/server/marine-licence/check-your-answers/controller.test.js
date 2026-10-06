@@ -161,7 +161,7 @@ describe('#checkYourAnswersController', () => {
       invoicingData: expectedInvoicingData,
       invoicingChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
-      marinePlanPolicies: mockPolicies,
+      marinePlanPolicySections: mockPolicies,
       amount: FEE_ESTIMATE_AMOUNT,
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })
@@ -197,7 +197,7 @@ describe('#checkYourAnswersController', () => {
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-      marinePlanPolicies: [],
+      marinePlanPolicySections: [],
       amount: FEE_ESTIMATE_AMOUNT,
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })

@@ -6,7 +6,8 @@ export default defineConfig({
   test: {
     ...baseConfig.test,
     include: [
-      'src/**/*.test.js',
+      'src/server/marine-licence/**/*.test.js',
+      'src/server/common/helpers/marine-licence/**/*.test.js',
       'tests/integration/marine-licence/**/*.test.js',
       'tests/integration/accessibility/marine-licence-page-accessibility.test.js'
     ],
@@ -14,7 +15,6 @@ export default defineConfig({
       '**/node_modules/**',
       '**/tests/integration/utils/**',
       '**/src/server/exemption/**',
-      '**/src/server/common/helpers/exemptions/**',
       '**/src/services/exemption-service/**',
       '**/src/server/defraid-guidance/**',
       '**/src/server/defraid-post-login/**',

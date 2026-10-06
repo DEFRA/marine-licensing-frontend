@@ -7,7 +7,8 @@ import {
 } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
-const CYA_RETURN_LINK = `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#marine-plan-policies-card`
+const cyaReturnLink = (slug) =>
+  `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#marine-plan-policies-card-${slug}`
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/services/marine-licence-service/index.js')
@@ -15,7 +16,12 @@ vi.mock('#src/services/marine-licence-service/index.js')
 const licenceData = {
   projectName: 'Test Project',
   marinePlanPolicies: [
-    { policyCode: 'SW-MPA-1', policy: 'MPA wording' },
+    {
+      policyCode: 'SW-MPA-1',
+      title: 'South West Marine protected areas 1',
+      category: 'Environmental',
+      policy: 'MPA wording'
+    },
     { policyCode: 'SW-BIO-1', policy: 'Biodiversity wording' }
   ],
   marinePlanPolicyResponses: { 'SW-BIO-1': 'My saved answer' }
@@ -29,7 +35,7 @@ describe('#marinePlanPolicyController (GET)', () => {
     })
   })
 
-  test('renders the policy with code heading, wording and find-out-more link', async () => {
+  test('renders the policy with "title (code)" heading, wording and find-out-more link', async () => {
     const h = { view: vi.fn() }
     await marinePlanPolicyController.handler(
       { params: { policyCode: 'SW-MPA-1' } },
@@ -37,8 +43,8 @@ describe('#marinePlanPolicyController (GET)', () => {
     )
 
     expect(h.view).toHaveBeenCalledWith(MARINE_PLAN_POLICY_VIEW_ROUTE, {
-      pageTitle: 'SW-MPA-1',
-      heading: 'SW-MPA-1',
+      pageTitle: 'South West Marine protected areas 1 (SW-MPA-1)',
+      heading: 'South West Marine protected areas 1 (SW-MPA-1)',
       projectName: 'Test Project',
       policyText: 'MPA wording',
       findOutMoreUrl:
@@ -109,7 +115,7 @@ describe('#marinePlanPolicyController (GET)', () => {
     expect(h.view).not.toHaveBeenCalled()
   })
 
-  test('back link targets check your answers when returnTo is set', async () => {
+  test("back link targets the policy's section card on check your answers when returnTo is set", async () => {
     const h = { view: vi.fn() }
     await marinePlanPolicyController.handler(
       {
@@ -127,7 +133,7 @@ describe('#marinePlanPolicyController (GET)', () => {
 
     expect(h.view).toHaveBeenCalledWith(
       MARINE_PLAN_POLICY_VIEW_ROUTE,
-      expect.objectContaining({ backLink: CYA_RETURN_LINK })
+      expect.objectContaining({ backLink: cyaReturnLink('environmental') })
     )
   })
 })
@@ -214,7 +220,7 @@ describe('#marinePlanPolicySubmitController (POST)', () => {
       h
     )
 
-    expect(h.redirect).toHaveBeenCalledWith(CYA_RETURN_LINK)
+    expect(h.redirect).toHaveBeenCalledWith(cyaReturnLink('other'))
   })
 
   test('failAction re-renders the page with the error and submitted value', async () => {
@@ -283,7 +289,7 @@ describe('#marinePlanPolicySubmitController (POST)', () => {
 
     expect(h.view).toHaveBeenCalledWith(
       MARINE_PLAN_POLICY_VIEW_ROUTE,
-      expect.objectContaining({ backLink: CYA_RETURN_LINK })
+      expect.objectContaining({ backLink: cyaReturnLink('other') })
     )
     expect(h.view().takeover).toHaveBeenCalled()
   })

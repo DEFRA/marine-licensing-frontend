@@ -18,7 +18,7 @@
   {% if isEmployee %}<div class="moj-scrollable-pane">{% endif %}
   
   {% if isEmployee %}
-    <h3 class="govuk-heading-s">{{projects.length}} results found in {{ subTitle }}</h3>
+    <h3 class="govuk-heading-s">{{projects.length}} result{% if projects.length != 1 %}s{% endif %} found in {{ subTitle }}</h3>
   {% endif %}
 
   <table class="govuk-table{% if not showTable %} govuk-!-display-none{% endif %}" data-module="moj-sortable-table" id="ex-projects-table">

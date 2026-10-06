@@ -12,6 +12,12 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
+import {
+  getPolicySection,
+  getPolicySectionCardId,
+  getPolicySectionSlug
+} from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
+import { formatPolicyTitle } from '#src/server/common/helpers/marine-licence/marine-plan-policy-title.js'
 
 export const MARINE_PLAN_POLICY_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/marine-plan-policy/index'
@@ -27,11 +33,10 @@ export const errorMessages = {
     'Policy consideration must be 2000 characters or less'
 }
 
-const CHECK_YOUR_ANSWERS_RETURN_LINK = `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#marine-plan-policies-card`
-
-const getPolicyReturnLink = (returnTo) => {
+const getPolicyReturnLink = (returnTo, policy) => {
   if (returnTo) {
-    return CHECK_YOUR_ANSWERS_RETURN_LINK
+    const slug = getPolicySectionSlug(getPolicySection(policy))
+    return `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#${getPolicySectionCardId(slug)}`
   }
   return marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
 }
@@ -72,17 +77,20 @@ const buildRenderModel = ({
   policy,
   payload,
   returnTo
-}) => ({
-  pageTitle: policyCode,
-  heading: policyCode,
-  projectName,
-  policyText: policy.policy,
-  findOutMoreUrl: `${FIND_OUT_MORE_BASE}${encodeURIComponent(policyCode)}`,
-  backLink: getPolicyReturnLink(returnTo),
-  marinePlanPolicyGuidanceLink:
-    marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
-  payload
-})
+}) => {
+  const title = formatPolicyTitle(policy)
+  return {
+    pageTitle: title,
+    heading: title,
+    projectName,
+    policyText: policy.policy,
+    findOutMoreUrl: `${FIND_OUT_MORE_BASE}${encodeURIComponent(policyCode)}`,
+    backLink: getPolicyReturnLink(returnTo, policy),
+    marinePlanPolicyGuidanceLink:
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
+    payload
+  }
+}
 
 export const marinePlanPolicyController = {
   async handler(request, h) {
@@ -138,7 +146,8 @@ export const marinePlanPolicySubmitController = {
     }
   },
   async handler(request, h) {
-    const { id, policyCode, returnTo } = await loadPolicyContext(request)
+    const { id, policyCode, policy, returnTo } =
+      await loadPolicyContext(request)
 
     await authenticatedPatchRequest(
       request,
@@ -150,6 +159,6 @@ export const marinePlanPolicySubmitController = {
       }
     )
 
-    return h.redirect(getPolicyReturnLink(returnTo))
+    return h.redirect(getPolicyReturnLink(returnTo, policy))
   }
 }

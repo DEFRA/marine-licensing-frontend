@@ -174,7 +174,7 @@ describe('marine-licence view details controller', () => {
         expect(buildMarinePlanPoliciesData).toHaveBeenCalledWith(marineLicence)
         expect(mockH.view).toHaveBeenCalledWith(
           VIEW_DETAILS_VIEW_ROUTE,
-          expect.objectContaining({ marinePlanPolicies: mockPolicies })
+          expect.objectContaining({ marinePlanPolicySections: mockPolicies })
         )
       })
 
@@ -323,7 +323,7 @@ describe('marine-licence view details controller', () => {
         expect(buildMarinePlanPoliciesData).toHaveBeenCalledWith(marineLicence)
         expect(mockH.view).toHaveBeenCalledWith(
           VIEW_DETAILS_VIEW_ROUTE,
-          expect.objectContaining({ marinePlanPolicies: mockPolicies })
+          expect.objectContaining({ marinePlanPolicySections: mockPolicies })
         )
       })
     })

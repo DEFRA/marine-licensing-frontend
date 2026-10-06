@@ -44,7 +44,8 @@ export const previewController = {
       const projectDetails = buildRedactedPreviewProjectDetails(summaryData)
       const siteData = buildRedactedSiteDetails(summaryData)
       const otherPermissions = buildRedactedOtherPermissions(summaryData)
-      const marinePlanPolicies = buildRedactedMarinePlanPolicies(marineLicence)
+      const marinePlanPolicySections =
+        buildRedactedMarinePlanPolicies(marineLicence)
       const waterFrameworkDirectiveData =
         buildRedactedWaterFrameworkDirectiveData(marineLicence)
 
@@ -55,7 +56,7 @@ export const previewController = {
         ...otherPermissions,
         ...buildApplicationDetailsCardData(marineLicence),
         siteData,
-        marinePlanPolicies,
+        marinePlanPolicySections,
         waterFrameworkDirectiveData,
         redactions: marineLicence.redactions
       })

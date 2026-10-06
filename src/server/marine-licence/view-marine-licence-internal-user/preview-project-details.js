@@ -117,9 +117,12 @@ export const buildRedactedOtherPermissions = (marineLicence) => {
 export const buildRedactedMarinePlanPolicies = (marineLicence) => {
   const responses = marineLicence.redactions?.marinePlanPolicyResponses ?? {}
 
-  return buildMarinePlanPoliciesData(marineLicence).map((policy) => ({
-    ...policy,
-    response: publishedText(responses[policy.policyCode], policy.response)
+  return buildMarinePlanPoliciesData(marineLicence).map((section) => ({
+    ...section,
+    policies: section.policies.map((policy) => ({
+      ...policy,
+      response: publishedText(responses[policy.policyCode], policy.response)
+    }))
   }))
 }
 

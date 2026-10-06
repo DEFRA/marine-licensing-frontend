@@ -153,6 +153,12 @@ const marineLicencePages = [
     session: applicationTaskOwnerSession
   },
   {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${mockMarineLicenceApplication.id}?evidence=1`,
+    title: 'Location name',
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
     title:
       'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?'

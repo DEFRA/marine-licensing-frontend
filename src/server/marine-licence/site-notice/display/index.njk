@@ -132,7 +132,7 @@
         {% set _ = evidenceRows.push({
           key: { text: "Date you displayed the notice" },
           value: { html: appIncompleteField({text: evidence.dateDisplayed}) },
-          actions: setSiteDetailsAction(evidence.dateDisplayed, evidenceLinks.dateDisplayed, null, " date you displayed the notice", { skipAction: true, evidenceIndex: evidenceIndex }) if not evidenceSubmission
+          actions: setSiteDetailsAction(evidence.dateDisplayed, evidenceLinks.dateDisplayed, null, "date you displayed the notice", { skipAction: true, evidenceIndex: evidenceIndex }) if not evidenceSubmission
         }) %}
 
         {% set _ = evidenceRows.push({

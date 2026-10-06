@@ -14,7 +14,6 @@ import { sessionCache } from '#src/server/common/helpers/session-cache/session-c
 import { getCacheEngine } from '#src/server/common/helpers/session-cache/cache-engine.js'
 import { pulse } from '#src/server/common/helpers/pulse.js'
 import { requestTracing } from '#src/server/common/helpers/request-tracing.js'
-import { setupProxy } from '#src/server/common/helpers/proxy/setup-proxy.js'
 import { csrf } from '#src/server/common/helpers/csrf.js'
 import { openId } from '#src/server/common/plugins/open-id.js'
 import { cookies } from '#src/server/common/plugins/cookies.js'
@@ -23,7 +22,6 @@ import { contentSecurityPolicy } from '#src/server/common/helpers/content-securi
 import { journeyLogger } from '#src/server/common/helpers/logging/journey-logger.js'
 
 export async function createServer() {
-  setupProxy()
   const server = hapi.server({
     port: config.get('port'),
     routes: {

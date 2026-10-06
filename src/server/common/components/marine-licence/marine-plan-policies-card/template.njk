@@ -2,9 +2,9 @@
 {% from "marine-licence/policy-wording/macro.njk" import appMarineLicencePolicyWording %}
 {% from "marine-licence/redaction-field/macro.njk" import appMarineLicenceRedactionField %}
 
-{% if params.policies and params.policies.length %}
+{% for section in params.sections %}
 {% set rows = [] %}
-{% for policy in params.policies %}
+{% for policy in section.policies %}
   {% set considerationValue %}
     <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Policy information</p>
     {{ appMarineLicencePolicyWording({ html: policy.wording }) }}
@@ -30,7 +30,7 @@
   {% endset %}
   {% set rows = (rows.push({
     key: {
-      text: policy.policyCode
+      text: policy.displayTitle
     },
     value: {
       html: considerationValue
@@ -51,12 +51,12 @@
 {{ govukSummaryList({
   card: {
     title: {
-      text: "Marine plan policies"
+      text: "Marine plan policies – " + section.heading
     },
     attributes: {
-      id: "marine-plan-policies-card"
+      id: section.cardId
     }
   },
   rows: rows
 }) }}
-{% endif %}
+{% endfor %}

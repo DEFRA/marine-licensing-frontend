@@ -91,7 +91,7 @@
     "@vitest/coverage-v8": "^4.1.4",
     "@vitest/runner": "^4.1.4",
     "@vitest/ui": "^4.1.10",
-    "allure-commandline": "^2.43.0",
+    "allure-commandline": "^2.46.1",
     "allure-vitest": "^3.6.0",
     "audit-ci": "7.1.0",
     "autoprefixer": "^10.6.1",

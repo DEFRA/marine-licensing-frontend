@@ -2,7 +2,7 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "marine-licence/site-notice-evidence-card/macro.njk" import appMarineLicenceSiteNoticeEvidenceCard %}
 {% from "incomplete-field/macro.njk" import appIncompleteField %}
 
 {% block beforeContent %}
@@ -121,44 +121,34 @@
       {% for evidence in siteNoticeEvidence %}
 
         {% set evidenceIndex = loop.index  %}
-        {% set evidenceRows = [] %}
 
-        {% set _ = evidenceRows.push({
-          key: { text: "Location name" },
-          value: { html: appIncompleteField({text: evidence.locationName}) },
-          actions: setSiteDetailsAction(evidence.locationName, evidenceLinks.locationName, null, "location name", { skipAction: true, evidenceIndex: evidenceIndex }) if not evidenceSubmission
-        }) %}
-    
-        {% set _ = evidenceRows.push({
-          key: { text: "Date you displayed the notice" },
-          value: { html: appIncompleteField({text: evidence.dateDisplayed}) },
-          actions: setSiteDetailsAction(evidence.dateDisplayed, evidenceLinks.dateDisplayed, null, "date you displayed the notice", { skipAction: true, evidenceIndex: evidenceIndex }) if not evidenceSubmission
-        }) %}
-
-        {% set _ = evidenceRows.push({
-          key: { text: "Close-up photo of notice" },
-          value: { html: appIncompleteField({text: evidence.closeUpPhoto}) },
-          actions: setSiteDetailsAction(evidence.closeUpPhoto, evidenceLinks.closeUpPhoto, null, "close-up photo of notice", { skipAction: true, evidenceIndex: evidenceIndex }) if not evidenceSubmission
-        }) %}
-
-        {% set _ = evidenceRows.push({
-          key: { text: "Photo evidencing notice position and location" },
-          value: { html: appIncompleteField({text: evidence.positionPhoto}) },
-          actions: setSiteDetailsAction(evidence.positionPhoto, evidenceLinks.positionPhoto, null, "photo evidencing notice position and location", { skipAction: true, evidenceIndex: evidenceIndex }) if not evidenceSubmission
-        }) %}
-
-        {% set title %}Location {{loop.index}} evidence{% endset %}
-
-        {{ govukSummaryList({
-          card: {
-            title: {
-              text: title
-            }
-          },
-          rows: evidenceRows
+        {{ appMarineLicenceSiteNoticeEvidenceCard({
+          evidenceIndex: evidenceIndex,
+          locationName: evidence.locationName,
+          locationNameHref: evidenceLinks.locationName ~ '?evidence=' ~ evidenceIndex,
+          dateDisplayed: evidence.dateDisplayed,
+          dateDisplayedHref: evidenceLinks.dateDisplayed ~ '?evidence=' ~ evidenceIndex,
+          closeUpPhoto: evidence.closeUpPhoto,
+          closeUpPhotoHref: evidenceLinks.closeUpPhoto ~ '?evidence=' ~ evidenceIndex,
+          positionPhoto: evidence.positionPhoto,
+          positionPhotoHref: evidenceLinks.positionPhoto ~ '?evidence=' ~ evidenceIndex,
+          cardAttributes: { id: 'site-location-' ~ evidenceIndex },
+          evidenceSubmission: evidenceSubmission
         }) }}
 
       {% endfor %}
+
+      {% if canAddLocation %}
+        <form method="POST" action="{{ addEvidenceFormAction }}" novalidate>
+          <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+          {{ govukButton({
+            text: "Add another location",
+            classes: "govuk-button--secondary",
+            preventDoubleClick: true
+          }) }}
+        </form>
+      {% endif %}
+
     </div>
   </div>
 

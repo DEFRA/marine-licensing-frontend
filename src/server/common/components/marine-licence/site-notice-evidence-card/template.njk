@@ -1,0 +1,40 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "incomplete-field/macro.njk" import appIncompleteField %}
+
+{% set title %}Location {{ params.evidenceIndex }} evidence{% endset %}
+
+{% set evidenceRows = [] %}
+
+{% set _ = evidenceRows.push({
+  key: { text: "Location name" },
+  value: { html: appIncompleteField({text: params.locationName}) },
+  actions: { items: [{ href: params.locationNameHref, text: "Change ", visuallyHiddenText: "location name", classes: "govuk-link--no-visited-state" }] } if not params.evidenceSubmission
+}) %}
+
+{% set _ = evidenceRows.push({
+  key: { text: "Date you displayed the notice" },
+  value: { html: appIncompleteField({text: params.dateDisplayed}) },
+  actions: { items: [{ href: params.dateDisplayedHref, text: "Change ", visuallyHiddenText: "date you displayed the notice", classes: "govuk-link--no-visited-state" }] } if not params.evidenceSubmission
+}) %}
+
+{% set _ = evidenceRows.push({
+  key: { text: "Close-up photo of notice" },
+  value: { html: appIncompleteField({text: params.closeUpPhoto}) },
+  actions: { items: [{ href: params.closeUpPhotoHref, text: "Change ", visuallyHiddenText: "close-up photo of notice", classes: "govuk-link--no-visited-state" }] } if not params.evidenceSubmission
+}) %}
+
+{% set _ = evidenceRows.push({
+  key: { text: "Photo evidencing notice position and location" },
+  value: { html: appIncompleteField({text: params.positionPhoto}) },
+  actions: { items: [{ href: params.positionPhotoHref, text: "Change ", visuallyHiddenText: "photo evidencing notice position and location", classes: "govuk-link--no-visited-state" }] } if not params.evidenceSubmission
+}) %}
+
+{{ govukSummaryList({
+  card: {
+    title: {
+      text: title
+    },
+    attributes: params.cardAttributes
+  },
+  rows: evidenceRows
+}) }}

@@ -13,6 +13,7 @@ import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import {
   mockApplicationTaskContactId,
+  mockSubmittedMarineLicenceApplication,
   mockMarineLicenceWithApplicationTask
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
@@ -433,6 +434,126 @@ describe('Site notice display page (marine licence)', () => {
 
       expect(authenticatedPostRequest).not.toHaveBeenCalled()
       expect(response.headers.location).toBe(displayUrl)
+    })
+  })
+
+  describe('Add another location', () => {
+    const marineLicenceId = mockMarineLicenceWithApplicationTask.id
+    const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
+    const addEvidenceUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_ADD_EVIDENCE}/${marineLicenceId}`
+
+    const mockLicence = (marineLicence) =>
+      vi.mocked(authenticatedGetRequest).mockResolvedValue({
+        payload: { message: 'success', value: marineLicence }
+      })
+
+    test('shows "Add another location" button when less than 30 locations and not submitted', async () => {
+      const document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(
+        getByRole(document, 'button', { name: 'Add another location' })
+      ).toBeInTheDocument()
+    })
+
+    test('hides "Add another location" button when evidence is submitted or at location limit', async () => {
+      mockLicence(mockSubmittedMarineLicenceApplication)
+
+      let document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(
+        queryByRole(document, 'button', { name: 'Add another location' })
+      ).not.toBeInTheDocument()
+
+      const licenceLimit = {
+        ...mockMarineLicenceWithApplicationTask,
+        siteNoticeEvidence: Array.from({ length: 30 }, (_, i) => ({
+          locationName: `Location ${i + 1}`,
+          dateDisplayed: { day: '1', month: '01', year: '2026' },
+          closeUpPhoto: { uploadedFile: { filename: `photo-${i + 1}.jpg` } },
+          positionPhoto: { uploadedFile: { filename: `photo-${i + 1}.jpg` } }
+        }))
+      }
+
+      mockLicence(licenceLimit)
+
+      document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(
+        queryByRole(document, 'button', { name: 'Add another location' })
+      ).not.toBeInTheDocument()
+    })
+
+    test('POST to add evidence redirects with anchor to new card', async () => {
+      const currentLicence = {
+        ...mockMarineLicenceWithApplicationTask,
+        siteNoticeEvidence: [
+          {
+            locationName: 'Harbour wall',
+            dateDisplayed: { day: '5', month: '03', year: '2026' },
+            closeUpPhoto: { uploadedFile: { filename: 'close-up.jpg' } },
+            positionPhoto: { uploadedFile: { filename: 'position.jpg' } }
+          }
+        ]
+      }
+
+      mockLicence(currentLicence)
+
+      const { response } = await submitForm({
+        requestUrl: addEvidenceUrl,
+        server: getServer(),
+        formData: {}
+      })
+
+      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+        expect.anything(),
+        '/marine-licence/add-site-notice-evidence',
+        { id: marineLicenceId }
+      )
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(`${displayUrl}#site-location-2`)
+
+      let document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      const card = document.getElementById('site-location-1')
+      expect(card).toBeInTheDocument()
+      expect(card.classList.contains('govuk-summary-card')).toBe(true)
+
+      // Test incomplete cards hide Send evidence
+      const incompleteLicence = {
+        ...mockMarineLicenceWithApplicationTask,
+        siteNoticeEvidence: [
+          {
+            locationName: 'Harbour wall',
+            dateDisplayed: { day: '5', month: '03', year: '2026' },
+            closeUpPhoto: { uploadedFile: { filename: 'close-up.jpg' } },
+            positionPhoto: { uploadedFile: { filename: 'position.jpg' } }
+          },
+          {} // incomplete second card
+        ]
+      }
+
+      mockLicence(incompleteLicence)
+
+      document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(
+        queryByRole(document, 'button', { name: 'Send evidence' })
+      ).not.toBeInTheDocument()
     })
   })
 })

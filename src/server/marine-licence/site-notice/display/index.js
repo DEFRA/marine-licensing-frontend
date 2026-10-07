@@ -1,6 +1,7 @@
 import {
   siteNoticeDisplayController,
-  siteNoticeDisplaySubmitController
+  siteNoticeDisplaySubmitController,
+  siteNoticeDisplayAddEvidenceController
 } from '#src/server/marine-licence/site-notice/display/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -14,5 +15,10 @@ export const siteNoticeDisplayRoutes = [
     method: 'POST',
     path: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/{marineLicenceId}`,
     ...siteNoticeDisplaySubmitController
+  },
+  {
+    method: 'POST',
+    path: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_ADD_EVIDENCE}/{marineLicenceId}`,
+    ...siteNoticeDisplayAddEvidenceController
   }
 ]

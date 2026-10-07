@@ -7,8 +7,10 @@ import {
   marineLicenceRoutes,
   routes
 } from '#src/server/common/constants/routes.js'
-import { areAnalyticsCookiesAccepted } from '#src/server/common/helpers/cookie-preferences.js'
-import { COOKIE_NAMES } from '#src/server/common/constants/cookies.js'
+import {
+  areAnalyticsCookiesAccepted,
+  areCookiePreferencesSet
+} from '#src/server/common/helpers/cookie-preferences.js'
 import { getExemptionCache } from '#src/server/common/helpers/exemptions/session-cache/utils.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 
@@ -102,8 +104,7 @@ export function context(request) {
 
   const serviceUrl = isProjectNameLandingPage ? '' : '/'
   const analyticsEnabled = areAnalyticsCookiesAccepted(request)
-  const cookiePreferencesSet =
-    request?.state?.[COOKIE_NAMES.PREFERENCES_SET] === 'true'
+  const cookiePreferencesSet = areCookiePreferencesSet(request)
   const isAuthenticated = request?.auth?.isAuthenticated ?? false
 
   return {

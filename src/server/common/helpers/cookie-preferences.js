@@ -1,3 +1,5 @@
+import { COOKIE_NAMES } from '#src/server/common/constants/cookies.js'
+
 export function getCookiePreferences(request) {
   const cookiesPolicy = request.state?.cookies_policy
 
@@ -16,4 +18,8 @@ export function getCookiePreferences(request) {
 export function areAnalyticsCookiesAccepted(request) {
   const preferences = getCookiePreferences(request)
   return preferences.analytics === true
+}
+
+export function areCookiePreferencesSet(request) {
+  return request?.state?.[COOKIE_NAMES.PREFERENCES_SET] === 'true'
 }

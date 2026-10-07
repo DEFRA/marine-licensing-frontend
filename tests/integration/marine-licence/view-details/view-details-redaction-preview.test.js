@@ -352,8 +352,8 @@ describe('Marine licence redaction preview', () => {
             'S-CC-1': { redactedText: `First ${REDACTION_LABEL}` }
           }
         },
-        card: '#marine-plan-policies-card',
-        row: 'S-CC-1',
+        card: '#marine-plan-policies-card-cross-cutting',
+        row: 'South Climate change 1 (S-CC-1)',
         published: `First ${REDACTION_LABEL}`,
         includes: true
       },

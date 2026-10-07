@@ -88,8 +88,18 @@ export const waterFrameworkDirective = {
 }
 
 export const mockMarinePlanPolicies = [
-  { policyCode: 'S-CC-2', policy: 'Second policy wording.' },
-  { policyCode: 'S-CC-1', policy: 'First policy wording.' }
+  {
+    policyCode: 'S-CC-2',
+    title: 'South Climate change 2',
+    category: 'Cross-cutting',
+    policy: 'Second policy wording.'
+  },
+  {
+    policyCode: 'S-CC-1',
+    title: 'South Climate change 1',
+    category: 'Cross-cutting',
+    policy: 'First policy wording.'
+  }
 ]
 
 export const mockMarinePlanPolicyResponses = {
@@ -424,9 +434,24 @@ export const mockMarineLicenceWithMarinePlanPolicies = {
   marinePlanPolicyJob: 'ready',
   marinePlanPoliciesCount: 3,
   marinePlanPolicies: [
-    { policyCode: 'SW-MPA-1', policy: 'Marine protected area policy wording.' },
-    { policyCode: 'SW-AGG-2', policy: 'Aggregates policy wording.' },
-    { policyCode: 'SW-BIO-1', policy: 'Biodiversity policy wording.' }
+    {
+      policyCode: 'SW-MPA-1',
+      title: 'South West Marine protected areas 1',
+      category: 'Environmental',
+      policy: 'Marine protected area policy wording.'
+    },
+    {
+      policyCode: 'SW-AGG-2',
+      title: 'South West Aggregates 2',
+      category: 'Economic',
+      policy: 'Aggregates policy wording.'
+    },
+    {
+      policyCode: 'SW-BIO-1',
+      title: 'South West Biodiversity 1',
+      category: 'Environmental',
+      policy: 'Biodiversity policy wording.'
+    }
   ]
 }
 

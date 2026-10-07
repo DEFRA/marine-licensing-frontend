@@ -22,6 +22,8 @@ describe('Marine plan policy (consideration) page', () => {
       marinePlanPolicies: [
         {
           policyCode: 'SW-BIO-1',
+          title: 'South West Biodiversity 1',
+          category: 'Environmental',
           policy: '<p>Intro</p><ol><li>first</li><li>second</li></ol>'
         }
       ]
@@ -46,7 +48,7 @@ describe('Marine plan policy (consideration) page', () => {
     const document = await loadPolicyPage()
 
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'SW-BIO-1'
+      'South West Biodiversity 1 (SW-BIO-1)'
     )
     expect(document.getElementById('policyConsideration')).not.toBeNull()
   })

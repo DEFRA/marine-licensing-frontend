@@ -127,7 +127,7 @@ const marineLicencePages = [
   },
   {
     url: getMarinePlanPolicyLink('SW-BIO-1'),
-    title: 'SW-BIO-1',
+    title: 'South West Biodiversity 1 (SW-BIO-1)',
     marineLicence: mockMarineLicenceWithMarinePlanPolicies
   },
   {
@@ -149,6 +149,12 @@ const marineLicencePages = [
   {
     url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceApplication.id}`,
     title: 'Display a site notice',
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${mockMarineLicenceApplication.id}?evidence=1`,
+    title: 'Location name',
     marineLicence: mockMarineLicenceWithApplicationTask,
     session: applicationTaskOwnerSession
   },

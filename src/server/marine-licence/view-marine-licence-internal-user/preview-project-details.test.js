@@ -236,8 +236,7 @@ describe('buildRedactedMarinePlanPolicies', () => {
       }
     })
 
-    const first = result.find((policy) => policy.policyCode === 'S-CC-1')
-    const second = result.find((policy) => policy.policyCode === 'S-CC-2')
+    const [first, second] = result[0].policies
 
     expect(first.wording).toBe('First wording')
     expect(first.response.val).toBe(wrapRedactionLabels('First ***REDACTED***'))

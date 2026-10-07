@@ -21,6 +21,10 @@
   max-width: 310px;
 }
 
+.moj-filter__options .govuk-radios__label {
+  max-width: calc(100% - 50px);
+}
+
 .js-enabled {
   .moj-filter__selected {
     display: block;

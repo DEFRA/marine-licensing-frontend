@@ -107,7 +107,7 @@ const buildViewModel = async ({
     invoicingData: formattedMarineLicence.invoicing,
     invoicingChangeLink:
       marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
-    marinePlanPolicies: buildMarinePlanPoliciesData(marineLicence),
+    marinePlanPolicySections: buildMarinePlanPoliciesData(marineLicence),
     applicationTasks,
     amount: FEE_ESTIMATE_AMOUNT,
     monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT,

@@ -1,5 +1,8 @@
 import { PUBLIC_NOTICE_REQUEST_RELATES_TO } from '#src/server/common/constants/site-notice.js'
-import { getDisplayConditions } from '#src/server/marine-licence/site-notice/display/utils.js'
+import {
+  getDisplayConditions,
+  getSiteNoticeValues
+} from '#src/server/marine-licence/site-notice/display/utils.js'
 import { mockMarineLicenceWithApplicationTask } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('getDisplayConditions', () => {
@@ -71,5 +74,37 @@ describe('getDisplayConditions', () => {
     const data = getDisplayConditions({}, task)
 
     expect(data.showMultipleSitesSection).toBe(false)
+  })
+})
+
+describe('getSiteNoticeValues', () => {
+  const evidence = {
+    locationName: 'Harbour wall',
+    dateDisplayed: { day: '5', month: '03', year: '2026' },
+    closeUpPhoto: { uploadedFile: { filename: 'close-up.jpg' } },
+    positionPhoto: { uploadedFile: { filename: 'position.jpg' } }
+  }
+
+  test('maps evidence for the display page', () => {
+    expect(getSiteNoticeValues({ siteNoticeEvidence: [evidence] })).toEqual([
+      {
+        locationName: 'Harbour wall',
+        dateDisplayed: '5 March 2026',
+        closeUpPhoto: 'close-up.jpg',
+        positionPhoto: 'position.jpg'
+      }
+    ])
+  })
+
+  test('returns null when the displayed date is missing', () => {
+    const [values] = getSiteNoticeValues({
+      siteNoticeEvidence: [{ ...evidence, dateDisplayed: null }]
+    })
+
+    expect(values.dateDisplayed).toBeNull()
+  })
+
+  test('returns an empty list when there is no evidence', () => {
+    expect(getSiteNoticeValues({})).toEqual([])
   })
 })

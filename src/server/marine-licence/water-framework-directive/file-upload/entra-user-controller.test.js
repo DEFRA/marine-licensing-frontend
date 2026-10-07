@@ -87,6 +87,14 @@ describe('waterFrameworkFileUploadEntraUserController', () => {
     )
   })
 
+  test('does not show the WFD assessment template help', async () => {
+    const h = createMockH()
+
+    await waterFrameworkFileUploadEntraUserController.handler(request(), h)
+
+    expect(h.view.mock.calls[0][1]).not.toHaveProperty('showTemplateHelp')
+  })
+
   test('shows an upload error left behind by the wait page', async () => {
     vi.mocked(redactionUpload.getRedactionUpload).mockReturnValue({
       uploadError: {

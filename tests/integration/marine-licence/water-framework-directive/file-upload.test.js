@@ -57,6 +57,9 @@ describe('File upload page (Water Framework Directive)', () => {
       /Upload your Water Framework Directive assessment/
     )
     expect(uploadInput).toBeInTheDocument()
+    expect(uploadInput).toHaveAccessibleDescription(
+      'You can only upload a file that is a .docx or .odt.'
+    )
 
     const continueButton = getByRole(document, 'button', { name: 'Continue' })
     expect(continueButton).toBeInTheDocument()
@@ -85,5 +88,45 @@ describe('File upload page (Water Framework Directive)', () => {
     expect(
       queryByRole(document, 'link', { name: 'Cancel' })
     ).not.toBeInTheDocument()
+  })
+  test('shows a collapsed WFD assessment template help section', async () => {
+    const document = await loadPage({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD,
+      server: getServer()
+    })
+
+    const summary = getByText(
+      document,
+      'Help with getting a WFD assessment template'
+    )
+    const details = summary.closest('details')
+    expect(details).not.toHaveAttribute('open')
+
+    expect(
+      getByText(
+        details,
+        "If you need to provide a WFD assessment, you can use the following template. It's called a scoping document."
+      )
+    ).toBeInTheDocument()
+
+    expect(
+      getByRole(details, 'link', {
+        name: 'Download the WFD assessment scoping document (ODT, 24KB)'
+      })
+    ).toHaveAttribute(
+      'href',
+      'https://assets.publishing.service.gov.uk/media/6ab4e3b9fceb6fb3a650110e/wfd_scoping_template__1_.odt'
+    )
+
+    const guidanceLink = getByRole(details, 'link', {
+      name: "Read the Environment Agency's guidance on the Water Framework Directive assessments for more information (opens in new tab)"
+    })
+    expect(guidanceLink).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/guidance/water-framework-directive-assessment-estuarine-and-coastal-waters'
+    )
+    expect(guidanceLink).toHaveAttribute('target', '_blank')
+    expect(guidanceLink).toHaveAttribute('rel', 'noreferrer noopener')
   })
 })

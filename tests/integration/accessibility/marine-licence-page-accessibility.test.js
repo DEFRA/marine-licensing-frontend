@@ -173,6 +173,10 @@ const marineLicencePages = [
     title: 'Check your answers for Water Framework Directive'
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_FILE_UPLOAD,
+    title: 'Upload your Water Framework Directive assessment'
+  },
+  {
     url: `${marineLicenceRoutes.MARINE_LICENCE_TYPE_OF_ACTIVITY}?site=1&activity=1`,
     title: 'Type of activity'
   },

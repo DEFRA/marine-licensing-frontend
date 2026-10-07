@@ -98,6 +98,7 @@ export const waterFrameworkFileUploadController = {
         uploadUrl: uploadConfig.uploadUrl,
         maxFileSize: uploadConfig.maxFileSize,
         acceptAttribute: WFD_ACCEPT_ATTRIBUTE,
+        showTemplateHelp: true,
         backLink: getBackLink(fileUploadEntryPoint),
         cancelLink: getCancelLink(waterFrameworkDirectiveReturnTo),
         errorSummary,

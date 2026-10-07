@@ -123,7 +123,6 @@ describe('#fileUpload', () => {
           uploadUrl: 'https://upload.example.com',
           maxFileSize: 50000000,
           acceptAttribute: WFD_ACCEPT_ATTRIBUTE,
-          showTemplateHelp: true,
           backLink:
             marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_EXCLUDED_ACTIVITIES,
           cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST

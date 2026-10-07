@@ -5,7 +5,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-{% from "marine-licence/wfd-assessment-template/macro.njk" import appMarineLicenceWfdAssessmentTemplate %}
+{% from "marine-licence/water-framework-directive-links/macro.njk" import appMarineLicenceWaterFrameworkDirectiveLinks %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -34,12 +34,10 @@
 
       <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-      {% if showTemplateHelp %}
-        {{ govukDetails({
-          summaryText: "Help with getting a WFD assessment template",
-          html: appMarineLicenceWfdAssessmentTemplate()
-        }) }}
-      {% endif %}
+      {{ govukDetails({
+        summaryText: "Help with getting a WFD assessment template",
+        html: appMarineLicenceWaterFrameworkDirectiveLinks()
+      }) }}
 
         <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>
 

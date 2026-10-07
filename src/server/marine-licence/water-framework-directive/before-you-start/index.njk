@@ -3,7 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
-{% from "marine-licence/wfd-assessment-template/macro.njk" import appMarineLicenceWfdAssessmentTemplate %}
+{% from "marine-licence/water-framework-directive-links/macro.njk" import appMarineLicenceWaterFrameworkDirectiveLinks %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -67,7 +67,7 @@
 
       <h3 class="govuk-heading-s">Getting a WFD assessment template</h3>
 
-      {{ appMarineLicenceWfdAssessmentTemplate() }}
+      {{ appMarineLicenceWaterFrameworkDirectiveLinks() }}
 
       <div class="govuk-button-group">
         {{ govukButton({

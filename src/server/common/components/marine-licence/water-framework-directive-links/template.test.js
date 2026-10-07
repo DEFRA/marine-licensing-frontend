@@ -1,8 +1,8 @@
 import { renderComponent } from '#src/server/test-helpers/component-helpers.js'
 
-describe('WFD Assessment Template Component', () => {
+describe('Water Framework Directive Links Component', () => {
   test('renders the scoping document introduction', () => {
-    const $ = renderComponent('marine-licence/wfd-assessment-template', {})
+    const $ = renderComponent('marine-licence/water-framework-directive-links', {})
 
     expect($('p').first().text()).toBe(
       "If you need to provide a WFD assessment, you can use the following template. It's called a scoping document."
@@ -10,7 +10,7 @@ describe('WFD Assessment Template Component', () => {
   })
 
   test('renders the scoping document download link', () => {
-    const $ = renderComponent('marine-licence/wfd-assessment-template', {})
+    const $ = renderComponent('marine-licence/water-framework-directive-links', {})
 
     const link = $('a').eq(0)
     expect(link.text()).toBe(
@@ -22,7 +22,7 @@ describe('WFD Assessment Template Component', () => {
   })
 
   test('renders the guidance link opening in a new tab', () => {
-    const $ = renderComponent('marine-licence/wfd-assessment-template', {})
+    const $ = renderComponent('marine-licence/water-framework-directive-links', {})
 
     const link = $('a').eq(1)
     expect(link.text()).toBe(

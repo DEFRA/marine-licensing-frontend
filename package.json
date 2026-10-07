@@ -63,7 +63,7 @@
     "chokidar": "3.6.0",
     "convict": "^6.2.5",
     "cssnano": "^9.1.1",
-    "cssnano-preset-default": "^9.0.1",
+    "cssnano-preset-default": "^9.1.2",
     "date-fns": "^4.4.0",
     "dayjs": "^1.11.23",
     "dotenv": "^17.4.2",

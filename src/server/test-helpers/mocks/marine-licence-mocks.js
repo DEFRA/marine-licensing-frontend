@@ -88,13 +88,30 @@ export const waterFrameworkDirective = {
 }
 
 export const mockMarinePlanPolicies = [
-  { policyCode: 'S-CC-2', policy: 'Second policy wording.' },
-  { policyCode: 'S-CC-1', policy: 'First policy wording.' }
+  {
+    policyCode: 'S-CC-2',
+    title: 'South Climate change 2',
+    category: 'Cross-cutting',
+    policy: 'Second policy wording.'
+  },
+  {
+    policyCode: 'S-CC-1',
+    title: 'South Climate change 1',
+    category: 'Cross-cutting',
+    policy: 'First policy wording.'
+  }
 ]
 
 export const mockMarinePlanPolicyResponses = {
   'S-CC-1': 'My first consideration.',
   'S-CC-2': 'My second consideration.'
+}
+
+export const mockSiteNoticeEvidence = {
+  locationName: 'North pier',
+  dateDisplayed: { day: '22', month: '05', year: '2026' },
+  closeUpPhoto: { uploadedFile: { filename: 'test.jpg' } },
+  positionPhoto: { uploadedFile: { filename: 'test.jpg' } }
 }
 
 export const mockMarineLicenceApplication = {
@@ -195,6 +212,7 @@ export const mockApplicationTaskContactId = 'contact-with-outstanding-task'
 export const mockMarineLicenceWithApplicationTask = {
   ...mockSubmittedMarineLicenceApplication,
   contactId: mockApplicationTaskContactId,
+  siteNoticeEvidence: [mockSiteNoticeEvidence],
   applicationTasks: [
     {
       taskId: '507f1f77bcf86cd799439012',
@@ -416,9 +434,24 @@ export const mockMarineLicenceWithMarinePlanPolicies = {
   marinePlanPolicyJob: 'ready',
   marinePlanPoliciesCount: 3,
   marinePlanPolicies: [
-    { policyCode: 'SW-MPA-1', policy: 'Marine protected area policy wording.' },
-    { policyCode: 'SW-AGG-2', policy: 'Aggregates policy wording.' },
-    { policyCode: 'SW-BIO-1', policy: 'Biodiversity policy wording.' }
+    {
+      policyCode: 'SW-MPA-1',
+      title: 'South West Marine protected areas 1',
+      category: 'Environmental',
+      policy: 'Marine protected area policy wording.'
+    },
+    {
+      policyCode: 'SW-AGG-2',
+      title: 'South West Aggregates 2',
+      category: 'Economic',
+      policy: 'Aggregates policy wording.'
+    },
+    {
+      policyCode: 'SW-BIO-1',
+      title: 'South West Biodiversity 1',
+      category: 'Environmental',
+      policy: 'Biodiversity policy wording.'
+    }
   ]
 }
 

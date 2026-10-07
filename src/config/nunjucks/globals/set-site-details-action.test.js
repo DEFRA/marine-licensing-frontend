@@ -14,7 +14,7 @@ describe('setSiteDetailsAction', () => {
         {
           classes: 'govuk-link--no-visited-state',
           href: '/site-details?site=1&action=change',
-          text: 'Change',
+          text: 'Change ',
           visuallyHiddenText: 'site name'
         }
       ]
@@ -34,7 +34,7 @@ describe('setSiteDetailsAction', () => {
         {
           classes: 'govuk-link--no-visited-state',
           href: '/another-page?site=5&action=change',
-          text: 'Change',
+          text: 'Change ',
           visuallyHiddenText: 'for site 5'
         }
       ]
@@ -178,6 +178,24 @@ describe('setSiteDetailsAction', () => {
           classes: 'govuk-link--no-visited-state',
           href: '/page?site=1&activity=2',
           text: 'Change'
+        }
+      ]
+    })
+  })
+
+  test('should include evidence query param when provided', () => {
+    const result = setSiteDetailsAction('', '/page', null, 'location name', {
+      skipAction: true,
+      evidenceIndex: 1
+    })
+
+    expect(result).toEqual({
+      items: [
+        {
+          classes: 'govuk-link--no-visited-state',
+          href: '/page?evidence=1',
+          text: 'Add ',
+          visuallyHiddenText: 'location name'
         }
       ]
     })

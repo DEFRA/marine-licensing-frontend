@@ -186,7 +186,7 @@ describe('marine-licence view details internal-user redaction controller', () =>
     expect(buildMarinePlanPoliciesData).toHaveBeenCalledWith(marineLicence)
     expect(mockH.view).toHaveBeenCalledWith(
       VIEW_DETAILS_INTERNAL_USER_VIEW_ROUTE,
-      expect.objectContaining({ marinePlanPolicies: mockPolicies })
+      expect.objectContaining({ marinePlanPolicySections: mockPolicies })
     )
   })
 

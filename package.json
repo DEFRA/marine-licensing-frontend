@@ -14,12 +14,12 @@
   "scripts": {
     "build": "npm run build:frontend",
     "build:frontend": "NODE_ENV=production webpack",
-    "dev": "run-p frontend:watch server:watch",
-    "dev:debug": "run-p frontend:watch server:debug",
+    "dev": "npm run frontend:watch & npm run server:watch",
+    "dev:debug": "npm run frontend:watch & npm run server:debug",
     "format": "prettier --write \"src/**/*.js\" \"**/*.{js,cjs,md,json,config.js,test.js}\"",
     "format:check": "prettier --check \"src/**/*.js\" \"**/*.{js,cjs,md,json,config.js,test.js}\"",
     "frontend:watch": "NODE_ENV=development webpack --watch",
-    "lint": "run-s lint:js lint:scss",
+    "lint": "npm run lint:js && npm run lint:scss",
     "lint:fix": "eslint . --fix",
     "lint:js": "eslint .",
     "lint:scss": "stylelint \"src/**/*.scss\" --cache --cache-location .cache/stylelint --cache-strategy content --color --ignore-path .gitignore",
@@ -30,11 +30,12 @@
     "test:watch": "TZ=UTC vitest",
     "test:watch:ml": "TZ=UTC vitest --config vitest.marine-licence.config.js",
     "test:integration:allure": "npx vitest run tests/ --coverage=false && npx allure generate allure-results --single-file --clean --name marine-licensing-dom-testing-library-tests",
-    "server:watch": "nodemon --inspect=0.0.0.0 --ext js,json --legacy-watch ./src",
-    "server:debug": "nodemon --inspect-brk=0.0.0.0 --ext js,json --legacy-watch ./src",
+    "server:watch": "node --watch --inspect=0.0.0.0 --env-file-if-exists=.env ./src",
+    "server:debug": "node --watch --inspect-brk=0.0.0.0 --env-file-if-exists=.env ./src",
     "prestart": "npm run build",
     "start": "NODE_ENV=production node --use-strict .",
     "iat": "node scripts/iat-query.js",
+    "audit": "audit-ci --config .audit-ci.jsonc",
     "knip": "knip"
   },
   "author": "Defra DDTS",
@@ -59,13 +60,13 @@
     "@ministryofjustice/frontend": "^9.0.0",
     "accessible-autocomplete": "3.0.1",
     "aws-embedded-metrics": "^4.2.1",
+    "chokidar": "3.6.0",
     "convict": "^6.2.5",
-    "cssnano": "^9.0.5",
-    "cssnano-preset-default": "^9.0.1",
+    "cssnano": "^9.1.1",
+    "cssnano-preset-default": "^9.1.2",
     "date-fns": "^4.4.0",
     "dayjs": "^1.11.23",
     "dotenv": "^17.4.2",
-    "global-agent": "^3.0.0",
     "govuk-frontend": "6.1.0",
     "hapi-pino": "^13.0.0",
     "hapi-pulse": "^4.0.0",
@@ -79,12 +80,11 @@
     "pino-pretty": "^13.1.1",
     "proj4": "^2.22.0",
     "rfc2047": "^4.0.1",
-    "sanitize-html": "2.17.7",
-    "undici": "^8.10.2"
+    "sanitize-html": "2.17.7"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@babel/preset-env": "^8.0.5",
+    "@babel/preset-env": "^8.0.6",
     "@faker-js/faker": "^10.6.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
@@ -93,7 +93,8 @@
     "@vitest/ui": "^4.1.10",
     "allure-commandline": "^2.43.0",
     "allure-vitest": "^3.6.0",
-    "autoprefixer": "^10.6.0",
+    "audit-ci": "7.1.0",
+    "autoprefixer": "^10.6.1",
     "babel-loader": "^10.1.1",
     "cheerio": "^1.2.0",
     "copy-webpack-plugin": "^14.0.0",
@@ -101,8 +102,6 @@
     "jsdom": "^30.1.0",
     "knip": "^6.36.0",
     "neostandard": "^0.13.0",
-    "nodemon": "^3.1.14",
-    "npm-run-all": "^4.1.5",
     "postcss-load-config": "^6.0.1",
     "postcss-loader": "^8.2.1",
     "prettier": "^3.9.8",
@@ -115,7 +114,7 @@
     "vitest": "^4.1.11",
     "vitest-axe": "^0.1.0",
     "vitest-fetch-mock": "^0.4.5",
-    "webpack": "^5.111.0",
+    "webpack": "^5.111.1",
     "webpack-assets-manifest": "6.5.2",
     "webpack-cli": "7.2.3"
   },
@@ -125,11 +124,17 @@
     "colord": "^2.9.4",
     "js-yaml": "^4.3.2",
     "svgo": "^4.1.0",
+    "moment": "^2.31.0",
+    "source-map-js": "^1.2.2",
+    "fast-copy": "^4.1.2",
+    "smol-toml": "^1.9.0",
+    "brace-expansion@^1": "^1.1.21",
+    "brace-expansion@^5": "^5.0.12",
     "@hapi/bell": {
-      "joi": "^17.13.7"
+      "joi": "^17.13.8"
     },
     "@hapi/catbox-redis": {
-      "joi": "^17.13.7"
+      "joi": "^17.13.8"
     }
   }
 }

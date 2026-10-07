@@ -8,13 +8,15 @@ import {
   mockSubmittedMarineLicenceApplication,
   mockWithdrawnMarineLicenceApplication,
   mockTransferredMarineLicenceApplication,
-  mockRejectedMarineLicenceApplication
+  mockRejectedMarineLicenceApplication,
+  mockMarineLicenceWithApplicationTask,
+  mockApplicationTaskContactId
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   mockMarineLicence,
   setupTestServer
 } from '../shared/test-setup-helpers.js'
-import { agentSession } from '../shared/session-fixtures.js'
+import { agentSession, citizenUserSession } from '../shared/session-fixtures.js'
 import { selectActivityVariants } from '~/src/server/common/constants/activity-variants.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 import { toApplicationReferenceUrlSegment } from '~/src/server/common/helpers/marine-licence/application-reference-url-segment.js'
@@ -28,6 +30,11 @@ vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
 vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
   getUserSession: vi.fn()
 }))
+
+const applicationTaskOwnerSession = {
+  ...citizenUserSession,
+  contactId: mockApplicationTaskContactId
+}
 
 const marineLicencePages = [
   {
@@ -120,7 +127,7 @@ const marineLicencePages = [
   },
   {
     url: getMarinePlanPolicyLink('SW-BIO-1'),
-    title: 'SW-BIO-1',
+    title: 'South West Biodiversity 1 (SW-BIO-1)',
     marineLicence: mockMarineLicenceWithMarinePlanPolicies
   },
   {
@@ -138,6 +145,18 @@ const marineLicencePages = [
   {
     url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,
     title: 'Water Framework Directive'
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceApplication.id}`,
+    title: 'Display a site notice',
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${mockMarineLicenceApplication.id}?evidence=1`,
+    title: 'Location name',
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_NAUTICAL_MILE,
@@ -284,6 +303,18 @@ const marineLicencePages = [
     url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockSubmittedMarineLicenceApplication.id}`,
     title: mockSubmittedMarineLicenceApplication.projectName,
     marineLicence: mockSubmittedMarineLicenceApplication
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`,
+    title: mockMarineLicenceWithApplicationTask.projectName,
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_WITHHOLDING_NOTIFICATION}/${mockMarineLicenceWithApplicationTask.id}`,
+    title: 'Update on the information you asked us to withhold',
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
   },
   {
     url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER}/${toApplicationReferenceUrlSegment(mockSubmittedMarineLicenceApplication.applicationReference)}`,

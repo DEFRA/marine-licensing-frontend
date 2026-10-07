@@ -122,7 +122,7 @@
       {% endif %}
 
       {{ appMarineLicenceMarinePlanPoliciesCard({
-        policies: marinePlanPolicies,
+        sections: marinePlanPolicySections,
         isApplicant: false,
         isReadOnly: true,
         enableRedaction: true,
@@ -160,7 +160,11 @@
         {{ govukButton({
           text: "Preview with redactions",
           href: redactionPreviewUrl,
-          classes: "govuk-button--secondary"
+          classes: "govuk-button--secondary",
+            attributes: {
+              target: "_blank",
+              rel: "noreferrer noopener"
+            }
         }) }}
       </div>
 

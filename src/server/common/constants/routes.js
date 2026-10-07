@@ -109,6 +109,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_UPLOAD_AND_WAIT: '/marine-licence/upload-and-wait',
   MARINE_LICENCE_CSV_DOWNLOAD: '/marine-licence/location-csv-download',
   MARINE_LICENCE_VIEW_DETAILS: '/marine-licence/view-details',
+  MARINE_LICENCE_WITHHOLDING_NOTIFICATION:
+    '/marine-licence/withholding-notification',
   MARINE_LICENCE_VIEW_DETAILS_PUBLIC: '/marine-licence/view-public-details',
   MARINE_LICENCE_VIEW_DETAILS_INTERNAL_USER: '/marine-licence/redaction',
   MARINE_LICENCE_COORDINATES_ENTRY_CHOICE:
@@ -148,6 +150,15 @@ export const marineLicenceRoutes = {
     '/marine-licence/water-framework-directive-upload-and-wait',
   MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS:
     '/marine-licence/water-framework-directive-review-your-answers',
+  MARINE_LICENCE_SITE_NOTICE_DISPLAY: '/marine-licence/site-notice/display',
+  MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME:
+    '/marine-licence/site-notice/location-name',
+  MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED:
+    '/marine-licence/site-notice/date-displayed',
+  MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO:
+    '/marine-licence/site-notice/close-up-photo',
+  MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO:
+    '/marine-licence/site-notice/position-photo',
   MARINE_LICENCE_FEE_ESTIMATE: '/marine-licence/fee-estimate',
   MARINE_LICENCE_FEE_ESTIMATE_ARE_YOU_SURE:
     '/marine-licence/fee-estimate-are-you-sure',
@@ -252,5 +263,6 @@ export const apiRoutes = {
   CONFIRM_SITE_DETAILS: '/marine-licence/confirm-site-details',
   COPY_MARINE_LICENCE: '/marine-licence/copy-marine-licence',
   REDACT_TEXT: '/marine-licence/redact-text',
-  GET_USER_NAMES: '/projects/users'
+  GET_USER_NAMES: '/projects/users',
+  UPDATE_SITE_NOTICE_EVIDENCE: '/marine-licence/update-site-notice-evidence'
 }

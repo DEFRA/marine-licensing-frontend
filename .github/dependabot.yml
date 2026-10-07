@@ -40,8 +40,6 @@ updates:
           - 'husky'
           - 'vitest'
           - 'vitest-*'
-          - 'nodemon'
-          - 'npm-run-all'
           - 'lodash'
           - 'source-map-loader'
           - 'sass-*'

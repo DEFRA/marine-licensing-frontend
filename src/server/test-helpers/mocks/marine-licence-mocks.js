@@ -1,6 +1,8 @@
 import { MARINE_LICENCE_KEY } from '#src/server/common/constants/marine-licence.js'
 import { faker } from '@faker-js/faker'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
+import { APPLICATION_TASK_TYPE } from '#src/server/common/helpers/marine-licence/application-tasks/registry.js'
+import { PUBLIC_NOTICE_REQUEST_RELATES_TO } from '#src/server/common/constants/site-notice.js'
 
 export const mockMarineLicenceTaskList = {
   projectName: 'COMPLETED',
@@ -86,13 +88,30 @@ export const waterFrameworkDirective = {
 }
 
 export const mockMarinePlanPolicies = [
-  { policyCode: 'S-CC-2', policy: 'Second policy wording.' },
-  { policyCode: 'S-CC-1', policy: 'First policy wording.' }
+  {
+    policyCode: 'S-CC-2',
+    title: 'South Climate change 2',
+    category: 'Cross-cutting',
+    policy: 'Second policy wording.'
+  },
+  {
+    policyCode: 'S-CC-1',
+    title: 'South Climate change 1',
+    category: 'Cross-cutting',
+    policy: 'First policy wording.'
+  }
 ]
 
 export const mockMarinePlanPolicyResponses = {
   'S-CC-1': 'My first consideration.',
   'S-CC-2': 'My second consideration.'
+}
+
+export const mockSiteNoticeEvidence = {
+  locationName: 'North pier',
+  dateDisplayed: { day: '22', month: '05', year: '2026' },
+  closeUpPhoto: { uploadedFile: { filename: 'test.jpg' } },
+  positionPhoto: { uploadedFile: { filename: 'test.jpg' } }
 }
 
 export const mockMarineLicenceApplication = {
@@ -186,6 +205,47 @@ export const mockSubmittedMarineLicenceApplication = {
   status: 'Submitted',
   applicationReference: 'MLA/2026/10264',
   submittedAt: '2026-05-26T10:00:00Z'
+}
+
+export const mockApplicationTaskContactId = 'contact-with-outstanding-task'
+
+export const mockMarineLicenceWithApplicationTask = {
+  ...mockSubmittedMarineLicenceApplication,
+  contactId: mockApplicationTaskContactId,
+  siteNoticeEvidence: [mockSiteNoticeEvidence],
+  applicationTasks: [
+    {
+      taskId: '507f1f77bcf86cd799439012',
+      type: APPLICATION_TASK_TYPE.WITHHOLDING_NOTIFICATION,
+      receivedAt: '2026-08-14T10:00:00.000Z',
+      resolvedAt: null,
+      data: {
+        decisionDate: '2026-08-14T09:00:00.000Z',
+        nationalSecurity: {
+          decision: 'DISAGREE',
+          applicantMessage:
+            'We did not agree that publishing this would be a risk.'
+        },
+        commercialConfidentiality: {
+          decision: 'AGREE_IN_PART',
+          applicantMessage: 'We have withheld the contractor rates.'
+        }
+      }
+    },
+    {
+      taskId: '507f1f77bcf86cd799439013',
+      type: APPLICATION_TASK_TYPE.PUBLIC_SITE_NOTICE,
+      receivedAt: '2026-09-19T10:00:00.000Z',
+      resolvedAt: null,
+      data: {
+        summary: {
+          proposedWorksSummary: 'test proposed works summary',
+          siteNoticeSummary: 'test site notice summary'
+        },
+        requestRelatesTo: PUBLIC_NOTICE_REQUEST_RELATES_TO.BOTH
+      }
+    }
+  ]
 }
 
 export const mockRedactions = {
@@ -374,9 +434,24 @@ export const mockMarineLicenceWithMarinePlanPolicies = {
   marinePlanPolicyJob: 'ready',
   marinePlanPoliciesCount: 3,
   marinePlanPolicies: [
-    { policyCode: 'SW-MPA-1', policy: 'Marine protected area policy wording.' },
-    { policyCode: 'SW-AGG-2', policy: 'Aggregates policy wording.' },
-    { policyCode: 'SW-BIO-1', policy: 'Biodiversity policy wording.' }
+    {
+      policyCode: 'SW-MPA-1',
+      title: 'South West Marine protected areas 1',
+      category: 'Environmental',
+      policy: 'Marine protected area policy wording.'
+    },
+    {
+      policyCode: 'SW-AGG-2',
+      title: 'South West Aggregates 2',
+      category: 'Economic',
+      policy: 'Aggregates policy wording.'
+    },
+    {
+      policyCode: 'SW-BIO-1',
+      title: 'South West Biodiversity 1',
+      category: 'Environmental',
+      policy: 'Biodiversity policy wording.'
+    }
   ]
 }
 

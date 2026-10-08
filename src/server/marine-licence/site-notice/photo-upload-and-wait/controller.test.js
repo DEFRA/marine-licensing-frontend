@@ -42,7 +42,7 @@ describe('#siteNoticePhotoUploadAndWaitController', () => {
     const request = createMockRequest({
       marineLicence,
       params: { marineLicenceId },
-      query: { evidence: '2' },
+      query: { location: '2' },
       yar: { get: vi.fn(() => requestSession), set: vi.fn(), commit: vi.fn() }
     })
     const h = createMockH()
@@ -167,7 +167,7 @@ describe('#siteNoticePhotoUploadAndWaitController', () => {
     const request = createMockRequest({
       marineLicence: mockMarineLicenceWithApplicationTask,
       params: { marineLicenceId },
-      query: { evidence: '2' },
+      query: { location: '2' },
       yar: { get: vi.fn(() => session), set: vi.fn(), commit: vi.fn() }
     })
     const h = createMockH()

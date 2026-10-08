@@ -54,7 +54,7 @@ export const siteNoticeLocationNameController = {
 
       const siteNoticeEvidence = getSiteNoticeEvidence(
         marineLicence,
-        request.query.evidence
+        request.query.location
       )
 
       let payload = {}
@@ -121,7 +121,7 @@ export const siteNoticeLocationNameSubmitController = {
         {
           locationName: payload.locationName,
           id: marineLicenceId,
-          evidenceIndex: Number.parseInt(request.query.evidence, 10) - 1
+          evidenceIndex: Number.parseInt(request.query.location, 10) - 1
         }
       )
 

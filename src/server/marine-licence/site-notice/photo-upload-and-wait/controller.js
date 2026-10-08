@@ -71,7 +71,7 @@ const savePhoto = async (status, context) => {
           }
         },
         id: request.params.marineLicenceId,
-        evidenceIndex: Number.parseInt(request.query.evidence, 10) - 1
+        evidenceIndex: Number.parseInt(request.query.location, 10) - 1
       }
     )
   } catch (error) {

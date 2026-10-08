@@ -124,7 +124,7 @@ describe('Site notice display page (marine licence)', () => {
       })
     ).toHaveAttribute(
       'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}?evidence=1`
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}?location=1`
     )
     expect(
       getByRole(document, 'link', {
@@ -132,7 +132,7 @@ describe('Site notice display page (marine licence)', () => {
       })
     ).toHaveAttribute(
       'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}?evidence=2`
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}?location=2`
     )
   })
 
@@ -196,7 +196,7 @@ describe('Site notice display page (marine licence)', () => {
       })
     ).toHaveAttribute(
       'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}?evidence=1`
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}?location=1`
     )
 
     expect(
@@ -205,7 +205,7 @@ describe('Site notice display page (marine licence)', () => {
       })
     ).toHaveAttribute(
       'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${licenceId}?evidence=1`
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${licenceId}?location=1`
     )
 
     expect(
@@ -214,7 +214,7 @@ describe('Site notice display page (marine licence)', () => {
       })
     ).toHaveAttribute(
       'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${licenceId}?evidence=1`
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${licenceId}?location=1`
     )
 
     expect(
@@ -223,7 +223,7 @@ describe('Site notice display page (marine licence)', () => {
       })
     ).toHaveAttribute(
       'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}?evidence=1`
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}?location=1`
     )
   })
 

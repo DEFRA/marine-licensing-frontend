@@ -25,7 +25,7 @@ export const siteNoticeDisplayUrl = (marineLicenceId) =>
   `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
 
 export const siteNoticeEvidenceUrl = (route, request) =>
-  `${route}/${request.params.marineLicenceId}?evidence=${request.query.evidence}`
+  `${route}/${request.params.marineLicenceId}?location=${request.query.location}`
 
 export const getPhotoUploadErrorDisplay = (request) => {
   const { uploadError } = getPhotoUploadSession(request)

@@ -25,7 +25,7 @@ describe('#siteNoticePositionPhotoController', () => {
     const request = createMockRequest({
       marineLicence: mockMarineLicenceWithApplicationTask,
       params: { marineLicenceId },
-      query: { evidence: '1' }
+      query: { location: '1' }
     })
     const h = createMockH()
 
@@ -33,7 +33,7 @@ describe('#siteNoticePositionPhotoController', () => {
 
     expect(photoUpload.initiatePhotoUpload).toHaveBeenCalledWith(request, h, {
       field: 'positionPhoto',
-      uploadPageUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${marineLicenceId}?evidence=1`
+      uploadPageUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${marineLicenceId}?location=1`
     })
     expect(h.view).toHaveBeenCalledWith(
       SITE_NOTICE_POSITION_PHOTO_VIEW_ROUTE,
@@ -58,7 +58,7 @@ describe('#siteNoticePositionPhotoController', () => {
           applicationTasks: []
         },
         params: { marineLicenceId },
-        query: { evidence: '1' }
+        query: { location: '1' }
       }),
       h
     )
@@ -78,7 +78,7 @@ describe('#siteNoticePositionPhotoController', () => {
       createMockRequest({
         marineLicence: mockMarineLicenceWithApplicationTask,
         params: { marineLicenceId },
-        query: { evidence: '1' }
+        query: { location: '1' }
       }),
       h
     )

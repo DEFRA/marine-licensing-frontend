@@ -53,7 +53,7 @@ export const siteNoticeDateDisplayedController = {
       }
 
       const siteNoticeEvidence = marineLicence.siteNoticeEvidence ?? []
-      const evidenceIndex = Number.parseInt(request.query.evidence, 10) - 1
+      const evidenceIndex = Number.parseInt(request.query.location, 10) - 1
       const existingEvidence = siteNoticeEvidence[evidenceIndex]
 
       let payload = {}
@@ -137,7 +137,7 @@ export const siteNoticeDateDisplayedSubmitController = {
         {
           dateDisplayed,
           id: marineLicenceId,
-          evidenceIndex: Number.parseInt(request.query.evidence, 10) - 1
+          evidenceIndex: Number.parseInt(request.query.location, 10) - 1
         }
       )
 

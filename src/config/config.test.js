@@ -67,6 +67,28 @@ const setAddressLookupEnv = () => {
     'api://lookup/.default'
 }
 
+const setProductionLikeEnv = (environment) => {
+  process.env.ENVIRONMENT = environment
+  process.env.NODE_ENV = 'production'
+  process.env.SESSION_COOKIE_PASSWORD = 'production-password-at-least-32-chars'
+  process.env.REDIS_HOST = 'prod-redis.example.com'
+  process.env.REDIS_USERNAME = 'prod-user'
+  process.env.REDIS_PASSWORD = 'prod-password'
+  process.env.MARINE_LICENSING_BACKEND_API_URL = 'https://api.example.com'
+  process.env.DEFRA_ID_OIDC_CONFIGURATION_URL = 'https://defra-id.example.com'
+  process.env.DEFRA_ID_CLIENT_ID = 'prod-client-id'
+  process.env.DEFRA_ID_CLIENT_SECRET = 'prod-secret'
+  process.env.DEFRA_ID_SERVICE_ID = 'prod-service'
+  process.env.DEFRA_ID_ACCOUNT_MANAGEMENT_URL = 'https://account.example.com'
+  process.env.ENTRA_ID_OIDC_CONFIGURATION_URL = 'https://entra.example.com'
+  process.env.ENTRA_ID_CLIENT_ID = 'entra-client-id'
+  process.env.ENTRA_ID_CLIENT_SECRET = 'entra-secret'
+  process.env.CDP_UPLOADER_BASE_URL = 'https://uploader.example.com'
+  process.env.CDP_UPLOAD_BUCKET = 'prod-bucket'
+  process.env.APP_BASE_URL = 'https://app.example.com'
+  setAddressLookupEnv()
+}
+
 describe('config validation', () => {
   let originalEnv
 
@@ -272,7 +294,7 @@ describe('config validation', () => {
     })
   })
 
-  describe('CLARITY_PROJECT_ID warning', () => {
+  describe('analytics ID warnings', () => {
     test('should warn when CLARITY_PROJECT_ID is not set in prod', async () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
@@ -316,6 +338,7 @@ describe('config validation', () => {
       process.env.ENVIRONMENT = 'prod'
       process.env.NODE_ENV = 'production'
       process.env.CLARITY_PROJECT_ID = 'some-clarity-id'
+      process.env.GOOGLE_TAG_MANAGER_KEY = 'GTM-TEST123'
       process.env.SESSION_COOKIE_PASSWORD =
         'production-password-at-least-32-chars'
       process.env.REDIS_HOST = 'prod-redis.example.com'
@@ -354,6 +377,58 @@ describe('config validation', () => {
       expect(warnSpy).not.toHaveBeenCalled()
 
       warnSpy.mockRestore()
+    })
+
+    test('should warn when GOOGLE_TAG_MANAGER_KEY is not set in prod', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      setProductionLikeEnv('prod')
+      process.env.CLARITY_PROJECT_ID = 'some-clarity-id'
+
+      await import('./config.js')
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'GOOGLE_TAG_MANAGER_KEY is not set for prod environment'
+        )
+      )
+    })
+
+    test('should not warn about GOOGLE_TAG_MANAGER_KEY in perf-test', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      setProductionLikeEnv('perf-test')
+      process.env.CLARITY_PROJECT_ID = 'some-clarity-id'
+
+      await import('./config.js')
+
+      expect(warnSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining('GOOGLE_TAG_MANAGER_KEY')
+      )
+    })
+
+    test('should blank an invalid GOOGLE_TAG_MANAGER_KEY and warn', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      process.env.ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'test'
+      process.env.GOOGLE_TAG_MANAGER_KEY = 'not-a-real-ga4-container-id'
+
+      const { config } = await import('./config.js')
+
+      expect(config.get('googleTagManagerKey')).toBe('')
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'GOOGLE_TAG_MANAGER_KEY is not a valid GTM container ID'
+        )
+      )
+    })
+
+    test('should keep a valid GOOGLE_TAG_MANAGER_KEY', async () => {
+      process.env.ENVIRONMENT = 'local'
+      process.env.NODE_ENV = 'test'
+      process.env.GOOGLE_TAG_MANAGER_KEY = 'GTM-TEST123'
+
+      const { config } = await import('./config.js')
+
+      expect(config.get('googleTagManagerKey')).toBe('GTM-TEST123')
     })
   })
 })

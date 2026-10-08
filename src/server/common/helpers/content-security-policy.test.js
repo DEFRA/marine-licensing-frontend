@@ -1,194 +1,284 @@
 import { vi } from 'vitest'
-import { contentSecurityPolicy } from './content-security-policy.js'
+import {
+  buildContentSecurityPolicy,
+  contentSecurityPolicy
+} from './content-security-policy.js'
+
+const configValues = vi.hoisted(() => ({
+  'cdpUploader.cdpUploadServiceBaseUrl': 'http://uploader',
+  'defraId.cspRedirectHosts': [
+    'https://dcidmtest.b2clogin.com',
+    'https://your-account.cpdev.cui.defra.gov.uk'
+  ],
+  clarityProjectId: '123',
+  googleTagManagerKey: '',
+  cdpEnvironment: 'local'
+}))
 
 vi.mock('~/src/config/config.js', () => ({
   config: {
-    get: vi.fn((key) => {
-      if (key === 'cdpUploader.cdpUploadServiceBaseUrl') {
-        return 'http://uploader'
-      }
-      if (key === 'defraId.cspRedirectHosts') {
-        return [
-          'https://dcidmtest.b2clogin.com',
-          'https://your-account.cpdev.cui.defra.gov.uk'
-        ]
-      }
-      return '123' // clarityProjectId
-    })
+    get: vi.fn((key) => configValues[key])
   }
 }))
 
-describe('contentSecurityPolicy', () => {
+const baseOptions = {
+  nonce: 'abc123',
+  uploaderServiceHost: 'http://uploader',
+  cspRedirectHosts: ['https://dcidmtest.b2clogin.com'],
+  clarityProjectId: '',
+  googleTagManagerKey: '',
+  includePreviewHosts: false
+}
+
+const directive = (header, name) =>
+  header.split('; ').find((part) => part.startsWith(`${name} `))
+
+describe('buildContentSecurityPolicy', () => {
+  test('sets the static directives', () => {
+    const header = buildContentSecurityPolicy(baseOptions)
+
+    expect(directive(header, 'base-uri')).toBe("base-uri 'self'")
+    expect(directive(header, 'default-src')).toBe("default-src 'self'")
+    expect(directive(header, 'font-src')).toBe("font-src 'self'")
+    expect(directive(header, 'form-action')).toBe(
+      "form-action 'self' http://uploader https://dcidmtest.b2clogin.com"
+    )
+    expect(directive(header, 'frame-ancestors')).toBe("frame-ancestors 'none'")
+    expect(directive(header, 'manifest-src')).toBe("manifest-src 'self'")
+    expect(directive(header, 'media-src')).toBe("media-src 'self'")
+    expect(directive(header, 'object-src')).toBe("object-src 'none'")
+    expect(directive(header, 'style-src')).toBe("style-src 'self'")
+  })
+
+  test('ends script-src with the nonce and includes the govuk-frontend hash', () => {
+    const header = buildContentSecurityPolicy(baseOptions)
+
+    expect(directive(header, 'script-src')).toBe(
+      "script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' 'nonce-abc123'"
+    )
+  })
+
+  test('never allows unsafe-inline or unsafe-eval', () => {
+    const header = buildContentSecurityPolicy({
+      ...baseOptions,
+      clarityProjectId: '123',
+      googleTagManagerKey: 'GTM-TEST123',
+      includePreviewHosts: true
+    })
+
+    expect(header).not.toContain('unsafe-inline')
+    expect(header).not.toContain('unsafe-eval')
+  })
+
+  describe('Clarity hosts', () => {
+    test('are omitted when no project ID is configured', () => {
+      const header = buildContentSecurityPolicy(baseOptions)
+
+      expect(header).not.toContain('clarity.ms')
+    })
+
+    test('are added to script-src and connect-src when a project ID is configured', () => {
+      const header = buildContentSecurityPolicy({
+        ...baseOptions,
+        clarityProjectId: '123'
+      })
+
+      expect(directive(header, 'script-src')).toBe(
+        "script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' https://www.clarity.ms/tag/123 https://scripts.clarity.ms 'nonce-abc123'"
+      )
+      expect(directive(header, 'connect-src')).toBe(
+        "connect-src 'self' https://*.clarity.ms/collect"
+      )
+    })
+  })
+
+  describe('Google Tag Manager hosts', () => {
+    test('are omitted when no container key is configured', () => {
+      const header = buildContentSecurityPolicy(baseOptions)
+
+      expect(header).not.toContain('googletagmanager.com')
+      expect(header).not.toContain('google-analytics.com')
+      expect(directive(header, 'frame-src')).toBe("frame-src 'self'")
+      expect(directive(header, 'img-src')).toBe(
+        "img-src 'self' https://tile.openstreetmap.org"
+      )
+    })
+
+    test('are added to script-src, connect-src, img-src and frame-src when a key is configured', () => {
+      const header = buildContentSecurityPolicy({
+        ...baseOptions,
+        googleTagManagerKey: 'GTM-TEST123'
+      })
+
+      expect(directive(header, 'script-src')).toBe(
+        "script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' https://www.googletagmanager.com 'nonce-abc123'"
+      )
+      expect(directive(header, 'connect-src')).toBe(
+        "connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.google.com"
+      )
+      expect(directive(header, 'img-src')).toBe(
+        "img-src 'self' https://tile.openstreetmap.org https://www.googletagmanager.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com"
+      )
+      expect(directive(header, 'frame-src')).toBe(
+        "frame-src 'self' https://www.googletagmanager.com"
+      )
+    })
+
+    test('include the apex analytics.google.com host because the wildcard does not match it', () => {
+      const header = buildContentSecurityPolicy({
+        ...baseOptions,
+        googleTagManagerKey: 'GTM-TEST123'
+      })
+
+      expect(directive(header, 'connect-src')).toContain(
+        ' https://analytics.google.com '
+      )
+    })
+  })
+
+  describe('Tag Assistant preview hosts', () => {
+    test('are omitted in production even with a key', () => {
+      const header = buildContentSecurityPolicy({
+        ...baseOptions,
+        googleTagManagerKey: 'GTM-TEST123',
+        includePreviewHosts: false
+      })
+
+      expect(header).not.toContain('tagmanager.google.com')
+      expect(header).not.toContain('fonts.googleapis.com')
+      expect(header).not.toContain('gstatic.com')
+    })
+
+    test('are omitted outside production when there is no key', () => {
+      const header = buildContentSecurityPolicy({
+        ...baseOptions,
+        includePreviewHosts: true
+      })
+
+      expect(header).not.toContain('tagmanager.google.com')
+    })
+
+    test('are added outside production when a key is configured', () => {
+      const header = buildContentSecurityPolicy({
+        ...baseOptions,
+        googleTagManagerKey: 'GTM-TEST123',
+        includePreviewHosts: true
+      })
+
+      expect(directive(header, 'script-src')).toBe(
+        "script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' https://www.googletagmanager.com https://tagmanager.google.com 'nonce-abc123'"
+      )
+      expect(directive(header, 'style-src')).toBe(
+        "style-src 'self' https://www.googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com"
+      )
+      expect(directive(header, 'img-src')).toContain(
+        'https://ssl.gstatic.com https://www.gstatic.com'
+      )
+      expect(directive(header, 'font-src')).toBe(
+        "font-src 'self' https://fonts.gstatic.com data:"
+      )
+    })
+  })
+})
+
+describe('contentSecurityPolicy plugin', () => {
   let server
   let mockResponse
   let mockRequest
   let mockH
+  let onPreResponseHandler
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    configValues.googleTagManagerKey = ''
+    configValues.clarityProjectId = '123'
+    configValues.cdpEnvironment = 'local'
     mockResponse = {
       header: vi.fn().mockReturnThis(),
-      isBoom: false
+      isBoom: false,
+      variety: 'view',
+      source: { context: { existing: true } }
     }
-    mockRequest = {
-      response: mockResponse
-    }
-    mockH = {
-      continue: Symbol('continue')
-    }
-    server = {
-      ext: vi.fn()
-    }
+    mockRequest = { response: mockResponse }
+    mockH = { continue: Symbol('continue') }
+    server = { ext: vi.fn() }
+    await contentSecurityPolicy.register(server)
+    onPreResponseHandler = server.ext.mock.calls[0][1]
   })
 
-  it('should register as a Hapi plugin', () => {
+  test('registers as a Hapi plugin with an onPreResponse hook', () => {
     expect(contentSecurityPolicy.name).toBe('content-security-policy')
-    expect(contentSecurityPolicy.register).toBeInstanceOf(Function)
+    expect(server.ext).toHaveBeenCalledWith(
+      'onPreResponse',
+      expect.any(Function)
+    )
   })
 
-  describe('when registered', () => {
-    let onPreResponseHandler
+  test('returns h.continue', () => {
+    expect(onPreResponseHandler(mockRequest, mockH)).toBe(mockH.continue)
+  })
 
-    beforeEach(async () => {
-      await contentSecurityPolicy.register(server)
-      onPreResponseHandler = server.ext.mock.calls[0][1]
+  test('sets the header with a fresh 32-character hex nonce and exposes it to the view', () => {
+    onPreResponseHandler(mockRequest, mockH)
+
+    const [, header] = mockResponse.header.mock.calls[0]
+    const [, nonce] = header.match(/'nonce-([a-f0-9]{32})'/)
+    expect(header).toContain(
+      "script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' https://www.clarity.ms/tag/123 https://scripts.clarity.ms 'nonce-"
+    )
+    expect(mockResponse.source.context).toEqual({
+      existing: true,
+      cspNonce: nonce
     })
+  })
 
-    it('should register onPreResponse hook', () => {
-      onPreResponseHandler(mockRequest, mockH)
+  test('uses a different nonce per response', () => {
+    onPreResponseHandler(mockRequest, mockH)
+    onPreResponseHandler(mockRequest, mockH)
 
-      expect(server.ext).toHaveBeenCalledWith(
-        'onPreResponse',
-        expect.any(Function)
-      )
-    })
+    const nonces = mockResponse.header.mock.calls.map(
+      ([, header]) => header.match(/'nonce-([a-f0-9]{32})'/)[1]
+    )
+    expect(nonces[0]).not.toBe(nonces[1])
+  })
 
-    it('should return h.continue', () => {
-      const result = onPreResponseHandler(mockRequest, mockH)
+  test('does not touch a non-view response context but still sets the header', () => {
+    mockResponse.variety = 'plain'
+    delete mockResponse.source
 
-      expect(result).toBe(mockH.continue)
-    })
+    onPreResponseHandler(mockRequest, mockH)
 
-    it('should set base-uri directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
+    expect(mockResponse.header).toHaveBeenCalledWith(
+      'Content-Security-Policy',
+      expect.stringContaining("default-src 'self'")
+    )
+  })
 
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining("base-uri 'self'")
-      )
-    })
+  test('adds Google hosts when the key is configured at registration', async () => {
+    configValues.googleTagManagerKey = 'GTM-TEST123'
+    server = { ext: vi.fn() }
+    await contentSecurityPolicy.register(server)
+    const handler = server.ext.mock.calls[0][1]
 
-    it('should set default-src directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
+    handler(mockRequest, mockH)
 
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining("default-src 'self'")
-      )
-    })
+    const [, header] = mockResponse.header.mock.calls[0]
+    expect(header).toContain(
+      "frame-src 'self' https://www.googletagmanager.com"
+    )
+    expect(header).toContain('https://tagmanager.google.com')
+  })
 
-    it('should set connect-src directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
+  test('omits preview hosts in prod', async () => {
+    configValues.googleTagManagerKey = 'GTM-TEST123'
+    configValues.cdpEnvironment = 'prod'
+    server = { ext: vi.fn() }
+    await contentSecurityPolicy.register(server)
+    const handler = server.ext.mock.calls[0][1]
 
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining(
-          "connect-src 'self' https://*.clarity.ms/collect"
-        )
-      )
-    })
+    handler(mockRequest, mockH)
 
-    it('should set font-src directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
-
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining("font-src 'self'")
-      )
-    })
-
-    it('should set form-action directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
-
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining(
-          "form-action 'self' http://uploader https://dcidmtest.b2clogin.com https://your-account.cpdev.cui.defra.gov.uk"
-        )
-      )
-    })
-
-    it('should set frame-src directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
-
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining("frame-src 'self'")
-      )
-    })
-
-    it('should set frame-ancestors directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
-
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining("frame-ancestors 'none'")
-      )
-    })
-
-    it('should set img-src directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
-
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining("img-src 'self' https://tile.openstreetmap.org")
-      )
-    })
-
-    it('should set manifest-src directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
-
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining("manifest-src 'self'")
-      )
-    })
-
-    it('should set media-src directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
-
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining("media-src 'self'")
-      )
-    })
-
-    it('should set object-src directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
-
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining("object-src 'none'")
-      )
-    })
-
-    it('should set script-src directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
-
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining(
-          "script-src 'self' 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw=' https://www.clarity.ms/tag/123 https://scripts.clarity.ms 'nonce-"
-        )
-      )
-    })
-
-    it('should set style-src directive', () => {
-      onPreResponseHandler(mockRequest, mockH)
-
-      expect(mockResponse.header).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.stringContaining("style-src 'self'")
-      )
-    })
+    const [, header] = mockResponse.header.mock.calls[0]
+    expect(header).toContain('https://www.googletagmanager.com')
+    expect(header).not.toContain('https://tagmanager.google.com')
   })
 })

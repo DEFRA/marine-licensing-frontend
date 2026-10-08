@@ -1,8 +1,12 @@
+import { vi } from 'vitest'
 import { JSDOM } from 'jsdom'
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, queryByRole } from '@testing-library/dom'
+import Boom from '@hapi/boom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+import { redirectPathCacheKey } from '~/src/server/common/constants/routes.js'
+import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 
 const expectContactDetailsSection = (document) => {
   const phoneHeading = getByRole(document, 'heading', {
@@ -99,6 +103,60 @@ describe('Error Pages Integration Tests', () => {
               pageTitle: 'Sorry, the service is unavailable'
             })
             .code(statusCodes.serviceUnavailable)
+        }
+      },
+      {
+        method: 'GET',
+        path: '/test-boom-500',
+        handler: () => {
+          throw Boom.internal('test failure')
+        }
+      },
+      {
+        method: 'GET',
+        path: '/test-boom-403',
+        handler: () => {
+          throw Boom.forbidden()
+        }
+      },
+      {
+        method: 'GET',
+        path: '/test-boom-redirect',
+        handler: () => {
+          const error = Boom.unauthorized()
+          error.redirectPath = '/home'
+          throw error
+        }
+      },
+      {
+        method: 'GET',
+        path: '/test-seed-session',
+        options: { auth: false },
+        handler: (request) => {
+          request.yar.set('seeded', true)
+          return { seeded: true }
+        }
+      },
+      {
+        method: 'GET',
+        path: '/test-read-redirect-flash',
+        options: { auth: false },
+        handler: (request) => request.yar.flash(redirectPathCacheKey)
+      },
+      {
+        method: 'GET',
+        path: '/test-sign-in',
+        options: { auth: false },
+        handler: async (request) => {
+          const sessionId = 'test-session-not-found-page'
+          await request.server.app.cache.set(sessionId, {
+            strategy: 'defra-id',
+            userId: 'test-user',
+            displayName: 'Test User',
+            expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+          })
+          request.cookieAuth.set({ sessionId })
+          return { signedIn: true }
         }
       }
     ])
@@ -352,5 +410,171 @@ describe('Error Pages Integration Tests', () => {
         expectContactDetailsSection(document)
       }
     )
+  })
+
+  describe('Boom-derived error pages get the full response lifecycle', () => {
+    const NONCE_IN_HEADER = /'nonce-([a-f0-9]{32})'/
+
+    test.each([
+      {
+        url: '/test-boom-500',
+        status: statusCodes.internalServerError,
+        heading: 'There is a problem with the service'
+      },
+      {
+        url: '/test-boom-403',
+        status: statusCodes.forbidden,
+        heading: 'You do not have permission to view this page'
+      }
+    ])(
+      '$url carries the CSP header, a matching nonce, the cookie banner and no-store',
+      async ({ url, status, heading }) => {
+        const response = await makeGetRequest({ server: getServer(), url })
+
+        expect(response.statusCode).toBe(status)
+
+        const csp = response.headers['content-security-policy']
+        expect(csp).toContain("frame-ancestors 'none'")
+        const [, headerNonce] = csp.match(NONCE_IN_HEADER)
+        expect(response.result).toMatch(
+          new RegExp(`nonce=["']${headerNonce}["']`)
+        )
+        expect(response.headers['cache-control']).toContain('no-store')
+
+        const document = new JSDOM(response.result).window.document
+        expect(
+          getByRole(document, 'heading', { name: heading, level: 1 })
+        ).toBeInTheDocument()
+        expect(
+          document.querySelector('.govuk-cookie-banner')
+        ).toBeInTheDocument()
+      }
+    )
+
+    test('a Boom with redirectPath redirects and still gets the CSP and cache-control headers', async () => {
+      const response = await makeGetRequest({
+        server: getServer(),
+        url: '/test-boom-redirect'
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe('/home')
+      // Both headers come from extensions that a takeover would have skipped
+      expect(response.headers['cache-control']).toContain('no-store')
+      expect(response.headers['content-security-policy']).toContain(
+        "frame-ancestors 'none'"
+      )
+    })
+  })
+
+  describe('Unknown URLs get the full request lifecycle', () => {
+    const unknownUrl = '/this-page-does-not-exist-for-testing'
+    const NONCE_IN_HEADER = /'nonce-([a-f0-9]{32})'/
+    const savedPreferences = () => {
+      const policy = Buffer.from(
+        JSON.stringify({ essential: true, analytics: false, timestamp: 1 })
+      ).toString('base64')
+      return `cookies_policy=${policy}; cookies_preferences_set=true`
+    }
+
+    test('signed-out: carries CSP, matching nonce, cookie banner, no-store and no navigation', async () => {
+      const response = await getServer().inject({
+        method: 'GET',
+        url: unknownUrl
+      })
+
+      expect(response.statusCode).toBe(statusCodes.notFound)
+      const csp = response.headers['content-security-policy']
+      const [, headerNonce] = csp.match(NONCE_IN_HEADER)
+      expect(response.result).toMatch(
+        new RegExp(`nonce=["']${headerNonce}["']`)
+      )
+      expect(response.headers['cache-control']).toContain('no-store')
+
+      const document = new JSDOM(response.result).window.document
+      expect(document.querySelector('.govuk-cookie-banner')).toBeInTheDocument()
+      expect(
+        queryByRole(document, 'link', { name: 'Sign out' })
+      ).not.toBeInTheDocument()
+      expect(
+        queryByRole(document, 'link', { name: 'Submissions' })
+      ).not.toBeInTheDocument()
+    })
+
+    test('does not show the cookie banner once preferences are saved', async () => {
+      const response = await getServer().inject({
+        method: 'GET',
+        url: unknownUrl,
+        headers: { cookie: savedPreferences() }
+      })
+
+      const document = new JSDOM(response.result).window.document
+      expect(
+        document.querySelector('.govuk-cookie-banner')
+      ).not.toBeInTheDocument()
+    })
+
+    test('signed-in: shows the service navigation', async () => {
+      // authenticated-requests.js is auto-mocked for the whole suite (see the
+      // vi.mock in test-setup-helpers.js), which replaces getAuthProvider with a
+      // stub that always returns undefined; restore its real implementation here
+      // so buildNavigation can tell this request is signed in.
+      const { getAuthProvider: realGetAuthProvider } = await vi.importActual(
+        '~/src/server/common/helpers/authenticated-requests.js'
+      )
+      vi.mocked(getAuthProvider).mockImplementation(realGetAuthProvider)
+
+      const signIn = await getServer().inject({
+        method: 'GET',
+        url: '/test-sign-in'
+      })
+      const sessionCookie = []
+        .concat(signIn.headers['set-cookie'])
+        .find((cookie) => cookie.startsWith('userSession='))
+        .split(';')[0]
+
+      const response = await getServer().inject({
+        method: 'GET',
+        url: unknownUrl,
+        headers: { cookie: sessionCookie }
+      })
+
+      expect(response.statusCode).toBe(statusCodes.notFound)
+      const document = new JSDOM(response.result).window.document
+      expect(
+        getByRole(document, 'link', { name: 'Sign out' })
+      ).toBeInTheDocument()
+      expect(
+        getByRole(document, 'link', { name: 'Submissions' })
+      ).toBeInTheDocument()
+    })
+
+    test('signed-out: does not store the unknown URL as the post-sign-in destination', async () => {
+      const seed = await getServer().inject({
+        method: 'GET',
+        url: '/test-seed-session'
+      })
+      const sessionCookie = []
+        .concat(seed.headers['set-cookie'])
+        .find((cookie) => cookie.startsWith('marineLicensingSession='))
+        .split(';')[0]
+
+      await getServer().inject({
+        method: 'GET',
+        url: unknownUrl,
+        headers: { cookie: sessionCookie }
+      })
+
+      const flash = await getServer().inject({
+        method: 'GET',
+        url: '/test-read-redirect-flash',
+        headers: { cookie: sessionCookie }
+      })
+
+      expect(flash.statusCode).toBe(statusCodes.ok)
+      // request.yar.flash(key) returns the raw array; hapi's inject `result`
+      // is the handler's unserialised return value, not a JSON string.
+      expect(flash.result).toEqual([])
+    })
   })
 })

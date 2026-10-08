@@ -3,7 +3,10 @@ import {
   COOKIE_OPTIONS_BASE64,
   FLASH_MESSAGE_KEYS
 } from '#src/server/common/constants/cookies.js'
-import { getCookiePreferences } from '#src/server/common/helpers/cookie-preferences.js'
+import {
+  getCookiePreferences,
+  areCookiePreferencesSet
+} from '#src/server/common/helpers/cookie-preferences.js'
 import { config } from '#src/config/config.js'
 
 export const cookies = {
@@ -33,8 +36,7 @@ export const cookies = {
 
       if (response.variety === 'view') {
         const cookiePolicy = getCookiePreferences(request)
-        const hasSetCookiePreferences =
-          request.state?.[COOKIE_NAMES.PREFERENCES_SET] === 'true'
+        const hasSetCookiePreferences = areCookiePreferencesSet(request)
 
         const showCookieBanner = !hasSetCookiePreferences
         const isOnCookiesPage = request.path === '/help/cookies'

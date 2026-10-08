@@ -8,7 +8,13 @@ import {
 } from '#src/server/common/constants/cookies.js'
 import { config } from '#src/config/config.js'
 
-vi.mock('~/src/server/common/helpers/cookie-preferences.js')
+vi.mock(
+  '~/src/server/common/helpers/cookie-preferences.js',
+  async (importOriginal) => ({
+    ...(await importOriginal()),
+    getCookiePreferences: vi.fn()
+  })
+)
 vi.mock('~/src/config/config.js')
 
 const createMockServer = () => ({

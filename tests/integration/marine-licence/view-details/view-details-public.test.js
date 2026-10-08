@@ -11,6 +11,7 @@ import {
   expectedWaterFrameworkDirectiveCard
 } from './fixtures.js'
 import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
+import { getCardRow } from './utils.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
@@ -34,6 +35,15 @@ describe('Marine Licence View Details', () => {
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       mockSubmittedMarineLicenceApplication.projectName
     )
+  })
+
+  test('renders who the marine licence is for in the application overview', () => {
+    const card = document.querySelector('#application-overview-card')
+    const row = getCardRow(card, 'Who the marine licence is for')
+
+    expect(
+      row.querySelector('.govuk-summary-list__value').textContent.trim()
+    ).toBe(mockSubmittedMarineLicenceApplication.whoMarineLicenceIsFor)
   })
 
   describe('site details', () => {

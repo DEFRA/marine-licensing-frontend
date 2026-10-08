@@ -68,9 +68,6 @@ export const siteNoticeDateDisplayedController = {
         payload
       })
     } catch (error) {
-      if (error.isBoom) {
-        throw error
-      }
       request.logger.error(
         error,
         'Error displaying site notice date displayed page'

@@ -97,6 +97,27 @@ describe('#siteNoticeDateDisplayed', () => {
       expect(h.view).not.toHaveBeenCalled()
     })
 
+    test('renders an empty payload when there is no site notice evidence', async () => {
+      const h = createMockH()
+
+      await siteNoticeDateDisplayedController.handler(
+        createMockRequest({
+          marineLicence: {
+            ...mockMarineLicenceWithApplicationTask,
+            siteNoticeEvidence: undefined
+          },
+          params: { marineLicenceId },
+          query: { location: '1' }
+        }),
+        h
+      )
+
+      expect(h.view).toHaveBeenCalledWith(
+        SITE_NOTICE_DATE_DISPLAYED_VIEW_ROUTE,
+        expect.objectContaining({ payload: {} })
+      )
+    })
+
     test('Should handle unexpected errors in catch block', async () => {
       const h = createMockH()
       h.view.mockImplementation(() => {
@@ -223,6 +244,48 @@ describe('#siteNoticeDateDisplayed', () => {
           ]
         })
       )
+    })
+
+    test('failAction redirects to view details when there is no site notice task', async () => {
+      vi.mocked(loadMarineLicence).mockResolvedValueOnce({
+        marineLicence: {
+          ...mockMarineLicenceWithApplicationTask,
+          applicationTasks: []
+        },
+        marineLicenceId
+      })
+      const h = createMockH()
+
+      await siteNoticeDateDisplayedSubmitController.options.validate.failAction(
+        createMockRequest({ params: { marineLicenceId } }),
+        h,
+        { details: [] }
+      )
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+      )
+      expect(h.redirect.mock.results[0].value.takeover).toHaveBeenCalled()
+      expect(h.view).not.toHaveBeenCalled()
+    })
+
+    test('rethrows API errors without validation details', async () => {
+      const apiError = new Error('API down')
+      vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(
+        apiError
+      )
+
+      await expect(
+        siteNoticeDateDisplayedSubmitController.handler(
+          createMockRequest({
+            marineLicence: mockMarineLicenceWithApplicationTask,
+            params: { marineLicenceId },
+            query: { location: '1' },
+            payload: validPayload
+          }),
+          createMockH()
+        )
+      ).rejects.toBe(apiError)
     })
 
     test('renders API validation errors', async () => {

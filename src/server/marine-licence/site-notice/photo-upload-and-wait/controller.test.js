@@ -13,6 +13,7 @@ import {
 } from '#src/server/common/constants/routes.js'
 import { statusCodes } from '#src/server/common/constants/status-codes.js'
 import { UPLOAD_AND_WAIT_VIEW_ROUTE } from '#src/server/common/helpers/file-upload/constants.js'
+import { DEFAULT_ERROR_MESSAGE } from '#src/server/common/helpers/file-upload/error-messages.js'
 import {
   createMockH,
   createMockRequest
@@ -158,11 +159,20 @@ describe('#siteNoticePhotoUploadAndWaitController', () => {
   test.each([
     ['FILE_TOO_LARGE', PHOTO_FILE_SIZE_ERROR_MESSAGE],
     ['INVALID_FILE_TYPE', PHOTO_FILE_TYPE_ERROR_MESSAGE],
-    ['VIRUS_DETECTED', 'The selected file contains a virus']
+    ['VIRUS_DETECTED', 'The selected file contains a virus'],
+    [undefined, DEFAULT_ERROR_MESSAGE]
   ])('maps the %s rejection to its message', async (errorCode, message) => {
     const result = await runWait({ status: 'rejected', errorCode })
 
     expectUploadError(result, message)
+  })
+
+  test('returns to the upload page when the upload status is unknown', async () => {
+    const { request, h } = await runWait({ status: 'mystery' })
+
+    expect(request.logger.warn).toHaveBeenCalled()
+    expect(request.yar.set).not.toHaveBeenCalled()
+    expect(h.redirect).toHaveBeenCalledWith(uploadPageUrl)
   })
 
   test('clears the session and returns to the upload page when the status check fails', async () => {
@@ -176,6 +186,20 @@ describe('#siteNoticePhotoUploadAndWaitController', () => {
     const h = createMockH()
 
     await siteNoticePhotoUploadAndWaitController.handler(request, h)
+
+    expect(request.yar.set).toHaveBeenCalledWith(PHOTO_UPLOAD_SESSION_KEY, {})
+    expect(h.redirect).toHaveBeenCalledWith(uploadPageUrl)
+  })
+
+  test('clears the session and returns to the upload page when saving the photo fails', async () => {
+    vi.mocked(authRequests.authenticatedPatchRequest).mockRejectedValue(
+      new Error('API down')
+    )
+
+    const { request, h } = await runWait({
+      status: 'ready',
+      s3Location: { detectedContentType: 'image/png' }
+    })
 
     expect(request.yar.set).toHaveBeenCalledWith(PHOTO_UPLOAD_SESSION_KEY, {})
     expect(h.redirect).toHaveBeenCalledWith(uploadPageUrl)

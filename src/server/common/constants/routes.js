@@ -163,6 +163,8 @@ export const marineLicenceRoutes = {
     '/marine-licence/site-notice/photo-upload-and-wait',
   MARINE_LICENCE_SITE_NOTICE_ADD_EVIDENCE:
     '/marine-licence/site-notice/display/add-evidence',
+  MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION:
+    '/marine-licence/{marineLicenceId}/delete-location',
   MARINE_LICENCE_FEE_ESTIMATE: '/marine-licence/fee-estimate',
   MARINE_LICENCE_FEE_ESTIMATE_ARE_YOU_SURE:
     '/marine-licence/fee-estimate-are-you-sure',
@@ -271,5 +273,6 @@ export const apiRoutes = {
   RESOLVE_APPLICATION_TASK:
     '/marine-licence/{marineLicenceId}/application-tasks/{taskId}/resolve',
   UPDATE_SITE_NOTICE_EVIDENCE: '/marine-licence/update-site-notice-evidence',
-  ADD_SITE_NOTICE_EVIDENCE: '/marine-licence/add-site-notice-evidence'
+  ADD_SITE_NOTICE_EVIDENCE: '/marine-licence/add-site-notice-evidence',
+  DELETE_SITE_NOTICE_EVIDENCE: '/marine-licence/delete-site-notice-evidence'
 }

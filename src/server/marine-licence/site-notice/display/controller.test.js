@@ -56,6 +56,7 @@ describe('#siteNoticeDisplay', () => {
         pageCaption: 'MLA/2026/10264 - Test Project',
         addEvidenceFormAction: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_ADD_EVIDENCE}/${licenceId}`,
         canAddLocation: true,
+        deleteLocationUrl: `/marine-licence/${licenceId}/delete-location`,
         evidenceLinks: {
           locationName: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}`,
           dateDisplayed: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${licenceId}`,

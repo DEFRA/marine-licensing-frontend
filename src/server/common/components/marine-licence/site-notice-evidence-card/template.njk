@@ -34,7 +34,15 @@
     title: {
       text: title
     },
-    attributes: params.cardAttributes
+    attributes: params.cardAttributes,
+    actions: {
+      items: [{
+        href: params.deleteHref,
+        text: "Delete location",
+        classes: "govuk-link--no-visited-state",
+        visuallyHiddenText: params.evidenceIndex
+      }]
+    } if params.deleteHref and not params.evidenceSubmission
   },
   rows: evidenceRows
 }) }}

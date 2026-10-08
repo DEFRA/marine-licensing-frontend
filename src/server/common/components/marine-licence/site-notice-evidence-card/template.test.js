@@ -5,16 +5,16 @@ describe('Marine Licence Site Notice Evidence Card', () => {
     evidenceIndex: 1,
     locationName: 'Harbour wall',
     locationNameHref:
-      '/marine-licence/site-notice/location-name/abc123?evidence=1',
+      '/marine-licence/site-notice/location-name/abc123?location=1',
     dateDisplayed: '5 March 2026',
     dateDisplayedHref:
-      '/marine-licence/site-notice/date-displayed/abc123?evidence=1',
+      '/marine-licence/site-notice/date-displayed/abc123?location=1',
     closeUpPhoto: 'close-up.jpg',
     closeUpPhotoHref:
-      '/marine-licence/site-notice/close-up-photo/abc123?evidence=1',
+      '/marine-licence/site-notice/close-up-photo/abc123?location=1',
     positionPhoto: 'position.jpg',
     positionPhotoHref:
-      '/marine-licence/site-notice/position-photo/abc123?evidence=1'
+      '/marine-licence/site-notice/position-photo/abc123?location=1'
   }
 
   test('should render all 4 rows with correct keys', () => {
@@ -51,10 +51,11 @@ describe('Marine Licence Site Notice Evidence Card', () => {
     )
     const links = $component('.govuk-summary-list__actions a')
     expect(links).toHaveLength(4)
-    expect(links.eq(0).attr('href')).toContain('evidence=1')
-    expect(links.eq(1).attr('href')).toContain('evidence=1')
-    expect(links.eq(2).attr('href')).toContain('evidence=1')
-    expect(links.eq(3).attr('href')).toContain('evidence=1')
+    expect(links.eq(0).attr('href')).toContain('location=1')
+    expect(links.eq(1).attr('href')).toContain('location=1')
+    expect(links.eq(2).attr('href')).toContain('location=1')
+    expect(links.eq(3).attr('href')).toContain('location=1')
+    expect($component('.govuk-summary-card__actions a')).toHaveLength(0)
   })
 
   test('should render card title with evidence index', () => {
@@ -81,15 +82,28 @@ describe('Marine Licence Site Notice Evidence Card', () => {
     expect($component('.govuk-summary-card').attr('id')).toBe('site-location-1')
   })
 
-  test('should not render Change links when evidenceSubmission is true', () => {
+  test('should not render Change or Delete links when evidenceSubmission is true', () => {
     const $component = renderComponent(
       'marine-licence/site-notice-evidence-card',
       {
         ...baseParams,
+        deleteHref: '/delete?location=2',
         evidenceSubmission: true
       }
     )
+    expect($component('.govuk-summary-list__actions a')).toHaveLength(0)
     expect($component('.govuk-summary-card__actions a')).toHaveLength(0)
+  })
+
+  test('should render Delete location link when deleteHref is set', () => {
+    const $component = renderComponent(
+      'marine-licence/site-notice-evidence-card',
+      { ...baseParams, evidenceIndex: 2, deleteHref: '/delete?location=2' }
+    )
+    const link = $component('.govuk-summary-card__actions a')
+    expect(link.attr('href')).toBe('/delete?location=2')
+    expect(link.text()).toContain('Delete location')
+    expect(link.find('.govuk-visually-hidden').text()).toContain('2')
   })
 
   test('should render "Incomplete" marker when value is missing', () => {

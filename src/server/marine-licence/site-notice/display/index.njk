@@ -125,13 +125,14 @@
         {{ appMarineLicenceSiteNoticeEvidenceCard({
           evidenceIndex: evidenceIndex,
           locationName: evidence.locationName,
-          locationNameHref: evidenceLinks.locationName ~ '?evidence=' ~ evidenceIndex,
+          locationNameHref: evidenceLinks.locationName ~ '?location=' ~ evidenceIndex,
           dateDisplayed: evidence.dateDisplayed,
-          dateDisplayedHref: evidenceLinks.dateDisplayed ~ '?evidence=' ~ evidenceIndex,
+          dateDisplayedHref: evidenceLinks.dateDisplayed ~ '?location=' ~ evidenceIndex,
           closeUpPhoto: evidence.closeUpPhoto,
-          closeUpPhotoHref: evidenceLinks.closeUpPhoto ~ '?evidence=' ~ evidenceIndex,
+          closeUpPhotoHref: evidenceLinks.closeUpPhoto ~ '?location=' ~ evidenceIndex,
           positionPhoto: evidence.positionPhoto,
-          positionPhotoHref: evidenceLinks.positionPhoto ~ '?evidence=' ~ evidenceIndex,
+          positionPhotoHref: evidenceLinks.positionPhoto ~ '?location=' ~ evidenceIndex,
+          deleteHref: (deleteLocationUrl ~ '?location=' ~ evidenceIndex) if evidenceIndex > 1,
           cardAttributes: { id: 'site-location-' ~ evidenceIndex },
           evidenceSubmission: evidenceSubmission
         }) }}

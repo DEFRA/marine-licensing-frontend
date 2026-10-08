@@ -8,7 +8,10 @@ import {
 } from '#src/server/common/helpers/marine-licence/site-notice.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { apiRoutes } from '#src/server/common/constants/routes.js'
-import { siteNoticeDisplayUrl } from '#src/server/marine-licence/site-notice/utils.js'
+import {
+  siteNoticeDisplayUrl,
+  siteNoticeLocationUrl
+} from '#src/server/marine-licence/site-notice/utils.js'
 
 export const DELETE_LOCATION_VIEW_ROUTE =
   'marine-licence/site-notice/delete-location/index'
@@ -39,15 +42,13 @@ const deleteLocationOptions = {
 export const deleteLocationController = {
   options: deleteLocationOptions,
   handler(request, h) {
-    const { marineLicenceId } = request.params
-    const locationNumber = getLocationIndex(request)
-    const pageTitle = `Are you sure you want to delete location ${locationNumber}?`
+    const pageTitle = `Are you sure you want to delete location ${getLocationIndex(request)}?`
 
     return h.view(DELETE_LOCATION_VIEW_ROUTE, {
       pageTitle,
       heading: pageTitle,
       projectName: request.marineLicence.projectName,
-      backLink: `${siteNoticeDisplayUrl(marineLicenceId)}#site-location-${locationNumber}`
+      backLink: siteNoticeLocationUrl(request)
     })
   }
 }

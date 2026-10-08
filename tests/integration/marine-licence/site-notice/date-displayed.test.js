@@ -48,7 +48,7 @@ describe('Site notice date displayed page', () => {
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      displayUrl
+      displayUrl + '#site-location-1'
     )
   })
 
@@ -64,7 +64,9 @@ describe('Site notice date displayed page', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(displayUrl)
+    expect(response.headers.location).toBe(
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`
+    )
   })
 
   test('forbids anyone who did not submit the application', async () => {

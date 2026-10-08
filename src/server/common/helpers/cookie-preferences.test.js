@@ -1,6 +1,7 @@
 import {
   getCookiePreferences,
-  areAnalyticsCookiesAccepted
+  areAnalyticsCookiesAccepted,
+  areCookiePreferencesSet
 } from './cookie-preferences.js'
 
 const DEFAULT_PREFERENCES = {
@@ -147,6 +148,34 @@ describe('cookie-preferences', () => {
           timestamp: 1234567890
         })
         expect(areAnalyticsCookiesAccepted(request)).toBe(false)
+      })
+    })
+  })
+
+  describe('areCookiePreferencesSet', () => {
+    it('should return true when the preferences-set cookie is the string true', () => {
+      const request = createMockRequest({ cookies_preferences_set: 'true' })
+      expect(areCookiePreferencesSet(request)).toBe(true)
+    })
+
+    const preferencesNotSetTestCases = [
+      {
+        name: 'the cookie is the string false',
+        request: createMockRequest({ cookies_preferences_set: 'false' })
+      },
+      {
+        name: 'the cookie is a boolean rather than the string true',
+        request: createMockRequest({ cookies_preferences_set: true })
+      },
+      { name: 'the cookie is absent', request: createMockRequest({}) },
+      { name: 'state is undefined', request: createMockRequest(undefined) },
+      { name: 'no state property', request: {} },
+      { name: 'request is undefined', request: undefined }
+    ]
+
+    preferencesNotSetTestCases.forEach(({ name, request }) => {
+      it(`should return false when ${name}`, () => {
+        expect(areCookiePreferencesSet(request)).toBe(false)
       })
     })
   })

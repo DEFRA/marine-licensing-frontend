@@ -105,4 +105,46 @@ describe('Marine Licence Application Details Card Component', () => {
     expect(htmlContent).toContain('Reasons marked as unable to progress')
     expect(htmlContent).toContain('<p>Test reason</p>')
   })
+
+  test('Should render who the marine licence is for after the reference number', () => {
+    const $component = renderComponent(
+      'marine-licence/application-details-card',
+      {
+        statusTag: '<a>Test</a>',
+        applicationReference: 'MLA/2025/10025',
+        whoMarineLicenceIsFor: 'Exmouth Oysters Ltd',
+        submittedAt: '27 August 2026'
+      }
+    )
+
+    const keys = $component('.govuk-summary-list__key')
+      .map((_, el) => $component(el).text().trim())
+      .get()
+    expect(keys).toEqual([
+      'Application type',
+      'Status',
+      'Reference number',
+      'Who the marine licence is for',
+      'Date submitted'
+    ])
+
+    const row = $component('.govuk-summary-list__row').eq(3)
+    expect(row.find('.govuk-summary-list__value').text().trim()).toBe(
+      'Exmouth Oysters Ltd'
+    )
+    expect(row.find('.govuk-summary-list__actions')).toHaveLength(0)
+  })
+
+  test('Should omit who the marine licence is for when not provided', () => {
+    const $component = renderComponent(
+      'marine-licence/application-details-card',
+      {
+        statusTag: '<a>Test</a>',
+        applicationReference: 'TEST-REF',
+        submittedAt: '01 01 2026'
+      }
+    )
+
+    expect($component.html()).not.toContain('Who the marine licence is for')
+  })
 })

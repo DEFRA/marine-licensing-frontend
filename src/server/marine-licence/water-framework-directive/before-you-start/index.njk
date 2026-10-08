@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
+{% from "marine-licence/water-framework-directive-links/macro.njk" import appMarineLicenceWaterFrameworkDirectiveLinks %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -66,11 +67,7 @@
 
       <h3 class="govuk-heading-s">Getting a WFD assessment template</h3>
 
-      <p class="govuk-body">If you need to provide a WFD assessment, you can use the following template. It's called a scoping document.</p>
-
-      <p class="govuk-body"><a href="https://assets.publishing.service.gov.uk/media/6ab4e3b9fceb6fb3a650110e/wfd_scoping_template__1_.odt" class="govuk-link">Download the WFD assessment scoping document (ODT, 24KB)</a>.</p>
-
-      <p class="govuk-body"><a href="https://www.gov.uk/guidance/water-framework-directive-assessment-estuarine-and-coastal-waters" class="govuk-link" rel="noreferrer noopener" target="_blank">Read the Environment Agency's guidance on the Water Framework Directive assessments for more information (opens in new tab)</a>.</p>
+      {{ appMarineLicenceWaterFrameworkDirectiveLinks() }}
 
       <div class="govuk-button-group">
         {{ govukButton({

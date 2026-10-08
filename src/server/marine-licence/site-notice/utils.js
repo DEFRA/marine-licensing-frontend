@@ -4,6 +4,7 @@ import { createFileUploadErrorDisplay } from '#src/server/common/helpers/file-up
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 
 export const PHOTO_ACCEPT_ATTRIBUTE = '.jpg,.jpeg,.png'
+export const PHOTO_ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png']
 export const PHOTO_MAX_FILE_SIZE = 10 * 1024 * 1024
 export const PHOTO_FILE_TYPE_ERROR_MESSAGE =
   'The selected file must be JPG, JPEG or PNG file'
@@ -44,6 +45,7 @@ export const initiatePhotoUpload = async (
     ),
     s3Path: PHOTO_S3_PATH,
     s3Bucket: config.get('cdpUploader').s3Bucket,
+    allowedMimeTypes: PHOTO_ALLOWED_MIME_TYPES,
     maxFileSize: PHOTO_MAX_FILE_SIZE
   })
 

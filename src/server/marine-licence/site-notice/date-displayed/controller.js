@@ -10,10 +10,7 @@ import {
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { extractDateFieldsFromPayload } from '#src/server/common/helpers/dates/date-utils.js'
-import {
-  apiRoutes,
-  marineLicenceRoutes
-} from '#src/server/common/constants/routes.js'
+import { apiRoutes } from '#src/server/common/constants/routes.js'
 import { dateDisplayedSchema } from '#src/server/common/validation/date-displayed/schema.js'
 import {
   dateDisplayedErrorMessages,
@@ -23,6 +20,7 @@ import {
   mapDateDisplayedErrors,
   validateDateDisplayed
 } from '#src/server/marine-licence/site-notice/date-displayed/utils.js'
+import { siteNoticeDisplayUrl } from '#src/server/marine-licence/site-notice/utils.js'
 
 export const SITE_NOTICE_DATE_DISPLAYED_VIEW_ROUTE =
   'marine-licence/site-notice/date-displayed/index'
@@ -31,9 +29,6 @@ const siteNoticeDateDisplayedOptions = {
   ...validateMarineLicenceIdParams,
   pre: [validateEvidenceParam]
 }
-
-const siteNoticeDisplayUrl = (marineLicenceId) =>
-  `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
 
 const siteNoticeDateDisplayedSettings = (request, marineLicence) => ({
   projectName: marineLicence.projectName,

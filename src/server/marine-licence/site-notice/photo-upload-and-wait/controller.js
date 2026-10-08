@@ -16,6 +16,7 @@ import {
 } from '#src/server/common/helpers/marine-licence/site-notice.js'
 import {
   getPhotoUploadSession,
+  PHOTO_ALLOWED_MIME_TYPES,
   PHOTO_FILE_SIZE_ERROR_MESSAGE,
   PHOTO_FILE_TYPE_ERROR_MESSAGE,
   setPhotoUploadSession,
@@ -23,7 +24,6 @@ import {
 } from '#src/server/marine-licence/site-notice/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 
-const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png'])
 const PROCESSING_STATUSES = new Set(['pending', 'scanning'])
 const FAILED_STATUSES = new Set(['rejected', 'error'])
 const REJECTION_MESSAGES = {
@@ -38,10 +38,8 @@ const rejectionMessage = (errorCode) => {
   return REJECTION_MESSAGES[errorCode] ?? getCdpErrorMessageFromCode(errorCode)
 }
 
-const isAllowedFileType = (s3Location) => {
-  const detected = s3Location?.detectedContentType
-  return !detected || ALLOWED_MIME_TYPES.has(detected)
-}
+const isAllowedFileType = (s3Location) =>
+  PHOTO_ALLOWED_MIME_TYPES.includes(s3Location?.detectedContentType)
 
 const failUpload = async ({ request, h, uploadPageUrl }, message) => {
   await setPhotoUploadSession(request, h, {

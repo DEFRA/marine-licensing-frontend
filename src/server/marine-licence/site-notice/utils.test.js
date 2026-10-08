@@ -39,6 +39,7 @@ describe('site notice photo upload helpers', () => {
         expect.objectContaining({
           redirectUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PHOTO_UPLOAD_AND_WAIT}/licence-id?location=2`,
           s3Path: 'marine-licence/site-notice',
+          allowedMimeTypes: ['image/jpeg', 'image/png'],
           maxFileSize: PHOTO_MAX_FILE_SIZE
         })
       )

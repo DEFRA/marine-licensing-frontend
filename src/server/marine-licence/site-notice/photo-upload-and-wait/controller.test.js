@@ -127,11 +127,14 @@ describe('#siteNoticePhotoUploadAndWaitController', () => {
     expect(h.redirect).toHaveBeenCalledWith(displayUrl)
   })
 
-  test('rejects a file that is not a JPG or PNG', async () => {
+  test.each([
+    ['not a JPG or PNG', { detectedContentType: 'application/pdf' }],
+    ['of unknown type', {}]
+  ])('rejects a file that is %s', async (_, s3Location) => {
     const result = await runWait({
       status: 'ready',
       filename: 'notice.pdf',
-      s3Location: { detectedContentType: 'application/pdf' }
+      s3Location
     })
 
     expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()

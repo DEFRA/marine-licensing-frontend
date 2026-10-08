@@ -27,6 +27,15 @@ describe('#buildApplicationDetailsCardData', () => {
     expect(result.statusTag).toContain(PROJECT_STATUS.TRANSFERRED)
   })
 
+  test('returns who the marine licence is for', () => {
+    const result = buildApplicationDetailsCardData({
+      status: PROJECT_STATUS.SUBMITTED,
+      whoMarineLicenceIsFor: 'Exmouth Oysters Ltd'
+    })
+
+    expect(result.whoMarineLicenceIsFor).toBe('Exmouth Oysters Ltd')
+  })
+
   test('renders a red Action required tag', () => {
     const result = buildApplicationDetailsCardData({
       applicationReference: 'ML-2026-001',

@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 
-/* eslint-env vitest */
 import { within } from '@testing-library/dom'
 
 const GOV_UK_SUMMARY_LIST_KEY = '.govuk-summary-list__key'

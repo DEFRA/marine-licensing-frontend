@@ -92,7 +92,7 @@
     "@vitest/runner": "^4.1.4",
     "@vitest/ui": "^4.1.10",
     "allure-commandline": "^2.46.1",
-    "allure-vitest": "^3.6.0",
+    "allure-vitest": "^3.13.0",
     "audit-ci": "7.1.0",
     "autoprefixer": "^10.6.1",
     "babel-loader": "^10.1.1",

@@ -29,6 +29,10 @@ export const expectedApplicationDetailsCard = {
       value: mockTransferredMarineLicenceApplication.applicationReference
     },
     {
+      key: 'Who the marine licence is for',
+      value: mockTransferredMarineLicenceApplication.whoMarineLicenceIsFor
+    },
+    {
       key: 'Date submitted',
       value: '26 May 2026'
     }

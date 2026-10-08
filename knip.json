@@ -1,0 +1,5 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["postcss.config.js"],
+  "ignoreDependencies": ["pino-pretty"]
+}

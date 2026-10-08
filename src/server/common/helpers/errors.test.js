@@ -51,9 +51,7 @@ describe('#catchAll', () => {
 
   const mockToolkitView = vi.fn()
   const mockToolkitCode = vi.fn()
-  const mockToolkitRedirect = vi.fn().mockReturnValue({
-    takeover: vi.fn()
-  })
+  const mockToolkitRedirect = vi.fn()
 
   const mockToolkit = {
     view: mockToolkitView,
@@ -64,9 +62,6 @@ describe('#catchAll', () => {
   beforeEach(() => {
     mockToolkitView.mockReturnValue(mockToolkit)
     mockToolkitCode.mockReturnValue(mockToolkit)
-    mockToolkitRedirect.mockReturnValue({
-      takeover: vi.fn()
-    })
   })
 
   test('Should provide expected "Not Found" page', () => {

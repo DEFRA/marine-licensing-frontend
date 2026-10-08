@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom'
-import { getByRole, getByText, within } from '@testing-library/dom'
+import { getByRole, getByText, queryByText, within } from '@testing-library/dom'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.js'
 
@@ -109,6 +109,19 @@ describe('Cookies page', () => {
           name: 'Microsoft Clarity'
         })
       ).toBeInTheDocument()
+
+      expect(
+        getByRole(document, 'heading', {
+          level: 3,
+          name: 'Google Analytics'
+        })
+      ).toBeInTheDocument()
+      expect(getByText(document, '_ga')).toBeInTheDocument()
+      expect(
+        getByText(document, '_ga_ followed by an identifier for this service')
+      ).toBeInTheDocument()
+      expect(getByText(document, 'ANONCHK')).toBeInTheDocument()
+      expect(queryByText(document, 'ANNOCHK')).not.toBeInTheDocument()
 
       // Verify "No" is selected by default
       expectRadioSelection(document, false)

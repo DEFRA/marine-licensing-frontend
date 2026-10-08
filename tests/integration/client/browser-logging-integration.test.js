@@ -72,7 +72,7 @@ describe('Browser Logging Integration', () => {
       )
     })
 
-    test('Should NOT include ENABLE_BROWSER_LOGGING script when disabled', async () => {
+    test('Should set ENABLE_BROWSER_LOGGING to false when disabled', async () => {
       config.get.mockImplementation((key) => {
         if (key === 'enableBrowserLogging') {
           return false
@@ -93,7 +93,10 @@ describe('Browser Logging Integration', () => {
         script.textContent?.includes('window.ENABLE_BROWSER_LOGGING')
       )
 
-      expect(loggingScript).toBeUndefined()
+      expect(loggingScript).toBeDefined()
+      expect(loggingScript.textContent).toContain(
+        'window.ENABLE_BROWSER_LOGGING = false'
+      )
     })
   })
 

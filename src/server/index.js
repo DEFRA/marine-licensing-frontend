@@ -72,6 +72,12 @@ export async function createServer() {
     segment: 'dashboard-users'
   })
 
+  // Registered before the plugins so it runs first in the onPreResponse chain. It swaps a
+  // Boom error for the rendered error view; the CSP, CSRF, cookie-banner and cache-control
+  // extensions registered by the plugins below then apply to that view as they do to every
+  // other page. hapi runs extensions in registration order.
+  server.ext('onPreResponse', catchAll)
+
   await server.register([
     requestLogger,
     requestTracing,
@@ -91,7 +97,6 @@ export async function createServer() {
   ])
 
   server.ext('onPreResponse', setPageCacheControlHeaders)
-  server.ext('onPreResponse', catchAll)
 
   return server
 }

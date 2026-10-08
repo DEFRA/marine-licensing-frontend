@@ -36,7 +36,7 @@ export function catchAll(request, h) {
   }
 
   if (response.redirectPath) {
-    return h.redirect(response.redirectPath).takeover()
+    return h.redirect(response.redirectPath)
   }
 
   const template = getCustomTemplate(statusCode)

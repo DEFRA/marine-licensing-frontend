@@ -3,7 +3,9 @@
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "cancel-button/macro.njk" import appCancelButton %}
+{% from "marine-licence/water-framework-directive-links/macro.njk" import appMarineLicenceWaterFrameworkDirectiveLinks %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -14,18 +16,6 @@
   }) }}
 </nav>
 {% endblock %}
-
-{% set formLabel %}
-  {% if projectName %}
-    <span class="govuk-caption-l">{{ projectName }}</span>
-  {% endif %}
-
-  <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
-    {{heading}}
-  </h1>
-
-  <p class="govuk-hint">You can only upload a file that is a .docx or .odt.</p>
-{% endset %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -38,15 +28,30 @@
         }) }}
       {% endif %}
 
+      {% if projectName %}
+        <span class="govuk-caption-l">{{ projectName }}</span>
+      {% endif %}
+
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      {{ govukDetails({
+        summaryText: "Help with getting a WFD assessment template",
+        html: appMarineLicenceWaterFrameworkDirectiveLinks()
+      }) }}
+
         <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>
 
           {{ govukFileUpload({
               id: "file-id",
               name: "file",
               label: {
-                html: formLabel,
+                text: heading,
+                classes: "govuk-visually-hidden",
                 for: "file-id"
-               },
+              },
+              hint: {
+                text: "You can only upload a file that is a .docx or .odt."
+              },
               multiple: false,
               javascript: true,
               errorMessage: { text: errors['file'].text } if errors and errors['file'] else false,

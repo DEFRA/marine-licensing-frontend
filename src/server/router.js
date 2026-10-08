@@ -22,6 +22,7 @@ import { journeySelfServiceOutcome } from '#src/server/journey/self-service/outc
 import { journeySelfServiceOutcomeDocument } from '#src/server/journey/self-service/outcome-document/index.js'
 import { journeySelfServiceInvalid } from '#src/server/journey/self-service/invalid/index.js'
 import { journeySelfServiceDataQualityInit } from '#src/server/journey/self-service/services/data-quality-init.js'
+import { notFound } from '#src/server/not-found/index.js'
 
 export const router = {
   plugin: {
@@ -69,6 +70,12 @@ export const router = {
 
       // Static assets
       await server.register([serveStaticFiles])
+
+      // Explicit 404 route so unknown URLs run the normal request lifecycle (cookies, session,
+      // CSRF, cookie banner) instead of hapi's bare internal notFound handler. The router ranks
+      // every literal-prefixed route above this bare wildcard, so registration order is not
+      // load-bearing; it is last for readability.
+      await server.register([notFound])
     }
   }
 }

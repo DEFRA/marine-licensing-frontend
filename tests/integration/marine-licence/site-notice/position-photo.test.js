@@ -19,7 +19,7 @@ vi.mock('~/src/services/cdp-upload-service/index.js')
 
 describe('Site notice position photo page', () => {
   const getServer = setupTestServer()
-  const requestUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${mockMarineLicenceWithApplicationTask.id}?evidence=1`
+  const requestUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${mockMarineLicenceWithApplicationTask.id}?location=1`
   const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`
 
   beforeEach(() => {
@@ -78,7 +78,7 @@ describe('Site notice position photo page', () => {
 
   test('redirects when the evidence number is not valid', async () => {
     const { statusCode } = await makeGetRequest({
-      url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${mockMarineLicenceWithApplicationTask.id}?evidence=99`,
+      url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${mockMarineLicenceWithApplicationTask.id}?location=99`,
       server: getServer()
     })
 

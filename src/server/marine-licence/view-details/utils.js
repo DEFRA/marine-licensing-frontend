@@ -59,7 +59,8 @@ export const buildApplicationDetailsCardData = (marineLicence) => {
     rejectedReasons,
     rejectedInformation,
     transferredDate,
-    withdrawnAt
+    withdrawnAt,
+    whoMarineLicenceIsFor
   } = marineLicence
 
   const isTransferred = status === PROJECT_STATUS.TRANSFERRED
@@ -68,6 +69,7 @@ export const buildApplicationDetailsCardData = (marineLicence) => {
 
   return {
     applicationReference,
+    whoMarineLicenceIsFor,
     submittedAt: formatDate(submittedAt, APPLICATION_DATE_FORMAT),
     transferredDate: formatDate(transferredDate, APPLICATION_DATE_FORMAT),
     withdrawnAt: formatDate(withdrawnAt, APPLICATION_DATE_FORMAT),

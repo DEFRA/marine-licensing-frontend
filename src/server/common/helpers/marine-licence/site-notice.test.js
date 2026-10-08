@@ -93,13 +93,13 @@ describe('validateEvidenceParam', () => {
   })
 
   const runHandler = async (
-    evidence,
+    location,
     marineLicence = mockMarineLicenceWithApplicationTask
   ) => {
     getMarineLicenceById.mockResolvedValue(marineLicence)
     const request = createMockRequest({
       params: { marineLicenceId },
-      query: evidence === undefined ? {} : { evidence }
+      query: location === undefined ? {} : { location }
     })
     const h = createMockH()
     const result = await validateEvidenceParam.method(request, h)

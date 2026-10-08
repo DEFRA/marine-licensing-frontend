@@ -29,9 +29,9 @@ vi.mock('~/src/services/cdp-upload-service/index.js')
 describe('Site notice photo upload and wait page', () => {
   const getServer = setupTestServer()
   const marineLicenceId = mockMarineLicenceWithApplicationTask.id
-  const closeUpPhotoUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${marineLicenceId}?evidence=1`
-  const positionPhotoUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${marineLicenceId}?evidence=1`
-  const waitUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PHOTO_UPLOAD_AND_WAIT}/${marineLicenceId}?evidence=1`
+  const closeUpPhotoUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${marineLicenceId}?location=1`
+  const positionPhotoUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${marineLicenceId}?location=1`
+  const waitUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PHOTO_UPLOAD_AND_WAIT}/${marineLicenceId}?location=1`
   const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
   let mockCdpService
 

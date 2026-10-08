@@ -17,6 +17,7 @@ import { toApplicationReferenceUrlSegment } from '~/src/server/common/helpers/ma
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
 import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
+import { getCardRow } from './utils.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
@@ -50,6 +51,15 @@ describe('Marine Licence View Details Redaction', () => {
     expect(document.querySelector('.app-redaction-label').textContent).toBe(
       '***REDACTED***'
     )
+  })
+
+  test('renders who the marine licence is for in the application overview', () => {
+    const card = document.querySelector('#application-overview-card')
+    const row = getCardRow(card, 'Who the marine licence is for')
+
+    expect(
+      row.querySelector('.govuk-summary-list__value').textContent.trim()
+    ).toBe(mockSubmittedMarineLicenceApplication.whoMarineLicenceIsFor)
   })
 
   test('cards not required from other view details variants do not show here', () => {

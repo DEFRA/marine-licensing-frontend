@@ -25,7 +25,7 @@ describe('site notice photo upload helpers', () => {
       vi.mocked(getCdpUploadService).mockReturnValue({ initiate })
       const request = createMockRequest({
         params: { marineLicenceId: 'licence-id' },
-        query: { evidence: '2' },
+        query: { location: '2' },
         yar: { get: vi.fn(), set: vi.fn(), commit: vi.fn() }
       })
 
@@ -37,8 +37,9 @@ describe('site notice photo upload helpers', () => {
       expect(uploadConfig.uploadUrl).toBe('https://cdp/upload')
       expect(initiate).toHaveBeenCalledWith(
         expect.objectContaining({
-          redirectUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PHOTO_UPLOAD_AND_WAIT}/licence-id?evidence=2`,
+          redirectUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PHOTO_UPLOAD_AND_WAIT}/licence-id?location=2`,
           s3Path: 'marine-licence/site-notice',
+          allowedMimeTypes: ['image/jpeg', 'image/png'],
           maxFileSize: PHOTO_MAX_FILE_SIZE
         })
       )

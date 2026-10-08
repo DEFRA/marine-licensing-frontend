@@ -4,7 +4,7 @@ import { assertIsOriginalSubmitter } from '#src/server/common/helpers/view-detai
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const getLocationIndex = (request) =>
-  Number.parseInt(request.query.evidence, 10)
+  Number.parseInt(request.query.location, 10)
 
 export const loadMarineLicence = async (request) => {
   const { marineLicenceId } = request.params
@@ -44,7 +44,7 @@ export const validateEvidenceParam = {
     const { marineLicence } = await loadMarineLicence(request)
     request.marineLicence = marineLicence
 
-    const evidenceNumber = Number.parseInt(request.query.evidence, 10)
+    const evidenceNumber = Number.parseInt(request.query.location, 10)
 
     if (
       hasInvalidEvidenceNumber(

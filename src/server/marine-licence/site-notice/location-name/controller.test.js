@@ -47,7 +47,7 @@ describe('#siteNoticeLocationName', () => {
         createMockRequest({
           marineLicence: mockMarineLicenceWithApplicationTask,
           params: { marineLicenceId },
-          query: { evidence: '1' }
+          query: { location: '1' }
         }),
         h
       )
@@ -98,7 +98,7 @@ describe('#siteNoticeLocationName', () => {
           createMockRequest({
             marineLicence: mockMarineLicenceWithApplicationTask,
             params: { marineLicenceId },
-            query: { evidence: '1' }
+            query: { location: '1' }
           }),
           h
         )
@@ -118,7 +118,7 @@ describe('#siteNoticeLocationName', () => {
       const request = createMockRequest({
         marineLicence: mockMarineLicenceWithApplicationTask,
         params: { marineLicenceId },
-        query: { evidence: '1' },
+        query: { location: '1' },
         payload: { locationName }
       })
 
@@ -146,7 +146,7 @@ describe('#siteNoticeLocationName', () => {
             applicationTasks: []
           },
           params: { marineLicenceId },
-          query: { evidence: '1' },
+          query: { location: '1' },
           payload: { locationName }
         }),
         h
@@ -162,7 +162,7 @@ describe('#siteNoticeLocationName', () => {
       const h = createMockH()
       const request = createMockRequest({
         params: { marineLicenceId },
-        query: { evidence: '1' },
+        query: { location: '1' },
         payload: { locationName: '' }
       })
 
@@ -219,7 +219,7 @@ describe('#siteNoticeLocationName', () => {
         createMockRequest({
           marineLicence: mockMarineLicenceWithApplicationTask,
           params: { marineLicenceId },
-          query: { evidence: '2' },
+          query: { location: '2' },
           payload: { locationName }
         }),
         h

@@ -55,7 +55,7 @@ describe('#siteNoticeDateDisplayed', () => {
         createMockRequest({
           marineLicence: mockMarineLicenceWithApplicationTask,
           params: { marineLicenceId },
-          query: { evidence: '1' }
+          query: { location: '1' }
         }),
         h
       )
@@ -108,7 +108,7 @@ describe('#siteNoticeDateDisplayed', () => {
           createMockRequest({
             marineLicence: mockMarineLicenceWithApplicationTask,
             params: { marineLicenceId },
-            query: { evidence: '1' }
+            query: { location: '1' }
           }),
           h
         )
@@ -132,7 +132,7 @@ describe('#siteNoticeDateDisplayed', () => {
       const request = createMockRequest({
         marineLicence: mockMarineLicenceWithApplicationTask,
         params: { marineLicenceId },
-        query: { evidence: '1' },
+        query: { location: '1' },
         payload: validPayload
       })
 
@@ -160,7 +160,7 @@ describe('#siteNoticeDateDisplayed', () => {
             applicationTasks: []
           },
           params: { marineLicenceId },
-          query: { evidence: '1' },
+          query: { location: '1' },
           payload: validPayload
         }),
         h
@@ -176,7 +176,7 @@ describe('#siteNoticeDateDisplayed', () => {
       const h = createMockH()
       const request = createMockRequest({
         params: { marineLicenceId },
-        query: { evidence: '1' },
+        query: { location: '1' },
         payload: {
           'date-displayed-day': '',
           'date-displayed-month': '',
@@ -249,7 +249,7 @@ describe('#siteNoticeDateDisplayed', () => {
         createMockRequest({
           marineLicence: mockMarineLicenceWithApplicationTask,
           params: { marineLicenceId },
-          query: { evidence: '2' },
+          query: { location: '2' },
           payload: validPayload
         }),
         h
@@ -271,7 +271,7 @@ describe('#siteNoticeDateDisplayed', () => {
       const request = createMockRequest({
         marineLicence: mockMarineLicenceWithApplicationTask,
         params: { marineLicenceId },
-        query: { evidence: '1' },
+        query: { location: '1' },
         payload: {
           'date-displayed-day': '32',
           'date-displayed-month': '13',
@@ -306,7 +306,7 @@ describe('#siteNoticeDateDisplayed', () => {
       const request = createMockRequest({
         marineLicence: mockMarineLicenceWithApplicationTask,
         params: { marineLicenceId },
-        query: { evidence: '1' },
+        query: { location: '1' },
         payload: {
           'date-displayed-day': '15',
           'date-displayed-month': '12',

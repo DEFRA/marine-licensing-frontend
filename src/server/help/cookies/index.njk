@@ -128,11 +128,54 @@
       <p class="govuk-body">With your permission, we use analytics cookies to collect data about how you use the Get
          permission for marine work service. This information helps us to improve our service.</p>
 
+      <h3 class="govuk-heading-m">Google Analytics</h3>
+      <p class="govuk-body">We use Google Analytics to collect information about how you use the service, such as
+         the pages you visit and how long you spend on them. Google sets these cookies on your device for all
+         defra.gov.uk websites. If you reject analytics cookies they are removed the next time you load a page
+         with JavaScript enabled. Google Analytics uses the following cookies:</p>
 
+      {{ govukTable({
+        head: [
+          {
+            text: "Name"
+          },
+          {
+            text: "Purpose"
+          },
+          {
+            text: "Expires"
+          }
+        ],
+        rows: [
+          [
+            {
+              text: "_ga"
+            },
+            {
+              text: "Used to distinguish users"
+            },
+            {
+              text: "2 years"
+            }
+          ],
+          [
+            {
+              text: "_ga_ followed by an identifier for this service"
+            },
+            {
+              text: "Used to persist session state"
+            },
+            {
+              text: "2 years"
+            }
+          ]
+        ]
+      }) }}
 
       <h3 class="govuk-heading-m">Microsoft Clarity</h3>
       <p class="govuk-body">We use Microsoft Clarity to understand how you use the service. This includes mouse
-         movements, clicks, scrolling, and other interactions. Microsoft Clarity uses the following cookies:</p>
+         movements, clicks, scrolling, and other interactions. CLID, ANONCHK, MUID, MR and SM are set by Microsoft on
+         Microsoft domains, not by this service. Microsoft Clarity uses the following cookies:</p>
 
       {{ govukTable({
         head: [
@@ -182,7 +225,7 @@
           ],
           [
             {
-              text: "ANNOCHK"
+              text: "ANONCHK"
             },
             {
               text: "Checks whether data is shared with another Microsoft advertising cookie (ANID). This is always off because this service does not use ANID"

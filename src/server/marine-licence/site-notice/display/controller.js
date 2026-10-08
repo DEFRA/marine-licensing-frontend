@@ -169,7 +169,7 @@ export const siteNoticeDisplayAddEvidenceController = {
         error,
         'Error adding site notice evidence placeholder'
       )
-      const { marineLicenceId } = request.params
+
       return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
     }
   }

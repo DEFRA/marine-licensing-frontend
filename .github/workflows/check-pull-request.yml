@@ -20,24 +20,116 @@ permissions:
   pull-requests: write
 
 jobs:
-  pr-validator:
-    name: Run Pull Request Checks
+  quality:
+    name: Format and Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
-      - name: Test code and Create Test Coverage Reports
+      - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: |
-          npm ci
-          npm run build
-          npm run format:check
-          npm run lint
-          npm run test:ci
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+  unit-tests:
+    name: Unit Tests (${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests (shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+        run: npm run test:ci:shard -- ${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      - name: Upload Vitest blob report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
+        with:
+          name: vitest-blob-${{ matrix.shardIndex }}
+          path: .vitest-reports
+          include-hidden-files: true
+          retention-days: 1
+
+  merge-test-reports:
+    name: Merge Test Reports
+    needs: unit-tests
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download Vitest blob reports
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 #v4.3.0
+        with:
+          path: .vitest-reports
+          pattern: vitest-blob-*
+          merge-multiple: true
+
+      - name: Merge reports and coverage
+        run: npm run test:ci:merge
+
+      - name: Upload coverage
+        if: ${{ success() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
+        with:
+          name: coverage
+          path: coverage
+          retention-days: 1
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Security audit
         run: |
           # Temporary braces allowlist in .audit-ci.jsonc — revisit/remove by this date
@@ -49,18 +141,86 @@ jobs:
           fi
           npm run audit
 
+  docker:
+    name: Test Docker Image Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+
       - name: Test Docker Image Build
         run: |
           set +e
           docker build --no-cache --tag cdp-node-frontend-template .
           exit $?
 
+  sonar:
+    name: SonarCloud Scan
+    needs: merge-test-reports
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Download coverage
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 #v4.3.0
+        with:
+          name: coverage
+          path: coverage
+
       - name: SonarCloud Scan
-        if: github.actor != 'dependabot[bot]'
         uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 #v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # Aggregator so existing branch-protection required checks keep working
+  pr-validator:
+    name: Run Pull Request Checks
+    needs:
+      - quality
+      - merge-test-reports
+      - security-audit
+      - docker
+      - sonar
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check dependent jobs
+        run: |
+          fail=0
+          check_success() {
+            local name="$1"
+            local result="$2"
+            echo "$name: $result"
+            if [[ "$result" != "success" ]]; then
+              fail=1
+            fi
+          }
+
+          check_success quality "${{ needs.quality.result }}"
+          check_success merge-test-reports "${{ needs.merge-test-reports.result }}"
+          check_success security-audit "${{ needs.security-audit.result }}"
+          check_success docker "${{ needs.docker.result }}"
+
+          sonar_result="${{ needs.sonar.result }}"
+          echo "sonar: $sonar_result"
+          if [[ "$sonar_result" == "success" ]]; then
+            true
+          elif [[ "$sonar_result" == "skipped" && "${{ github.actor }}" == "dependabot[bot]" ]]; then
+            true
+          else
+            fail=1
+          fi
+
+          if [[ "$fail" -ne 0 ]]; then
+            echo "One or more required jobs did not succeed"
+            exit 1
+          fi
+          echo "All required jobs succeeded"
 
   test-journey:
     name: Run Journey Tests

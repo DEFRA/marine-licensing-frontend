@@ -1,0 +1,61 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% set formLabel %}
+  <span class="govuk-caption-l">{{ projectName }}</span>
+  <span class="govuk-caption-l">Location {{ locationIndex }}</span>
+  <h1 class="govuk-heading-l govuk-!-margin-bottom-2">{{ heading }}</h1>
+  <p class="govuk-hint">Take the photo close enough that all the text on the notice can be read. We need to be able to check the notice content clearly.</p>
+  <p class="govuk-hint">The file must be a JPG, JPEG or PNG and no larger than 10MB.</p>
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>
+        {{ govukFileUpload({
+          id: "file-id",
+          name: "file",
+          label: {
+            html: formLabel,
+            for: "file-id"
+          },
+          multiple: false,
+          javascript: true,
+          errorMessage: { text: errors['file'].text } if errors and errors['file'] else false,
+          attributes: {
+            "accept": acceptAttribute
+          }
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Continue",
+            type: "submit",
+            classes: "govuk-button--primary"
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

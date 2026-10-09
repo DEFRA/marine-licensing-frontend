@@ -153,8 +153,26 @@ const marineLicencePages = [
     session: applicationTaskOwnerSession
   },
   {
-    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${mockMarineLicenceApplication.id}?evidence=1`,
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${mockMarineLicenceApplication.id}?location=1`,
     title: 'Location name',
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${mockMarineLicenceApplication.id}?location=1`,
+    title: 'When did you first display the notice?',
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${mockMarineLicenceApplication.id}?location=1`,
+    title: 'Close-up photo upload',
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
+  },
+  {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${mockMarineLicenceApplication.id}?location=1`,
+    title: 'Position and location photo upload',
     marineLicence: mockMarineLicenceWithApplicationTask,
     session: applicationTaskOwnerSession
   },

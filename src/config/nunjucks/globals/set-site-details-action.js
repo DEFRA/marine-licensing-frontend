@@ -17,7 +17,7 @@ const buildQueryString = (
     queryParams.push(`drawing=${drawingNumber}`)
   }
   if (evidenceIndex) {
-    queryParams.push(`evidence=${evidenceIndex}`)
+    queryParams.push(`location=${evidenceIndex}`)
   }
   if (!skipAction) {
     queryParams.push(`action=${action}`)

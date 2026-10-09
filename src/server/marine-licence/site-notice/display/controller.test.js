@@ -1,7 +1,10 @@
 import {
   siteNoticeDisplayController,
+  siteNoticeDisplaySubmitController,
   SITE_NOTICE_DISPLAY_VIEW_ROUTE
 } from '#src/server/marine-licence/site-notice/display/controller.js'
+import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
+import { findSiteNoticeTask } from '#src/server/common/helpers/marine-licence/site-notice.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import {
   mockMarineLicenceWithApplicationTask,
@@ -60,6 +63,8 @@ describe('#siteNoticeDisplay', () => {
         showCommunityUserSection: true,
         showMarineUserSection: true,
         showMultipleSitesSection: false,
+        evidenceSubmission: null,
+        canSendEvidence: true,
         siteNoticeEvidence: [
           {
             closeUpPhoto: 'test.jpg',
@@ -113,6 +118,64 @@ describe('#siteNoticeDisplay', () => {
       ).rejects.toThrow('Error displaying site notice display page')
 
       expect(h.view).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('#siteNoticeDisplaySubmitController', () => {
+    const marineLicenceId = mockMarineLicenceWithApplicationTask.id
+    const { taskId } = findSiteNoticeTask(mockMarineLicenceWithApplicationTask)
+
+    const submit = async (marineLicence) => {
+      vi.mocked(getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
+      })
+      const h = createMockH()
+      await siteNoticeDisplaySubmitController.handler(
+        createMockRequest({ params: { marineLicenceId } }),
+        h
+      )
+      return h
+    }
+
+    beforeEach(() => {
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({})
+    })
+
+    test('resolves the site notice task and returns to view details', async () => {
+      const h = await submit(mockMarineLicenceWithApplicationTask)
+
+      expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
+        expect.anything(),
+        `/marine-licence/${marineLicenceId}/application-tasks/${taskId}/resolve`,
+        {}
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+      )
+    })
+
+    test('does not resolve the task when evidence is incomplete', async () => {
+      const h = await submit({
+        ...mockMarineLicenceWithApplicationTask,
+        siteNoticeEvidence: [{ locationName: 'North pier' }]
+      })
+
+      expect(authRequests.authenticatedPostRequest).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
+      )
+    })
+
+    test('redirects to view details when there is no site notice task', async () => {
+      const h = await submit({
+        ...mockMarineLicenceWithApplicationTask,
+        applicationTasks: []
+      })
+
+      expect(authRequests.authenticatedPostRequest).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+      )
     })
   })
 })

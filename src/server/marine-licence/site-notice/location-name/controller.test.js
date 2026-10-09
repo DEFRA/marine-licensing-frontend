@@ -29,9 +29,10 @@ vi.mock(
 
 describe('#siteNoticeLocationName', () => {
   const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`
+  const marineLicenceId = mockMarineLicenceWithApplicationTask.id
   const loadedLicence = {
     marineLicence: mockMarineLicenceWithApplicationTask,
-    marineLicenceId: mockMarineLicenceWithApplicationTask.id
+    marineLicenceId
   }
 
   beforeEach(() => {
@@ -44,10 +45,9 @@ describe('#siteNoticeLocationName', () => {
 
       await siteNoticeLocationNameController.handler(
         createMockRequest({
-          params: {
-            marineLicenceId: mockMarineLicenceWithApplicationTask.id
-          },
-          query: { evidence: '1' }
+          marineLicence: mockMarineLicenceWithApplicationTask,
+          params: { marineLicenceId },
+          query: { location: '1' }
         }),
         h
       )
@@ -68,18 +68,15 @@ describe('#siteNoticeLocationName', () => {
     })
 
     test('redirects to view details when there is no site notice task', async () => {
-      vi.mocked(loadMarineLicence).mockResolvedValue({
-        ...loadedLicence,
-        marineLicence: {
-          ...mockMarineLicenceWithApplicationTask,
-          applicationTasks: []
-        }
-      })
       const h = createMockH()
 
       await siteNoticeLocationNameController.handler(
         createMockRequest({
-          params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id }
+          marineLicence: {
+            ...mockMarineLicenceWithApplicationTask,
+            applicationTasks: []
+          },
+          params: { marineLicenceId }
         }),
         h
       )
@@ -90,24 +87,22 @@ describe('#siteNoticeLocationName', () => {
       expect(h.view).not.toHaveBeenCalled()
     })
 
-    test('Should handle API errors in catch block', async () => {
+    test('Should handle unexpected errors in catch block', async () => {
       const h = createMockH()
-
-      const mockError = new Error('API Error')
-
-      const mockRequest = createMockRequest({
-        params: {
-          marineLicenceId: mockMarineLicenceWithApplicationTask.id
-        }
+      h.view.mockImplementation(() => {
+        throw new Error('render failed')
       })
 
-      vi.mocked(loadMarineLicence).mockRejectedValue(mockError)
-
       await expect(
-        siteNoticeLocationNameController.handler(mockRequest, h)
+        siteNoticeLocationNameController.handler(
+          createMockRequest({
+            marineLicence: mockMarineLicenceWithApplicationTask,
+            params: { marineLicenceId },
+            query: { location: '1' }
+          }),
+          h
+        )
       ).rejects.toThrow('Error displaying site notice location name page')
-
-      expect(h.view).not.toHaveBeenCalled()
     })
   })
 
@@ -121,10 +116,9 @@ describe('#siteNoticeLocationName', () => {
     test('saves the location name and redirects to site notice display', async () => {
       const h = createMockH()
       const request = createMockRequest({
-        params: {
-          marineLicenceId: mockMarineLicenceWithApplicationTask.id
-        },
-        query: { evidence: '1' },
+        marineLicence: mockMarineLicenceWithApplicationTask,
+        params: { marineLicenceId },
+        query: { location: '1' },
         payload: { locationName }
       })
 
@@ -143,19 +137,16 @@ describe('#siteNoticeLocationName', () => {
     })
 
     test('redirects to view details without saving when there is no site notice task', async () => {
-      vi.mocked(loadMarineLicence).mockResolvedValue({
-        ...loadedLicence,
-        marineLicence: {
-          ...mockMarineLicenceWithApplicationTask,
-          applicationTasks: []
-        }
-      })
       const h = createMockH()
 
       await siteNoticeLocationNameSubmitController.handler(
         createMockRequest({
-          params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id },
-          query: { evidence: '1' },
+          marineLicence: {
+            ...mockMarineLicenceWithApplicationTask,
+            applicationTasks: []
+          },
+          params: { marineLicenceId },
+          query: { location: '1' },
           payload: { locationName }
         }),
         h
@@ -170,8 +161,8 @@ describe('#siteNoticeLocationName', () => {
     test('failAction renders the location name error', async () => {
       const h = createMockH()
       const request = createMockRequest({
-        params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id },
-        query: { evidence: '1' },
+        params: { marineLicenceId },
+        query: { location: '1' },
         payload: { locationName: '' }
       })
 
@@ -226,8 +217,9 @@ describe('#siteNoticeLocationName', () => {
 
       await siteNoticeLocationNameSubmitController.handler(
         createMockRequest({
-          params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id },
-          query: { evidence: '2' },
+          marineLicence: mockMarineLicenceWithApplicationTask,
+          params: { marineLicenceId },
+          query: { location: '2' },
           payload: { locationName }
         }),
         h

@@ -1,0 +1,20 @@
+{
+  "userId": "04aea168-eec8-4a0b-93af-b0c16a6b6b8e",
+  "contactId": "746c575f-a030-4334-8816-4073e51364dd",
+  "email": "casey.consultee@example.com",
+  "firstName": "Casey",
+  "lastName": "Consultee",
+  "loa": "1",
+  "aal": "1",
+  "enrolmentCount": 1,
+  "enrolmentRequestCount": 1,
+  "relationships": [
+    {
+      "organisationName": "Some Org",
+      "relationshipId": "f0239b00-0411-4dca-b5d7-a428f3e86982",
+      "relationshipRole": "Consultee",
+      "roleName": "Consultee",
+      "roleStatus": "1"
+    }
+  ]
+}

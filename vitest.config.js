@@ -1,21 +1,33 @@
 import { defineConfig } from 'vitest/config'
+import { serverBackedSrcTestFiles } from './vitest.isolated-paths.js'
 
 const isCI = Boolean(process.env.CI)
 
+const alias = {
+  '~': new URL('.', import.meta.url).pathname
+}
+
+const sharedTestOptions = {
+  globals: true,
+  pool: 'threads',
+  setupFiles: ['.vite/setup-files.js', 'allure-vitest/setup'],
+  silent: 'passed-only',
+  clearMocks: true,
+  restoreMocks: true
+}
+
+const unitFastInclude = [
+  'src/**/schema.test.js',
+  'src/**/index.test.js',
+  'src/**/urls.test.js',
+  'scripts/**/*.test.js'
+]
+
 export default defineConfig({
+  resolve: {
+    alias
+  },
   test: {
-    globals: true,
-    // threads is faster than the default forks pool for this suite (no process.chdir /
-    // native addons). Keep isolate: true — isolate:false fails due to shared mock state.
-    pool: 'threads',
-    setupFiles: ['.vite/setup-files.js', 'allure-vitest/setup'],
-    include: [
-      '**/src/**/*.test.js',
-      '**/tests/**/*.test.js',
-      '**/scripts/**/*.test.js'
-    ],
-    exclude: ['**/node_modules/**', '**/tests/integration/utils/**'],
-    silent: 'passed-only',
     coverage: {
       provider: 'v8',
       include: ['src/**/*.js'],
@@ -29,7 +41,6 @@ export default defineConfig({
         '**/*.json'
       ],
       reportsDirectory: 'coverage',
-      // text-summary avoids dumping hundreds of per-file rows in CI logs
       reporter: isCI ? ['text-summary', 'lcov'] : ['text', 'lcov']
     },
     reporters: isCI
@@ -44,12 +55,48 @@ export default defineConfig({
           ]
         ]
       : ['default'],
-    clearMocks: true,
-    restoreMocks: true
-  },
-  resolve: {
-    alias: {
-      '~': new URL('.', import.meta.url).pathname
-    }
+    projects: [
+      {
+        resolve: { alias },
+        test: {
+          ...sharedTestOptions,
+          name: 'unit-fast',
+          // Lightweight unit files that do not rely on per-file module isolation
+          isolate: false,
+          include: unitFastInclude
+        }
+      },
+      {
+        resolve: { alias },
+        test: {
+          ...sharedTestOptions,
+          name: 'unit',
+          isolate: true,
+          include: ['src/**/*.test.js'],
+          exclude: [
+            '**/node_modules/**',
+            '**/*.integration.test.js',
+            ...unitFastInclude,
+            ...serverBackedSrcTestFiles
+          ]
+        }
+      },
+      {
+        resolve: { alias },
+        test: {
+          ...sharedTestOptions,
+          name: 'integration',
+          // Must stay isolated: createServer closes over vi.mock'd modules at boot.
+          // Cross-file server reuse needs isolate:false plus mock/session hygiene work.
+          isolate: true,
+          include: [
+            'tests/integration/**/*.test.js',
+            'src/**/*.integration.test.js',
+            ...serverBackedSrcTestFiles
+          ],
+          exclude: ['**/node_modules/**', '**/tests/integration/utils/**']
+        }
+      }
+    ]
   }
 })

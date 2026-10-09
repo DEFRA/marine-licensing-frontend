@@ -273,5 +273,6 @@ export const apiRoutes = {
   RESOLVE_APPLICATION_TASK:
     '/marine-licence/{marineLicenceId}/application-tasks/{taskId}/resolve',
   UPDATE_SITE_NOTICE_EVIDENCE: '/marine-licence/update-site-notice-evidence',
-  ADD_SITE_NOTICE_EVIDENCE: '/marine-licence/add-site-notice-evidence'
+  ADD_SITE_NOTICE_EVIDENCE: '/marine-licence/add-site-notice-evidence',
+  DELETE_SITE_NOTICE_EVIDENCE: '/marine-licence/delete-site-notice-evidence'
 }

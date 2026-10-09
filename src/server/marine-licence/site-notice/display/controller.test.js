@@ -263,10 +263,7 @@ describe('#siteNoticeDisplay', () => {
         getMarineLicenceById: vi.fn().mockRejectedValue(mockError)
       })
 
-      await siteNoticeDisplayAddEvidenceController.handler(
-        mockRequest,
-        mockH
-      )
+      await siteNoticeDisplayAddEvidenceController.handler(mockRequest, mockH)
 
       expect(authRequests.authenticatedPostRequest).not.toHaveBeenCalled()
       expect(mockH.redirect).toHaveBeenCalledWith(

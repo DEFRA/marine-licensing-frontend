@@ -10,7 +10,8 @@ import {
   initiatePhotoUpload,
   PHOTO_ACCEPT_ATTRIBUTE,
   siteNoticeDisplayUrl,
-  siteNoticeEvidenceUrl
+  siteNoticeEvidenceUrl,
+  siteNoticeLocationUrl
 } from '#src/server/marine-licence/site-notice/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -52,7 +53,7 @@ export const siteNoticeCloseUpPhotoController = {
         locationIndex: getLocationIndex(request),
         uploadUrl: uploadConfig.uploadUrl,
         acceptAttribute: PHOTO_ACCEPT_ATTRIBUTE,
-        backLink: siteNoticeDisplayUrl(marineLicenceId),
+        backLink: siteNoticeLocationUrl(request),
         errorSummary,
         errors
       })

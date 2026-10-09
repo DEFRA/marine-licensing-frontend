@@ -43,7 +43,7 @@ describe('#siteNoticePositionPhotoController', () => {
         locationIndex: 1,
         uploadUrl: 'https://cdp/upload',
         acceptAttribute: photoUpload.PHOTO_ACCEPT_ATTRIBUTE,
-        backLink: displayUrl
+        backLink: `${displayUrl}#site-location-1`
       })
     )
   })

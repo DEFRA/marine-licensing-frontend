@@ -15,7 +15,8 @@ import {
   getDisplayConditions,
   getEvidenceSubmission,
   getSiteNoticeValues,
-  isSiteNoticeEvidenceComplete
+  isSiteNoticeEvidenceComplete,
+  getCanAddLocation
 } from '#src/server/marine-licence/site-notice/display/utils.js'
 import { siteNoticeDisplayUrl } from '#src/server/marine-licence/site-notice/utils.js'
 
@@ -62,6 +63,13 @@ export const siteNoticeDisplayController = {
       const siteNoticeEvidenceComplete =
         isSiteNoticeEvidenceComplete(siteNoticeEvidence)
 
+      const canAddLocation = getCanAddLocation(
+        siteNoticeEvidence,
+        evidenceSubmission
+      )
+
+      const addEvidenceFormAction = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_ADD_EVIDENCE}/${marineLicenceId}`
+
       return h.view(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         ...siteNoticeDisplaySettings,
         backLink: viewDetailsUrl,
@@ -70,6 +78,13 @@ export const siteNoticeDisplayController = {
         siteNoticeEvidence,
         evidenceSubmission,
         canSendEvidence: !evidenceSubmission && !!siteNoticeEvidenceComplete,
+        canAddLocation,
+        addEvidenceFormAction,
+        deleteLocationUrl:
+          marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION.replace(
+            '{marineLicenceId}',
+            marineLicenceId
+          ),
         ...displayConditions
       })
     } catch (error) {
@@ -115,5 +130,49 @@ export const siteNoticeDisplaySubmitController = {
     )
 
     return h.redirect(getViewDetailsUrl(marineLicenceId))
+  }
+}
+
+export const siteNoticeDisplayAddEvidenceController = {
+  options: validateMarineLicenceIdParams,
+  async handler(request, h) {
+    const { marineLicenceId } = request.params
+
+    try {
+      const service = getMarineLicenceService(request)
+      const marineLicence = await service.getMarineLicenceById(marineLicenceId)
+
+      await assertIsOriginalSubmitter(request, marineLicence)
+
+      const task = findSiteNoticeTask(marineLicence)
+
+      if (!task) {
+        return h.redirect(getViewDetailsUrl(marineLicenceId))
+      }
+
+      if (task.resolvedAt) {
+        return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
+      }
+
+      await authenticatedPostRequest(
+        request,
+        apiRoutes.ADD_SITE_NOTICE_EVIDENCE,
+        { id: marineLicenceId }
+      )
+
+      const newLocationNumber =
+        (marineLicence.siteNoticeEvidence?.length ?? 0) + 1
+
+      return h.redirect(
+        `${siteNoticeDisplayUrl(marineLicenceId)}#site-location-${newLocationNumber}`
+      )
+    } catch (error) {
+      request.logger.error(
+        error,
+        'Error adding site notice evidence placeholder'
+      )
+
+      return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
+    }
   }
 }

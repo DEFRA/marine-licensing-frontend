@@ -28,16 +28,10 @@ export const findSiteNoticeTask = (marineLicence) =>
     (task) => task.type === APPLICATION_TASK_TYPE.PUBLIC_SITE_NOTICE
   )
 
-const hasInvalidEvidenceNumber = (evidenceNumber, evidenceItems) => {
-  if (!Number.isInteger(evidenceNumber) || evidenceNumber < 1) {
-    return true
-  }
-
-  const editingExistingEvidence = evidenceNumber <= evidenceItems.length
-  const addingNewEvidence = evidenceNumber === evidenceItems.length + 1
-
-  return !editingExistingEvidence && !addingNewEvidence
-}
+const hasInvalidEvidenceNumber = (evidenceNumber, evidenceItems) =>
+  !Number.isInteger(evidenceNumber) ||
+  evidenceNumber < 1 ||
+  evidenceNumber > evidenceItems.length
 
 export const validateEvidenceParam = {
   method: async (request, h) => {

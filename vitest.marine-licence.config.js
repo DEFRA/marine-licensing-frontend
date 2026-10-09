@@ -1,20 +1,10 @@
 import { defineConfig } from 'vitest/config'
-
-const alias = {
-  '~': new URL('.', import.meta.url).pathname
-}
+import baseConfig from './vitest.config.js'
 
 export default defineConfig({
-  resolve: {
-    alias
-  },
+  ...baseConfig,
   test: {
-    globals: true,
-    pool: 'threads',
-    setupFiles: ['.vite/setup-files.js', 'allure-vitest/setup'],
-    silent: 'passed-only',
-    clearMocks: true,
-    restoreMocks: true,
+    ...baseConfig.test,
     include: [
       'src/server/marine-licence/**/*.test.js',
       'src/server/common/helpers/marine-licence/**/*.test.js',

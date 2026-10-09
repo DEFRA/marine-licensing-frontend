@@ -24,7 +24,7 @@ vi.mock('~/src/server/common/plugins/auth/utils.js')
 
 describe('Site notice location name page', () => {
   const getServer = setupTestServer()
-  const requestUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${mockMarineLicenceWithApplicationTask.id}?evidence=1`
+  const requestUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${mockMarineLicenceWithApplicationTask.id}?location=1`
   const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`
 
   beforeEach(() => {
@@ -135,7 +135,7 @@ describe('Site notice location name page', () => {
 
   test('redirects when the evidence number is not valid', async () => {
     const { statusCode } = await makeGetRequest({
-      url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${mockMarineLicenceWithApplicationTask.id}?evidence=99`,
+      url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${mockMarineLicenceWithApplicationTask.id}?location=99`,
       server: getServer()
     })
 

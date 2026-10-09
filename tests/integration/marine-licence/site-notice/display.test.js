@@ -9,7 +9,7 @@ import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
-import { loadPage } from '~/tests/integration/shared/app-server.js'
+import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import {
   mockApplicationTaskContactId,
@@ -18,7 +18,11 @@ import {
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { PUBLIC_NOTICE_REQUEST_RELATES_TO } from '~/src/server/common/constants/site-notice.js'
-import { authenticatedGetRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import {
+  authenticatedGetRequest,
+  authenticatedPostRequest
+} from '~/src/server/common/helpers/authenticated-requests.js'
+import { findSiteNoticeTask } from '~/src/server/common/helpers/marine-licence/site-notice.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
@@ -56,19 +60,79 @@ describe('Site notice display page (marine licence)', () => {
         'Notices should be placed in locations chosen to best bring the proposed application to the attention of the public and interested parties. Consider locations such as those below.'
       )
     ).toBeInTheDocument()
-  })
-
-  test('should have correct navigation links', async () => {
-    const document = await loadPage({
-      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${mockMarineLicenceWithApplicationTask.id}`,
-      server: getServer()
-    })
 
     const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       expectedViewDetailsUrl
+    )
+    expect(
+      getByRole(document, 'heading', { name: 'Send us evidence' })
+    ).toBeInTheDocument()
+
+    expect(document.body).toHaveTextContent(
+      'Add the details and photographs for each location where you displayed a site notice.'
+    )
+
+    expect(document.body).toHaveTextContent(
+      'You must complete all sections marked Incomplete before you can send your evidence.'
+    )
+
+    expect(
+      queryByRole(document, 'heading', { name: 'Location 1 evidence' })
+    ).toBeInTheDocument()
+  })
+
+  test('shows saved site notice evidence and links each location', async () => {
+    const marineLicence = {
+      ...mockMarineLicenceWithApplicationTask,
+      siteNoticeEvidence: [
+        {
+          locationName: 'Harbour wall',
+          dateDisplayed: { day: '5', month: '03', year: '2026' },
+          closeUpPhoto: { uploadedFile: { filename: 'close-up.jpg' } },
+          positionPhoto: { uploadedFile: { filename: 'position.jpg' } }
+        },
+        {
+          locationName: 'Slipway',
+          dateDisplayed: { day: '12', month: '04', year: '2026' },
+          closeUpPhoto: { uploadedFile: { filename: 'slipway-close-up.jpg' } },
+          positionPhoto: { uploadedFile: { filename: 'slipway-position.jpg' } }
+        }
+      ]
+    }
+
+    vi.mocked(authenticatedGetRequest).mockResolvedValue({
+      payload: { message: 'success', value: marineLicence }
+    })
+
+    const document = await loadPage({
+      requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicence.id}`,
+      server: getServer()
+    })
+
+    const licenceId = marineLicence.id
+
+    expect(getByText(document, 'Harbour wall')).toBeInTheDocument()
+    expect(getByText(document, '5 March 2026')).toBeInTheDocument()
+    expect(getByText(document, 'close-up.jpg')).toBeInTheDocument()
+    expect(getByText(document, 'position.jpg')).toBeInTheDocument()
+    expect(
+      getByRole(document, 'link', {
+        name: 'Change location name (Location 1 evidence)'
+      })
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}?location=1`
+    )
+    expect(
+      getByRole(document, 'link', {
+        name: 'Change photo evidencing notice position and location (Location 2 evidence)'
+      })
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}?location=2`
     )
   })
 
@@ -132,23 +196,35 @@ describe('Site notice display page (marine licence)', () => {
       })
     ).toHaveAttribute(
       'href',
-      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}?evidence=1`
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}?location=1`
     )
+
     expect(
-      queryByRole(document, 'link', {
+      getByRole(document, 'link', {
         name: 'Change date you displayed the notice (Location 1 evidence)'
       })
-    ).not.toBeInTheDocument()
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${licenceId}?location=1`
+    )
+
     expect(
-      queryByRole(document, 'link', {
+      getByRole(document, 'link', {
         name: 'Change close-up photo of notice (Location 1 evidence)'
       })
-    ).not.toBeInTheDocument()
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${licenceId}?location=1`
+    )
+
     expect(
-      queryByRole(document, 'link', {
+      getByRole(document, 'link', {
         name: 'Change photo evidencing notice position and location (Location 1 evidence)'
       })
-    ).not.toBeInTheDocument()
+    ).toHaveAttribute(
+      'href',
+      `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_POSITION_PHOTO}/${licenceId}?location=1`
+    )
   })
 
   test('forbids anyone who did not submit the application', async () => {
@@ -240,5 +316,123 @@ describe('Site notice display page (marine licence)', () => {
     })
 
     expect(getByText(document, 'Multiple sites')).toBeInTheDocument()
+  })
+
+  describe('Send evidence', () => {
+    const marineLicenceId = mockMarineLicenceWithApplicationTask.id
+    const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
+    const viewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+    const incompleteMarineLicence = {
+      ...mockMarineLicenceWithApplicationTask,
+      siteNoticeEvidence: [{ locationName: 'Harbour wall' }]
+    }
+
+    const mockLicence = (marineLicence) =>
+      vi.mocked(authenticatedGetRequest).mockResolvedValue({
+        payload: { message: 'success', value: marineLicence }
+      })
+
+    test('sends evidence when all evidence is complete', async () => {
+      const { taskId } = findSiteNoticeTask(
+        mockMarineLicenceWithApplicationTask
+      )
+
+      const document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(document.body).toHaveTextContent(
+        'Check that you have added evidence for every location where you displayed a site notice.'
+      )
+      expect(
+        getByRole(document, 'button', { name: 'Send evidence' })
+      ).toBeInTheDocument()
+
+      const { response } = await submitForm({
+        requestUrl: displayUrl,
+        server: getServer(),
+        formData: {}
+      })
+
+      expect(authenticatedPostRequest).toHaveBeenCalledWith(
+        expect.anything(),
+        `/marine-licence/${marineLicenceId}/application-tasks/${taskId}/resolve`,
+        {}
+      )
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(viewDetailsUrl)
+    })
+
+    test('does not send evidence when evidence is incomplete', async () => {
+      mockLicence(incompleteMarineLicence)
+
+      const document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(
+        queryByRole(document, 'button', { name: 'Send evidence' })
+      ).not.toBeInTheDocument()
+
+      const { response } = await submitForm({
+        requestUrl: displayUrl,
+        server: getServer(),
+        formData: {}
+      })
+
+      expect(authenticatedPostRequest).not.toHaveBeenCalled()
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(displayUrl)
+    })
+
+    test('shows a read only page once evidence has been sent', async () => {
+      const siteNoticeTask = findSiteNoticeTask(
+        mockMarineLicenceWithApplicationTask
+      )
+      mockLicence({
+        ...mockMarineLicenceWithApplicationTask,
+        applicationTasks:
+          mockMarineLicenceWithApplicationTask.applicationTasks.map((task) =>
+            task === siteNoticeTask
+              ? {
+                  ...task,
+                  resolvedAt: '2026-10-05T10:00:00.000Z',
+                  resolvedByName: 'Sam Evans'
+                }
+              : task
+          )
+      })
+
+      const document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(
+        getByText(
+          document,
+          'Evidence was submitted 5 October 2026 by Sam Evans'
+        )
+      ).toBeInTheDocument()
+      expect(
+        queryByRole(document, 'button', { name: 'Send evidence' })
+      ).not.toBeInTheDocument()
+      expect(
+        queryByRole(document, 'link', {
+          name: 'Change location name (Location 1 evidence)'
+        })
+      ).not.toBeInTheDocument()
+
+      const { response } = await submitForm({
+        requestUrl: displayUrl,
+        server: getServer(),
+        formData: {}
+      })
+
+      expect(authenticatedPostRequest).not.toHaveBeenCalled()
+      expect(response.headers.location).toBe(displayUrl)
+    })
   })
 })

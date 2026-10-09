@@ -183,7 +183,7 @@ describe('setSiteDetailsAction', () => {
     })
   })
 
-  test('should include evidence query param when provided', () => {
+  test('should include location query param when provided', () => {
     const result = setSiteDetailsAction('', '/page', null, 'location name', {
       skipAction: true,
       evidenceIndex: 1
@@ -193,7 +193,7 @@ describe('setSiteDetailsAction', () => {
       items: [
         {
           classes: 'govuk-link--no-visited-state',
-          href: '/page?evidence=1',
+          href: '/page?location=1',
           text: 'Add ',
           visuallyHiddenText: 'location name'
         }

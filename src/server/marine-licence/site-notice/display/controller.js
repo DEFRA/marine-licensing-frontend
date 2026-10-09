@@ -167,9 +167,6 @@ export const siteNoticeDisplayAddEvidenceController = {
         `${siteNoticeDisplayUrl(marineLicenceId)}#site-location-${newLocationNumber}`
       )
     } catch (error) {
-      if (error.isBoom) {
-        throw error
-      }
       request.logger.error(
         error,
         'Error adding site notice evidence placeholder'

@@ -37,8 +37,7 @@ export const withdrawMarineLicenceConfirmController = {
 
       if (!marineLicence) {
         request.logger.warn(
-          { marineLicenceId },
-          'Marine licence to withdraw not found'
+          `Marine licence to withdraw not found for licence ${marineLicenceId}`
         )
         return h.redirect(routes.DASHBOARD)
       }
@@ -47,8 +46,8 @@ export const withdrawMarineLicenceConfirmController = {
         !WITHDRAWABLE_MARINE_LICENCE_STATUSES.includes(marineLicence.status)
       ) {
         request.logger.warn(
-          { marineLicenceId, status: marineLicence.status },
-          'Marine licence cannot be withdrawn'
+          { status: marineLicence.status },
+          `Marine licence to withdraw not found for licence ${marineLicenceId}`
         )
         return h.redirect(routes.DASHBOARD)
       }
@@ -106,7 +105,6 @@ export const withdrawMarineLicenceSubmitController = {
       )
 
       request.logger.info(
-        { marineLicenceId },
         `Withdrawn marine licence ${marineLicenceId}`
       )
 

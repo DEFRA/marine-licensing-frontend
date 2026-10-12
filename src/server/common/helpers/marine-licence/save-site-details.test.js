@@ -398,12 +398,11 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          marineLicenceId: mockMarineLicenceApplication.id,
           siteCount: 1,
           coordinatesType: 'file',
           isSingleSite: true
         },
-        'Successfully saved site details to backend'
+        `Successfully saved site details to backend for licence ${mockMarineLicenceApplication.id}`
       )
     })
 
@@ -434,12 +433,11 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          marineLicenceId: mockMarineLicenceApplication.id,
           siteCount: 1,
           coordinatesType: 'file',
           isSingleSite: false
         },
-        'Successfully saved site details to backend'
+        `Successfully saved site details to backend for licence ${mockMarineLicenceApplication.id}`
       )
     })
 
@@ -473,12 +471,11 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          marineLicenceId: mockManualCoordinatesMarineLicence.id,
           siteCount: 1,
           coordinatesType: 'coordinates',
           isSingleSite: false
         },
-        'Successfully saved site details to backend'
+        `Successfully saved site details to backend for licence ${mockManualCoordinatesMarineLicence.id}`
       )
     })
 

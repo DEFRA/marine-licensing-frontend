@@ -159,21 +159,19 @@ export const saveSiteDetailsToBackend = async (
 
     request.logger.info(
       {
-        marineLicenceId: marineLicence.id,
         siteCount: cacheData.length,
         coordinatesType,
         isSingleSite
       },
-      'Successfully saved site details to backend'
+      `Successfully saved site details to backend for licence ${marineLicence.id}`
     )
   } catch (error) {
     request.logger.error(
       {
         err: error,
-        marineLicenceId: marineLicence.id,
         coordinatesType
       },
-      'Failed to save site details to backend'
+      `Failed to save site details to backend for licence ${marineLicence.id}`
     )
     throw error
   }

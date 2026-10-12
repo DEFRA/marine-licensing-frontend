@@ -95,7 +95,6 @@ export const deleteMarineLicenceSubmitController = {
       )
 
       request.logger.info(
-        { marineLicenceId },
         `Deleted marine licence ${marineLicenceId} by user ${authedUser.contactId}`
       )
 

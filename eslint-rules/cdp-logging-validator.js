@@ -13,7 +13,7 @@ const CDP_SCHEMA = {
     created: true,
     duration: true,
     kind: true,
-    outcome: true,
+    outcome: ['failure', 'success', 'unknown'],
     reason: true,
     reference: true,
     severity: true,
@@ -68,6 +68,17 @@ const checkProperty = (context, prop, schema, prefix) => {
     return
   }
 
+  if (Array.isArray(schema[key])) {
+    if (!schema[key].includes(prop.value.value)) {
+      context.report({
+        node: prop.value,
+        messageId: 'invalidValue',
+        data: { key: prefix + key, allowed: schema[key].join(', ') }
+      })
+    }
+    return
+  }
+
   if (schema[key] !== true && prop.value.type === 'ObjectExpression') {
     checkObject(context, prop.value, schema[key], `${prefix}${key}.`)
   }
@@ -89,7 +100,8 @@ export default {
     },
     schema: [],
     messages: {
-      invalidKey: '`{{key}}` is not a valid CDP log field.'
+      invalidKey: '`{{key}}` is not a valid CDP log field.',
+      invalidValue: '`{{key}}` must be a string literal, one of: {{allowed}}.'
     }
   },
   create(context) {

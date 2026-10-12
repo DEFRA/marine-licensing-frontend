@@ -47,7 +47,7 @@ export const withdrawMarineLicenceConfirmController = {
       ) {
         request.logger.warn(
           { tenant: { message: `status: ${marineLicence.status}` } },
-          `Marine licence to withdraw not found for licence ${marineLicenceId}`
+          `Marine licence cannot be withdrawn for ${marineLicenceId}`
         )
         return h.redirect(routes.DASHBOARD)
       }

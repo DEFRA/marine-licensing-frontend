@@ -43,7 +43,10 @@ async function handleGeoParserError(request, h, error, filename, fileType) {
   request.logger.error(
     {
       err: error,
-      event: { outcome: errorCode, reason: message },
+      event: {
+        outcome: 'failure',
+        reason: `errorCode: ${errorCode}, message: ${message}`
+      },
       tenant: { message: `filename: ${filename}, fileType: ${fileType}` }
     },
     'FileUpload: ERROR: Failed to extract coordinates from uploaded file'

@@ -563,8 +563,9 @@ describe('#uploadAndWait', () => {
           {
             err: expect.any(Error),
             event: {
-              outcome: null,
-              reason: 'The selected file could not be processed – try again'
+              outcome: 'failure',
+              reason:
+                'errorCode: null, message: The selected file could not be processed – try again'
             },
             tenant: { message: 'filename: test.kml, fileType: kml' }
           },
@@ -633,8 +634,9 @@ describe('#uploadAndWait', () => {
           {
             err: geoParserError,
             event: {
-              outcome: 'SHAPEFILE_MISSING_CORE_FILES',
-              reason: 'The selected file must include .shp .shx and .dbf files'
+              outcome: 'failure',
+              reason:
+                'errorCode: SHAPEFILE_MISSING_CORE_FILES, message: The selected file must include .shp .shx and .dbf files'
             },
             tenant: {
               message: 'filename: coordinates.zip, fileType: shapefile'

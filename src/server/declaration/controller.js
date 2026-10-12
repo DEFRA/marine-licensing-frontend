@@ -127,7 +127,7 @@ const submitExemption = async (request, h) => {
     throw new Error(errorMessages.UNEXPECTED_API_RESPONSE)
   } catch (error) {
     request.logger.error(
-      { err: error, exemptionId: id },
+      { err: error, tenant: { message: `exemptionId: ${id}` } },
       errorMessages.SUBMISSION_FAILED
     )
     throw Boom.badRequest(errorMessages.SUBMISSION_FAILED, error)
@@ -146,7 +146,10 @@ export const declarationSubmitController = {
       return submitExemption(request, h)
     }
 
-    request.logger.error({ projectType: type }, 'Unknown project type')
+    request.logger.error(
+      { tenant: { message: `projectType: ${type}` } },
+      'Unknown project type'
+    )
     return h.view(DECLARATION_VIEW_ROUTE, getViewContext(type))
   }
 }

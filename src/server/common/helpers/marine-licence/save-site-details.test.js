@@ -59,9 +59,10 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          fileType: 'kml',
-          featureCount: 1,
-          filename: 'test-upload-id'
+          tenant: {
+            message:
+              'fileType: kml, featureCount: 1, filename: test-upload-id'
+          }
         },
         'Saving file upload site details'
       )
@@ -398,9 +399,9 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          siteCount: 1,
-          coordinatesType: 'file',
-          isSingleSite: true
+          tenant: {
+            message: 'siteCount: 1, coordinatesType: file, isSingleSite: true'
+          }
         },
         `Successfully saved site details to backend for licence ${mockMarineLicenceApplication.id}`
       )
@@ -433,9 +434,9 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          siteCount: 1,
-          coordinatesType: 'file',
-          isSingleSite: false
+          tenant: {
+            message: 'siteCount: 1, coordinatesType: file, isSingleSite: false'
+          }
         },
         `Successfully saved site details to backend for licence ${mockMarineLicenceApplication.id}`
       )
@@ -471,9 +472,10 @@ describe('save-site-details', () => {
 
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
-          siteCount: 1,
-          coordinatesType: 'coordinates',
-          isSingleSite: false
+          tenant: {
+            message:
+              'siteCount: 1, coordinatesType: coordinates, isSingleSite: false'
+          }
         },
         `Successfully saved site details to backend for licence ${mockManualCoordinatesMarineLicence.id}`
       )

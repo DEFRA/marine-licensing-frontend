@@ -15,8 +15,9 @@ export const logExtractionSuccess = (
 ) => {
   request.logger.info(
     {
-      featureCount: geoJSON.features.length,
-      coordinateCount: extractedCoordinates.length
+      tenant: {
+        message: `featureCount: ${geoJSON.features.length}, coordinateCount: ${extractedCoordinates.length}`
+      }
     },
     'FileUpload: Successfully extracted coordinates'
   )
@@ -30,9 +31,9 @@ export const logSuccessfulProcessing = (
 ) => {
   request.logger.info(
     {
-      filename: status.filename,
-      fileType: uploadConfig.fileType,
-      featureCount: coordinateData.featureCount
+      tenant: {
+        message: `filename: ${status.filename}, fileType: ${uploadConfig.fileType}, featureCount: ${coordinateData.featureCount}`
+      }
     },
     'FileUpload: File upload and coordinate extraction completed successfully'
   )

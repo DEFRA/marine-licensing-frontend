@@ -75,8 +75,9 @@ export const deleteMarineLicenceSubmitController = {
       if (!marineLicenceId || marineLicenceId !== cachedMarineLicenceId) {
         request.logger.error(
           {
-            formMarineLicenceId: marineLicenceId,
-            cachedMarineLicenceId
+            tenant: {
+              message: `formMarineLicenceId: ${marineLicenceId}, cachedMarineLicenceId: ${cachedMarineLicenceId}`
+            }
           },
           'Marine licence ID mismatch or missing'
         )

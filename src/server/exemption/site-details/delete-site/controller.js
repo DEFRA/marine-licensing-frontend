@@ -39,7 +39,11 @@ export const deleteSiteSubmitController = {
     try {
       if (!exemption.siteDetails[parsedSiteIndex]) {
         request.logger.error(
-          { siteIndex, exemptionId: exemption.id },
+          {
+            tenant: {
+              message: `siteIndex: ${siteIndex}, exemptionId: ${exemption.id}`
+            }
+          },
           'Invalid site index for deletion'
         )
         return h.redirect(routes.REVIEW_SITE_DETAILS)
@@ -68,8 +72,9 @@ export const deleteSiteSubmitController = {
       request.logger.error(
         {
           err: error,
-          siteIndex: parsedSiteIndex,
-          exemptionId: exemption.id
+          tenant: {
+            message: `siteIndex: ${parsedSiteIndex}, exemptionId: ${exemption.id}`
+          }
         },
         'Error deleting site'
       )

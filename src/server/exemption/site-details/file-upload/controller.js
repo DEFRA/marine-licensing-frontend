@@ -86,8 +86,9 @@ export const fileUploadController = {
       request.logger.error(
         {
           err: error,
-          exemptionId: exemption.id,
-          fileUploadType
+          tenant: {
+            message: `exemptionId: ${exemption.id}, fileUploadType: ${fileUploadType}`
+          }
         },
         'Failed to initialize file upload'
       )

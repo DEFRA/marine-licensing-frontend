@@ -60,8 +60,7 @@ describe('save-site-details', () => {
       expect(mockRequest.logger.info).toHaveBeenCalledWith(
         {
           tenant: {
-            message:
-              'fileType: kml, featureCount: 1, filename: test-upload-id'
+            message: 'fileType: kml, featureCount: 1, filename: test-upload-id'
           }
         },
         'Saving file upload site details'

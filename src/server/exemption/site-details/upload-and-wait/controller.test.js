@@ -737,7 +737,9 @@ describe('#uploadAndWait', () => {
               outcome: 'SHAPEFILE_MISSING_CORE_FILES',
               reason: 'The selected file must include .shp .shx and .dbf files'
             },
-            tenant: { message: 'filename: coordinates.zip, fileType: shapefile' }
+            tenant: {
+              message: 'filename: coordinates.zip, fileType: shapefile'
+            }
           },
           'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
         )

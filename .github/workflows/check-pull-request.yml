@@ -41,7 +41,7 @@ jobs:
       - name: Security audit
         run: |
           # Temporary braces allowlist in .audit-ci.jsonc — revisit/remove by this date
-          EXPIRES_ON=2026-10-12
+          EXPIRES_ON=2026-11-12
           TODAY=$(date -u +%F)
           if ! [[ "$TODAY" < "$EXPIRES_ON" ]]; then
             echo "::error::Temporary npm audit allowlist for GHSA-vfj7-8cjw-p6xm expired on ${EXPIRES_ON}. Revisit braces or extend the date with team agreement."

@@ -5,7 +5,6 @@ const LOGGER_CALL =
   '[callee.object.property.name="logger"]' +
   '[callee.property.name=/^(debug|info|warn|error|fatal)$/]'
 
-// CDP log schema. `true` = allowed, with anything nested below it.
 const CDP_SCHEMA = {
   client: { address: true, ip: true, port: true },
   error: { code: true, id: true, message: true, stack_trace: true, type: true },
@@ -74,8 +73,6 @@ const checkProperty = (context, prop, schema, prefix) => {
   }
 }
 
-// Only inline `{ ... }` keys can be read; variables, spreads and computed
-// keys are only known at runtime, so they're skipped.
 const checkObject = (context, objectNode, schema, prefix = '') => {
   for (const prop of objectNode.properties) {
     if (prop.type === 'Property' && !prop.computed) {
@@ -84,7 +81,6 @@ const checkObject = (context, objectNode, schema, prefix = '') => {
   }
 }
 
-/** @type {import('eslint').Rule.RuleModule} */
 export default {
   meta: {
     type: 'problem',

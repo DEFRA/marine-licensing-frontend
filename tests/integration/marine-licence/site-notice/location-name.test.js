@@ -53,7 +53,7 @@ describe('Site notice location name page', () => {
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      displayUrl
+      displayUrl + '#site-location-1'
     )
     expect(getByLabelText(document, 'Location name')).toBeInTheDocument()
     expect(document.body).toHaveTextContent(

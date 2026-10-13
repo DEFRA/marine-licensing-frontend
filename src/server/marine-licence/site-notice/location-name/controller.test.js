@@ -55,7 +55,7 @@ describe('#siteNoticeLocationName', () => {
       expect(h.view).toHaveBeenCalledWith(
         SITE_NOTICE_LOCATION_NAME_VIEW_ROUTE,
         {
-          backLink: displayUrl,
+          backLink: `${displayUrl}#site-location-1`,
           pageTitle: 'Location name',
           heading: 'Location name',
           projectName: 'Test Project',
@@ -185,7 +185,7 @@ describe('#siteNoticeLocationName', () => {
         expect.objectContaining({
           projectName: 'Test Project',
           locationIndex: 1,
-          backLink: displayUrl,
+          backLink: `${displayUrl}#site-location-1`,
           errors: expect.objectContaining({
             locationName: expect.objectContaining({
               text: 'Enter the location name'

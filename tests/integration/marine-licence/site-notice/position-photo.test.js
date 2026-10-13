@@ -61,7 +61,7 @@ describe('Site notice position photo page', () => {
 
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      displayUrl
+      displayUrl + '#site-location-1'
     )
   })
 

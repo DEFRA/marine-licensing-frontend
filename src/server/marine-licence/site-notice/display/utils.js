@@ -2,6 +2,8 @@ import { PUBLIC_NOTICE_REQUEST_RELATES_TO } from '#src/server/common/constants/s
 import dayjs from 'dayjs'
 import { formatDate as formatDateString } from '#src/server/common/helpers/dates/date-utils.js'
 
+export const MAX_SITE_NOTICE_LOCATIONS = 30
+
 export const getDisplayConditions = (marineLicence, taskData = {}) => {
   const { requestRelatesTo } = taskData
 
@@ -59,4 +61,10 @@ export const getSiteNoticeValues = (marineLicence) => {
       ? evidence.positionPhoto.uploadedFile.filename
       : undefined
   }))
+}
+
+export const getCanAddLocation = (siteNoticeEvidence, evidenceSubmission) => {
+  return (
+    !evidenceSubmission && siteNoticeEvidence.length < MAX_SITE_NOTICE_LOCATIONS
+  )
 }

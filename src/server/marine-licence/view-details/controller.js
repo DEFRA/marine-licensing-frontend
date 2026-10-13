@@ -52,9 +52,9 @@ const fetchViewableMarineLicence = async (
   if (!isProjectViewable(marineLicence)) {
     request.logger.error(
       {
-        id: marineLicenceId,
-        status: marineLicence.status,
-        hasApplicationReference: !!marineLicence.applicationReference
+        tenant: {
+          message: `id: ${marineLicenceId}, status: ${marineLicence.status}, hasApplicationReference: ${!!marineLicence.applicationReference}`
+        }
       },
       errorMessages.MARINE_LICENCE_NOT_SUBMITTED
     )

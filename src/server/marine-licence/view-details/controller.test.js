@@ -200,10 +200,11 @@ describe('marine-licence view details controller', () => {
         ).rejects.toMatchObject({ isBoom: true, output: { statusCode: 403 } })
 
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
-          expect.objectContaining({
-            id: mockMarineLicenceApplication.id,
-            status: 'Draft'
-          }),
+          {
+            tenant: {
+              message: `id: ${mockMarineLicenceApplication.id}, status: Draft, hasApplicationReference: true`
+            }
+          },
           errorMessages.MARINE_LICENCE_NOT_SUBMITTED
         )
       })

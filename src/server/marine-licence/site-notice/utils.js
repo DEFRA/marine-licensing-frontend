@@ -1,6 +1,7 @@
 import { config } from '#src/config/config.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createFileUploadErrorDisplay } from '#src/server/common/helpers/file-upload/file-upload.js'
+import { getLocationIndex } from '#src/server/common/helpers/marine-licence/site-notice.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 
 export const PHOTO_ACCEPT_ATTRIBUTE = '.jpg,.jpeg,.png'
@@ -24,6 +25,9 @@ export const setPhotoUploadSession = async (request, h, value) => {
 
 export const siteNoticeDisplayUrl = (marineLicenceId) =>
   `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
+
+export const siteNoticeLocationUrl = (request) =>
+  `${siteNoticeDisplayUrl(request.params.marineLicenceId)}#site-location-${getLocationIndex(request)}`
 
 export const siteNoticeEvidenceUrl = (route, request) =>
   `${route}/${request.params.marineLicenceId}?location=${request.query.location}`

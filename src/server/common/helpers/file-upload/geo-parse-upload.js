@@ -53,7 +53,11 @@ export const extractCoordinatesFromFile = async (
 ) => {
   try {
     request.logger.info(
-      { s3Bucket, s3Key, fileType },
+      {
+        tenant: {
+          message: `s3Bucket: ${s3Bucket}, s3Key: ${s3Key}, fileType: ${fileType}`
+        }
+      },
       `FileUpload: Calling geo-parser API`
     )
     const response = await callGeoParserAPI(

@@ -14,10 +14,11 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
+import { apiRoutes } from '#src/server/common/constants/routes.js'
 import {
-  apiRoutes,
-  marineLicenceRoutes
-} from '#src/server/common/constants/routes.js'
+  siteNoticeDisplayUrl,
+  siteNoticeLocationUrl
+} from '#src/server/marine-licence/site-notice/utils.js'
 import { locationNameSchema } from '#src/server/common/validation/location-name/schema.js'
 import {
   locationNameErrorMessages,
@@ -31,9 +32,6 @@ const siteNoticeLocationNameOptions = {
   ...validateMarineLicenceIdParams,
   pre: [validateEvidenceParam]
 }
-
-const getBackLink = (marineLicenceId) =>
-  `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
 
 const siteNoticeLocationNameSettings = (request, marineLicence) => ({
   projectName: marineLicence.projectName,
@@ -64,7 +62,7 @@ export const siteNoticeLocationNameController = {
 
       return h.view(SITE_NOTICE_LOCATION_NAME_VIEW_ROUTE, {
         ...locationNameSettings,
-        backLink: getBackLink(marineLicenceId),
+        backLink: siteNoticeLocationUrl(request),
         ...siteNoticeLocationNameSettings(request, marineLicence),
         payload
       })
@@ -98,7 +96,7 @@ export const siteNoticeLocationNameSubmitController = {
           viewRoute: SITE_NOTICE_LOCATION_NAME_VIEW_ROUTE,
           settings: locationNameSettings,
           errorMessages: locationNameErrorMessages,
-          backLink: getBackLink(marineLicenceId),
+          backLink: siteNoticeLocationUrl(request),
           payload: request.payload,
           params: siteNoticeLocationNameSettings(request, marineLicence)
         })(request, h, err)
@@ -125,7 +123,7 @@ export const siteNoticeLocationNameSubmitController = {
         }
       )
 
-      return h.redirect(getBackLink(marineLicenceId))
+      return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details
@@ -143,7 +141,7 @@ export const siteNoticeLocationNameSubmitController = {
       return h.view(SITE_NOTICE_LOCATION_NAME_VIEW_ROUTE, {
         ...locationNameSettings,
         payload,
-        backLink: getBackLink(marineLicenceId),
+        backLink: siteNoticeLocationUrl(request),
         ...siteNoticeLocationNameSettings(request, marineLicence),
         errors,
         errorSummary

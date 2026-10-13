@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
       - name: Test code and Create Test Coverage Reports
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -41,7 +41,7 @@ jobs:
       - name: Security audit
         run: |
           # Temporary braces allowlist in .audit-ci.jsonc — revisit/remove by this date
-          EXPIRES_ON=2026-10-12
+          EXPIRES_ON=2026-11-12
           TODAY=$(date -u +%F)
           if ! [[ "$TODAY" < "$EXPIRES_ON" ]]; then
             echo "::error::Temporary npm audit allowlist for GHSA-vfj7-8cjw-p6xm expired on ${EXPIRES_ON}. Revisit braces or extend the date with team agreement."

@@ -257,8 +257,7 @@ describe('#fileUpload', () => {
         expect(mockRequest.logger.debug).toHaveBeenCalledWith(
           expect.objectContaining({
             message: 'The selected file contains a virus',
-            fieldName: 'file',
-            fileType: 'kml'
+            tenant: { message: 'fieldName: file, fileType: kml' }
           }),
           'Displaying upload error from session'
         )
@@ -282,8 +281,9 @@ describe('#fileUpload', () => {
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           expect.objectContaining({
             err: expect.any(Error),
-            exemptionId: mockExemption.id,
-            fileUploadType: 'kml'
+            tenant: {
+              message: `exemptionId: ${mockExemption.id}, fileUploadType: kml`
+            }
           }),
           'Failed to initialize file upload'
         )

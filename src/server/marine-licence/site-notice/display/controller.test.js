@@ -1,6 +1,7 @@
 import {
   siteNoticeDisplayController,
   siteNoticeDisplaySubmitController,
+  siteNoticeDisplayAddEvidenceController,
   SITE_NOTICE_DISPLAY_VIEW_ROUTE
 } from '#src/server/marine-licence/site-notice/display/controller.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
@@ -21,6 +22,8 @@ vi.mock('#src/services/marine-licence-service/index.js')
 vi.mock('#src/server/common/plugins/auth/utils.js')
 
 describe('#siteNoticeDisplay', () => {
+  const mockH = createMockH()
+
   beforeEach(() => {
     vi.spyOn(authUtils, 'getUserSession').mockResolvedValue({
       contactId: mockApplicationTaskContactId
@@ -35,7 +38,6 @@ describe('#siteNoticeDisplay', () => {
           .mockResolvedValue(mockMarineLicenceWithApplicationTask)
       }
       vi.mocked(getMarineLicenceService).mockReturnValue(mockService)
-      const h = createMockH()
 
       await siteNoticeDisplayController.handler(
         createMockRequest({
@@ -43,17 +45,20 @@ describe('#siteNoticeDisplay', () => {
             marineLicenceId: mockMarineLicenceWithApplicationTask.id
           }
         }),
-        h
+        mockH
       )
 
       const licenceId = mockMarineLicenceWithApplicationTask.id
       const expectedViewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${licenceId}`
 
-      expect(h.view).toHaveBeenCalledWith(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
+      expect(mockH.view).toHaveBeenCalledWith(SITE_NOTICE_DISPLAY_VIEW_ROUTE, {
         backLink: expectedViewDetailsUrl,
         pageTitle: 'Display a site notice',
         heading: 'Display a site notice',
         pageCaption: 'MLA/2026/10264 - Test Project',
+        addEvidenceFormAction: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_ADD_EVIDENCE}/${licenceId}`,
+        canAddLocation: true,
+        deleteLocationUrl: `/marine-licence/${licenceId}/delete-location`,
         evidenceLinks: {
           locationName: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${licenceId}`,
           dateDisplayed: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DATE_DISPLAYED}/${licenceId}`,
@@ -83,24 +88,21 @@ describe('#siteNoticeDisplay', () => {
           applicationTasks: []
         })
       })
-      const h = createMockH()
 
       await siteNoticeDisplayController.handler(
         createMockRequest({
           params: { marineLicenceId: mockMarineLicenceWithApplicationTask.id }
         }),
-        h
+        mockH
       )
 
-      expect(h.redirect).toHaveBeenCalledWith(
+      expect(mockH.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithApplicationTask.id}`
       )
-      expect(h.view).not.toHaveBeenCalled()
+      expect(mockH.view).not.toHaveBeenCalled()
     })
 
     test('Should handle API errors in catch block', async () => {
-      const h = createMockH()
-
       const mockError = new Error('API Error')
 
       const mockRequest = createMockRequest({
@@ -114,10 +116,10 @@ describe('#siteNoticeDisplay', () => {
       })
 
       await expect(
-        siteNoticeDisplayController.handler(mockRequest, h)
+        siteNoticeDisplayController.handler(mockRequest, mockH)
       ).rejects.toThrow('Error displaying site notice display page')
 
-      expect(h.view).not.toHaveBeenCalled()
+      expect(mockH.view).not.toHaveBeenCalled()
     })
   })
 
@@ -129,12 +131,12 @@ describe('#siteNoticeDisplay', () => {
       vi.mocked(getMarineLicenceService).mockReturnValue({
         getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
       })
-      const h = createMockH()
+
       await siteNoticeDisplaySubmitController.handler(
         createMockRequest({ params: { marineLicenceId } }),
-        h
+        mockH
       )
-      return h
+      return mockH
     }
 
     beforeEach(() => {
@@ -142,39 +144,130 @@ describe('#siteNoticeDisplay', () => {
     })
 
     test('resolves the site notice task and returns to view details', async () => {
-      const h = await submit(mockMarineLicenceWithApplicationTask)
+      await submit(mockMarineLicenceWithApplicationTask)
 
       expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
         expect.anything(),
         `/marine-licence/${marineLicenceId}/application-tasks/${taskId}/resolve`,
         {}
       )
-      expect(h.redirect).toHaveBeenCalledWith(
+      expect(mockH.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
       )
     })
 
     test('does not resolve the task when evidence is incomplete', async () => {
-      const h = await submit({
+      await submit({
         ...mockMarineLicenceWithApplicationTask,
         siteNoticeEvidence: [{ locationName: 'North pier' }]
       })
 
       expect(authRequests.authenticatedPostRequest).not.toHaveBeenCalled()
-      expect(h.redirect).toHaveBeenCalledWith(
+      expect(mockH.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
       )
     })
 
     test('redirects to view details when there is no site notice task', async () => {
-      const h = await submit({
+      await submit({
         ...mockMarineLicenceWithApplicationTask,
         applicationTasks: []
       })
 
       expect(authRequests.authenticatedPostRequest).not.toHaveBeenCalled()
-      expect(h.redirect).toHaveBeenCalledWith(
+      expect(mockH.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+      )
+    })
+
+    test('redirects to display page when task is resolved', async () => {
+      const resolvedAt = '2026-10-01T12:00:00.000Z'
+
+      const mockResolvedMarineLicenceWithApplicationTask = {
+        ...mockMarineLicenceWithApplicationTask
+      }
+
+      mockResolvedMarineLicenceWithApplicationTask.applicationTasks[1].resolvedAt =
+        resolvedAt
+
+      await submit(mockResolvedMarineLicenceWithApplicationTask)
+
+      expect(authRequests.authenticatedPostRequest).not.toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
+      )
+    })
+  })
+
+  describe('#siteNoticeDisplayAddEvidenceController', () => {
+    const marineLicenceId = mockMarineLicenceWithApplicationTask.id
+
+    beforeEach(() => {
+      vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({})
+    })
+
+    test('redirects to view details when there is no site notice task', async () => {
+      vi.mocked(getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          ...mockMarineLicenceWithApplicationTask,
+          applicationTasks: []
+        })
+      })
+
+      await siteNoticeDisplayAddEvidenceController.handler(
+        createMockRequest({ params: { marineLicenceId } }),
+        mockH
+      )
+
+      expect(authRequests.authenticatedPostRequest).not.toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
+      )
+    })
+
+    test('redirects to display page when task is resolved', async () => {
+      const resolvedAt = '2026-10-01T12:00:00.000Z'
+
+      const mockResolvedMarineLicenceWithApplicationTask = {
+        ...mockMarineLicenceWithApplicationTask
+      }
+
+      mockResolvedMarineLicenceWithApplicationTask.applicationTasks[1].resolvedAt =
+        resolvedAt
+
+      vi.mocked(getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi
+          .fn()
+          .mockResolvedValue(mockResolvedMarineLicenceWithApplicationTask)
+      })
+
+      await siteNoticeDisplayAddEvidenceController.handler(
+        createMockRequest({ params: { marineLicenceId } }),
+        mockH
+      )
+
+      expect(authRequests.authenticatedPostRequest).not.toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
+      )
+    })
+
+    test('handles errors by redirecting to display page', async () => {
+      const mockError = new Error('API Error')
+
+      const mockRequest = createMockRequest({
+        params: { marineLicenceId }
+      })
+
+      getMarineLicenceService.mockReturnValue({
+        getMarineLicenceById: vi.fn().mockRejectedValue(mockError)
+      })
+
+      await siteNoticeDisplayAddEvidenceController.handler(mockRequest, mockH)
+
+      expect(authRequests.authenticatedPostRequest).not.toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`
       )
     })
   })

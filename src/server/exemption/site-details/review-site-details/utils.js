@@ -228,8 +228,9 @@ export const handleSubmissionError = (
   request.logger.error(
     {
       err: error,
-      exemptionId,
-      coordinatesType
+      tenant: {
+        message: `exemptionId: ${exemptionId}, coordinatesType: ${coordinatesType}`
+      }
     },
     'Error submitting site review'
   )

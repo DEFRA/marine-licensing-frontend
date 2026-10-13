@@ -20,7 +20,10 @@ import {
   mapDateDisplayedErrors,
   validateDateDisplayed
 } from '#src/server/marine-licence/site-notice/date-displayed/utils.js'
-import { siteNoticeDisplayUrl } from '#src/server/marine-licence/site-notice/utils.js'
+import {
+  siteNoticeDisplayUrl,
+  siteNoticeLocationUrl
+} from '#src/server/marine-licence/site-notice/utils.js'
 
 export const SITE_NOTICE_DATE_DISPLAYED_VIEW_ROUTE =
   'marine-licence/site-notice/date-displayed/index'
@@ -63,7 +66,7 @@ export const siteNoticeDateDisplayedController = {
 
       return h.view(SITE_NOTICE_DATE_DISPLAYED_VIEW_ROUTE, {
         ...dateDisplayedSettings,
-        backLink: siteNoticeDisplayUrl(marineLicenceId),
+        backLink: siteNoticeLocationUrl(request),
         ...siteNoticeDateDisplayedSettings(request, marineLicence),
         payload
       })
@@ -82,7 +85,7 @@ const showErrorView = (request, h, err, marineLicence) =>
     viewRoute: SITE_NOTICE_DATE_DISPLAYED_VIEW_ROUTE,
     settings: dateDisplayedSettings,
     errorMessages: dateDisplayedErrorMessages,
-    backLink: siteNoticeDisplayUrl(request.params.marineLicenceId),
+    backLink: siteNoticeLocationUrl(request),
     payload: request.payload,
     params: siteNoticeDateDisplayedSettings(request, marineLicence)
   })(request, h, { details: mapDateDisplayedErrors(err.details) })

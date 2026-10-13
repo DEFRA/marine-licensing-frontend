@@ -88,7 +88,7 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@vitest/coverage-v8": "^4.1.4",
     "@vitest/runner": "^4.1.4",
-    "@vitest/ui": "^4.1.10",
+    "@vitest/ui": "^5.0.3",
     "allure-commandline": "^2.46.1",
     "allure-vitest": "^3.13.0",
     "audit-ci": "7.1.0",

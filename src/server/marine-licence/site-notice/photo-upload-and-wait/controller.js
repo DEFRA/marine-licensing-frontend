@@ -110,7 +110,7 @@ const processUploadStatus = (status, context) => {
   }
 
   request.logger.warn(
-    { status: status.status },
+    { tenant: { message: `status: ${status.status}` } },
     'Site notice photo upload: Unknown upload status'
   )
   return h.redirect(uploadPageUrl)

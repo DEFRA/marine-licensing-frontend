@@ -94,7 +94,7 @@ const processUploadStatus = (status, context) => {
       isProcessing: true,
       filename: status.filename,
       tryAgainLink: uploadPageUrl,
-      cancelLink: siteNoticeDisplayUrl(request.params.marineLicenceId)
+      cancelLink: siteNoticeLocationUrl(request)
     })
   }
 

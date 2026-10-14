@@ -93,7 +93,7 @@ describe('#siteNoticePhotoUploadAndWaitController', () => {
         isProcessing: true,
         filename: 'a.jpg',
         tryAgainLink: uploadPageUrl,
-        cancelLink: displayUrl
+        cancelLink: `${displayUrl}#site-location-2`
       })
     )
   })

@@ -58,6 +58,24 @@ describe('Marine Licence Site Notice Evidence Card', () => {
     expect($component('.govuk-summary-card__actions a')).toHaveLength(0)
   })
 
+  test('should render Add links for empty fields', () => {
+    const $component = renderComponent(
+      'marine-licence/site-notice-evidence-card',
+      {
+        ...baseParams,
+        locationName: '',
+        dateDisplayed: undefined,
+        closeUpPhoto: null,
+        positionPhoto: ''
+      }
+    )
+    const links = $component('.govuk-summary-list__actions a')
+    expect(links).toHaveLength(4)
+    links.each((_, link) => {
+      expect($component(link).text()).toMatch(/^Add/)
+    })
+  })
+
   test('should render card title with evidence index', () => {
     const $component = renderComponent(
       'marine-licence/site-notice-evidence-card',

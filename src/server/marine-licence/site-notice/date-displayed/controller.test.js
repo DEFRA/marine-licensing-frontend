@@ -168,7 +168,7 @@ describe('#siteNoticeDateDisplayed', () => {
           evidenceIndex: 0
         }
       )
-      expect(h.redirect).toHaveBeenCalledWith(displayUrl)
+      expect(h.redirect).toHaveBeenCalledWith(`${displayUrl}#site-location-1`)
     })
 
     test('redirects to view details without saving when there is no site notice task', async () => {

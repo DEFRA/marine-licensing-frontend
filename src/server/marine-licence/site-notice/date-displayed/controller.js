@@ -20,10 +20,7 @@ import {
   mapDateDisplayedErrors,
   validateDateDisplayed
 } from '#src/server/marine-licence/site-notice/date-displayed/utils.js'
-import {
-  siteNoticeDisplayUrl,
-  siteNoticeLocationUrl
-} from '#src/server/marine-licence/site-notice/utils.js'
+import { siteNoticeLocationUrl } from '#src/server/marine-licence/site-notice/utils.js'
 
 export const SITE_NOTICE_DATE_DISPLAYED_VIEW_ROUTE =
   'marine-licence/site-notice/date-displayed/index'
@@ -136,7 +133,7 @@ export const siteNoticeDateDisplayedSubmitController = {
         }
       )
 
-      return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
+      return h.redirect(siteNoticeLocationUrl(request))
     } catch (e) {
       const details = e.data?.payload?.validation?.details
 

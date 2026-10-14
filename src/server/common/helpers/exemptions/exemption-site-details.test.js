@@ -222,7 +222,7 @@ describe('exemption-site-details helper', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         {
           err: expect.any(Error),
-          exemptionId: mockExemptionId
+          tenant: { message: `exemptionId: ${mockExemptionId}` }
         },
         'Error getting file upload summary data'
       )

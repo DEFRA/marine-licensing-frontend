@@ -103,6 +103,17 @@ describe('#declarationSubmitController', () => {
     vi.spyOn(authUtils, 'getUserSession').mockResolvedValue(mockUserSession)
   })
 
+  test('renders declaration page for unknown project type', async () => {
+    vi.mocked(getProjectType).mockReturnValue('unknown')
+
+    await declarationSubmitController.handler(mockRequest, mockH)
+
+    expect(mockH.view).toHaveBeenCalledWith(
+      DECLARATION_VIEW_ROUTE,
+      expect.objectContaining({ pageTitle: 'Declaration' })
+    )
+  })
+
   describe('#declarationSubmitController/exemptions', () => {
     const mockApplicationReference = 'EXE/2025/10264'
 
@@ -194,6 +205,18 @@ describe('#declarationSubmitController', () => {
       await expect(
         declarationSubmitController.handler(mockRequest, mockH)
       ).rejects.toThrow('Marine licence not found')
+    })
+
+    test.each([
+      ['displayName', { email: mockUserSession.email }],
+      ['email', { displayName: mockUserSession.displayName }]
+    ])('throws error when user session has no %s', async (_, userSession) => {
+      vi.spyOn(authUtils, 'getUserSession').mockResolvedValueOnce(userSession)
+
+      await expect(
+        declarationSubmitController.handler(mockRequest, mockH)
+      ).rejects.toThrow(errorMessages.MARINE_LICENCE_SUBMISSION_FAILED)
+      expect(authRequests.authenticatedPostRequest).not.toHaveBeenCalled()
     })
 
     test('correctly submits marine-licence with correct arguments', async () => {

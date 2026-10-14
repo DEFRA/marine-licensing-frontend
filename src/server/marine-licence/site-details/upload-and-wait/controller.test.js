@@ -375,10 +375,7 @@ describe('#uploadAndWait', () => {
         await uploadAndWaitController.handler(mockRequest, h)
 
         expect(mockRequest.logger.warn).toHaveBeenCalledWith(
-          {
-            uploadId: 'test-upload-id',
-            status: 'unknown'
-          },
+          { tenant: { message: 'uploadId: test-upload-id, status: unknown' } },
           'FileUpload: Unknown upload status'
         )
 
@@ -565,11 +562,12 @@ describe('#uploadAndWait', () => {
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
             err: expect.any(Error),
-            filename: 'test.kml',
-            fileType: 'kml',
-            errorCode: null,
-            mappedMessage:
-              'The selected file could not be processed – try again'
+            event: {
+              outcome: 'failure',
+              reason:
+                'errorCode: null, message: The selected file could not be processed – try again'
+            },
+            tenant: { message: 'filename: test.kml, fileType: kml' }
           },
           'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
         )
@@ -635,11 +633,14 @@ describe('#uploadAndWait', () => {
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
             err: geoParserError,
-            filename: 'coordinates.zip',
-            fileType: 'shapefile',
-            errorCode: 'SHAPEFILE_MISSING_CORE_FILES',
-            mappedMessage:
-              'The selected file must include .shp .shx and .dbf files'
+            event: {
+              outcome: 'failure',
+              reason:
+                'errorCode: SHAPEFILE_MISSING_CORE_FILES, message: The selected file must include .shp .shx and .dbf files'
+            },
+            tenant: {
+              message: 'filename: coordinates.zip, fileType: shapefile'
+            }
           },
           'FileUpload: ERROR: Failed to extract coordinates from uploaded file'
         )
@@ -734,7 +735,7 @@ describe('#uploadAndWait', () => {
         expect(mockRequest.logger.error).toHaveBeenCalledWith(
           {
             err: expect.any(Error),
-            uploadId: 'test-upload-id'
+            tenant: { message: 'uploadId: test-upload-id' }
           },
           'FileUpload: ERROR: Failed to check upload status'
         )

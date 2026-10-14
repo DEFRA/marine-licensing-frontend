@@ -189,7 +189,11 @@ async function processUploadStatus(status, context) {
   }
 
   request.logger.warn(
-    { uploadId: uploadConfig.uploadId, status: status.status },
+    {
+      tenant: {
+        message: `uploadId: ${uploadConfig.uploadId}, status: ${status.status}`
+      }
+    },
     'ConstructionDrawingUpload: Unknown upload status'
   )
 
@@ -228,7 +232,10 @@ export const uploadConstructionDrawingWaitController = {
       })
     } catch (error) {
       request.logger.error(
-        { err: error, uploadId: uploadConfig.uploadId },
+        {
+          err: error,
+          tenant: { message: `uploadId: ${uploadConfig.uploadId}` }
+        },
         'ConstructionDrawingUpload: ERROR: Failed to check upload status'
       )
 

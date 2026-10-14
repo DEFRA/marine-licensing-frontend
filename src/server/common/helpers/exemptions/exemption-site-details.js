@@ -48,7 +48,7 @@ export const processFileUploadSiteDetails = (
     request.logger.error(
       {
         err: error,
-        exemptionId: id
+        tenant: { message: `exemptionId: ${id}` }
       },
       errorMessages.FILE_UPLOAD_DATA_ERROR
     )

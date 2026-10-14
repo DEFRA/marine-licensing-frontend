@@ -125,7 +125,7 @@ describe('Site notice photo upload and wait page', () => {
         })
       )
       expect(response.statusCode).toBe(statusCodes.redirect)
-      expect(response.headers.location).toBe(displayUrl)
+      expect(response.headers.location).toBe(`${displayUrl}#site-location-1`)
     }
   )
 

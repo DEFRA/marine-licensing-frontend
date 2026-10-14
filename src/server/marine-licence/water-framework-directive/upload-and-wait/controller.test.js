@@ -175,7 +175,7 @@ describe('#uploadAndWait', () => {
         )
 
         expect(mockRequest.logger.warn).toHaveBeenCalledWith(
-          { uploadId: 'test-upload-id', status: 'unknown' },
+          { tenant: { message: 'uploadId: test-upload-id, status: unknown' } },
           'WFD FileUpload: Unknown upload status'
         )
 

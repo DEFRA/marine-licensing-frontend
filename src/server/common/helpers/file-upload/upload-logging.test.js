@@ -25,7 +25,7 @@ describe('#logExtractionSuccess', () => {
     logExtractionSuccess(request, geoJSON, extractedCoordinates)
 
     expect(request.logger.info).toHaveBeenCalledWith(
-      { featureCount: 2, coordinateCount: 3 },
+      { tenant: { message: 'featureCount: 2, coordinateCount: 3' } },
       'FileUpload: Successfully extracted coordinates'
     )
   })
@@ -60,7 +60,11 @@ describe('#logSuccessfulProcessing', () => {
     logSuccessfulProcessing(request, status, uploadConfig, coordinateData)
 
     expect(request.logger.info).toHaveBeenCalledWith(
-      { filename: 'test.kml', fileType: 'kml', featureCount: 2 },
+      {
+        tenant: {
+          message: 'filename: test.kml, fileType: kml, featureCount: 2'
+        }
+      },
       'FileUpload: File upload and coordinate extraction completed successfully'
     )
   })

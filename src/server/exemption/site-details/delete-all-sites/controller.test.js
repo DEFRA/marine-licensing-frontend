@@ -128,7 +128,7 @@ describe('deleteAllSitesController', () => {
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
         {
           err: 'test error',
-          exemptionId: mockExemption.id
+          tenant: { message: `exemptionId: ${mockExemption.id}` }
         },
         'Error deleting all sites'
       )

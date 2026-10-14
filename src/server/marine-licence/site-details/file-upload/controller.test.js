@@ -124,7 +124,7 @@ describe('#fileUpload (marine-licence)', () => {
 
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
         expect.objectContaining({ err: expect.any(Error) }),
-        'Failed to initialize file upload'
+        expect.stringContaining('Failed to initialize file upload for licence')
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHOOSE_FILE_UPLOAD_TYPE

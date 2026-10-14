@@ -27,9 +27,11 @@ export function catchAll(request, h) {
     request.logger.error(
       {
         err: response, // Pino automatically serializes Error objects with stack trace
-        statusCode,
-        path: request.path,
-        method: request.method
+        http: {
+          request: { method: request.method },
+          response: { status_code: statusCode }
+        },
+        url: { path: request.path }
       },
       'Error occurred'
     )

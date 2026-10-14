@@ -187,7 +187,11 @@ describe('deleteSiteController', () => {
       await deleteSiteSubmitController.handler(requestWithInvalidSite, mockH)
 
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
-        { siteIndex: '999', exemptionId: mockExemption.id },
+        {
+          tenant: {
+            message: `siteIndex: 999, exemptionId: ${mockExemption.id}`
+          }
+        },
         'Invalid site index for deletion'
       )
       expect(mockH.redirect).toHaveBeenCalledWith(routes.REVIEW_SITE_DETAILS)

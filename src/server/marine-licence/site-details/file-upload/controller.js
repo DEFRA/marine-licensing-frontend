@@ -101,10 +101,9 @@ export const fileUploadController = {
       request.logger.error(
         {
           err: error,
-          marineLicenceId: marineLicence.id,
-          fileUploadType
+          tenant: { message: `fileUploadType: ${fileUploadType}` }
         },
-        'Failed to initialize file upload'
+        `Failed to initialize file upload for licence ${marineLicence.id}`
       )
 
       return h.redirect(

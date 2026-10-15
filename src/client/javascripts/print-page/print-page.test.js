@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { vi } from 'vitest'
 
-import { PrintPage } from './index.js'
+import { initPrintPage } from './index.js'
 
-describe('PrintPage', () => {
+describe('initPrintPage', () => {
   beforeEach(() => {
     window.print = vi.fn()
   })
@@ -13,7 +13,7 @@ describe('PrintPage', () => {
     a.setAttribute('href', '#')
     document.body.appendChild(a)
 
-    new PrintPage(a) // eslint-disable-line no-new
+    initPrintPage(a)
 
     const event = new MouseEvent('click', {
       cancelable: true,
@@ -30,7 +30,7 @@ describe('PrintPage', () => {
     button.hidden = true
     document.body.appendChild(button)
 
-    new PrintPage(button) // eslint-disable-line no-new
+    initPrintPage(button)
 
     expect(button.hidden).toBe(false)
   })
@@ -43,13 +43,13 @@ describe('PrintPage', () => {
     controls.appendChild(button)
     document.body.appendChild(controls)
 
-    new PrintPage(button) // eslint-disable-line no-new
+    initPrintPage(button)
 
     expect(controls.hidden).toBe(false)
   })
 
   test('does not throw or bind when given null', () => {
-    expect(() => new PrintPage(null)).not.toThrow()
+    expect(() => initPrintPage(null)).not.toThrow()
     expect(window.print).not.toHaveBeenCalled()
   })
 })

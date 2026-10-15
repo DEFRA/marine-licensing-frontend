@@ -54,4 +54,20 @@ describe('Display a site notice page', () => {
     expect(link.getAttribute('target')).toBe('_blank')
     expect(link.getAttribute('rel')).toBe('noopener noreferrer')
   })
+
+  test('shows who the user is representing', async () => {
+    vi.mocked(getUserSession).mockResolvedValue({
+      contactId: mockApplicationTaskContactId,
+      shouldShowOrgOrUserName: true,
+      organisationName: 'Represented Org Ltd'
+    })
+
+    const response = await makeGetRequest({
+      url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`,
+      server: getServer()
+    })
+    const { document } = new JSDOM(response.result).window
+
+    expect(document.body.textContent).toContain('Represented Org Ltd')
+  })
 })

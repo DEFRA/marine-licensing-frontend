@@ -10,9 +10,9 @@
 {% endblock %}
 
 {% block content %}
-  <div class="app-site-notice-page__controls">
+  <div class="app-site-notice-page__controls" data-print-page-controls data-testid="print-controls" hidden>
     <p class="govuk-body">
-      <button type="button" class="govuk-link govuk-button--as-link app-print-button" data-module="app-print-page" data-testid="print-button" hidden>Print this page</button>
+      <button type="button" class="govuk-link govuk-button--as-link app-print-button" data-module="app-print-page" data-testid="print-button">Print this page</button>
     </p>
     <p class="govuk-body">To save as a PDF, select 'Print this page' and choose 'Save as PDF' as your printer.</p>
   </div>
@@ -28,7 +28,7 @@
 
     {% if summaryOfWorks %}
       <p class="govuk-body">The application proposes:</p>
-      <p class="govuk-body govuk-!-font-weight-bold app-site-notice__summary" data-testid="site-notice-summary">{{ summaryOfWorks }}</p>
+      <p class="govuk-body govuk-!-font-weight-bold" data-testid="site-notice-summary">{{ summaryOfWorks }}</p>
     {% endif %}
 
     <h2 class="govuk-heading-m">View the application and comment</h2>

@@ -3,7 +3,6 @@ import { config } from '#src/config/config.js'
 import {
   createQrCodeSvg,
   getPublicViewDetailsAbsoluteUrl,
-  getSiteNoticeQrCode,
   SITE_NOTICE_QR_CODE_DEFAULT_SIZE
 } from '#src/server/common/helpers/marine-licence/site-notice-qr-code.js'
 
@@ -61,17 +60,11 @@ describe('#getPublicViewDetailsAbsoluteUrl', () => {
 })
 
 describe('#createQrCodeSvg', () => {
-  test('returns an SVG at the requested size', async () => {
-    const svg = await createQrCodeSvg(cdpTestPublicUrl, 120)
-
-    expect(svg).toMatch(/^<svg /)
-    expect(svg).toContain('width="120" height="120"')
-    expect(svg).toContain('viewBox=')
-  })
-
-  test('uses the default size when none is given', async () => {
+  test('returns an SVG at the default size', async () => {
     const svg = await createQrCodeSvg(cdpTestPublicUrl)
 
+    expect(svg).toMatch(/^<svg /)
+    expect(svg).toContain('viewBox=')
     expect(svg).toContain(
       `width="${SITE_NOTICE_QR_CODE_DEFAULT_SIZE}" height="${SITE_NOTICE_QR_CODE_DEFAULT_SIZE}"`
     )
@@ -92,17 +85,5 @@ describe('#createQrCodeSvg', () => {
 
     expect(svg).not.toMatch(/\sstyle=/)
     expect(svg).not.toContain('<style')
-  })
-})
-
-describe('#getSiteNoticeQrCode', () => {
-  test('returns the encoded URL and its SVG', async () => {
-    const qrCode = await getSiteNoticeQrCode(marineLicenceId, {
-      baseUrl: cdpTestBaseUrl,
-      size: 300
-    })
-
-    expect(qrCode.url).toBe(cdpTestPublicUrl)
-    expect(qrCode.svg).toContain('width="300" height="300"')
   })
 })

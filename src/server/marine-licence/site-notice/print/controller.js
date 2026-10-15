@@ -7,8 +7,7 @@ import {
 import { getViewDetailsUrl } from '#src/server/common/helpers/view-details/utils.js'
 import { getSiteNoticeQrCode } from '#src/server/common/helpers/marine-licence/site-notice-qr-code.js'
 
-export const SITE_NOTICE_PRINT_VIEW_ROUTE =
-  'marine-licence/site-notice/print/index'
+const SITE_NOTICE_PRINT_VIEW_ROUTE = 'marine-licence/site-notice/print/index'
 
 const SITE_NOTICE_PRINT_PAGE_TITLE = 'Site notice'
 

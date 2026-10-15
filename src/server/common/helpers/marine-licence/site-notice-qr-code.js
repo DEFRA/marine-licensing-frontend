@@ -38,10 +38,7 @@ export const createQrCodeSvg = (
     width: size
   })
 
-export const getSiteNoticeQrCode = async (
-  marineLicenceId,
-  { size = SITE_NOTICE_QR_CODE_DEFAULT_SIZE, baseUrl } = {}
-) => {
-  const url = getPublicViewDetailsAbsoluteUrl(marineLicenceId, baseUrl)
-  return { url, svg: await createQrCodeSvg(url, size) }
+export const getSiteNoticeQrCode = async (marineLicenceId) => {
+  const url = getPublicViewDetailsAbsoluteUrl(marineLicenceId)
+  return { url, svg: await createQrCodeSvg(url) }
 }

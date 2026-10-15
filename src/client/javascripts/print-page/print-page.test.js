@@ -35,6 +35,19 @@ describe('PrintPage', () => {
     expect(button.hidden).toBe(false)
   })
 
+  test('reveals the surrounding print controls that are hidden until JavaScript runs', () => {
+    const controls = document.createElement('div')
+    controls.dataset.printPageControls = ''
+    controls.hidden = true
+    const button = document.createElement('button')
+    controls.appendChild(button)
+    document.body.appendChild(controls)
+
+    new PrintPage(button) // eslint-disable-line no-new
+
+    expect(controls.hidden).toBe(false)
+  })
+
   test('does not throw or bind when given null', () => {
     expect(() => new PrintPage(null)).not.toThrow()
     expect(window.print).not.toHaveBeenCalled()

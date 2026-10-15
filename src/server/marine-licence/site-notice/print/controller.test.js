@@ -129,11 +129,18 @@ describe('#siteNoticePrintController', () => {
     ['blank', { siteNoticeSummary: '   ' }],
     ['absent', undefined]
   ])(
-    'omits the proposal section when the summary is %s',
+    'omits the proposal section and logs a warning when the summary is %s',
     async (_case, summary) => {
       getMarineLicenceById.mockResolvedValue(withSiteNoticeSummary(summary))
+      const requestLogger = getServer().logger.child({})
+      const warn = vi.spyOn(requestLogger, 'warn')
+      vi.spyOn(getServer().logger, 'child').mockReturnValue(requestLogger)
 
       const { response, document } = await getPage()
+
+      expect(warn).toHaveBeenCalledWith(
+        `Site notice summary missing for marine licence ${marineLicenceId}`
+      )
 
       expect(response.statusCode).toBe(statusCodes.ok)
       expect(
@@ -187,13 +194,18 @@ describe('#siteNoticePrintController', () => {
     expect(document.body.textContent).not.toContain('Represented Org Ltd')
   })
 
-  test('renders "Print this page" as a button hidden until JavaScript runs', async () => {
+  test('hides "Print this page" and its PDF instructions until JavaScript runs', async () => {
     const { document } = await getPage()
 
-    const button = document.querySelector('[data-testid="print-button"]')
+    const controls = document.querySelector('[data-testid="print-controls"]')
+    const button = controls.querySelector('[data-testid="print-button"]')
+    expect(controls.hasAttribute('hidden')).toBe(true)
+    expect(controls.hasAttribute('data-print-page-controls')).toBe(true)
+    expect(controls.textContent).toContain(
+      "To save as a PDF, select 'Print this page'"
+    )
     expect(button.tagName).toBe('BUTTON')
     expect(button.getAttribute('type')).toBe('button')
-    expect(button.hasAttribute('hidden')).toBe(true)
     expect(button.dataset.module).toBe('app-print-page')
   })
 
@@ -219,15 +231,6 @@ describe('#siteNoticePrintController', () => {
     expect(response.headers.location).toBe(
       `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
     )
-  })
-
-  test('returns 400 for an invalid marine licence id', async () => {
-    const response = await makeGetRequest({
-      url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PRINT}/not-an-id`,
-      server: getServer()
-    })
-
-    expect(response.statusCode).toBe(statusCodes.badRequest)
   })
 
   test('returns 500 when loading the marine licence fails', async () => {

@@ -1,0 +1,116 @@
+@use 'sass:math';
+@use 'govuk-frontend' as *;
+
+$app-site-notice-font-family: arial, helvetica, sans-serif;
+$app-site-notice-qr-size-screen: 160px;
+$app-site-notice-print-zoom: 0.7;
+// Below ~35mm, phone cameras struggle to read a printed QR code at arm's length.
+// Divided by the zoom so the code still prints at this size.
+$app-site-notice-qr-size-print: math.div(40mm, $app-site-notice-print-zoom);
+
+.app-print-button {
+  @include govuk-font-size($size: 19);
+  cursor: pointer;
+}
+
+.app-site-notice {
+  padding: govuk-spacing(6);
+  border: 5px solid govuk-colour('black');
+
+  &,
+  * {
+    font-family: $app-site-notice-font-family;
+  }
+}
+
+.app-site-notice__act {
+  padding-bottom: govuk-spacing(2);
+  border-bottom: 2px solid govuk-colour('black');
+  text-transform: uppercase;
+}
+
+.app-site-notice__qr {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(6);
+  align-items: flex-start;
+  margin-bottom: govuk-spacing(4);
+}
+
+.app-site-notice__qr-code svg {
+  display: block;
+  width: $app-site-notice-qr-size-screen;
+  height: $app-site-notice-qr-size-screen;
+}
+
+.app-site-notice__qr-text {
+  flex: 1 1 15em;
+  min-width: 0;
+}
+
+.app-site-notice__url {
+  overflow-wrap: anywhere;
+}
+
+.app-site-notice__date {
+  display: flex;
+  gap: govuk-spacing(3);
+  align-items: baseline;
+  max-width: 26em;
+}
+
+.app-site-notice__date-line {
+  flex: 1 1 auto;
+  height: 2.2em;
+  border-bottom: 2px solid govuk-colour('black');
+}
+
+@media print {
+  @page {
+    size: a4 portrait;
+    margin: 20mm;
+  }
+
+  .govuk-template:has(.app-site-notice-page) {
+    background-color: govuk-colour('white');
+  }
+
+  .app-site-notice-page {
+    .govuk-header,
+    .govuk-service-navigation,
+    .govuk-phase-banner,
+    .govuk-cookie-banner,
+    .govuk-skip-link,
+    .app-site-notice-page__controls {
+      display: none;
+    }
+
+    .govuk-width-container {
+      max-width: none;
+      margin: 0;
+    }
+
+    .govuk-main-wrapper {
+      padding: 0;
+    }
+  }
+
+  // Browsers don't let a page set the print dialog's scale, so the notice is
+  // zoomed instead to fit on one A4 page.
+  .app-site-notice {
+    padding: 16px;
+    border-width: 3px;
+    break-inside: avoid;
+    zoom: $app-site-notice-print-zoom;
+  }
+
+  .app-site-notice__qr {
+    flex-wrap: nowrap;
+    break-inside: avoid;
+  }
+
+  .app-site-notice__qr-code svg {
+    width: $app-site-notice-qr-size-print;
+    height: $app-site-notice-qr-size-print;
+  }
+}

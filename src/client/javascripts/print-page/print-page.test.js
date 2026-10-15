@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { vi } from 'vitest'
 
-import { IatAnswerPrint } from './index.js'
+import { PrintPage } from './index.js'
 
-describe('IatAnswerPrint', () => {
+describe('PrintPage', () => {
   beforeEach(() => {
     window.print = vi.fn()
   })
@@ -13,7 +13,7 @@ describe('IatAnswerPrint', () => {
     a.setAttribute('href', '#')
     document.body.appendChild(a)
 
-    new IatAnswerPrint(a) // eslint-disable-line no-new
+    new PrintPage(a) // eslint-disable-line no-new
 
     const event = new MouseEvent('click', {
       cancelable: true,
@@ -25,8 +25,18 @@ describe('IatAnswerPrint', () => {
     expect(event.defaultPrevented).toBe(true)
   })
 
+  test('reveals a control that is hidden until JavaScript runs', () => {
+    const button = document.createElement('button')
+    button.hidden = true
+    document.body.appendChild(button)
+
+    new PrintPage(button) // eslint-disable-line no-new
+
+    expect(button.hidden).toBe(false)
+  })
+
   test('does not throw or bind when given null', () => {
-    expect(() => new IatAnswerPrint(null)).not.toThrow()
+    expect(() => new PrintPage(null)).not.toThrow()
     expect(window.print).not.toHaveBeenCalled()
   })
 })

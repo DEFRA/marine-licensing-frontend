@@ -14,7 +14,7 @@ const expectedRoutes = [
   ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_ADD_EVIDENCE],
   ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION],
   ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION],
-  ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_QR_CODE]
+  ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PRINT]
 ]
 
 describe('#siteNoticeRoutes', () => {

@@ -182,13 +182,13 @@ describe('Marine Licence View Details', () => {
     )
   })
 
-  describe('things that require your attention', () => {
+  describe('Updates and tasks', () => {
     const asOwner = () =>
       vi.mocked(getUserSession).mockResolvedValue({
         contactId: mockApplicationTaskContactId
       })
 
-    const ATTENTION_HEADING = 'Things that require your attention'
+    const ATTENTION_HEADING = 'Updates and tasks'
 
     test('renders an outstanding task as a red tag linking to the notification', async () => {
       asOwner()

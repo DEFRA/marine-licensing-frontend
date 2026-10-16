@@ -51,7 +51,7 @@
       <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
 
       {% if applicationTasks and applicationTasks.length %}
-        <h2 class="govuk-heading-m" id="application-tasks-heading">Things that require your attention</h2>
+        <h2 class="govuk-heading-m" id="application-tasks-heading">Updates and tasks</h2>
         {{ govukTaskList({
           items: applicationTasks,
           idPrefix: "application-task"

@@ -4,7 +4,6 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const SITE_NOTICE_QR_CODE_DEFAULT_SIZE = 200
 const ERROR_CORRECTION_LEVEL = 'Q'
-// QR spec minimum; anything smaller makes printed notices unreliable to scan
 const QUIET_ZONE_MODULES = 4
 
 const trimTrailingSlashes = (path) => {

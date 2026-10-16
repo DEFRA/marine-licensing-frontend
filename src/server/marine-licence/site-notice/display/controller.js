@@ -80,6 +80,7 @@ export const siteNoticeDisplayController = {
         canSendEvidence: !evidenceSubmission && !!siteNoticeEvidenceComplete,
         canAddLocation,
         addEvidenceFormAction,
+        siteNoticePrintUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PRINT}/${marineLicenceId}`,
         deleteLocationUrl:
           marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION.replace(
             '{marineLicenceId}',

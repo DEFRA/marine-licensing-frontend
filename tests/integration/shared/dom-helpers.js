@@ -1,7 +1,5 @@
 // @vitest-environment jsdom
 
-/* eslint-env vitest */
-
 import { getAllByRole, getByRole, within } from '@testing-library/dom'
 
 /**

@@ -1,4 +1,6 @@
 import { vi } from 'vitest'
+import Boom from '@hapi/boom'
+import { JSDOM } from 'jsdom'
 import {
   getAllByRole,
   getByRole,
@@ -460,26 +462,49 @@ describe('Resubmit site notice evidence photo upload', () => {
     }
   )
 
-  test('saves an uploaded photo against the resubmission and returns to the task page', async () => {
+  const readyStatus = {
+    status: 'ready',
+    filename: 'harbour-office.png',
+    s3Location: {
+      s3Key: 'key',
+      checksumSha256: 'sum',
+      detectedContentType: 'image/png'
+    }
+  }
+
+  const checkStatus = async (status) => {
     const pageResponse = await makeGetRequest({
       url: `${positionUrl}?location=4`,
       server: getServer()
     })
-    mockCdpService.getStatus.mockResolvedValue({
-      status: 'ready',
-      filename: 'harbour-office.png',
-      s3Location: {
-        s3Key: 'key',
-        checksumSha256: 'sum',
-        detectedContentType: 'image/png'
-      }
-    })
+    mockCdpService.getStatus.mockResolvedValue(status)
 
-    const response = await makeGetRequest({
+    return makeGetRequest({
       url: `${waitUrl}?location=4`,
       server: getServer(),
       headers: { cookie: sessionCookie(pageResponse) }
     })
+  }
+
+  test('shows the checking page while the photo is scanned', async () => {
+    const response = await checkStatus({
+      status: 'scanning',
+      filename: 'harbour-office.png'
+    })
+    const { document } = new JSDOM(response.result).window
+
+    expect(response.statusCode).toBe(statusCodes.ok)
+    expect(
+      getByRole(document, 'heading', {
+        level: 1,
+        name: 'Checking your file...'
+      })
+    ).toBeInTheDocument()
+    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
+  })
+
+  test('saves an uploaded photo against the resubmission and returns to the task page', async () => {
+    const response = await checkStatus(readyStatus)
 
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.anything(),
@@ -497,6 +522,15 @@ describe('Resubmit site notice evidence photo upload', () => {
         }
       }
     )
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(taskUrl)
+  })
+
+  test('returns to the task page when the task was completed while the photo was scanned', async () => {
+    vi.mocked(authenticatedPatchRequest).mockRejectedValue(Boom.notFound())
+
+    const response = await checkStatus(readyStatus)
+
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(taskUrl)
   })

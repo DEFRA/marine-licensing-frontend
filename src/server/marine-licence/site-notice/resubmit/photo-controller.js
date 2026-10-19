@@ -19,7 +19,7 @@ import {
   SITE_NOTICE_POSITION_PHOTO_VIEW_ROUTE,
   siteNoticePositionPhotoSettings
 } from '#src/server/marine-licence/site-notice/position-photo/controller.js'
-import { handlePhotoUploadStatus } from '#src/server/marine-licence/site-notice/photo-upload-and-wait/controller.js'
+import { handlePhotoUploadStatus } from '#src/server/marine-licence/site-notice/photo-upload-and-wait/upload-status.js'
 import {
   getPhotoUploadErrorDisplay,
   initiatePhotoUpload,

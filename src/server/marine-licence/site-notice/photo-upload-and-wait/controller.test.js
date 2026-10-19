@@ -156,6 +156,21 @@ describe('#siteNoticePhotoUploadAndWaitController', () => {
     expectUploadError(result, PHOTO_FILE_TYPE_ERROR_MESSAGE)
   })
 
+  test('clears the session and returns to the location when the API has nothing to save against', async () => {
+    vi.mocked(authRequests.authenticatedPatchRequest).mockRejectedValue({
+      output: { statusCode: statusCodes.notFound }
+    })
+
+    const { request, h } = await runWait({
+      status: 'ready',
+      filename: 'notice.png',
+      s3Location: { detectedContentType: 'image/png' }
+    })
+
+    expect(request.yar.set).toHaveBeenCalledWith(PHOTO_UPLOAD_SESSION_KEY, {})
+    expect(h.redirect).toHaveBeenCalledWith(`${displayUrl}#site-location-2`)
+  })
+
   test.each([
     ['FILE_TOO_LARGE', PHOTO_FILE_SIZE_ERROR_MESSAGE],
     ['INVALID_FILE_TYPE', PHOTO_FILE_TYPE_ERROR_MESSAGE],

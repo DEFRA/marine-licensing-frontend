@@ -13,7 +13,21 @@ const expectedRoutes = [
   ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PHOTO_UPLOAD_AND_WAIT],
   ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_ADD_EVIDENCE],
   ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION],
-  ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION]
+  ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION],
+  ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT],
+  ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT],
+  [
+    'GET',
+    marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT_CLOSE_UP_PHOTO
+  ],
+  [
+    'GET',
+    marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT_POSITION_PHOTO
+  ],
+  [
+    'GET',
+    marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT_PHOTO_UPLOAD_AND_WAIT
+  ]
 ]
 
 describe('#siteNoticeRoutes', () => {
@@ -26,7 +40,11 @@ describe('#siteNoticeRoutes', () => {
     const siteNoticeRoute = siteNoticeRoutes.find(
       (route) =>
         route.method === method &&
-        [path, `${path}/{marineLicenceId}`].includes(route.path)
+        [
+          path,
+          `${path}/{marineLicenceId}`,
+          `${path}/{marineLicenceId}/{taskId}`
+        ].includes(route.path)
     )
 
     expect(siteNoticeRoute).toBeDefined()

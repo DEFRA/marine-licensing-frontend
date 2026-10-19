@@ -14,6 +14,8 @@ import {
   mockTransferredMarineLicenceApplication,
   mockRejectedMarineLicenceApplication,
   mockMarineLicenceWithApplicationTask,
+  mockMarineLicenceWithResubmissionTask,
+  mockResubmissionTaskId,
   mockApplicationTaskContactId
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
@@ -182,13 +184,13 @@ describe('Marine Licence View Details', () => {
     )
   })
 
-  describe('things that require your attention', () => {
+  describe('updates and tasks', () => {
     const asOwner = () =>
       vi.mocked(getUserSession).mockResolvedValue({
         contactId: mockApplicationTaskContactId
       })
 
-    const ATTENTION_HEADING = 'Things that require your attention'
+    const ATTENTION_HEADING = 'Updates and tasks'
 
     test('renders an outstanding task as a red tag linking to the notification', async () => {
       asOwner()
@@ -241,6 +243,42 @@ describe('Marine Licence View Details', () => {
       expect(status.textContent.trim()).toBe('Read')
       expect(status.querySelector('.govuk-tag')).toBeNull()
     })
+
+    test.each([
+      ['outstanding', null, 'Incomplete', true],
+      ['resolved', '2026-09-20T10:00:00.000Z', 'Completed', false]
+    ])(
+      'renders a %s resubmit site notice evidence task linking to its task page',
+      async (_state, resolvedAt, statusText, isTag) => {
+        asOwner()
+        const [siteNoticeTask, resubmissionTask] =
+          mockMarineLicenceWithResubmissionTask.applicationTasks
+
+        const document = await loadViewDetailsPage(getServer(), {
+          ...mockMarineLicenceWithResubmissionTask,
+          applicationTasks: [
+            siteNoticeTask,
+            { ...resubmissionTask, resolvedAt }
+          ]
+        })
+
+        expect(
+          getByRole(document, 'heading', { name: ATTENTION_HEADING })
+        ).toBeInTheDocument()
+        const link = getByRole(document, 'link', {
+          name: 'Resubmit site notice evidence'
+        })
+        expect(link).toHaveAttribute(
+          'href',
+          `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT}/${mockMarineLicenceWithResubmissionTask.id}/${mockResubmissionTaskId}`
+        )
+
+        const row = link.closest('.govuk-task-list__item')
+        const status = row.querySelector('.govuk-task-list__status')
+        expect(status.textContent.trim()).toBe(statusText)
+        expect(Boolean(status.querySelector('.govuk-tag--red'))).toBe(isTag)
+      }
+    )
 
     test('omits the section entirely when the application has no tasks', async () => {
       asOwner()

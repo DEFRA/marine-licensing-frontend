@@ -40,13 +40,15 @@ export const getPhotoUploadErrorDisplay = (request) => {
 export const initiatePhotoUpload = async (
   request,
   h,
-  { field, uploadPageUrl }
+  { field, uploadPageUrl, redirectUrl }
 ) => {
   const uploadConfig = await getCdpUploadService().initiate({
-    redirectUrl: siteNoticeEvidenceUrl(
-      marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PHOTO_UPLOAD_AND_WAIT,
-      request
-    ),
+    redirectUrl:
+      redirectUrl ??
+      siteNoticeEvidenceUrl(
+        marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PHOTO_UPLOAD_AND_WAIT,
+        request
+      ),
     s3Path: PHOTO_S3_PATH,
     s3Bucket: config.get('cdpUploader').s3Bucket,
     allowedMimeTypes: PHOTO_ALLOWED_MIME_TYPES,

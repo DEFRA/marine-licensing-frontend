@@ -18,7 +18,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 export const SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE =
   'marine-licence/site-notice/close-up-photo/index'
 
-const siteNoticeCloseUpPhotoSettings = {
+export const siteNoticeCloseUpPhotoSettings = {
   pageTitle: 'Close-up photo upload',
   heading: 'Close-up photo upload'
 }

@@ -114,4 +114,62 @@ describe('Marine Licence Site Notice Evidence Card', () => {
     )
     expect($component('.govuk-tag--red').first().text()).toContain('Incomplete')
   })
+
+  describe('for a resubmission', () => {
+    const resubmissionParams = {
+      evidenceIndex: 3,
+      locationName: 'Harbour wall',
+      dateDisplayed: '5 March 2026',
+      rejectionReason: 'The close-up photo is blurred.',
+      closeUpPhoto: null,
+      closeUpPhotoHref: '/resubmit/close-up-photo?location=3',
+      positionPhoto: 'position.jpg',
+      positionPhotoHref: '/resubmit/position-photo?location=3',
+      addWhenIncomplete: true
+    }
+
+    const render = (params = resubmissionParams) =>
+      renderComponent('marine-licence/site-notice-evidence-card', params)
+
+    test('adds the caseworker reason after the date', () => {
+      const $component = render()
+
+      const keys = $component('.govuk-summary-list__key')
+      expect(keys).toHaveLength(5)
+      expect(keys.eq(2).text()).toContain(
+        'Why we could not accept your photographs'
+      )
+      expect($component('.govuk-summary-list__value').eq(2).text()).toContain(
+        'The close-up photo is blurred.'
+      )
+    })
+
+    test('escapes the caseworker reason', () => {
+      const $component = render({
+        ...resubmissionParams,
+        rejectionReason: '<b>bold</b>'
+      })
+
+      expect($component('.govuk-summary-list__value b')).toHaveLength(0)
+      expect($component('.govuk-summary-list__value').eq(2).text()).toContain(
+        '<b>bold</b>'
+      )
+    })
+
+    test('shows the location name and date without links when no link is given', () => {
+      const $component = render()
+
+      const rows = $component('.govuk-summary-list__row')
+      expect(rows.eq(0).find('a')).toHaveLength(0)
+      expect(rows.eq(1).find('a')).toHaveLength(0)
+    })
+
+    test('offers Add for a missing photo and Change for one already added', () => {
+      const links = render()('.govuk-summary-list__actions a')
+
+      expect(links).toHaveLength(2)
+      expect(links.eq(0).text()).toMatch(/^Add\b/)
+      expect(links.eq(1).text()).toMatch(/^Change\b/)
+    })
+  })
 })

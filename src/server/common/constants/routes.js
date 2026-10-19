@@ -165,6 +165,13 @@ export const marineLicenceRoutes = {
     '/marine-licence/site-notice/display/add-evidence',
   MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION:
     '/marine-licence/{marineLicenceId}/delete-location',
+  MARINE_LICENCE_SITE_NOTICE_RESUBMIT: '/marine-licence/site-notice/resubmit',
+  MARINE_LICENCE_SITE_NOTICE_RESUBMIT_CLOSE_UP_PHOTO:
+    '/marine-licence/site-notice/resubmit/close-up-photo',
+  MARINE_LICENCE_SITE_NOTICE_RESUBMIT_POSITION_PHOTO:
+    '/marine-licence/site-notice/resubmit/position-photo',
+  MARINE_LICENCE_SITE_NOTICE_RESUBMIT_PHOTO_UPLOAD_AND_WAIT:
+    '/marine-licence/site-notice/resubmit/photo-upload-and-wait',
   MARINE_LICENCE_FEE_ESTIMATE: '/marine-licence/fee-estimate',
   MARINE_LICENCE_FEE_ESTIMATE_ARE_YOU_SURE:
     '/marine-licence/fee-estimate-are-you-sure',
@@ -274,5 +281,7 @@ export const apiRoutes = {
     '/marine-licence/{marineLicenceId}/application-tasks/{taskId}/resolve',
   UPDATE_SITE_NOTICE_EVIDENCE: '/marine-licence/update-site-notice-evidence',
   ADD_SITE_NOTICE_EVIDENCE: '/marine-licence/add-site-notice-evidence',
-  DELETE_SITE_NOTICE_EVIDENCE: '/marine-licence/delete-site-notice-evidence'
+  DELETE_SITE_NOTICE_EVIDENCE: '/marine-licence/delete-site-notice-evidence',
+  UPDATE_SITE_NOTICE_RESUBMISSION:
+    '/marine-licence/update-site-notice-resubmission'
 }

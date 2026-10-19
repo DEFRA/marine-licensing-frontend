@@ -104,6 +104,24 @@ describe('buildApplicationTasks', () => {
     expect(items).toHaveLength(1)
   })
 
+  it('links a resubmit site notice evidence task to its own round', () => {
+    const [item] = build({
+      marineLicence: buildMarineLicence([
+        buildTask({
+          taskId: 'round-2',
+          type: APPLICATION_TASK_TYPE.RESUBMIT_SITE_NOTICE_EVIDENCE
+        })
+      ])
+    })
+
+    expect(item).toEqual({
+      title: { text: 'Resubmit site notice evidence' },
+      href: `/marine-licence/site-notice/resubmit/${MARINE_LICENCE_ID}/round-2`,
+      status: { tag: { text: 'Incomplete', classes: 'govuk-tag--red' } },
+      sortOrder: 3
+    })
+  })
+
   it('skips a task type it does not recognise', () => {
     expect(
       build({

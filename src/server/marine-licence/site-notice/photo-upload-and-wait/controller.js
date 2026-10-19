@@ -48,30 +48,24 @@ const failUpload = async ({ request, h, uploadPageUrl }, message) => {
   return h.redirect(uploadPageUrl)
 }
 
+const buildPhoto = (status) => ({
+  uploadedFile: { filename: status.filename },
+  s3Location: {
+    s3Bucket: config.get('cdpUploader').s3Bucket,
+    s3Key: status.s3Location?.s3Key,
+    checksumSha256: status.s3Location?.checksumSha256
+  }
+})
+
 const savePhoto = async (status, context) => {
-  const { request, h, field } = context
+  const { request, h, field, persistPhoto, returnUrl } = context
 
   if (!isAllowedFileType(status.s3Location)) {
     return failUpload(context, PHOTO_FILE_TYPE_ERROR_MESSAGE)
   }
 
   try {
-    await authenticatedPatchRequest(
-      request,
-      apiRoutes.UPDATE_SITE_NOTICE_EVIDENCE,
-      {
-        [field]: {
-          uploadedFile: { filename: status.filename },
-          s3Location: {
-            s3Bucket: config.get('cdpUploader').s3Bucket,
-            s3Key: status.s3Location?.s3Key,
-            checksumSha256: status.s3Location?.checksumSha256
-          }
-        },
-        id: request.params.marineLicenceId,
-        evidenceIndex: Number.parseInt(request.query.location, 10) - 1
-      }
-    )
+    await persistPhoto(request, field, buildPhoto(status))
   } catch (error) {
     if (error.output?.statusCode === statusCodes.unsupportedMediaType) {
       return failUpload(context, PHOTO_FILE_TYPE_ERROR_MESSAGE)
@@ -80,11 +74,11 @@ const savePhoto = async (status, context) => {
   }
 
   await setPhotoUploadSession(request, h, {})
-  return h.redirect(siteNoticeDisplayUrl(request.params.marineLicenceId))
+  return h.redirect(returnUrl)
 }
 
 const processUploadStatus = (status, context) => {
-  const { request, h, uploadPageUrl, marineLicence } = context
+  const { h, uploadPageUrl, marineLicence, returnUrl } = context
 
   if (PROCESSING_STATUSES.has(status.status)) {
     return h.view(UPLOAD_AND_WAIT_VIEW_ROUTE, {
@@ -93,7 +87,7 @@ const processUploadStatus = (status, context) => {
       isProcessing: true,
       filename: status.filename,
       tryAgainLink: uploadPageUrl,
-      cancelLink: siteNoticeDisplayUrl(request.params.marineLicenceId)
+      cancelLink: returnUrl
     })
   }
 
@@ -102,26 +96,66 @@ const processUploadStatus = (status, context) => {
   }
 
   if (FAILED_STATUSES.has(status.status)) {
-    request.logger.error(
+    context.request.logger.error(
       { error: { code: status.errorCode, message: status.message } },
       'Site notice photo upload: CDP rejection error'
     )
     return failUpload(context, rejectionMessage(status.errorCode))
   }
 
-  request.logger.warn(
+  context.request.logger.warn(
     { tenant: { message: `status: ${status.status}` } },
     'Site notice photo upload: Unknown upload status'
   )
   return h.redirect(uploadPageUrl)
 }
 
+export const handlePhotoUploadStatus = async (
+  request,
+  h,
+  { marineLicence, persistPhoto, returnUrl }
+) => {
+  const { uploadId, statusUrl, field, uploadPageUrl } =
+    getPhotoUploadSession(request)
+
+  if (!uploadId) {
+    return h.redirect(returnUrl)
+  }
+
+  try {
+    const status = await getCdpUploadService().getStatus(uploadId, statusUrl)
+    return await processUploadStatus(status, {
+      request,
+      h,
+      field,
+      uploadPageUrl,
+      marineLicence,
+      persistPhoto,
+      returnUrl
+    })
+  } catch (error) {
+    request.logger.error(
+      { err: error },
+      'Site notice photo upload: Failed to check upload status'
+    )
+    await setPhotoUploadSession(request, h, {})
+    return h.redirect(uploadPageUrl)
+  }
+}
+
+const saveSiteNoticeEvidencePhoto = (request, field, photo) =>
+  authenticatedPatchRequest(request, apiRoutes.UPDATE_SITE_NOTICE_EVIDENCE, {
+    [field]: photo,
+    id: request.params.marineLicenceId,
+    evidenceIndex: Number.parseInt(request.query.location, 10) - 1
+  })
+
 export const siteNoticePhotoUploadAndWaitController = {
   options: {
     ...validateMarineLicenceIdParams,
     pre: [validateEvidenceParam]
   },
-  async handler(request, h) {
+  handler(request, h) {
     const { marineLicenceId } = request.params
     const marineLicence = request.marineLicence
 
@@ -129,29 +163,10 @@ export const siteNoticePhotoUploadAndWaitController = {
       return h.redirect(getViewDetailsUrl(marineLicenceId))
     }
 
-    const { uploadId, statusUrl, field, uploadPageUrl } =
-      getPhotoUploadSession(request)
-
-    if (!uploadId) {
-      return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
-    }
-
-    try {
-      const status = await getCdpUploadService().getStatus(uploadId, statusUrl)
-      return await processUploadStatus(status, {
-        request,
-        h,
-        field,
-        uploadPageUrl,
-        marineLicence
-      })
-    } catch (error) {
-      request.logger.error(
-        { err: error },
-        'Site notice photo upload: Failed to check upload status'
-      )
-      await setPhotoUploadSession(request, h, {})
-      return h.redirect(uploadPageUrl)
-    }
+    return handlePhotoUploadStatus(request, h, {
+      marineLicence,
+      persistPhoto: saveSiteNoticeEvidencePhoto,
+      returnUrl: siteNoticeDisplayUrl(marineLicenceId)
+    })
   }
 }

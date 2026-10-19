@@ -5,6 +5,7 @@ import { siteNoticeCloseUpPhotoRoutes } from '#src/server/marine-licence/site-no
 import { siteNoticePositionPhotoRoutes } from '#src/server/marine-licence/site-notice/position-photo/index.js'
 import { siteNoticePhotoUploadAndWaitRoutes } from '#src/server/marine-licence/site-notice/photo-upload-and-wait/index.js'
 import { siteNoticeDeleteLocationRoutes } from '#src/server/marine-licence/site-notice/delete-location/index.js'
+import { siteNoticeResubmitRoutes } from '#src/server/marine-licence/site-notice/resubmit/index.js'
 
 export const siteNoticeRoutes = [
   ...siteNoticeDisplayRoutes,
@@ -13,5 +14,6 @@ export const siteNoticeRoutes = [
   ...siteNoticeCloseUpPhotoRoutes,
   ...siteNoticePositionPhotoRoutes,
   ...siteNoticePhotoUploadAndWaitRoutes,
-  ...siteNoticeDeleteLocationRoutes
+  ...siteNoticeDeleteLocationRoutes,
+  ...siteNoticeResubmitRoutes
 ]

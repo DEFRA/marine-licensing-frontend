@@ -18,7 +18,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 export const SITE_NOTICE_POSITION_PHOTO_VIEW_ROUTE =
   'marine-licence/site-notice/position-photo/index'
 
-const siteNoticePositionPhotoSettings = {
+export const siteNoticePositionPhotoSettings = {
   pageTitle: 'Position and location photo upload',
   heading: 'Position and location photo upload'
 }

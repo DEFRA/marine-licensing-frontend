@@ -1,3 +1,4 @@
+{%- from "govuk/components/table/macro.njk" import govukTable -%}
 {% extends "layouts/page.njk" %}
 
 {% block content %}
@@ -6,33 +7,18 @@
       <h1 class="govuk-heading-l">{{ heading }}</h1>
 
       {% if consultations and consultations.length > 0 %}
-        <table class="govuk-table">
-          <caption class="govuk-table__caption govuk-visually-hidden">{{ heading }}</caption>
-          <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header">Application name</th>
-              <th scope="col" class="govuk-table__header">Type</th>
-              <th scope="col" class="govuk-table__header">Reference</th>
-              <th scope="col" class="govuk-table__header">Status</th>
-              <th scope="col" class="govuk-table__header">Received</th>
-            </tr>
-          </thead>
-          <tbody class="govuk-table__body">
-            {% for consultation in consultations %}
-              <tr class="govuk-table__row">
-                {% for cell in consultation.cells %}
-                  <td class="govuk-table__cell">
-                    {% if cell.html %}
-                      {{ cell.html | safe }}
-                    {% else %}
-                      {{ cell.text }}
-                    {% endif %}
-                  </td>
-                {% endfor %}
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        {{ govukTable({
+          caption: heading,
+          captionClasses: "govuk-visually-hidden",
+          head: [
+            { text: "Application name" },
+            { text: "Type" },
+            { text: "Reference" },
+            { text: "Status" },
+            { text: "Received" }
+          ],
+          rows: consultations
+        }) }}
       {% else %}
         <p class="govuk-body">There are no consultations to display.</p>
       {% endif %}

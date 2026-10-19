@@ -6,6 +6,7 @@ import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { serviceHomeController, SERVICE_HOME_VIEW_ROUTE } from './controller.js'
 import { config } from '#src/config/config.js'
+import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 
 vi.mock('~/src/server/common/helpers/page-view-common-data.js')
 
@@ -77,6 +78,18 @@ describe('#serviceHome', () => {
       expect(viewContext.marineLicenceEnabled).toBe(true)
       expect(viewContext.cards).toHaveLength(4)
       expect(viewContext.cards[2].title).toBe('Apply for a marine licence')
+    })
+
+    test('Should redirect consultees to the consultations dashboard', async () => {
+      const h = { redirect: vi.fn(), view: vi.fn() }
+      const request = {
+        auth: { credentials: { userRelationshipType: USER_TYPES.CONSULTEE } }
+      }
+
+      await serviceHomeController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(routes.CONSULTATIONS)
+      expect(h.view).not.toHaveBeenCalled()
     })
   })
 })

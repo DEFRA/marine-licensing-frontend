@@ -29,9 +29,7 @@ describe('#consultationsController', () => {
     expect(h.view).toHaveBeenCalledWith(CONSULTATIONS_VIEW_ROUTE, {
       pageTitle: 'Consultations',
       heading: 'Consultations',
-      consultations: expect.arrayContaining([
-        expect.objectContaining({ cells: expect.any(Array) })
-      ])
+      consultations: expect.arrayContaining([expect.any(Array)])
     })
   })
 

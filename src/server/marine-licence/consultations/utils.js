@@ -29,16 +29,14 @@ export const getConsultationStatusCell = (status) => {
 }
 
 export const formatConsultationsForDisplay = (consultations) =>
-  consultations.map((consultation) => ({
-    cells: [
-      { text: consultation.projectName },
-      { text: CONSULTATION_TYPE[consultation.consultationType] || '-' },
-      { text: consultation.applicationReference || '-' },
-      getConsultationStatusCell(consultation.consultationStatus),
-      {
-        text: consultation.consultationStartDate
-          ? formatDate(consultation.consultationStartDate, 'd MMM yyyy')
-          : '-'
-      }
-    ]
-  }))
+  consultations.map((consultation) => [
+    { text: consultation.projectName },
+    { text: CONSULTATION_TYPE[consultation.consultationType] || '-' },
+    { text: consultation.applicationReference || '-' },
+    getConsultationStatusCell(consultation.consultationStatus),
+    {
+      text: consultation.consultationStartDate
+        ? formatDate(consultation.consultationStartDate, 'd MMM yyyy')
+        : '-'
+    }
+  ])

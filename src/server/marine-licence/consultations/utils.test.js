@@ -47,22 +47,20 @@ describe('#formatConsultationsForDisplay', () => {
     ])
 
     expect(result).toEqual([
-      {
-        cells: [
-          { text: 'Test Project' },
-          { text: 'Request for advice' },
-          { text: 'MLA/2026/10001' },
-          {
-            html: '<strong class="govuk-tag govuk-tag--grey">No response needed</strong>'
-          },
-          { text: '15 Jan 2026' }
-        ]
-      }
+      [
+        { text: 'Test Project' },
+        { text: 'Request for advice' },
+        { text: 'MLA/2026/10001' },
+        {
+          html: '<strong class="govuk-tag govuk-tag--grey">No response needed</strong>'
+        },
+        { text: '15 Jan 2026' }
+      ]
     ])
   })
 
   test('Should show placeholders when type, reference, status and date are missing', () => {
-    const [{ cells }] = formatConsultationsForDisplay([
+    const [cells] = formatConsultationsForDisplay([
       { projectName: 'Test Project' }
     ])
 

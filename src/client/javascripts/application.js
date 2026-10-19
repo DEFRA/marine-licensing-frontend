@@ -15,7 +15,7 @@ import { AccessibleAutocomplete } from './accessible-autocomplete/index.js'
 import { AddAnotherPoint } from './add-another-point/index.js'
 import { BackLinkHistory } from './back-link-history/index.js'
 import { MojFilter } from './moj-filter/index.js'
-import { IatAnswerPrint } from './iat-answer-print/index.js'
+import { initPrintPage } from './print-page/index.js'
 import { SiteDetailsMap } from './site-details-map/index.js'
 import { RedactionField } from './redaction-field/index.js'
 import { WithholdLocation } from './withhold-location/index.js'
@@ -63,10 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const printElements = document.querySelectorAll(
-    '[data-module="iat-answer-print"]'
+    '[data-module="app-print-page"]'
   )
   for (const element of printElements) {
-    new IatAnswerPrint(element) // eslint-disable-line no-new
+    initPrintPage(element)
   }
 
   const redactionFieldElements = document.querySelectorAll(

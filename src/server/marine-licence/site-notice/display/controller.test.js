@@ -57,6 +57,7 @@ describe('#siteNoticeDisplay', () => {
         heading: 'Display a site notice',
         pageCaption: 'MLA/2026/10264 - Test Project',
         addEvidenceFormAction: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_ADD_EVIDENCE}/${licenceId}`,
+        siteNoticePrintUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PRINT}/${licenceId}`,
         canAddLocation: true,
         deleteLocationUrl: `/marine-licence/${licenceId}/delete-location`,
         evidenceLinks: {

@@ -13,7 +13,8 @@ const expectedRoutes = [
   ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PHOTO_UPLOAD_AND_WAIT],
   ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_ADD_EVIDENCE],
   ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION],
-  ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION]
+  ['POST', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION],
+  ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PRINT]
 ]
 
 describe('#siteNoticeRoutes', () => {

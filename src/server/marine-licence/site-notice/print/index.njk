@@ -1,0 +1,73 @@
+{% extends 'layouts/page.njk' %}
+
+{% set bodyClasses = "app-site-notice-page" %}
+{% set hideOrganisationHeading = true %}
+
+{% block govukServiceNavigation %}
+  {{ govukServiceNavigation({
+    serviceName: serviceName
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="app-site-notice-page__controls" data-print-page-controls data-testid="print-controls" hidden>
+    <p class="govuk-body">
+      <button type="button" class="govuk-link govuk-button--as-link app-print-button" data-module="app-print-page" data-testid="print-button">Print this page</button>
+    </p>
+    <p class="govuk-body">To save as a PDF, select 'Print this page' and choose 'Save as PDF' as your printer.</p>
+  </div>
+
+  <div class="app-site-notice" data-testid="site-notice">
+    <p class="govuk-body govuk-!-font-weight-bold app-site-notice__act">Marine and Coastal Access Act 2009</p>
+
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Have your say on a proposed marine activity</h1>
+    <p class="govuk-body-l" data-testid="site-notice-subheading">Marine licence application notice {{ applicationReference }}</p>
+
+    <h2 class="govuk-heading-m">About this application</h2>
+    <p class="govuk-body" data-testid="site-notice-applicant">{{ applicantName }} has applied to the Marine Management Organisation (MMO) under Part 4 of the Marine and Coastal Access Act 2009 for a marine licence.</p>
+
+    {% if summaryOfWorks %}
+      <p class="govuk-body">The application proposes:</p>
+      <p class="govuk-body govuk-!-font-weight-bold" data-testid="site-notice-summary">{{ summaryOfWorks }}</p>
+    {% endif %}
+
+    <h2 class="govuk-heading-m">View the application and comment</h2>
+    <p class="govuk-body">You can view the application documents and send us your comments through the MMO Public Register.</p>
+
+    <div class="app-site-notice__qr">
+      <div class="app-site-notice__qr-code">
+        <p class="govuk-body govuk-!-margin-bottom-2">Scan this QR code:</p>
+        <div role="img" aria-label="QR code linking to this application on the MMO Public Register" data-testid="site-notice-qr-code">
+          {{- qrCode.svg | safe -}}
+        </div>
+      </div>
+      <div class="app-site-notice__qr-text">
+        <p class="govuk-body govuk-!-margin-bottom-0">Or go to:</p>
+        <p class="govuk-body govuk-!-font-weight-bold app-site-notice__url" data-testid="site-notice-url">{{ qrCode.displayUrl }}</p>
+        <p class="govuk-body" data-testid="site-notice-qr-reference">Application reference: {{ applicationReference }}</p>
+      </div>
+    </div>
+
+    <h2 class="govuk-heading-m">If you cannot access the Public Register</h2>
+    <p class="govuk-body">You can also send your comments by post to:</p>
+    <p class="govuk-body">Marine Management Organisation, Tyneside House, Skinnerburn Road, Newcastle Business Park, Newcastle upon Tyne, NE4 7AR</p>
+
+    <h2 class="govuk-heading-m">Important information</h2>
+    <p class="govuk-body">Your comments must:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>be received within 21 days of the date this notice was first displayed</li>
+      <li data-testid="site-notice-bullet-reference">quote the application reference {{ applicationReference }}</li>
+      <li>include a postal address or email address, so we can respond to you</li>
+    </ul>
+    <p class="govuk-body">We will share your comments and your name with the applicant as part of the application process.</p>
+
+    <h2 class="govuk-heading-m">Date notice first displayed</h2>
+    <p class="govuk-body">To be completed by the applicant before the notice is displayed.</p>
+    <div class="app-site-notice__date">
+      <span class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-0">DD&nbsp; /&nbsp; MM&nbsp; /&nbsp; YYYY</span>
+      <span class="app-site-notice__date-line"></span>
+    </div>
+  </div>
+{% endblock %}
+
+{% block govukFooter %}{% endblock %}

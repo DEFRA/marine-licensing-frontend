@@ -165,6 +165,7 @@ export const marineLicenceRoutes = {
     '/marine-licence/site-notice/display/add-evidence',
   MARINE_LICENCE_SITE_NOTICE_DELETE_LOCATION:
     '/marine-licence/{marineLicenceId}/delete-location',
+  MARINE_LICENCE_SITE_NOTICE_PRINT: '/marine-licence/site-notice/print',
   MARINE_LICENCE_FEE_ESTIMATE: '/marine-licence/fee-estimate',
   MARINE_LICENCE_FEE_ESTIMATE_ARE_YOU_SURE:
     '/marine-licence/fee-estimate-are-you-sure',

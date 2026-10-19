@@ -15,10 +15,7 @@ import {
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { apiRoutes } from '#src/server/common/constants/routes.js'
-import {
-  siteNoticeDisplayUrl,
-  siteNoticeLocationUrl
-} from '#src/server/marine-licence/site-notice/utils.js'
+import { siteNoticeLocationUrl } from '#src/server/marine-licence/site-notice/utils.js'
 import { locationNameSchema } from '#src/server/common/validation/location-name/schema.js'
 import {
   locationNameErrorMessages,
@@ -123,7 +120,7 @@ export const siteNoticeLocationNameSubmitController = {
         }
       )
 
-      return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
+      return h.redirect(siteNoticeLocationUrl(request))
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details

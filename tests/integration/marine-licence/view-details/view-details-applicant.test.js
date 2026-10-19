@@ -184,7 +184,7 @@ describe('Marine Licence View Details', () => {
     )
   })
 
-  describe('updates and tasks', () => {
+  describe('Updates and tasks', () => {
     const asOwner = () =>
       vi.mocked(getUserSession).mockResolvedValue({
         contactId: mockApplicationTaskContactId

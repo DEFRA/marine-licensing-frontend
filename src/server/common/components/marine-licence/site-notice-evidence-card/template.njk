@@ -11,13 +11,13 @@
 {% set _ = evidenceRows.push({
   key: { text: "Location name" },
   value: { html: appIncompleteField({text: params.locationName}) },
-  actions: { items: [{ href: params.locationNameHref, text: "Change ", visuallyHiddenText: "location name", classes: "govuk-link--no-visited-state" }] } if params.locationNameHref and not params.evidenceSubmission
+  actions: { items: [{ href: params.locationNameHref, text: "Change " if params.locationName else "Add ", visuallyHiddenText: "location name", classes: "govuk-link--no-visited-state" }] } if params.locationNameHref and not params.evidenceSubmission
 }) %}
 
 {% set _ = evidenceRows.push({
   key: { text: "Date you displayed the notice" },
   value: { html: appIncompleteField({text: params.dateDisplayed}) },
-  actions: { items: [{ href: params.dateDisplayedHref, text: "Change ", visuallyHiddenText: "date you displayed the notice", classes: "govuk-link--no-visited-state" }] } if params.dateDisplayedHref and not params.evidenceSubmission
+  actions: { items: [{ href: params.dateDisplayedHref, text: "Change " if params.dateDisplayed else "Add ", visuallyHiddenText: "date you displayed the notice", classes: "govuk-link--no-visited-state" }] } if params.dateDisplayedHref and not params.evidenceSubmission
 }) %}
 
 {% if params.rejectionReason %}
@@ -30,13 +30,13 @@
 {% set _ = evidenceRows.push({
   key: { text: "Close-up photo of notice" },
   value: { html: appIncompleteField({text: params.closeUpPhoto}) },
-  actions: { items: [{ href: params.closeUpPhotoHref, text: closeUpPhotoActionText, visuallyHiddenText: "close-up photo of notice", classes: "govuk-link--no-visited-state" }] } if not params.evidenceSubmission
+  actions: { items: [{ href: params.closeUpPhotoHref, text: "Change " if params.closeUpPhoto else "Add ", visuallyHiddenText: "close-up photo of notice", classes: "govuk-link--no-visited-state" }] } if not params.evidenceSubmission
 }) %}
 
 {% set _ = evidenceRows.push({
   key: { text: "Photo evidencing notice position and location" },
   value: { html: appIncompleteField({text: params.positionPhoto}) },
-  actions: { items: [{ href: params.positionPhotoHref, text: positionPhotoActionText, visuallyHiddenText: "photo evidencing notice position and location", classes: "govuk-link--no-visited-state" }] } if not params.evidenceSubmission
+  actions: { items: [{ href: params.positionPhotoHref, text: "Change " if params.positionPhoto else "Add ", visuallyHiddenText: "photo evidencing notice position and location", classes: "govuk-link--no-visited-state" }] } if not params.evidenceSubmission
 }) %}
 
 {{ govukSummaryList({

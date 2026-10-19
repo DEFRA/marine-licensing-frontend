@@ -85,7 +85,7 @@ describe('Site notice location name page', () => {
       }
     )
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(displayUrl)
+    expect(response.headers.location).toBe(`${displayUrl}#site-location-1`)
   })
 
   test('shows an error when the location name is missing', async () => {

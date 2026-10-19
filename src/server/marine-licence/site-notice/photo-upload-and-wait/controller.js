@@ -20,7 +20,8 @@ import {
   PHOTO_FILE_SIZE_ERROR_MESSAGE,
   PHOTO_FILE_TYPE_ERROR_MESSAGE,
   setPhotoUploadSession,
-  siteNoticeDisplayUrl
+  siteNoticeDisplayUrl,
+  siteNoticeLocationUrl
 } from '#src/server/marine-licence/site-notice/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 
@@ -74,7 +75,7 @@ const savePhoto = async (status, context) => {
   }
 
   await setPhotoUploadSession(request, h, {})
-  return h.redirect(returnUrl)
+  return h.redirect(siteNoticeLocationUrl(request))
 }
 
 const processUploadStatus = (status, context) => {
@@ -87,7 +88,7 @@ const processUploadStatus = (status, context) => {
       isProcessing: true,
       filename: status.filename,
       tryAgainLink: uploadPageUrl,
-      cancelLink: returnUrl
+      cancelLink: siteNoticeLocationUrl(request)
     })
   }
 

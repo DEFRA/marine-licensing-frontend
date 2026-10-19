@@ -93,7 +93,7 @@ describe('#siteNoticePhotoUploadAndWaitController', () => {
         isProcessing: true,
         filename: 'a.jpg',
         tryAgainLink: uploadPageUrl,
-        cancelLink: displayUrl
+        cancelLink: `${displayUrl}#site-location-2`
       })
     )
   })
@@ -125,7 +125,7 @@ describe('#siteNoticePhotoUploadAndWaitController', () => {
       }
     )
     expect(request.yar.set).toHaveBeenCalledWith(PHOTO_UPLOAD_SESSION_KEY, {})
-    expect(h.redirect).toHaveBeenCalledWith(displayUrl)
+    expect(h.redirect).toHaveBeenCalledWith(`${displayUrl}#site-location-2`)
   })
 
   test.each([

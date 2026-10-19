@@ -178,6 +178,12 @@ const marineLicencePages = [
     session: applicationTaskOwnerSession
   },
   {
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PRINT}/${mockMarineLicenceApplication.id}`,
+    title: 'Site notice',
+    marineLicence: mockMarineLicenceWithApplicationTask,
+    session: applicationTaskOwnerSession
+  },
+  {
     url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_LOCATION_NAME}/${mockMarineLicenceApplication.id}?location=1`,
     title: 'Location name',
     marineLicence: mockMarineLicenceWithApplicationTask,

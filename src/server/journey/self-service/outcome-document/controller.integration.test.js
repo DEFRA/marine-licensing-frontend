@@ -216,7 +216,7 @@ describe('#outcomeDocumentController (integration)', () => {
     expect(response.statusCode).toBe(400)
   })
 
-  test('renders the GOV.UK header, service name and Beta phase banner; hides service nav links, back link and organisation banner', async () => {
+  test('renders the GOV.UK header, service name, Beta phase banner and print control; hides service nav links, back link and organisation banner', async () => {
     vi.mocked(iatOutcomeDocumentService.get).mockResolvedValueOnce(
       buildSnapshot({
         outcomeRoute: '/mod-permission',
@@ -244,6 +244,10 @@ describe('#outcomeDocumentController (integration)', () => {
     const phaseBanner = document.querySelector('.govuk-phase-banner')
     expect(phaseBanner).not.toBeNull()
     expect(phaseBanner.textContent.toLowerCase()).toContain('beta')
+
+    expect(
+      document.querySelector('[data-module="app-print-page"]')
+    ).not.toBeNull()
 
     expect(document.querySelector('.govuk-service-navigation__list')).toBeNull()
 

@@ -27,7 +27,8 @@ const expectedRoutes = [
   [
     'GET',
     marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT_PHOTO_UPLOAD_AND_WAIT
-  ]
+  ],
+  ['GET', marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_PRINT]
 ]
 
 describe('#siteNoticeRoutes', () => {

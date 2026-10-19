@@ -88,10 +88,12 @@
     html: 'This is a new service. Help us improve it and <a class="govuk-link govuk-link--no-visited-state" target="_blank" rel="noopener noreferrer" href="' + surveyUrls.midJourney + '">give your feedback (opens in new tab)</a>.'
   }) }}
   </div>
-  {{ appOrganisationHeading({
-    orgOrUserName: commonPageViewData.orgOrUserName,
-    showChangeOrganisationLink: commonPageViewData.showChangeOrganisationLink
-  }) }}
+  {% if not hideOrganisationHeading %}
+    {{ appOrganisationHeading({
+      orgOrUserName: commonPageViewData.orgOrUserName,
+      showChangeOrganisationLink: commonPageViewData.showChangeOrganisationLink
+    }) }}
+  {% endif %}
 {% endblock %}
 
 {% block content %}{% endblock %}

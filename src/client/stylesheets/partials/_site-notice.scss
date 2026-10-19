@@ -21,6 +21,15 @@ $app-site-notice-qr-size-print: math.div(40mm, $app-site-notice-print-zoom);
   * {
     font-family: $app-site-notice-font-family;
   }
+
+  // Browsers don't let a page set the print dialog's scale, so the notice is
+  // zoomed instead to fit on one A4 page.
+  @media print {
+    padding: 16px;
+    border-width: 3px;
+    break-inside: avoid;
+    zoom: $app-site-notice-print-zoom;
+  }
 }
 
 .app-site-notice__act {
@@ -35,12 +44,22 @@ $app-site-notice-qr-size-print: math.div(40mm, $app-site-notice-print-zoom);
   gap: govuk-spacing(6);
   align-items: flex-start;
   margin-bottom: govuk-spacing(4);
+
+  @media print {
+    flex-wrap: nowrap;
+    break-inside: avoid;
+  }
 }
 
 .app-site-notice__qr-code svg {
   display: block;
   width: $app-site-notice-qr-size-screen;
   height: $app-site-notice-qr-size-screen;
+
+  @media print {
+    width: $app-site-notice-qr-size-print;
+    height: $app-site-notice-qr-size-print;
+  }
 }
 
 .app-site-notice__qr-text {
@@ -95,24 +114,5 @@ $app-site-notice-qr-size-print: math.div(40mm, $app-site-notice-print-zoom);
     .govuk-main-wrapper {
       padding: 0;
     }
-  }
-
-  // Browsers don't let a page set the print dialog's scale, so the notice is
-  // zoomed instead to fit on one A4 page.
-  .app-site-notice {
-    padding: 16px;
-    border-width: 3px;
-    break-inside: avoid;
-    zoom: $app-site-notice-print-zoom;
-  }
-
-  .app-site-notice__qr {
-    flex-wrap: nowrap;
-    break-inside: avoid;
-  }
-
-  .app-site-notice__qr-code svg {
-    width: $app-site-notice-qr-size-print;
-    height: $app-site-notice-qr-size-print;
   }
 }

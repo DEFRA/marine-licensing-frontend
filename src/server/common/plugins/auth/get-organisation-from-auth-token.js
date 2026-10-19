@@ -33,8 +33,13 @@ export const getOrganisationFromToken = (decodedToken) => {
   // Employee - user picked an organisation they are an employee of
   // Agent - user picked an organisation they are an intermediary of
   // Citizen - EITHER, the user selected themselves in the org picker (not an organisation), OR they don't have any linked organisations
+  // Consultee - user selected in dynamics to be consultee
   let userRelationshipType = relationshipRoleType
-  if (!['Employee', 'Agent', 'Citizen'].includes(userRelationshipType)) {
+  if (
+    !['Employee', 'Agent', 'Citizen', 'Consultee'].includes(
+      userRelationshipType
+    )
+  ) {
     const logger = createLogger()
     logger.error(`Invalid relationship type: ${userRelationshipType}`)
     userRelationshipType = defaultUserRelationshipType

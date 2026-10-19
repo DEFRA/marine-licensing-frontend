@@ -76,6 +76,27 @@ export const validateAgentUserSession = {
   }
 }
 
+export const validateConsulteeUserSession = {
+  method: async (request, h) => {
+    const userSession = await getUserSession(
+      request,
+      request.state?.userSession
+    )
+
+    const sessionCheck = validateSessionExists(userSession, h)
+    if (sessionCheck) {
+      return sessionCheck
+    }
+    const { userRelationshipType } = userSession
+
+    if (userRelationshipType !== USER_TYPES.CONSULTEE) {
+      return h.redirect(routes.SERVICE_HOME).takeover()
+    }
+
+    return h.continue
+  }
+}
+
 export const validateTeamAdminSession = {
   method: (request) => {
     if (request.auth?.credentials?.isTeamAdmin !== true) {

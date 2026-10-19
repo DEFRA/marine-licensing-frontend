@@ -98,6 +98,28 @@ describe('#getOrganisationFromToken', () => {
       })
     })
 
+    test('When token has valid Consultee relationship data', () => {
+      const decodedToken = {
+        currentRelationshipId: '81d48d6c-6e94-f011-b4cc-000d3ac28f39',
+        relationships: [
+          '81d48d6c-6e94-f011-b4cc-000d3ac28f39:27d48d6c-6e94-f011-b4cc-000d3ac28f39:CDP Consultee Org:0:Consultee:0'
+        ],
+        enrolmentCount: 1,
+        roles: ['role1']
+      }
+
+      const result = getOrganisationFromToken(decodedToken)
+
+      expect(result).toEqual({
+        organisationId: '27d48d6c-6e94-f011-b4cc-000d3ac28f39',
+        organisationName: 'CDP Consultee Org',
+        userRelationshipType: 'Consultee',
+        hasMultipleOrgPickerEntries: false,
+        shouldShowOrgOrUserName: false,
+        shouldShowCitizenName: false
+      })
+    })
+
     test('When Agent has multiple organisations', () => {
       const decodedToken = {
         currentRelationshipId: '81d48d6c-6e94-f011-b4cc-000d3ac28f39',

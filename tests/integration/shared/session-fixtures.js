@@ -38,6 +38,12 @@ export const agentSession = {
   shouldShowOrgOrUserName: false
 }
 
+export const consulteeSession = {
+  ...baseSession,
+  userRelationshipType: USER_TYPES.CONSULTEE,
+  organisationName: 'Consultee Org'
+}
+
 export const agentSessionWithMultipleOrgs = {
   ...agentSession,
   hasMultipleOrgPickerEntries: true

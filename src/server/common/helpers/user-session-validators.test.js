@@ -3,11 +3,13 @@ import { routes } from '#src/server/common/constants/routes.js'
 import {
   agentSession,
   citizenUserSession,
+  consulteeSession,
   employeeSession
 } from '~/tests/integration/shared/session-fixtures.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import {
   validateAgentUserSession,
+  validateConsulteeUserSession,
   validateEmployeeUserSession,
   validateIndividualUserSession,
   validateTeamAdminSession
@@ -193,6 +195,53 @@ describe('#validateIndividualUserSession', () => {
     const h = createMockH()
 
     const result = await validateIndividualUserSession.method(request, h)
+
+    expect(h.redirect).not.toHaveBeenCalled()
+    expect(result).toBe(h.continue)
+  })
+})
+
+describe('#validateConsulteeUserSession', () => {
+  const createMockH = () => ({
+    redirect: vi.fn().mockReturnValue({
+      takeover: vi.fn().mockReturnValue({})
+    }),
+    continue: vi.fn()
+  })
+
+  beforeEach(() => {
+    vi.mocked(getUserSession).mockResolvedValue(consulteeSession)
+  })
+
+  test('redirects to sign-in when userSession does not exist', async () => {
+    vi.mocked(getUserSession).mockResolvedValue({})
+
+    const request = createMockRequest()
+    const h = createMockH()
+
+    const result = await validateConsulteeUserSession.method(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(routes.SIGNIN)
+    expect(result).not.toBe(h.continue)
+  })
+
+  test('redirects to correct page when userRelationshipType is not Consultee', async () => {
+    vi.mocked(getUserSession).mockResolvedValue(employeeSession)
+
+    const request = createMockRequest()
+    const h = createMockH()
+
+    const result = await validateConsulteeUserSession.method(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(routes.SERVICE_HOME)
+    expect(result).not.toBe(h.continue)
+  })
+
+  test('returns h.continue when userSession is correct', async () => {
+    const request = createMockRequest()
+    const h = createMockH()
+
+    const result = await validateConsulteeUserSession.method(request, h)
 
     expect(h.redirect).not.toHaveBeenCalled()
     expect(result).toBe(h.continue)

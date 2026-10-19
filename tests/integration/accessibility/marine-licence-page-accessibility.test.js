@@ -1,7 +1,11 @@
 // @vitest-environment jsdom
 import { vi } from 'vitest'
-import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
+  marineLicenceRoutes,
+  routes
+} from '~/src/server/common/constants/routes.js'
+import {
+  mockConsultations,
   mockManualCoordinatesMarineLicence,
   mockMarineLicenceApplication,
   mockMarineLicenceWithMarinePlanPolicies,
@@ -16,7 +20,11 @@ import {
   mockMarineLicence,
   setupTestServer
 } from '../shared/test-setup-helpers.js'
-import { agentSession, citizenUserSession } from '../shared/session-fixtures.js'
+import {
+  agentSession,
+  citizenUserSession,
+  consulteeSession
+} from '../shared/session-fixtures.js'
 import { selectActivityVariants } from '~/src/server/common/constants/activity-variants.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 import { toApplicationReferenceUrlSegment } from '~/src/server/common/helpers/marine-licence/application-reference-url-segment.js'
@@ -37,6 +45,12 @@ const applicationTaskOwnerSession = {
 }
 
 const marineLicencePages = [
+  {
+    url: routes.CONSULTATIONS,
+    title: 'Consultations',
+    marineLicence: { consultations: mockConsultations },
+    session: consulteeSession
+  },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,
     title: 'Site name'

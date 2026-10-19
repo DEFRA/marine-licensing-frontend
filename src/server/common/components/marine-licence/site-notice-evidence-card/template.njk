@@ -3,9 +3,6 @@
 
 {% set title %}Location {{ params.evidenceIndex }} evidence{% endset %}
 
-{% set closeUpPhotoActionText = "Add " if params.addWhenIncomplete and not params.closeUpPhoto else "Change " %}
-{% set positionPhotoActionText = "Add " if params.addWhenIncomplete and not params.positionPhoto else "Change " %}
-
 {% set evidenceRows = [] %}
 
 {% set _ = evidenceRows.push({

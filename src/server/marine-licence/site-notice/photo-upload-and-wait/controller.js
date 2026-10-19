@@ -75,7 +75,7 @@ const savePhoto = async (status, context) => {
   }
 
   await setPhotoUploadSession(request, h, {})
-  return h.redirect(siteNoticeLocationUrl(request))
+  return h.redirect(returnUrl)
 }
 
 const processUploadStatus = (status, context) => {
@@ -88,7 +88,7 @@ const processUploadStatus = (status, context) => {
       isProcessing: true,
       filename: status.filename,
       tryAgainLink: uploadPageUrl,
-      cancelLink: siteNoticeLocationUrl(request)
+      cancelLink: returnUrl
     })
   }
 
@@ -114,13 +114,13 @@ const processUploadStatus = (status, context) => {
 export const handlePhotoUploadStatus = async (
   request,
   h,
-  { marineLicence, persistPhoto, returnUrl }
+  { marineLicence, persistPhoto, returnUrl, noUploadUrl = returnUrl }
 ) => {
   const { uploadId, statusUrl, field, uploadPageUrl } =
     getPhotoUploadSession(request)
 
   if (!uploadId) {
-    return h.redirect(returnUrl)
+    return h.redirect(noUploadUrl)
   }
 
   try {
@@ -167,7 +167,8 @@ export const siteNoticePhotoUploadAndWaitController = {
     return handlePhotoUploadStatus(request, h, {
       marineLicence,
       persistPhoto: saveSiteNoticeEvidencePhoto,
-      returnUrl: siteNoticeDisplayUrl(marineLicenceId)
+      returnUrl: siteNoticeLocationUrl(request),
+      noUploadUrl: siteNoticeDisplayUrl(marineLicenceId)
     })
   }
 }

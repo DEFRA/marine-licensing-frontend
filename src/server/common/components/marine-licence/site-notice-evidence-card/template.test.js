@@ -142,8 +142,7 @@ describe('Marine Licence Site Notice Evidence Card', () => {
       closeUpPhoto: null,
       closeUpPhotoHref: '/resubmit/close-up-photo?location=3',
       positionPhoto: 'position.jpg',
-      positionPhotoHref: '/resubmit/position-photo?location=3',
-      addWhenIncomplete: true
+      positionPhotoHref: '/resubmit/position-photo?location=3'
     }
 
     const render = (params = resubmissionParams) =>

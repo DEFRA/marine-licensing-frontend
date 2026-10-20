@@ -14,6 +14,21 @@ const getRoleName = (roles, currentRelationshipId) => {
   return role?.roleName ?? null
 }
 
+const defaultUserRelationshipType = 'Citizen'
+
+// Employee - user picked an organisation they are an employee of
+// Agent - user picked an organisation they are an intermediary of
+// Citizen - EITHER, the user selected themselves in the org picker (not an organisation), OR they don't have any linked organisations
+const getRelationshipType = (relationshipRoleType) => {
+  if (!['Employee', 'Agent', 'Citizen'].includes(relationshipRoleType)) {
+    const logger = createLogger()
+    logger.error(`Invalid relationship type: ${relationshipRoleType}`)
+    return defaultUserRelationshipType
+  }
+
+  return relationshipRoleType
+}
+
 const getNameDisplayFlags = ({
   hasMultipleOrgPickerEntries,
   userRelationshipType,
@@ -35,7 +50,6 @@ export const getOrganisationFromToken = (decodedToken) => {
   // relationships - The relationships the user has selected to sign into the service in, within their current session.
   // enrolmentCount - The number of enrolments assigned to the user for this service, across all organisations.
   // The roles related to the relationship the user has selected within their current session.
-  const defaultUserRelationshipType = 'Citizen'
   const { currentRelationshipId, relationships, enrolmentCount, roles } =
     decodedToken
   if (
@@ -69,15 +83,7 @@ export const getOrganisationFromToken = (decodedToken) => {
   // Consultee - user selected in dynamics to be consultee
   const userRoleType = getRoleName(roles, currentRelationshipId)
 
-  // Employee - user picked an organisation they are an employee of
-  // Agent - user picked an organisation they are an intermediary of
-  // Citizen - EITHER, the user selected themselves in the org picker (not an organisation), OR they don't have any linked organisations
-  let userRelationshipType = relationshipRoleType
-  if (!['Employee', 'Agent', 'Citizen'].includes(userRelationshipType)) {
-    const logger = createLogger()
-    logger.error(`Invalid relationship type: ${userRelationshipType}`)
-    userRelationshipType = defaultUserRelationshipType
-  }
+  const userRelationshipType = getRelationshipType(relationshipRoleType)
 
   const hasMultipleOrgPickerEntries =
     enrolmentCount > roles.length || relationships.length > 1

@@ -19,7 +19,7 @@ export const applicationTaskRegistry = {
     title: 'Display a site notice',
     buildHref: (marineLicenceId) =>
       `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${marineLicenceId}`,
-    outstandingLabel: 'Not yet responded',
+    outstandingLabel: 'Incomplete',
     resolvedLabel: 'Completed',
     sortOrder: 2
   },

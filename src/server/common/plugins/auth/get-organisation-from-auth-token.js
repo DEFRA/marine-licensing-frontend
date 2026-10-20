@@ -14,6 +14,22 @@ const getRoleName = (roles, currentRelationshipId) => {
   return role?.roleName ?? null
 }
 
+const getNameDisplayFlags = ({
+  hasMultipleOrgPickerEntries,
+  userRelationshipType,
+  userRoleType
+}) => {
+  const shouldShowOrgOrUserName =
+    hasMultipleOrgPickerEntries ||
+    userRelationshipType === 'Employee' ||
+    userRoleType === USER_ROLE_TYPES.CONSULTEE
+
+  const shouldShowCitizenName =
+    !shouldShowOrgOrUserName && userRelationshipType === 'Citizen'
+
+  return { shouldShowOrgOrUserName, shouldShowCitizenName }
+}
+
 export const getOrganisationFromToken = (decodedToken) => {
   // currentRelationshipId is the relationship the user is signing into the service in the context of, based on what they selected in the organisation picker (either themselves, or a linked org)
   // relationships - The relationships the user has selected to sign into the service in, within their current session.
@@ -66,13 +82,12 @@ export const getOrganisationFromToken = (decodedToken) => {
   const hasMultipleOrgPickerEntries =
     enrolmentCount > roles.length || relationships.length > 1
 
-  const shouldShowOrgOrUserName =
-    hasMultipleOrgPickerEntries ||
-    userRelationshipType === 'Employee' ||
-    userRoleType === USER_ROLE_TYPES.CONSULTEE
-
-  const shouldShowCitizenName =
-    !shouldShowOrgOrUserName && userRelationshipType === 'Citizen'
+  const { shouldShowOrgOrUserName, shouldShowCitizenName } =
+    getNameDisplayFlags({
+      hasMultipleOrgPickerEntries,
+      userRelationshipType,
+      userRoleType
+    })
 
   return {
     organisationId,

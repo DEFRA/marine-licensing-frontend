@@ -103,7 +103,7 @@ describe('#getOrganisationFromToken', () => {
     })
 
     test('When token has a Consultee role for the current relationship', () => {
-      const decodedToken = {
+      const result = getOrganisationFromToken({
         currentRelationshipId: '23950a2d-c37d-43da-9fcb-0a4ce9aa11ee',
         relationships: [
           '23950a2d-c37d-43da-9fcb-0a4ce9aa11ee:bc19305a-f9b6-ea11-a812-000d3ab4653d:ABC Organisation2:0:Employee:0',
@@ -114,9 +114,7 @@ describe('#getOrganisationFromToken', () => {
           '23950a2d-c37d-43da-9fcb-0a4ce9aa11ee:Consultee:3',
           'e0dfefcf-f0f0-4383-b094-1da327083589:Reviewer:3'
         ]
-      }
-
-      const result = getOrganisationFromToken(decodedToken)
+      })
 
       expect(result).toEqual({
         organisationId: 'bc19305a-f9b6-ea11-a812-000d3ab4653d',
@@ -127,6 +125,21 @@ describe('#getOrganisationFromToken', () => {
         shouldShowOrgOrUserName: true,
         shouldShowCitizenName: false
       })
+    })
+
+    test('When a single-org Agent is a Consultee the organisation name is shown', () => {
+      const result = getOrganisationFromToken({
+        currentRelationshipId: 'e0dfefcf-f0f0-4383-b094-1da327083589',
+        relationships: [
+          'e0dfefcf-f0f0-4383-b094-1da327083589:a1837c90-c8f2-4ac3-90b2-83df6145e3c5:XYZ Organisation:0:Agent:0'
+        ],
+        enrolmentCount: 1,
+        roles: ['e0dfefcf-f0f0-4383-b094-1da327083589:Consultee:1']
+      })
+
+      expect(result.userRoleType).toBe('Consultee')
+      expect(result.shouldShowOrgOrUserName).toBe(true)
+      expect(result.shouldShowCitizenName).toBe(false)
     })
 
     test('When the role for the current relationship is not Consultee', () => {
@@ -157,19 +170,6 @@ describe('#getOrganisationFromToken', () => {
       })
 
       expect(result.userRoleType).toBeNull()
-    })
-
-    test('When the Consultee role is not yet approved it still counts', () => {
-      const result = getOrganisationFromToken({
-        currentRelationshipId: 'f0239b00-0411-4dca-b5d7-a428f3e86982',
-        relationships: [
-          'f0239b00-0411-4dca-b5d7-a428f3e86982:f0239b00-0411-4dca-b5d7-a428f3e86982:Some Org:0:Employee:0'
-        ],
-        enrolmentCount: 1,
-        roles: ['f0239b00-0411-4dca-b5d7-a428f3e86982:Consultee:1']
-      })
-
-      expect(result.userRoleType).toBe('Consultee')
     })
 
     test('When Agent has multiple organisations', () => {

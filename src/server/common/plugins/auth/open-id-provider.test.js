@@ -40,7 +40,7 @@ describe('#openIdProvider', () => {
         relationships: [
           'testRelationshipId:testOrgId:Test Organisation Ltd:0:Employee:0'
         ],
-        roles: ['testRoles'],
+        roles: ['testRelationshipId:Consultee:3'],
         aud: 'test',
         iss: 'test',
         user: 'Test User'
@@ -82,8 +82,9 @@ describe('#openIdProvider', () => {
         organisationId: 'testOrgId',
         organisationName: 'Test Organisation Ltd',
         userRelationshipType: 'Employee',
+        userRoleType: 'Consultee',
         hasMultipleOrgPickerEntries: true,
-        roles: ['testRoles'],
+        roles: ['testRelationshipId:Consultee:3'],
         idToken: 'test-id-token',
         tokenUrl: 'http://test-token-endpoint',
         logoutUrl: 'http://test-end-session-endpoint',

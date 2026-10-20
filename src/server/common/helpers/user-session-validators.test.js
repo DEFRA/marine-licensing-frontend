@@ -225,7 +225,7 @@ describe('#validateConsulteeUserSession', () => {
     expect(result).not.toBe(h.continue)
   })
 
-  test('redirects to correct page when userRelationshipType is not Consultee', async () => {
+  test('redirects to correct page when role is not Consultee', async () => {
     vi.mocked(getUserSession).mockResolvedValue(employeeSession)
 
     const request = createMockRequest()

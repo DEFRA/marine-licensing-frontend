@@ -49,7 +49,7 @@ const marineLicencePages = [
     url: routes.CONSULTATIONS,
     title: 'Consultations',
     marineLicence: { consultations: mockConsultations },
-    session: consulteeSession
+    session: { ...consulteeSession, shouldShowOrgOrUserName: false }
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_SITE_NAME,

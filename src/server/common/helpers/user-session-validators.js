@@ -1,6 +1,9 @@
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { routes } from '#src/server/common/constants/routes.js'
-import { USER_TYPES } from '#src/server/common/constants/user-types.js'
+import {
+  USER_ROLE_TYPES,
+  USER_TYPES
+} from '#src/server/common/constants/user-types.js'
 import Boom from '@hapi/boom'
 
 export const validateSessionExists = (userSession, h) => {
@@ -87,9 +90,9 @@ export const validateConsulteeUserSession = {
     if (sessionCheck) {
       return sessionCheck
     }
-    const { userRelationshipType } = userSession
+    const { userRoleType } = userSession
 
-    if (userRelationshipType !== USER_TYPES.CONSULTEE) {
+    if (userRoleType !== USER_ROLE_TYPES.CONSULTEE) {
       return h.redirect(routes.SERVICE_HOME).takeover()
     }
 

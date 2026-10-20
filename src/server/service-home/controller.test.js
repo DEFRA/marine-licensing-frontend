@@ -6,7 +6,7 @@ import { setupTestServer } from '#tests/integration/shared/test-setup-helpers.js
 import { makeGetRequest } from '#src/server/test-helpers/server-requests.js'
 import { serviceHomeController, SERVICE_HOME_VIEW_ROUTE } from './controller.js'
 import { config } from '#src/config/config.js'
-import { USER_TYPES } from '#src/server/common/constants/user-types.js'
+import { USER_ROLE_TYPES } from '#src/server/common/constants/user-types.js'
 
 vi.mock('~/src/server/common/helpers/page-view-common-data.js')
 
@@ -83,7 +83,7 @@ describe('#serviceHome', () => {
     test('Should redirect consultees to the consultations dashboard', async () => {
       const h = { redirect: vi.fn(), view: vi.fn() }
       const request = {
-        auth: { credentials: { userRelationshipType: USER_TYPES.CONSULTEE } }
+        auth: { credentials: { userRoleType: USER_ROLE_TYPES.CONSULTEE } }
       }
 
       await serviceHomeController.handler(request, h)

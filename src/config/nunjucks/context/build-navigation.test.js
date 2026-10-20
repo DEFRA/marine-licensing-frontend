@@ -2,7 +2,7 @@ import { vi } from 'vitest'
 import { buildNavigation } from '#src/config/nunjucks/context/build-navigation.js'
 import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
-import { USER_TYPES } from '#src/server/common/constants/user-types.js'
+import { USER_ROLE_TYPES } from '#src/server/common/constants/user-types.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
@@ -70,7 +70,7 @@ describe('#buildNavigation', () => {
   describe('defra ID consultee', () => {
     const consulteeRequest = (path) => ({
       path,
-      auth: { credentials: { userRelationshipType: USER_TYPES.CONSULTEE } }
+      auth: { credentials: { userRoleType: USER_ROLE_TYPES.CONSULTEE } }
     })
 
     beforeEach(() =>

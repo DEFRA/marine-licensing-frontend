@@ -30,6 +30,7 @@ export const openIdProvider = async (name, authConfig) => {
         organisationId,
         organisationName,
         userRelationshipType,
+        userRoleType,
         hasMultipleOrgPickerEntries,
         shouldShowOrgOrUserName,
         shouldShowCitizenName
@@ -64,6 +65,7 @@ export const openIdProvider = async (name, authConfig) => {
         organisationId,
         organisationName,
         userRelationshipType,
+        userRoleType,
         hasMultipleOrgPickerEntries,
         shouldShowOrgOrUserName,
         shouldShowCitizenName,

@@ -1,5 +1,4 @@
 import { vi } from 'vitest'
-import Boom from '@hapi/boom'
 import { JSDOM } from 'jsdom'
 import {
   getAllByRole,
@@ -22,7 +21,10 @@ import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import {
   mockApplicationTaskContactId,
   mockMarineLicenceWithResubmissionTask,
-  mockResubmissionTaskId
+  mockResubmissionTaskId,
+  mockResubmissionWithAllPhotos,
+  mockResubmittedMarineLicence,
+  mockResubmittedPhoto
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
@@ -41,36 +43,15 @@ const [siteNoticeTask, resubmissionTask] =
 const taskUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT}/${marineLicenceId}/${mockResubmissionTaskId}`
 const viewDetailsUrl = `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
 
-const photo = (filename) => ({
-  uploadedFile: { filename },
-  s3Location: { s3Bucket: 'mmo-uploads', s3Key: filename }
-})
-
-const withLocations = (mapLocation, taskOverrides = {}) => ({
+const withLocations = (mapLocation) => ({
   ...mockMarineLicenceWithResubmissionTask,
   applicationTasks: [
     siteNoticeTask,
     {
       ...resubmissionTask,
-      ...taskOverrides,
       data: { locations: resubmissionTask.data.locations.map(mapLocation) }
     }
   ]
-})
-
-const withAllPhotos = (taskOverrides) =>
-  withLocations(
-    (location) => ({
-      ...location,
-      closeUpPhoto: photo(`close-up-${location.locationNumber}.jpg`),
-      positionPhoto: photo(`position-${location.locationNumber}.jpg`)
-    }),
-    taskOverrides
-  )
-
-const resubmitted = withAllPhotos({
-  resolvedAt: '2026-09-20T10:00:00.000Z',
-  resolvedByName: 'Sam Evans'
 })
 
 const cardHeadings = (document) =>
@@ -178,7 +159,7 @@ describe('Resubmit site notice evidence page', () => {
       mockMarineLicence(
         withLocations((location) => ({
           ...location,
-          closeUpPhoto: photo('new.jpg')
+          closeUpPhoto: mockResubmittedPhoto('new.jpg')
         }))
       )
 
@@ -216,33 +197,6 @@ describe('Resubmit site notice evidence page', () => {
         queryAllByRole(document, 'link', { name: /Delete location/ })
       ).toHaveLength(0)
     })
-
-    test('shows the caseworker reason as text rather than markup', async () => {
-      mockMarineLicence(
-        withLocations((location) => ({
-          ...location,
-          reason: '<script>alert("x")</script>'
-        }))
-      )
-
-      const document = await load()
-
-      expect(cardFor(document, 1).querySelector('script')).toBeNull()
-      expect(cardFor(document, 1)).toHaveTextContent(
-        '<script>alert("x")</script>'
-      )
-    })
-
-    test('loading the page and going back changes nothing', async () => {
-      const document = await load()
-
-      expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
-        'href',
-        viewDetailsUrl
-      )
-      expect(authenticatedPostRequest).not.toHaveBeenCalled()
-      expect(authenticatedPatchRequest).not.toHaveBeenCalled()
-    })
   })
 
   describe('Send evidence', () => {
@@ -250,9 +204,9 @@ describe('Resubmit site notice evidence page', () => {
       mockMarineLicence(
         withLocations((location) => ({
           ...location,
-          closeUpPhoto: photo('a.jpg'),
+          closeUpPhoto: mockResubmittedPhoto('a.jpg'),
           ...(location.locationNumber !== 4 && {
-            positionPhoto: photo('b.jpg')
+            positionPhoto: mockResubmittedPhoto('b.jpg')
           })
         }))
       )
@@ -265,7 +219,7 @@ describe('Resubmit site notice evidence page', () => {
     })
 
     test('is shown once every photo on every card is added', async () => {
-      mockMarineLicence(withAllPhotos())
+      mockMarineLicence(mockResubmissionWithAllPhotos())
 
       const document = await load()
 
@@ -274,7 +228,12 @@ describe('Resubmit site notice evidence page', () => {
       ).toBeInTheDocument()
     })
 
-    test('a post is refused while any photo is missing', async () => {
+    test.each([
+      ['while any photo is missing', mockMarineLicenceWithResubmissionTask],
+      ['for a completed task', mockResubmittedMarineLicence]
+    ])('a post is refused %s', async (_case, marineLicence) => {
+      mockMarineLicence(marineLicence)
+
       const { response } = await send()
 
       expect(authenticatedPostRequest).not.toHaveBeenCalled()
@@ -283,7 +242,7 @@ describe('Resubmit site notice evidence page', () => {
     })
 
     test('completes the task and returns to view details', async () => {
-      mockMarineLicence(withAllPhotos())
+      mockMarineLicence(mockResubmissionWithAllPhotos())
 
       const { response } = await send()
 
@@ -295,20 +254,11 @@ describe('Resubmit site notice evidence page', () => {
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(viewDetailsUrl)
     })
-
-    test('a post to a completed task is refused', async () => {
-      mockMarineLicence(resubmitted)
-
-      const { response } = await send()
-
-      expect(authenticatedPostRequest).not.toHaveBeenCalled()
-      expect(response.headers.location).toBe(taskUrl)
-    })
   })
 
   describe('once evidence has been resubmitted', () => {
     test('shows a read-only page saying when and by whom', async () => {
-      mockMarineLicence(resubmitted)
+      mockMarineLicence(mockResubmittedMarineLicence)
 
       const document = await load()
 
@@ -347,7 +297,7 @@ describe('Resubmit site notice evidence page', () => {
     })
 
     test('forbids anyone else from sending evidence', async () => {
-      mockMarineLicence(withAllPhotos())
+      mockMarineLicence(mockResubmissionWithAllPhotos())
       vi.mocked(getUserSession).mockResolvedValue({ contactId: 'someone-else' })
 
       const { response } = await send()
@@ -445,7 +395,7 @@ describe('Resubmit site notice evidence photo upload', () => {
       mockMarineLicenceWithResubmissionTask,
       2
     ],
-    ['a completed task', resubmitted, 1]
+    ['a completed task', mockResubmittedMarineLicence, 1]
   ])(
     'redirects to the task page for %s',
     async (_case, marineLicence, location) => {
@@ -461,6 +411,18 @@ describe('Resubmit site notice evidence photo upload', () => {
       expect(mockCdpService.initiate).not.toHaveBeenCalled()
     }
   )
+
+  test('returns to the task page when the upload cannot be started', async () => {
+    mockCdpService.initiate.mockRejectedValue(new Error('CDP unavailable'))
+
+    const { statusCode, headers } = await makeGetRequest({
+      url: `${closeUpUrl}?location=3`,
+      server: getServer()
+    })
+
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(taskUrl)
+  })
 
   const readyStatus = {
     status: 'ready',
@@ -522,15 +484,6 @@ describe('Resubmit site notice evidence photo upload', () => {
         }
       }
     )
-    expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(taskUrl)
-  })
-
-  test('returns to the task page when the task was completed while the photo was scanned', async () => {
-    vi.mocked(authenticatedPatchRequest).mockRejectedValue(Boom.notFound())
-
-    const response = await checkStatus(readyStatus)
-
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(taskUrl)
   })

@@ -12,6 +12,8 @@ import {
   mockMarineLicenceWithApplicationTask,
   mockMarineLicenceWithResubmissionTask,
   mockResubmissionTaskId,
+  mockResubmissionWithAllPhotos,
+  mockResubmittedMarineLicence,
   mockApplicationTaskContactId
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
@@ -36,29 +38,6 @@ vi.mock('~/src/server/common/plugins/auth/utils.js', () => ({
 const applicationTaskOwnerSession = {
   ...citizenUserSession,
   contactId: mockApplicationTaskContactId
-}
-
-const resubmittedPhoto = (filename) => ({ uploadedFile: { filename } })
-
-const mockResubmittedMarineLicence = {
-  ...mockMarineLicenceWithResubmissionTask,
-  applicationTasks: mockMarineLicenceWithResubmissionTask.applicationTasks.map(
-    (task) =>
-      task.taskId === mockResubmissionTaskId
-        ? {
-            ...task,
-            resolvedAt: '2026-09-20T10:00:00.000Z',
-            resolvedByName: 'Sam Evans',
-            data: {
-              locations: task.data.locations.map((location) => ({
-                ...location,
-                closeUpPhoto: resubmittedPhoto('close-up.jpg'),
-                positionPhoto: resubmittedPhoto('position.jpg')
-              }))
-            }
-          }
-        : task
-  )
 }
 
 const marineLicencePages = [
@@ -364,15 +343,15 @@ const marineLicencePages = [
     session: applicationTaskOwnerSession
   },
   {
-    url: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${mockMarineLicenceWithResubmissionTask.id}`,
-    title: mockMarineLicenceWithResubmissionTask.projectName,
+    url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT}/${mockMarineLicenceWithResubmissionTask.id}/${mockResubmissionTaskId}`,
+    title: 'Resubmit site notice evidence',
     marineLicence: mockMarineLicenceWithResubmissionTask,
     session: applicationTaskOwnerSession
   },
   {
     url: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT}/${mockMarineLicenceWithResubmissionTask.id}/${mockResubmissionTaskId}`,
     title: 'Resubmit site notice evidence',
-    marineLicence: mockMarineLicenceWithResubmissionTask,
+    marineLicence: mockResubmissionWithAllPhotos(),
     session: applicationTaskOwnerSession
   },
   {

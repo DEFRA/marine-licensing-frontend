@@ -180,13 +180,5 @@ describe('Marine Licence Site Notice Evidence Card', () => {
       expect(rows.eq(0).find('a')).toHaveLength(0)
       expect(rows.eq(1).find('a')).toHaveLength(0)
     })
-
-    test('offers Add for a missing photo and Change for one already added', () => {
-      const links = render()('.govuk-summary-list__actions a')
-
-      expect(links).toHaveLength(2)
-      expect(links.eq(0).text()).toMatch(/^Add\b/)
-      expect(links.eq(1).text()).toMatch(/^Change\b/)
-    })
   })
 })

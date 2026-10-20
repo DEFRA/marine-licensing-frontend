@@ -296,6 +296,43 @@ export const mockMarineLicenceWithResubmissionTask = {
   ]
 }
 
+export const mockResubmittedPhoto = (filename) => ({
+  uploadedFile: { filename },
+  s3Location: { s3Bucket: 'mmo-uploads', s3Key: filename }
+})
+
+export const mockResubmissionWithAllPhotos = (taskOverrides) => {
+  const [siteNoticeTask, resubmissionTask] =
+    mockMarineLicenceWithResubmissionTask.applicationTasks
+
+  return {
+    ...mockMarineLicenceWithResubmissionTask,
+    applicationTasks: [
+      siteNoticeTask,
+      {
+        ...resubmissionTask,
+        ...taskOverrides,
+        data: {
+          locations: resubmissionTask.data.locations.map((location) => ({
+            ...location,
+            closeUpPhoto: mockResubmittedPhoto(
+              `close-up-${location.locationNumber}.jpg`
+            ),
+            positionPhoto: mockResubmittedPhoto(
+              `position-${location.locationNumber}.jpg`
+            )
+          }))
+        }
+      }
+    ]
+  }
+}
+
+export const mockResubmittedMarineLicence = mockResubmissionWithAllPhotos({
+  resolvedAt: '2026-09-20T10:00:00.000Z',
+  resolvedByName: 'Sam Evans'
+})
+
 export const mockRedactions = {
   projectName: {
     redactedText: 'Harbour ***REDACTED*** works',

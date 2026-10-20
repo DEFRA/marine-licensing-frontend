@@ -62,7 +62,7 @@
     "aws-embedded-metrics": "^4.2.1",
     "chokidar": "3.6.0",
     "convict": "^6.2.5",
-    "cssnano": "^9.3.2",
+    "cssnano": "^9.8.0",
     "cssnano-preset-default": "^9.1.2",
     "date-fns": "^4.4.0",
     "dayjs": "^1.11.23",

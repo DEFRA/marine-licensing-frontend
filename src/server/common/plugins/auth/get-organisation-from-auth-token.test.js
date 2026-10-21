@@ -134,7 +134,7 @@ describe('#getOrganisationFromToken', () => {
           'e0dfefcf-f0f0-4383-b094-1da327083589:a1837c90-c8f2-4ac3-90b2-83df6145e3c5:XYZ Organisation:0:Agent:0'
         ],
         enrolmentCount: 1,
-        roles: ['e0dfefcf-f0f0-4383-b094-1da327083589:Consultee:1']
+        roles: ['e0dfefcf-f0f0-4383-b094-1da327083589:Consultee:3']
       })
 
       expect(result.userRoleType).toBe('Consultee')
@@ -158,6 +158,22 @@ describe('#getOrganisationFromToken', () => {
       expect(result.userRelationshipType).toBe('Agent')
       expect(result.userRoleType).toBe('Reviewer')
     })
+
+    test.each(['1', '2', '4', '5', '6', '7'])(
+      'When the Consultee role has status %s it is not approved',
+      (status) => {
+        const result = getOrganisationFromToken({
+          currentRelationshipId: 'f0239b00-0411-4dca-b5d7-a428f3e86982',
+          relationships: [
+            'f0239b00-0411-4dca-b5d7-a428f3e86982:f0239b00-0411-4dca-b5d7-a428f3e86982:Some Org:0:Employee:0'
+          ],
+          enrolmentCount: 1,
+          roles: [`f0239b00-0411-4dca-b5d7-a428f3e86982:Consultee:${status}`]
+        })
+
+        expect(result.userRoleType).toBeNull()
+      }
+    )
 
     test('When no role matches the current relationship', () => {
       const result = getOrganisationFromToken({

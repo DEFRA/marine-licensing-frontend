@@ -1,9 +1,12 @@
 import { createLogger } from '#src/server/common/helpers/logging/logger.js'
 import { USER_ROLE_TYPES } from '#src/server/common/constants/user-types.js'
 
+// 3 - Complete (approved)
+const ROLE_STATUS_APPROVED = '3'
+
 const parseRole = (role) => {
-  const [relationshipId, roleName] = role.split(':')
-  return { relationshipId, roleName }
+  const [relationshipId, roleName, status] = role.split(':')
+  return { relationshipId, roleName, status }
 }
 
 const getRoleName = (roles, currentRelationshipId) => {
@@ -11,7 +14,11 @@ const getRoleName = (roles, currentRelationshipId) => {
     .map(parseRole)
     .find(({ relationshipId }) => relationshipId === currentRelationshipId)
 
-  return role?.roleName ?? null
+  if (role?.status !== ROLE_STATUS_APPROVED) {
+    return null
+  }
+
+  return role.roleName
 }
 
 const defaultUserRelationshipType = 'Citizen'

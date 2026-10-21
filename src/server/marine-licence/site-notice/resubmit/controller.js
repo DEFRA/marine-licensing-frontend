@@ -1,9 +1,6 @@
 import Boom from '@hapi/boom'
-import {
-  apiRoutes,
-  marineLicenceRoutes
-} from '#src/server/common/constants/routes.js'
-import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { resolveApplicationTask } from '#src/server/common/helpers/marine-licence/application-tasks/resolve.js'
 import {
   isResubmissionComplete,
   loadResubmissionTask,
@@ -14,7 +11,7 @@ import { getViewDetailsUrl } from '#src/server/common/helpers/view-details/utils
 import { getEvidenceSubmission } from '#src/server/marine-licence/site-notice/display/utils.js'
 import { getResubmissionLocations } from '#src/server/marine-licence/site-notice/resubmit/utils.js'
 
-const SITE_NOTICE_RESUBMIT_VIEW_ROUTE =
+export const SITE_NOTICE_RESUBMIT_VIEW_ROUTE =
   'marine-licence/site-notice/resubmit/index'
 
 const siteNoticeResubmitSettings = {
@@ -76,14 +73,7 @@ export const siteNoticeResubmitSubmitController = {
       return h.redirect(resubmissionUrl(marineLicenceId, task.taskId))
     }
 
-    await authenticatedPostRequest(
-      request,
-      apiRoutes.RESOLVE_APPLICATION_TASK.replace(
-        '{marineLicenceId}',
-        marineLicenceId
-      ).replace('{taskId}', task.taskId),
-      {}
-    )
+    await resolveApplicationTask(request, marineLicenceId, task.taskId)
 
     return h.redirect(getViewDetailsUrl(marineLicenceId))
   }

@@ -11,6 +11,7 @@ import {
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { resolveApplicationTask } from '#src/server/common/helpers/marine-licence/application-tasks/resolve.js'
 import {
   getDisplayConditions,
   getEvidenceSubmission,
@@ -121,14 +122,7 @@ export const siteNoticeDisplaySubmitController = {
       return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
     }
 
-    await authenticatedPostRequest(
-      request,
-      apiRoutes.RESOLVE_APPLICATION_TASK.replace(
-        '{marineLicenceId}',
-        marineLicenceId
-      ).replace('{taskId}', task.taskId),
-      {}
-    )
+    await resolveApplicationTask(request, marineLicenceId, task.taskId)
 
     return h.redirect(getViewDetailsUrl(marineLicenceId))
   }

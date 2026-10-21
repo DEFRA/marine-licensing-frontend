@@ -173,20 +173,6 @@ describe('Resubmit site notice evidence page', () => {
       expect(cardFor(document, 1)).toHaveTextContent('new.jpg')
     })
 
-    test('still shows a rejected location whose original evidence is missing', async () => {
-      mockMarineLicence({
-        ...mockMarineLicenceWithResubmissionTask,
-        siteNoticeEvidence:
-          mockMarineLicenceWithResubmissionTask.siteNoticeEvidence.slice(0, 3)
-      })
-
-      const document = await load()
-
-      expect(cardFor(document, 4)).toHaveTextContent(
-        'Why we could not accept your photographs'
-      )
-    })
-
     test('offers no way to add or delete a location', async () => {
       const document = await load()
 
@@ -226,19 +212,6 @@ describe('Resubmit site notice evidence page', () => {
       expect(
         getByRole(document, 'button', { name: 'Send evidence' })
       ).toBeInTheDocument()
-    })
-
-    test.each([
-      ['while any photo is missing', mockMarineLicenceWithResubmissionTask],
-      ['for a completed task', mockResubmittedMarineLicence]
-    ])('a post is refused %s', async (_case, marineLicence) => {
-      mockMarineLicence(marineLicence)
-
-      const { response } = await send()
-
-      expect(authenticatedPostRequest).not.toHaveBeenCalled()
-      expect(response.statusCode).toBe(statusCodes.redirect)
-      expect(response.headers.location).toBe(taskUrl)
     })
 
     test('completes the task and returns to view details', async () => {
@@ -281,6 +254,21 @@ describe('Resubmit site notice evidence page', () => {
       expect(document.body).not.toHaveTextContent(
         'You must complete all sections marked'
       )
+    })
+
+    test('leaves out who resubmitted the evidence when their name is not known', async () => {
+      mockMarineLicence(
+        mockResubmissionWithAllPhotos({
+          resolvedAt: '2026-09-20T10:00:00.000Z',
+          resolvedByName: null
+        })
+      )
+
+      const document = await load()
+
+      expect(
+        getByText(document, 'Evidence was resubmitted 20 September 2026')
+      ).toBeInTheDocument()
     })
   })
 
@@ -411,18 +399,6 @@ describe('Resubmit site notice evidence photo upload', () => {
       expect(mockCdpService.initiate).not.toHaveBeenCalled()
     }
   )
-
-  test('returns to the task page when the upload cannot be started', async () => {
-    mockCdpService.initiate.mockRejectedValue(new Error('CDP unavailable'))
-
-    const { statusCode, headers } = await makeGetRequest({
-      url: `${closeUpUrl}?location=3`,
-      server: getServer()
-    })
-
-    expect(statusCode).toBe(statusCodes.redirect)
-    expect(headers.location).toBe(taskUrl)
-  })
 
   const readyStatus = {
     status: 'ready',

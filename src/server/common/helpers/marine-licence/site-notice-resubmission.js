@@ -5,22 +5,26 @@ import {
   getLocationIndex,
   loadMarineLicence
 } from '#src/server/common/helpers/marine-licence/site-notice.js'
-import { marineLicenceIdSchema } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
+import {
+  marineLicenceIdSchema,
+  taskIdSchema
+} from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
 import { getViewDetailsUrl } from '#src/server/common/helpers/view-details/utils.js'
-
-const TASK_ID_LENGTH = 24
 
 export const validateResubmissionParams = {
   validate: {
     params: joi.object({
       marineLicenceId: marineLicenceIdSchema,
-      taskId: joi.string().hex().length(TASK_ID_LENGTH).required()
+      taskId: taskIdSchema
     })
   }
 }
 
 export const resubmissionUrl = (marineLicenceId, taskId) =>
   `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_RESUBMIT}/${marineLicenceId}/${taskId}`
+
+export const resubmissionLocationUrl = (request) =>
+  `${resubmissionUrl(request.params.marineLicenceId, request.params.taskId)}#site-location-${getLocationIndex(request)}`
 
 export const resubmissionPhotoUrl = (route, request) => {
   const { marineLicenceId, taskId } = request.params

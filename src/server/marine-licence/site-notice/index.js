@@ -6,6 +6,9 @@ import { siteNoticePositionPhotoRoutes } from '#src/server/marine-licence/site-n
 import { siteNoticePhotoUploadAndWaitRoutes } from '#src/server/marine-licence/site-notice/photo-upload-and-wait/index.js'
 import { siteNoticeDeleteLocationRoutes } from '#src/server/marine-licence/site-notice/delete-location/index.js'
 import { siteNoticeResubmitRoutes } from '#src/server/marine-licence/site-notice/resubmit/index.js'
+import { siteNoticeResubmitCloseUpPhotoRoutes } from '#src/server/marine-licence/site-notice/resubmit/close-up-photo/index.js'
+import { siteNoticeResubmitPositionPhotoRoutes } from '#src/server/marine-licence/site-notice/resubmit/position-photo/index.js'
+import { siteNoticeResubmitPhotoUploadAndWaitRoutes } from '#src/server/marine-licence/site-notice/resubmit/photo-upload-and-wait/index.js'
 import { siteNoticePrintRoutes } from '#src/server/marine-licence/site-notice/print/index.js'
 
 export const siteNoticeRoutes = [
@@ -17,5 +20,8 @@ export const siteNoticeRoutes = [
   ...siteNoticePhotoUploadAndWaitRoutes,
   ...siteNoticeDeleteLocationRoutes,
   ...siteNoticeResubmitRoutes,
+  ...siteNoticeResubmitCloseUpPhotoRoutes,
+  ...siteNoticeResubmitPositionPhotoRoutes,
+  ...siteNoticeResubmitPhotoUploadAndWaitRoutes,
   ...siteNoticePrintRoutes
 ]

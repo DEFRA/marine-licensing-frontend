@@ -23,7 +23,7 @@
 
       {% if evidenceSubmission %}
         {{ govukInsetText({
-          text: "Evidence was submitted " + evidenceSubmission.resolvedAt + " by " + evidenceSubmission.resolvedByName
+          text: "Evidence was submitted " + evidenceSubmission.resolvedAt + ((" by " + evidenceSubmission.resolvedByName) if evidenceSubmission.resolvedByName else "")
         }) }}
       {% endif %}
 

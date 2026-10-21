@@ -435,6 +435,34 @@ describe('Site notice display page (marine licence)', () => {
       expect(authenticatedPostRequest).not.toHaveBeenCalled()
       expect(response.headers.location).toBe(displayUrl)
     })
+
+    test('leaves out who sent the evidence when their name is not known', async () => {
+      const siteNoticeTask = findSiteNoticeTask(
+        mockMarineLicenceWithApplicationTask
+      )
+      mockLicence({
+        ...mockMarineLicenceWithApplicationTask,
+        applicationTasks:
+          mockMarineLicenceWithApplicationTask.applicationTasks.map((task) =>
+            task === siteNoticeTask
+              ? {
+                  ...task,
+                  resolvedAt: '2026-10-05T10:00:00.000Z',
+                  resolvedByName: null
+                }
+              : task
+          )
+      })
+
+      const document = await loadPage({
+        requestUrl: displayUrl,
+        server: getServer()
+      })
+
+      expect(
+        getByText(document, 'Evidence was submitted 5 October 2026')
+      ).toBeInTheDocument()
+    })
   })
 
   describe('Add another location', () => {

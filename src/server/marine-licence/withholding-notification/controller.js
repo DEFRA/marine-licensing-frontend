@@ -5,9 +5,10 @@ import {
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import { authenticatedPostRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import { resolveApplicationTask } from '#src/server/common/helpers/marine-licence/application-tasks/resolve.js'
 import {
   marineLicenceIdSchema,
+  taskIdSchema,
   validateMarineLicenceIdParams
 } from '#src/server/common/helpers/marine-licence/validate-marine-licence-id-params.js'
 import {
@@ -75,7 +76,7 @@ export const withholdingNotificationSubmitController = {
       payload: joi.object({
         csrfToken: joi.string().allow(''),
         marineLicenceId: marineLicenceIdSchema,
-        taskId: joi.string().hex().length(24).required()
+        taskId: taskIdSchema
       }),
       failAction: (request, h) => {
         request.logger.warn(
@@ -89,11 +90,7 @@ export const withholdingNotificationSubmitController = {
     const { marineLicenceId, taskId } = request.payload
 
     try {
-      await authenticatedPostRequest(
-        request,
-        `/marine-licence/${marineLicenceId}/application-tasks/${taskId}/resolve`,
-        {}
-      )
+      await resolveApplicationTask(request, marineLicenceId, taskId)
     } catch (error) {
       request.logger.error(
         { err: error },

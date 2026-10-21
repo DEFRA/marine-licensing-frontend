@@ -9,12 +9,14 @@ import {
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import {
   validateAgentUserSession,
+  redirectConsulteeToConsultations,
   validateConsulteeUserSession,
   validateEmployeeUserSession,
   validateIndividualUserSession,
   validateTeamAdminSession
 } from '#src/server/common/helpers/user-session-validators.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import { USER_ROLE_TYPES } from '#src/server/common/constants/user-types.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
@@ -242,6 +244,37 @@ describe('#validateConsulteeUserSession', () => {
     const h = createMockH()
 
     const result = await validateConsulteeUserSession.method(request, h)
+
+    expect(h.redirect).not.toHaveBeenCalled()
+    expect(result).toBe(h.continue)
+  })
+})
+
+describe('#redirectConsulteeToConsultations', () => {
+  const createMockH = () => ({
+    redirect: vi.fn().mockReturnValue({
+      takeover: vi.fn().mockReturnValue({})
+    }),
+    continue: vi.fn()
+  })
+
+  test('redirects consultees to the consultations page', () => {
+    const request = {
+      auth: { credentials: { userRoleType: USER_ROLE_TYPES.CONSULTEE } }
+    }
+    const h = createMockH()
+
+    const result = redirectConsulteeToConsultations.method(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(routes.CONSULTATIONS)
+    expect(result).not.toBe(h.continue)
+  })
+
+  test('returns h.continue for everyone else', () => {
+    const request = { auth: { credentials: { userRoleType: null } } }
+    const h = createMockH()
+
+    const result = redirectConsulteeToConsultations.method(request, h)
 
     expect(h.redirect).not.toHaveBeenCalled()
     expect(result).toBe(h.continue)

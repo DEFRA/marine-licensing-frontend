@@ -100,6 +100,16 @@ export const validateConsulteeUserSession = {
   }
 }
 
+export const redirectConsulteeToConsultations = {
+  method: (request, h) => {
+    if (request.auth?.credentials?.userRoleType === USER_ROLE_TYPES.CONSULTEE) {
+      return h.redirect(routes.CONSULTATIONS).takeover()
+    }
+
+    return h.continue
+  }
+}
+
 export const validateTeamAdminSession = {
   method: (request) => {
     if (request.auth?.credentials?.isTeamAdmin !== true) {

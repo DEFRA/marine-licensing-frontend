@@ -5,7 +5,7 @@ export const dashboardRoutes = [
   {
     method: 'GET',
     path: routes.DASHBOARD,
-    handler: dashboardController.handler
+    ...dashboardController
   },
   {
     method: 'POST',

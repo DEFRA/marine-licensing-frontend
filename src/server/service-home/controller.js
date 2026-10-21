@@ -5,7 +5,7 @@ import {
 import { MCMS_LOGIN_URL } from '#src/server/common/constants/mcms.js'
 import { config } from '#src/config/config.js'
 import { clearMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { USER_ROLE_TYPES } from '#src/server/common/constants/user-types.js'
+import { redirectConsulteeToConsultations } from '#src/server/common/helpers/user-session-validators.js'
 
 export const SERVICE_HOME_VIEW_ROUTE = 'service-home/index'
 
@@ -41,11 +41,10 @@ const filteredCards = [
 ]
 
 export const serviceHomeController = {
+  options: {
+    pre: [redirectConsulteeToConsultations]
+  },
   async handler(request, h) {
-    if (request.auth?.credentials?.userRoleType === USER_ROLE_TYPES.CONSULTEE) {
-      return h.redirect(routes.CONSULTATIONS)
-    }
-
     const marineLicence = config.get('marineLicence')
 
     const displayCards = marineLicence.enabled

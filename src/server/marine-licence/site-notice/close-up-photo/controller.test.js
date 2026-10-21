@@ -1,5 +1,6 @@
 import {
   siteNoticeCloseUpPhotoController,
+  siteNoticeCloseUpPhotoSettings,
   SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE
 } from '#src/server/marine-licence/site-notice/close-up-photo/controller.js'
 import * as photoUpload from '#src/server/marine-licence/site-notice/utils.js'
@@ -15,13 +16,10 @@ const displayUrl = `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_DISPLAY}/${
 
 describe('#siteNoticeCloseUpPhotoController', () => {
   beforeEach(() => {
-    vi.spyOn(photoUpload, 'getPhotoUploadErrorDisplay').mockReturnValue({})
-    vi.spyOn(photoUpload, 'initiatePhotoUpload').mockResolvedValue({
-      uploadUrl: 'https://cdp/upload'
-    })
+    vi.spyOn(photoUpload, 'renderPhotoUploadPage').mockResolvedValue({})
   })
 
-  test('starts a close-up photo upload and renders the page', async () => {
+  test('renders the close-up photo upload for the location', async () => {
     const request = createMockRequest({
       marineLicence: mockMarineLicenceWithApplicationTask,
       params: { marineLicenceId },
@@ -31,21 +29,15 @@ describe('#siteNoticeCloseUpPhotoController', () => {
 
     await siteNoticeCloseUpPhotoController.handler(request, h)
 
-    expect(photoUpload.initiatePhotoUpload).toHaveBeenCalledWith(request, h, {
+    expect(photoUpload.renderPhotoUploadPage).toHaveBeenCalledWith(request, h, {
       field: 'closeUpPhoto',
-      uploadPageUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${marineLicenceId}?location=1`
+      viewRoute: SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE,
+      settings: siteNoticeCloseUpPhotoSettings,
+      uploadPageUrl: `${marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO}/${marineLicenceId}?location=1`,
+      backLink: `${displayUrl}#site-location-1`,
+      failureUrl: displayUrl,
+      logLabel: 'site notice close-up photo upload'
     })
-    expect(h.view).toHaveBeenCalledWith(
-      SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE,
-      expect.objectContaining({
-        heading: 'Close-up photo upload',
-        projectName: 'Test Project',
-        locationIndex: 1,
-        uploadUrl: 'https://cdp/upload',
-        acceptAttribute: photoUpload.PHOTO_ACCEPT_ATTRIBUTE,
-        backLink: `${displayUrl}#site-location-1`
-      })
-    )
   })
 
   test('redirects to view details when there is no site notice task', async () => {
@@ -63,27 +55,9 @@ describe('#siteNoticeCloseUpPhotoController', () => {
       h
     )
 
-    expect(photoUpload.initiatePhotoUpload).not.toHaveBeenCalled()
+    expect(photoUpload.renderPhotoUploadPage).not.toHaveBeenCalled()
     expect(h.redirect).toHaveBeenCalledWith(
       `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`
     )
-  })
-
-  test('redirects to the site notice page when the upload cannot be started', async () => {
-    vi.mocked(photoUpload.initiatePhotoUpload).mockRejectedValue(
-      new Error('CDP down')
-    )
-    const h = createMockH()
-
-    await siteNoticeCloseUpPhotoController.handler(
-      createMockRequest({
-        marineLicence: mockMarineLicenceWithApplicationTask,
-        params: { marineLicenceId },
-        query: { location: '1' }
-      }),
-      h
-    )
-
-    expect(h.redirect).toHaveBeenCalledWith(displayUrl)
   })
 })

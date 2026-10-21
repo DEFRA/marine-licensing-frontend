@@ -64,3 +64,42 @@ export const initiatePhotoUpload = async (
 
   return uploadConfig
 }
+
+export const renderPhotoUploadPage = async (
+  request,
+  h,
+  {
+    field,
+    viewRoute,
+    settings,
+    uploadPageUrl,
+    redirectUrl,
+    backLink,
+    failureUrl,
+    logLabel
+  }
+) => {
+  const { errorSummary, errors } = getPhotoUploadErrorDisplay(request)
+
+  try {
+    const { uploadUrl } = await initiatePhotoUpload(request, h, {
+      field,
+      uploadPageUrl,
+      redirectUrl
+    })
+
+    return h.view(viewRoute, {
+      ...settings,
+      projectName: request.marineLicence.projectName,
+      locationIndex: getLocationIndex(request),
+      uploadUrl,
+      acceptAttribute: PHOTO_ACCEPT_ATTRIBUTE,
+      backLink,
+      errorSummary,
+      errors
+    })
+  } catch (error) {
+    request.logger.error({ err: error }, `Failed to initialise ${logLabel}`)
+    return h.redirect(failureUrl)
+  }
+}

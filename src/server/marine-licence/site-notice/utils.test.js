@@ -1,9 +1,11 @@
 import {
   getPhotoUploadErrorDisplay,
   initiatePhotoUpload,
+  PHOTO_ACCEPT_ATTRIBUTE,
   PHOTO_FILE_TYPE_ERROR_MESSAGE,
   PHOTO_MAX_FILE_SIZE,
-  PHOTO_UPLOAD_SESSION_KEY
+  PHOTO_UPLOAD_SESSION_KEY,
+  renderPhotoUploadPage
 } from '#src/server/marine-licence/site-notice/utils.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -72,6 +74,68 @@ describe('site notice photo upload helpers', () => {
       )
 
       expect(errors.file.text).toBe(PHOTO_FILE_TYPE_ERROR_MESSAGE)
+    })
+  })
+
+  describe('#renderPhotoUploadPage', () => {
+    const pageOptions = {
+      field: 'positionPhoto',
+      viewRoute: 'photo-view',
+      settings: { heading: 'Photo upload' },
+      uploadPageUrl: '/upload-page',
+      redirectUrl: '/wait-page?location=3',
+      backLink: '/task#site-location-3',
+      failureUrl: '/task',
+      logLabel: 'test photo upload'
+    }
+
+    const buildRequest = () =>
+      createMockRequest({
+        marineLicence: { projectName: 'Test Project' },
+        params: { marineLicenceId: 'licence-id' },
+        query: { location: '3' },
+        yar: { get: vi.fn(), set: vi.fn(), commit: vi.fn() }
+      })
+
+    test('starts the upload and renders the photo page', async () => {
+      const initiate = vi.fn().mockResolvedValue({
+        uploadId: 'upload-id',
+        statusUrl: 'status-url',
+        uploadUrl: 'https://cdp/upload'
+      })
+      vi.mocked(getCdpUploadService).mockReturnValue({ initiate })
+      const h = createMockH()
+
+      await renderPhotoUploadPage(buildRequest(), h, pageOptions)
+
+      expect(initiate).toHaveBeenCalledWith(
+        expect.objectContaining({ redirectUrl: '/wait-page?location=3' })
+      )
+      expect(h.view).toHaveBeenCalledWith('photo-view', {
+        heading: 'Photo upload',
+        projectName: 'Test Project',
+        locationIndex: 3,
+        uploadUrl: 'https://cdp/upload',
+        acceptAttribute: PHOTO_ACCEPT_ATTRIBUTE,
+        backLink: '/task#site-location-3'
+      })
+    })
+
+    test('logs and redirects when the upload cannot be started', async () => {
+      const error = new Error('CDP down')
+      vi.mocked(getCdpUploadService).mockReturnValue({
+        initiate: vi.fn().mockRejectedValue(error)
+      })
+      const request = buildRequest()
+      const h = createMockH()
+
+      await renderPhotoUploadPage(request, h, pageOptions)
+
+      expect(request.logger.error).toHaveBeenCalledWith(
+        { err: error },
+        'Failed to initialise test photo upload'
+      )
+      expect(h.redirect).toHaveBeenCalledWith('/task')
     })
   })
 })

@@ -2,13 +2,10 @@ import { validateMarineLicenceIdParams } from '#src/server/common/helpers/marine
 import { getViewDetailsUrl } from '#src/server/common/helpers/view-details/utils.js'
 import {
   findSiteNoticeTask,
-  getLocationIndex,
   validateEvidenceParam
 } from '#src/server/common/helpers/marine-licence/site-notice.js'
 import {
-  getPhotoUploadErrorDisplay,
-  initiatePhotoUpload,
-  PHOTO_ACCEPT_ATTRIBUTE,
+  renderPhotoUploadPage,
   siteNoticeDisplayUrl,
   siteNoticeEvidenceUrl,
   siteNoticeLocationUrl
@@ -28,41 +25,24 @@ export const siteNoticeCloseUpPhotoController = {
     ...validateMarineLicenceIdParams,
     pre: [validateEvidenceParam]
   },
-  async handler(request, h) {
+  handler(request, h) {
     const { marineLicenceId } = request.params
-    const marineLicence = request.marineLicence
 
-    if (!findSiteNoticeTask(marineLicence)) {
+    if (!findSiteNoticeTask(request.marineLicence)) {
       return h.redirect(getViewDetailsUrl(marineLicenceId))
     }
 
-    const { errorSummary, errors } = getPhotoUploadErrorDisplay(request)
-
-    try {
-      const uploadConfig = await initiatePhotoUpload(request, h, {
-        field: 'closeUpPhoto',
-        uploadPageUrl: siteNoticeEvidenceUrl(
-          marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO,
-          request
-        )
-      })
-
-      return h.view(SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE, {
-        ...siteNoticeCloseUpPhotoSettings,
-        projectName: marineLicence.projectName,
-        locationIndex: getLocationIndex(request),
-        uploadUrl: uploadConfig.uploadUrl,
-        acceptAttribute: PHOTO_ACCEPT_ATTRIBUTE,
-        backLink: siteNoticeLocationUrl(request),
-        errorSummary,
-        errors
-      })
-    } catch (error) {
-      request.logger.error(
-        { err: error },
-        'Failed to initialise site notice close-up photo upload'
-      )
-      return h.redirect(siteNoticeDisplayUrl(marineLicenceId))
-    }
+    return renderPhotoUploadPage(request, h, {
+      field: 'closeUpPhoto',
+      viewRoute: SITE_NOTICE_CLOSE_UP_PHOTO_VIEW_ROUTE,
+      settings: siteNoticeCloseUpPhotoSettings,
+      uploadPageUrl: siteNoticeEvidenceUrl(
+        marineLicenceRoutes.MARINE_LICENCE_SITE_NOTICE_CLOSE_UP_PHOTO,
+        request
+      ),
+      backLink: siteNoticeLocationUrl(request),
+      failureUrl: siteNoticeDisplayUrl(marineLicenceId),
+      logLabel: 'site notice close-up photo upload'
+    })
   }
 }

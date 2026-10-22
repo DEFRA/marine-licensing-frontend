@@ -5,6 +5,9 @@ import { setupTestServer } from '~/tests/integration/shared/test-setup-helpers.j
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { config } from '~/src/config/config.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { USER_ROLE_TYPES } from '#src/server/common/constants/user-types.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 describe('Service Home', () => {
   const getServer = setupTestServer()
@@ -14,6 +17,17 @@ describe('Service Home', () => {
       requestUrl: routes.SERVICE_HOME,
       server: getServer()
     })
+
+  test('redirects consultees to the consultations page', async () => {
+    const response = await makeGetRequest({
+      url: routes.SERVICE_HOME,
+      server: getServer(),
+      auth: { credentials: { userRoleType: USER_ROLE_TYPES.CONSULTEE } }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(routes.CONSULTATIONS)
+  })
 
   describe('when marine licence is disabled', () => {
     test('should render cards without Apply for Marine Licence tile and correct layout', async () => {

@@ -3,16 +3,20 @@ import { routes } from '#src/server/common/constants/routes.js'
 import {
   agentSession,
   citizenUserSession,
+  consulteeSession,
   employeeSession
 } from '~/tests/integration/shared/session-fixtures.js'
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import {
   validateAgentUserSession,
+  redirectConsulteeToConsultations,
+  validateConsulteeUserSession,
   validateEmployeeUserSession,
   validateIndividualUserSession,
   validateTeamAdminSession
 } from '#src/server/common/helpers/user-session-validators.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
+import { USER_ROLE_TYPES } from '#src/server/common/constants/user-types.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
@@ -193,6 +197,84 @@ describe('#validateIndividualUserSession', () => {
     const h = createMockH()
 
     const result = await validateIndividualUserSession.method(request, h)
+
+    expect(h.redirect).not.toHaveBeenCalled()
+    expect(result).toBe(h.continue)
+  })
+})
+
+describe('#validateConsulteeUserSession', () => {
+  const createMockH = () => ({
+    redirect: vi.fn().mockReturnValue({
+      takeover: vi.fn().mockReturnValue({})
+    }),
+    continue: vi.fn()
+  })
+
+  beforeEach(() => {
+    vi.mocked(getUserSession).mockResolvedValue(consulteeSession)
+  })
+
+  test('redirects to sign-in when userSession does not exist', async () => {
+    vi.mocked(getUserSession).mockResolvedValue({})
+
+    const request = createMockRequest()
+    const h = createMockH()
+
+    const result = await validateConsulteeUserSession.method(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(routes.SIGNIN)
+    expect(result).not.toBe(h.continue)
+  })
+
+  test('redirects to correct page when role is not Consultee', async () => {
+    vi.mocked(getUserSession).mockResolvedValue(employeeSession)
+
+    const request = createMockRequest()
+    const h = createMockH()
+
+    const result = await validateConsulteeUserSession.method(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(routes.SERVICE_HOME)
+    expect(result).not.toBe(h.continue)
+  })
+
+  test('returns h.continue when userSession is correct', async () => {
+    const request = createMockRequest()
+    const h = createMockH()
+
+    const result = await validateConsulteeUserSession.method(request, h)
+
+    expect(h.redirect).not.toHaveBeenCalled()
+    expect(result).toBe(h.continue)
+  })
+})
+
+describe('#redirectConsulteeToConsultations', () => {
+  const createMockH = () => ({
+    redirect: vi.fn().mockReturnValue({
+      takeover: vi.fn().mockReturnValue({})
+    }),
+    continue: vi.fn()
+  })
+
+  test('redirects consultees to the consultations page', () => {
+    const request = {
+      auth: { credentials: { userRoleType: USER_ROLE_TYPES.CONSULTEE } }
+    }
+    const h = createMockH()
+
+    const result = redirectConsulteeToConsultations.method(request, h)
+
+    expect(h.redirect).toHaveBeenCalledWith(routes.CONSULTATIONS)
+    expect(result).not.toBe(h.continue)
+  })
+
+  test('returns h.continue for everyone else', () => {
+    const request = { auth: { credentials: { userRoleType: null } } }
+    const h = createMockH()
+
+    const result = redirectConsulteeToConsultations.method(request, h)
 
     expect(h.redirect).not.toHaveBeenCalled()
     expect(result).toBe(h.continue)

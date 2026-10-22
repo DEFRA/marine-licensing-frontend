@@ -1,4 +1,7 @@
-import { USER_TYPES } from '#src/server/common/constants/user-types.js'
+import {
+  USER_ROLE_TYPES,
+  USER_TYPES
+} from '#src/server/common/constants/user-types.js'
 
 const displayName = 'Test User'
 
@@ -36,6 +39,12 @@ export const agentSession = {
   userRelationshipType: 'Agent',
   organisationName: 'Client Org',
   shouldShowOrgOrUserName: false
+}
+
+export const consulteeSession = {
+  ...employeeSession,
+  userRoleType: USER_ROLE_TYPES.CONSULTEE,
+  organisationName: 'Consultee Org'
 }
 
 export const agentSessionWithMultipleOrgs = {

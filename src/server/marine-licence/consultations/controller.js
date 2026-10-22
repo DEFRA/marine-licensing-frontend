@@ -16,6 +16,15 @@ export const consultationsController = {
     try {
       const consultations = await fetchConsultations(request)
 
+      request.logger.info(
+        {
+          tenant: {
+            message: JSON.stringify(consultations)
+          }
+        },
+        'Consultations'
+      )
+
       return h.view(CONSULTATIONS_VIEW_ROUTE, {
         pageTitle: CONSULTATIONS_PAGE_TITLE,
         heading: CONSULTATIONS_PAGE_TITLE,

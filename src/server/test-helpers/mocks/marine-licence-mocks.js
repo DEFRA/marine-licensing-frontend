@@ -620,3 +620,20 @@ export const mockPolygonMarineLicence = {
     }
   ]
 }
+
+export const mockConsultations = [
+  {
+    projectName: 'Harbour wall repair',
+    consultationType: 'APPLICATION_NOTIFICATION',
+    applicationReference: 'MLA/2026/10001',
+    consultationStatus: 'RESPONSE_NEEDED',
+    consultationStartDate: '2026-10-01T09:00:00.000Z'
+  },
+  {
+    projectName: 'Slipway extension',
+    consultationType: 'REQUEST_FOR_ADVICE',
+    applicationReference: 'MLA/2026/10002',
+    consultationStatus: 'NO_RESPONSE_NEEDED',
+    consultationStartDate: '2026-10-12T09:00:00.000Z'
+  }
+]

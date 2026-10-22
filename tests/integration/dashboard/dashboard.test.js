@@ -26,6 +26,9 @@ import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { EXEMPTION_TYPE } from '#src/server/common/constants/exemptions.js'
 import { MARINE_LICENCE_TYPE } from '#src/server/common/constants/marine-licence.js'
 import { mockDashboardServerResponse } from '#src/server/test-helpers/mocks/dashboard.js'
+import { USER_ROLE_TYPES } from '#src/server/common/constants/user-types.js'
+import { statusCodes } from '#src/server/common/constants/status-codes.js'
+import { authenticatedPostRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
@@ -101,6 +104,23 @@ describe('Dashboard', () => {
       submittedAt: '2025-10-23T12:00:00.000Z'
     }
   ]
+
+  it('should redirect consultees to the consultations page', async () => {
+    const response = await makeGetRequest({
+      url: routes.DASHBOARD,
+      server: getServer(),
+      auth: {
+        credentials: {
+          ...employeeSession,
+          userRoleType: USER_ROLE_TYPES.CONSULTEE
+        }
+      }
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(routes.CONSULTATIONS)
+    expect(authenticatedPostRequest).not.toHaveBeenCalled()
+  })
 
   it('should render the dashboard page title, heading and Create button', async () => {
     mockExemptions(mockDashboardServerResponse(exemptions))

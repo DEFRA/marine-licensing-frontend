@@ -215,6 +215,7 @@ export const routes = {
   SIGN_OUT: '/sign-out',
   CHANGE_ORGANISATION: '/change-organisation',
   DASHBOARD: '/submissions',
+  CONSULTATIONS: '/consultations',
   SERVICE_HOME: '/home',
   COOKIES: '/help/cookies',
   PRIVACY: '/help/privacy',
@@ -284,5 +285,6 @@ export const apiRoutes = {
   ADD_SITE_NOTICE_EVIDENCE: '/marine-licence/add-site-notice-evidence',
   DELETE_SITE_NOTICE_EVIDENCE: '/marine-licence/delete-site-notice-evidence',
   UPDATE_SITE_NOTICE_RESUBMISSION:
-    '/marine-licence/update-site-notice-resubmission'
+    '/marine-licence/update-site-notice-resubmission',
+  GET_CONSULTATIONS: '/marine-licence/consultations'
 }

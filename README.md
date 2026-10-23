@@ -29,7 +29,7 @@ ability to create licence exemption notifications.
 
 ## Prerequisites
 
-This project targets **Node.js 24** to align with the [CDP Node.js frontend template](https://github.com/DEFRA/cdp-node-frontend-template). The required version is pinned in [.nvmrc](./.nvmrc) (`v24.14.1`); minimum versions are also listed in [package.json](./package.json) `engines`.
+This project targets **Node.js 24** to align with the [CDP Node.js frontend template](https://github.com/DEFRA/cdp-node-frontend-template). The required version is pinned in [.nvmrc](./.nvmrc) (`v24.22.1`); minimum versions are also listed in [package.json](./package.json) `engines`.
 
 - [Node.js](http://nodejs.org/) 24.x
 - [npm](https://nodejs.org/) (bundled with Node.js)

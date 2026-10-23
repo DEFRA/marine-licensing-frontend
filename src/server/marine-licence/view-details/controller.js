@@ -18,6 +18,7 @@ import {
 } from '#src/server/common/validation/fee-estimate/constants.js'
 import { buildApplicationTasks } from '#src/server/common/helpers/marine-licence/application-tasks/build.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
+import { isConsulteeUser } from '#src/server/common/helpers/user-session-utils.js'
 
 export const VIEW_DETAILS_VIEW_ROUTE = 'marine-licence/view-details/index'
 
@@ -38,15 +39,24 @@ const getApplicantBackLink = (status, marineLicenceId) => {
   return routes.DASHBOARD
 }
 
+const getServiceMethod = ({ isPublicView, isConsulteeView }) => {
+  if (isPublicView) {
+    return 'getPublicMarineLicenceById'
+  }
+
+  if (isConsulteeView) {
+    return 'getConsultationMarineLicenceById'
+  }
+
+  return 'getMarineLicenceById'
+}
+
 const fetchViewableMarineLicence = async (
   request,
   marineLicenceId,
-  isPublicView
+  serviceMethod
 ) => {
   const service = getMarineLicenceService(request)
-  const serviceMethod = isPublicView
-    ? 'getPublicMarineLicenceById'
-    : 'getMarineLicenceById'
   const marineLicence = await service[serviceMethod](marineLicenceId)
 
   if (!isProjectViewable(marineLicence)) {
@@ -123,13 +133,15 @@ export const viewDetailsController = {
       marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS_PUBLIC
     )
 
-    const isApplicantView = !isPublicView
+    const isConsulteeView = isConsulteeUser(request)
+
+    const isApplicantView = !isPublicView && !isConsulteeView
 
     try {
       const marineLicence = await fetchViewableMarineLicence(
         request,
         marineLicenceId,
-        isPublicView
+        getServiceMethod({ isPublicView, isConsulteeView })
       )
 
       const viewModel = await buildViewModel({

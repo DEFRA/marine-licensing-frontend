@@ -4,7 +4,10 @@ import {
   formatConsultationsForDisplay,
   getConsultationStatusCell
 } from './utils.js'
-import { apiRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceConsultationDetailsRoutes
+} from '#src/server/common/constants/routes.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { mockConsultations } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
@@ -38,6 +41,7 @@ describe('#formatConsultationsForDisplay', () => {
   test('Should format a consultation with all fields', () => {
     const result = formatConsultationsForDisplay([
       {
+        id: 'test-consultation-id',
         projectName: 'Test Project',
         consultationType: 'REQUEST_FOR_ADVICE',
         applicationReference: 'MLA/2026/10001',
@@ -46,9 +50,17 @@ describe('#formatConsultationsForDisplay', () => {
       }
     ])
 
+    const expectedLink =
+      marineLicenceConsultationDetailsRoutes.MARINE_LICENCE_CONSULTATION_DETAILS.replace(
+        '{marineLicenceId}',
+        'test-consultation-id'
+      )
+
     expect(result).toEqual([
       [
-        { text: 'Test Project' },
+        {
+          html: `<a href="${expectedLink}" class="govuk-link govuk-link--no-visited-state">Test Project</a>`
+        },
         { text: 'Request for advice' },
         { text: 'MLA/2026/10001' },
         {
@@ -61,16 +73,24 @@ describe('#formatConsultationsForDisplay', () => {
 
   test('Should show placeholders when type, reference, status and date are missing', () => {
     const [cells] = formatConsultationsForDisplay([
-      { projectName: 'Test Project' }
+      { id: 'test-id', projectName: 'Test Project' }
     ])
 
-    expect(cells).toEqual([
-      { text: 'Test Project' },
+    expect(cells.slice(1)).toEqual([
       { text: '-' },
       { text: '-' },
       { text: '-' },
       { text: '-' }
     ])
+  })
+
+  test('Should escape the project name in the link', () => {
+    const [[nameCell]] = formatConsultationsForDisplay([
+      { id: 'test-id', projectName: '<script>alert(1)</script>' }
+    ])
+
+    expect(nameCell.html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;')
+    expect(nameCell.html).not.toContain('<script>')
   })
 
   test('Should return an empty array when there are no consultations', () => {

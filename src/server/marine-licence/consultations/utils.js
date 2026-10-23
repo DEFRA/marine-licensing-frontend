@@ -1,6 +1,10 @@
 import { formatDate } from '#src/config/nunjucks/filters/format-date.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import { apiRoutes } from '#src/server/common/constants/routes.js'
+import escapeHtml from 'lodash/escape.js'
+import {
+  apiRoutes,
+  marineLicenceConsultationDetailsRoutes
+} from '#src/server/common/constants/routes.js'
 import {
   CONSULTATION_STATUS,
   CONSULTATION_TYPE
@@ -30,7 +34,12 @@ export const getConsultationStatusCell = (status) => {
 
 export const formatConsultationsForDisplay = (consultations) =>
   consultations.map((consultation) => [
-    { text: consultation.projectName },
+    {
+      html: `<a href="${marineLicenceConsultationDetailsRoutes.MARINE_LICENCE_CONSULTATION_DETAILS.replace(
+        '{marineLicenceId}',
+        consultation.id
+      )}" class="govuk-link govuk-link--no-visited-state">${escapeHtml(consultation.projectName)}</a>`
+    },
     { text: CONSULTATION_TYPE[consultation.consultationType] || '-' },
     { text: consultation.applicationReference || '-' },
     getConsultationStatusCell(consultation.consultationStatus),

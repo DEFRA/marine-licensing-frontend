@@ -380,6 +380,45 @@ describe('MarineLicenceService', () => {
     })
   })
 
+  describe('getConsultationMarineLicenceById', () => {
+    const validId = '507f1f77bcf86cd799439011'
+
+    beforeEach(() => {
+      service = new MarineLicenceService(mockRequest, mockLogger)
+    })
+
+    test('should return marine licence data using the consultation endpoint', async () => {
+      const expectedMarineLicence = {
+        id: validId,
+        projectName: 'Test Project',
+        applicationReference: 'ML/2024/12345'
+      }
+
+      vi.mocked(authenticatedGetRequest).mockResolvedValue({
+        payload: { message: 'success', value: expectedMarineLicence }
+      })
+
+      const result = await service.getConsultationMarineLicenceById(validId)
+
+      expect(authenticatedGetRequest).toHaveBeenCalledWith(
+        mockRequest,
+        `/marine-licence/consultation/${validId}/details`
+      )
+      expect(result).toEqual(expectedMarineLicence)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
+    test('should throw when API response is not successful', async () => {
+      vi.mocked(authenticatedGetRequest).mockResolvedValue({
+        payload: { message: 'error', value: null }
+      })
+
+      await expect(
+        service.getConsultationMarineLicenceById(validId)
+      ).rejects.toThrow(errorMessages.MARINE_LICENCE_DATA_NOT_FOUND)
+    })
+  })
+
   describe('saveRedaction', () => {
     const validId = '507f1f77bcf86cd799439011'
 

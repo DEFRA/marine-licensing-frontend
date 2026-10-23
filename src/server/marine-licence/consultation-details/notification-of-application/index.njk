@@ -1,0 +1,31 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <span class="govuk-caption-l">{{ projectName }}</span>
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+    <p class="govuk-body">
+      <a href="{{ viewApplicationLink }}" class="govuk-link govuk-link--no-visited-state" target="_blank" rel="noopener noreferrer">View the application (opens in new tab)</a>
+    </p>
+
+    <h2 class="govuk-heading-m">If you need to respond</h2>
+
+    <p class="govuk-body">
+      <a href="#" class="govuk-link govuk-link--no-visited-state">Respond to the notification</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

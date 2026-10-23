@@ -187,6 +187,15 @@ export const marineLicenceRoutes = {
     '/marine-licence/marine-plan-policy/{policyCode}'
 }
 
+export const marineLicenceConsultationDetailsRoutes = {
+  MARINE_LICENCE_CONSULTATION_DETAILS:
+    '/marine-licence/consultation-details/{marineLicenceId}',
+  MARINE_LICENCE_NOTIFICATION_OF_APPLICATION:
+    '/marine-licence/notification-of-application/{marineLicenceId}',
+  MARINE_LICENCE_REQUEST_FOR_ADVICE:
+    '/marine-licence/request-for-advice/{marineLicenceId}'
+}
+
 export const defraIdGuidanceRoutes = {
   WHO_IS_EXEMPTION_FOR: '/guidance/who-is-the-exemption-for',
   CHECK_SETUP_EMPLOYEE: '/guidance/check-setup-employee',
@@ -284,6 +293,7 @@ export const apiRoutes = {
   UPDATE_SITE_NOTICE_EVIDENCE: '/marine-licence/update-site-notice-evidence',
   ADD_SITE_NOTICE_EVIDENCE: '/marine-licence/add-site-notice-evidence',
   DELETE_SITE_NOTICE_EVIDENCE: '/marine-licence/delete-site-notice-evidence',
+  GET_CONSULTATION: '/marine-licence/consultation/{marineLicenceId}',
   UPDATE_SITE_NOTICE_RESUBMISSION:
     '/marine-licence/update-site-notice-resubmission',
   GET_CONSULTATIONS: '/marine-licence/consultations'

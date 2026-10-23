@@ -9,8 +9,31 @@ import { apiRoutes } from '#src/server/common/constants/routes.js'
 const apiPaths = {
   getMarineLicence: (id) => `/marine-licence/${id}`,
   getPublicMarineLicence: (id) => `/public/marine-licence/${id}`,
+  getConsultationMarineLicence: (id) =>
+    `/marine-licence/consultation/${id}/details`,
   getMarineLicenceByReference: (applicationReference) =>
     `/marine-licence/applicationReference/${applicationReference}`
+}
+
+const getEndpoint = ({
+  id,
+  applicationReference,
+  isPublic,
+  isConsultation
+}) => {
+  if (applicationReference) {
+    return apiPaths.getMarineLicenceByReference(applicationReference)
+  }
+
+  if (isPublic) {
+    return apiPaths.getPublicMarineLicence(id)
+  }
+
+  if (isConsultation) {
+    return apiPaths.getConsultationMarineLicence(id)
+  }
+
+  return apiPaths.getMarineLicence(id)
 }
 
 export class MarineLicenceService {
@@ -27,11 +50,20 @@ export class MarineLicenceService {
     return this.getMarineLicenceData({ id, isPublic: true })
   }
 
+  async getConsultationMarineLicenceById(id) {
+    return this.getMarineLicenceData({ id, isConsultation: true })
+  }
+
   async getMarineLicenceByReference(applicationReference) {
     return this.getMarineLicenceData({ applicationReference })
   }
 
-  async getMarineLicenceData({ id, applicationReference, isPublic = false }) {
+  async getMarineLicenceData({
+    id,
+    applicationReference,
+    isPublic = false,
+    isConsultation = false
+  }) {
     if (!id && !applicationReference) {
       this.logger.error(
         {
@@ -46,14 +78,12 @@ export class MarineLicenceService {
       throw new Error(errorMessages.MARINE_LICENCE_NOT_FOUND)
     }
 
-    let endpoint
-    if (applicationReference) {
-      endpoint = apiPaths.getMarineLicenceByReference(applicationReference)
-    } else if (isPublic) {
-      endpoint = apiPaths.getPublicMarineLicence(id)
-    } else {
-      endpoint = apiPaths.getMarineLicence(id)
-    }
+    const endpoint = getEndpoint({
+      id,
+      applicationReference,
+      isPublic,
+      isConsultation
+    })
 
     const { payload } = await authenticatedGetRequest(this.request, endpoint)
 

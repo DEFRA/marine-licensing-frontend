@@ -5,6 +5,7 @@ import {
   USER_TYPES
 } from '#src/server/common/constants/user-types.js'
 import Boom from '@hapi/boom'
+import { isConsulteeUser } from '#src/server/common/helpers/user-session-utils.js'
 
 export const validateSessionExists = (userSession, h) => {
   if (!userSession?.displayName) {
@@ -102,7 +103,7 @@ export const validateConsulteeUserSession = {
 
 export const redirectConsulteeToConsultations = {
   method: (request, h) => {
-    if (request.auth?.credentials?.userRoleType === USER_ROLE_TYPES.CONSULTEE) {
+    if (isConsulteeUser(request)) {
       return h.redirect(routes.CONSULTATIONS).takeover()
     }
 

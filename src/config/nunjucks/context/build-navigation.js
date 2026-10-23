@@ -2,7 +2,7 @@ import { config } from '#src/config/config.js'
 import { routes } from '#src/server/common/constants/routes.js'
 import { AUTH_STRATEGIES } from '#src/server/common/constants/auth.js'
 import { getAuthProvider } from '#src/server/common/helpers/authenticated-requests.js'
-import { USER_ROLE_TYPES } from '#src/server/common/constants/user-types.js'
+import { isConsulteeUser } from '#src/server/common/helpers/user-session-utils.js'
 
 const getNavItem = (request, text, href) => ({
   text,
@@ -16,10 +16,7 @@ export const buildNavigation = (request) => {
   const authProvider = getAuthProvider(request)
 
   if (authProvider === AUTH_STRATEGIES.DEFRA_ID) {
-    const isConsultee =
-      request?.auth?.credentials?.userRoleType === USER_ROLE_TYPES.CONSULTEE
-
-    const primaryItems = isConsultee
+    const primaryItems = isConsulteeUser(request)
       ? [getNavItem(request, 'Consultations', routes.CONSULTATIONS)]
       : [
           getNavItem(request, 'Home', routes.SERVICE_HOME),

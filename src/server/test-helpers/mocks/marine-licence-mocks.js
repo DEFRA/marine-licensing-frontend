@@ -623,6 +623,7 @@ export const mockPolygonMarineLicence = {
 
 export const mockConsultations = [
   {
+    id: '6a1b2c3d4e5f6a7b8c9d0e1f',
     projectName: 'Harbour wall repair',
     consultationType: 'APPLICATION_NOTIFICATION',
     applicationReference: 'MLA/2026/10001',
@@ -630,6 +631,7 @@ export const mockConsultations = [
     consultationStartDate: '2026-10-01T09:00:00.000Z'
   },
   {
+    id: '6a1b2c3d4e5f6a7b8c9d0e2f',
     projectName: 'Slipway extension',
     consultationType: 'REQUEST_FOR_ADVICE',
     applicationReference: 'MLA/2026/10002',

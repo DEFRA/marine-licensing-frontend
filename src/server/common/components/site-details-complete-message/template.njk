@@ -1,0 +1,10 @@
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% set completeMessageText %}
+  <p class="govuk-!-margin-bottom-0">The site details you've provided are saved.</p>
+  <p class="govuk-!-margin-bottom-0">You can return to this page and make changes at any time before you send your information.</p>
+{% endset %}
+
+{{ govukInsetText({
+  html: completeMessageText
+}) }}

@@ -11,10 +11,12 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
+import { mockActivityDetailsDeposit } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   getRowByKey,
   getSiteDetailsCard,
   validateActivityDetailsCards,
+  validateIncompleteWarning,
   validateMultipleSites,
   validateNavigationElements,
   validatePageStructure,
@@ -67,6 +69,34 @@ describe('ML Review Site Details - Polygon Coordinates Integration Tests', () =>
       }
     }
   )
+
+  describe('inset text', () => {
+    const withActivity = (activity) => ({
+      ...testScenarios[0].marineLicence,
+      siteDetails: [
+        {
+          ...testScenarios[0].marineLicence.siteDetails[0],
+          activityDetails: [activity]
+        }
+      ]
+    })
+
+    test('shows the incomplete warning when an activity field is missing', async () => {
+      const document = await getPageDocument(
+        withActivity({ ...mockActivityDetailsDeposit, workingHours: '' })
+      )
+
+      validateIncompleteWarning(document, { hasIncompleteWarning: true })
+    })
+
+    test('shows the complete message when nothing is incomplete', async () => {
+      const document = await getPageDocument(
+        withActivity(mockActivityDetailsDeposit)
+      )
+
+      validateIncompleteWarning(document, { hasIncompleteWarning: false })
+    })
+  })
 
   describe('back link', () => {
     test('should point to check your answers when from=check-your-answers', async () => {

@@ -125,9 +125,9 @@ describe('Dashboard', () => {
   it('should render the dashboard page title, heading and Create button', async () => {
     mockExemptions(mockDashboardServerResponse(exemptions))
     const doc = await loadDashboardPage()
-    expect(getByRole(doc, 'heading', { level: 1 })).toHaveTextContent(
-      'Submissions'
-    )
+    const heading = getByRole(doc, 'heading', { level: 1 })
+    expect(heading.textContent.trim()).toBe('Submissions')
+    expect(heading.querySelector('.govuk-caption-l')).toBeNull()
   })
 
   it('should render a draft exemption', async () => {

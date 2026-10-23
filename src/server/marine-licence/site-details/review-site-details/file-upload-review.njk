@@ -6,6 +6,7 @@
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% from "incomplete-field/macro.njk" import appIncompleteField %}
 {% from "incomplete-fields-warning/macro.njk" import appIncompleteFieldsWarning %}
+{% from "site-details-complete-message/macro.njk" import appSiteDetailsCompleteMessage %}
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% from "marine-licence/construction-drawing-card/macro.njk" import appMarineLicenceConstructionDrawingCard %}
 {% from "finished-site-details-question/macro.njk" import appFinishedSiteDetailsQuestion %}
@@ -37,6 +38,8 @@
 
             {% if hasIncompleteFields %}
               {{ appIncompleteFieldsWarning() }}
+            {% else %}
+              {{ appSiteDetailsCompleteMessage() }}
             {% endif %}
 
             {% set multipleSiteRows = [

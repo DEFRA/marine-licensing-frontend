@@ -24,6 +24,7 @@ describe('Before you start site details page (exemption)', () => {
     request: () =>
       makeGetRequest({ server: getServer(), url: routes.SITE_DETAILS }),
     projectName: mockExemptionData.projectName,
+    heading: 'Site details',
     navLinks: {
       continueHref: '/exemption/how-do-you-want-to-provide-the-coordinates',
       backHref: '/exemption/task-list'

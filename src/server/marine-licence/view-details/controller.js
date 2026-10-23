@@ -93,9 +93,7 @@ const buildViewModel = async ({
     coordinatesType,
     summaryData,
     isReadOnly: true,
-    pageCaption: isApplicantView
-      ? `${marineLicence.applicationReference} - Marine licence`
-      : marineLicence.applicationReference,
+    pageCaption: marineLicence.applicationReference,
     backLink: isApplicantView
       ? getApplicantBackLink(marineLicence.status, marineLicenceId)
       : null,

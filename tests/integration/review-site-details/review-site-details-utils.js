@@ -53,11 +53,15 @@ export const getRowByKey = (card, keyText) => {
   })
 }
 
+const completeMessage =
+  'You can return to this page and make changes at any time before you send your information.'
+
 export const validateIncompleteWarning = (document, expected) => {
+  expect(
+    getByText(document, "The site details you've provided are saved.")
+  ).toBeInTheDocument()
+
   if (expected.hasIncompleteWarning) {
-    expect(
-      getByText(document, "The site details you've provided are saved.")
-    ).toBeInTheDocument()
     expect(
       getByText(document, /You must complete all sections marked/i)
     ).toBeInTheDocument()
@@ -67,9 +71,11 @@ export const validateIncompleteWarning = (document, expected) => {
         'If you cannot finish now, you can return to this page later.'
       )
     ).toBeInTheDocument()
+    expect(queryByText(document, completeMessage)).not.toBeInTheDocument()
   } else {
+    expect(getByText(document, completeMessage)).toBeInTheDocument()
     expect(
-      queryByText(document, "The site details you've provided are saved.")
+      queryByText(document, /You must complete all sections marked/i)
     ).not.toBeInTheDocument()
   }
 }

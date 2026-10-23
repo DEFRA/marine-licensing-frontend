@@ -5,6 +5,7 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 export function sharedBeforeYouStartSiteDetailsTests({
   request,
   projectName,
+  heading,
   navLinks,
   projectType
 }) {
@@ -15,9 +16,10 @@ export function sharedBeforeYouStartSiteDetailsTests({
 
     const { document } = new JSDOM(result).window
 
-    expect(
-      getByRole(document, 'heading', { name: 'Site details' })
-    ).toBeInTheDocument()
+    expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
+      heading
+    )
+    expect(document.title).toContain(heading)
     expect(getByText(document, projectName)).toBeInTheDocument()
 
     expect(

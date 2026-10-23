@@ -138,7 +138,7 @@ describe('taskList utils', () => {
           status: { text: 'Completed' },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Site details'
+            text: 'Sites and activities'
           }
         }
       ])
@@ -155,7 +155,7 @@ describe('taskList utils', () => {
           },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Site details'
+            text: 'Sites and activities'
           }
         }
       ])
@@ -172,7 +172,7 @@ describe('taskList utils', () => {
             },
             title: {
               classes: 'govuk-link--no-visited-state',
-              text: 'Site details'
+              text: 'Sites and activities'
             }
           }
         ])

@@ -25,7 +25,7 @@ const toPolicyRow = (responses) => (policy) => ({
   href: getMarinePlanPolicyLink(policy.policyCode),
   status: isCompleted(responses, policy.policyCode)
     ? { text: 'Completed' }
-    : { tag: { text: 'Not yet started', classes: 'govuk-tag--blue' } }
+    : { tag: { text: 'Incomplete', classes: 'govuk-tag--red' } }
 })
 
 const countCompleted = (policies, responses) =>

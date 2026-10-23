@@ -34,11 +34,11 @@ describe('#marinePlanPoliciesController', () => {
     }
   ]
 
-  const notYetStarted = {
-    tag: { text: 'Not yet started', classes: 'govuk-tag--blue' }
+  const incomplete = {
+    tag: { text: 'Incomplete', classes: 'govuk-tag--red' }
   }
 
-  const row = (policyCode, text, status = notYetStarted) => ({
+  const row = (policyCode, text, status = incomplete) => ({
     title: { text, classes: 'govuk-link--no-visited-state' },
     href: getMarinePlanPolicyLink(policyCode),
     status
@@ -79,7 +79,7 @@ describe('#marinePlanPoliciesController', () => {
     expect(request.yar.flash).not.toHaveBeenCalled()
   })
 
-  test('renders policies as "title (code)" rows under alphabetical section headings, sorted by code, all "Not yet started"', async () => {
+  test('renders policies as "title (code)" rows under alphabetical section headings, sorted by code, all "Incomplete"', async () => {
     const h = { view: vi.fn() }
 
     await marinePlanPoliciesController.handler(mockRequest, h)

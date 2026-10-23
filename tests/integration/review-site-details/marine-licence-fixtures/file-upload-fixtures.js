@@ -1,6 +1,7 @@
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
+  mockActivityDetailsDeposit,
   mockEmptyActivityDetails,
   mockOutputActivityDetails,
   mockOutputActivityDetailsDeposit,
@@ -64,6 +65,67 @@ export const testScenarios = [
           ...mockMarineLicenceApplication.siteDetails[0],
           siteName: null,
           activityDetails: [mockOutputEmptyActivityDetails]
+        }
+      ]
+    }
+  },
+  {
+    name: 'File Upload - KML - Incomplete activity details (site name present)',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          activityDetails: [{ ...mockActivityDetailsDeposit, workingHours: '' }]
+        }
+      ]
+    },
+    expectedPageContent: {
+      projectName: 'Test Project',
+      backLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
+      hasIncompleteWarning: true,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          activityDetails: [
+            { ...mockOutputActivityDetailsDeposit, workingHours: '' }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    name: 'File Upload - KML - Empty additional construction drawing slot',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          constructionDrawings: [
+            {
+              filename: 'tech-drawing.pdf',
+              s3Location: {
+                s3Bucket: 'test-bucket',
+                s3Key: 'test-key',
+                checksumSha256: 'test-checksum'
+              }
+            },
+            {}
+          ]
+        }
+      ]
+    },
+    expectedPageContent: {
+      projectName: 'Test Project',
+      backLink: marineLicenceRoutes.MARINE_LICENCE_FILE_UPLOAD,
+      hasIncompleteWarning: true,
+      siteDetails: [
+        {
+          ...mockMarineLicenceApplication.siteDetails[0],
+          activityDetails: [
+            mockOutputActivityDetails,
+            mockOutputActivityDetailsDeposit
+          ]
         }
       ]
     }

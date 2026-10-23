@@ -87,6 +87,23 @@ describe('Special legal powers', () => {
     ).not.toBeChecked()
   })
 
+  test('shows the character limit hint for the details textarea', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      specialLegalPowers: { agree: 'yes', details: '' }
+    })
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_SPECIAL_LEGAL_POWERS,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(document, 'textbox', {
+        name: 'Provide details of the legal powers including the relevant legislation'
+      })
+    ).toHaveAccessibleDescription('Enter a maximum of 1,000 characters')
+  })
+
   test('form state when decision and details set', async () => {
     mockMarineLicence({
       ...marineLicence,

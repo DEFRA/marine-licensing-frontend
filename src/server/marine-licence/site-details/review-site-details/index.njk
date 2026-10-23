@@ -4,6 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "incomplete-fields-warning/macro.njk" import appIncompleteFieldsWarning %}
+{% from "site-details-complete-message/macro.njk" import appSiteDetailsCompleteMessage %}
 {% from "site-details-map/macro.njk" import appSiteDetailsMap %}
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% from "marine-licence/construction-drawing-card/macro.njk" import appMarineLicenceConstructionDrawingCard %}
@@ -36,6 +37,8 @@
 
       {% if hasIncompleteFields %}
         {{ appIncompleteFieldsWarning() }}
+      {% else %}
+        {{ appSiteDetailsCompleteMessage() }}
       {% endif %}
 
       {% set multipleSiteRows = [

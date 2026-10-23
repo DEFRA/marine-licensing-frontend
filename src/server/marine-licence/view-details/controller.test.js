@@ -136,7 +136,7 @@ describe('marine-licence view details controller', () => {
           VIEW_DETAILS_VIEW_ROUTE,
           expect.objectContaining({
             pageTitle: marineLicence.projectName,
-            pageCaption: `${marineLicence.applicationReference} - Marine licence`,
+            pageCaption: marineLicence.applicationReference,
             backLink: routes.DASHBOARD,
             coordinatesType: 'coordinates',
             summaryData: [{ siteNumber: 1, siteName: 'Test Site' }],
@@ -264,7 +264,7 @@ describe('marine-licence view details controller', () => {
     })
 
     describe('controller unit tests', () => {
-      test('should call view with backLink null and short pageCaption for public view', async () => {
+      test('should call view with backLink null and the application reference caption for public view', async () => {
         const marineLicence = createSubmittedMarineLicence()
         const mockServiceInstance = {
           getPublicMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)

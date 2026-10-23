@@ -37,6 +37,18 @@ describe('Marine Licence View Details', () => {
     )
   })
 
+  test('renders Application name as the first row of the project details card', () => {
+    const card = document.querySelector('#project-details-card')
+    const firstRow = card.querySelector('.govuk-summary-list__row')
+
+    expect(
+      firstRow.querySelector('.govuk-summary-list__key').textContent.trim()
+    ).toBe('Application name')
+    expect(
+      firstRow.querySelector('.govuk-summary-list__value').textContent.trim()
+    ).toBe(mockSubmittedMarineLicenceApplication.projectName)
+  })
+
   test('renders who the marine licence is for in the application overview', () => {
     const card = document.querySelector('#application-overview-card')
     const row = getCardRow(card, 'Who the marine licence is for')

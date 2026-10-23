@@ -49,6 +49,23 @@ describe('Invoice address postcode search', () => {
     vi.restoreAllMocks()
   })
 
+  test.each(['Postcode', 'Property name or number (optional)'])(
+    'shows the "%s" label in bold',
+    async (labelText) => {
+      mockMarineLicence(mockMarineLicenceApplication)
+
+      const document = await loadPage({
+        requestUrl:
+          marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
+        server: getServer()
+      })
+
+      expect(getByText(document, labelText, { selector: 'label' })).toHaveClass(
+        'govuk-label--s'
+      )
+    }
+  )
+
   test('page elements', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
 

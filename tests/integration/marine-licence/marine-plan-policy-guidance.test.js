@@ -44,6 +44,15 @@ describe('Marine plan policy guidance page (marine licence)', () => {
     expect(
       getByText(
         document,
+        (_, element) =>
+          element.tagName === 'P' &&
+          element.textContent ===
+            'Avoid: Impacts do not happen at all. This is the most effective approach to reducing impacts.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        document,
         'Avoiding may include changing the location, method, timing, of a proposal, potentially including buffers or exclusion zones. It is often easiest to achieve when designing a proposal so that the impact does not occur.'
       )
     ).toBeInTheDocument()

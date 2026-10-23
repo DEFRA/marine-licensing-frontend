@@ -38,8 +38,8 @@ describe('#beforeYouStart', () => {
           cancelLink: `${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}?cancel=site-details`,
           continueLink:
             marineLicenceRoutes.MARINE_LICENCE_COORDINATES_TYPE_CHOICE,
-          pageTitle: 'Site details',
-          heading: 'Site details',
+          pageTitle: 'Sites and activities',
+          heading: 'Sites and activities',
           projectName: 'Test Project',
           isMarineLicence: true
         }

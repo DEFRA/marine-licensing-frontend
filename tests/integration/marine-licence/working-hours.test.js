@@ -48,6 +48,20 @@ describe('Working hours (marine licence)', () => {
     ).toBeInTheDocument()
   })
 
+  test('renders the textarea five rows tall', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const document = await loadPage({
+      requestUrl: pageUrl,
+      server: getServer()
+    })
+
+    expect(document.querySelector('textarea#workingHours')).toHaveAttribute(
+      'rows',
+      '5'
+    )
+  })
+
   test('pre-populates textarea with existing value', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
 

@@ -143,6 +143,10 @@ export const expectedProjectDetailsCard = {
   cardTitle: 'Application details',
   rows: [
     {
+      key: 'Application name',
+      value: mockSubmittedMarineLicenceApplication.projectName
+    },
+    {
       key: 'Proposed works summary',
       value: mockSubmittedMarineLicenceApplication.projectBackground
     },

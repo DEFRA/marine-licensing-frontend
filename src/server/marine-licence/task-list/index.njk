@@ -4,10 +4,8 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      {% if projectName %}
-        <span class="govuk-caption-l">{{projectName}}</span>
-      {% endif %}
-        <h1 class="govuk-heading-l">Marine licence start page</h1>
+      <span class="govuk-caption-l">Marine licence</span>
+      <h1 class="govuk-heading-l">{{ projectName }}</h1>
       <p class="govuk-body">You need to complete all sections before sending your application. Your progress will be saved as you go if you need to come back later.</p>
       <p class="govuk-body">You can start the Marine plan policy section once you have completed the site details section.</p>
 
@@ -16,7 +14,7 @@
           idPrefix: "project-details-task-list",
           items: projectDetailsTaskList
         }) }}
-      <h2 class="govuk-heading-m">Site details and activities</h2>
+      <h2 class="govuk-heading-m">Site and activity details</h2>
       {{ govukTaskList({
           idPrefix: "site-details-task-list",
           items: siteDetailsTaskList
@@ -61,7 +59,7 @@
         
         {% if hasCompletedAllTasks %}
           {{ govukButton({
-            text: "Review and send your information",
+            text: "Check and send your information",
             href: "/marine-licence/check-your-answers",
             attributes: {
                 id: "review-and-send"

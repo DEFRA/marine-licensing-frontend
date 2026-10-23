@@ -154,7 +154,7 @@ const marineLicencePages = [
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS,
-    title: 'Site details'
+    title: 'Sites and activities'
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_BEFORE_YOU_START,

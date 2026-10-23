@@ -22,6 +22,25 @@ import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 describe('UK invoice address', () => {
   const getServer = setupTestServer()
 
+  test.each([
+    'Address line 1',
+    'Address line 2 (optional)',
+    'Town or city',
+    'County (optional)',
+    'Postcode'
+  ])('shows the "%s" label in bold', async (labelText) => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_UK_INVOICE_ADDRESS,
+      server: getServer()
+    })
+
+    expect(getByText(document, labelText, { selector: 'label' })).toHaveClass(
+      'govuk-label--s'
+    )
+  })
+
   test('page elements', async () => {
     mockMarineLicence(mockMarineLicenceApplication)
 

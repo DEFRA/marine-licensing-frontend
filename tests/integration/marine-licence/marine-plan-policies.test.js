@@ -1,4 +1,4 @@
-import { getByRole } from '@testing-library/dom'
+import { getByRole, within } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -87,5 +87,32 @@ describe('Marine plan policies (policy list) page', () => {
     expect(
       getByRole(document, 'link', { name: 'Back to your project task list' })
     ).toHaveAttribute('href', marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+  })
+
+  test('shows "Completed" for answered policies and a red "Incomplete" tag for the rest', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceWithMarinePlanPolicies,
+      marinePlanPolicyResponses: { 'SW-AGG-2': 'Our response' }
+    })
+
+    const document = await loadPolicyListPage()
+
+    const statusFor = (name) =>
+      getByRole(document, 'link', { name })
+        .closest('.govuk-task-list__item')
+        .querySelector('.govuk-task-list__status')
+
+    expect(statusFor('South West Aggregates 2 (SW-AGG-2)')).toHaveTextContent(
+      'Completed'
+    )
+
+    for (const name of [
+      'South West Biodiversity 1 (SW-BIO-1)',
+      'South West Marine protected areas 1 (SW-MPA-1)'
+    ]) {
+      const tag = within(statusFor(name)).getByText('Incomplete')
+      expect(tag).toHaveClass('govuk-tag--red')
+    }
+    expect(document.body).not.toHaveTextContent('Not yet started')
   })
 })

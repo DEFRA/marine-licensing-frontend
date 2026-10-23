@@ -6,6 +6,8 @@ import {
 import {
   getFileUploadBackLink,
   getManualEntryBackLink,
+  hasIncompleteActivityDetails,
+  hasIncompleteConstructionDrawings,
   hasIncompleteFields,
   MANUAL_ENTRY_REVIEW_VIEW_ROUTE,
   renderFileUploadReview,
@@ -13,6 +15,7 @@ import {
 } from '#src/server/marine-licence/site-details/review-site-details/utils.js'
 import { getFileUploadSummaryData } from '#src/server/common/helpers/review-site-details/file-upload.js'
 import { createSiteDetailsDataJson } from '#src/server/common/helpers/site-details.js'
+import { mockOutputActivityDetails } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
@@ -313,6 +316,103 @@ describe('siteDetails utils', () => {
           },
           {
             siteName: ''
+          }
+        ])
+      ).toBe(true)
+    })
+  })
+  describe('hasIncompleteActivityDetails util', () => {
+    const completeActivity = { ...mockOutputActivityDetails }
+
+    test('returns false when every activity has all fields', () => {
+      expect(
+        hasIncompleteActivityDetails([
+          { activityDetails: [completeActivity, completeActivity] }
+        ])
+      ).toBe(false)
+    })
+
+    test('returns false when there are no sites or activities', () => {
+      expect(hasIncompleteActivityDetails([])).toBe(false)
+      expect(hasIncompleteActivityDetails(undefined)).toBe(false)
+      expect(hasIncompleteActivityDetails([{ activityDetails: [] }])).toBe(
+        false
+      )
+    })
+
+    test.each([
+      ['activitySubType', null],
+      ['activityDescription', ''],
+      ['activityDuration', null],
+      ['completionDate', null],
+      ['completionDate', ''],
+      ['activityMonths', null],
+      ['activityMonths', ''],
+      ['workingHours', '']
+    ])('returns true when %s is %j', (field, value) => {
+      expect(
+        hasIncompleteActivityDetails([
+          { activityDetails: [{ ...completeActivity, [field]: value }] }
+        ])
+      ).toBe(true)
+    })
+
+    test('returns true when only a later site has an incomplete activity', () => {
+      expect(
+        hasIncompleteActivityDetails([
+          { activityDetails: [completeActivity] },
+          {
+            activityDetails: [
+              completeActivity,
+              { ...completeActivity, workingHours: '' }
+            ]
+          }
+        ])
+      ).toBe(true)
+    })
+  })
+
+  describe('hasIncompleteConstructionDrawings util', () => {
+    const requiresDrawing = [{ requiresConstructionDrawing: true }]
+    const uploaded = { filename: 'drawing.pdf' }
+
+    test('returns false when every drawing slot has a file', () => {
+      expect(
+        hasIncompleteConstructionDrawings([
+          {
+            activityDetails: requiresDrawing,
+            constructionDrawings: [uploaded, uploaded]
+          }
+        ])
+      ).toBe(false)
+    })
+
+    test('returns false when no activity requires a drawing', () => {
+      expect(
+        hasIncompleteConstructionDrawings([
+          {
+            activityDetails: [{ requiresConstructionDrawing: false }],
+            constructionDrawings: []
+          }
+        ])
+      ).toBe(false)
+      expect(hasIncompleteConstructionDrawings(undefined)).toBe(false)
+    })
+
+    test('returns true when a drawing is required but none is uploaded', () => {
+      expect(
+        hasIncompleteConstructionDrawings([
+          { activityDetails: requiresDrawing, constructionDrawings: undefined }
+        ])
+      ).toBe(true)
+    })
+
+    test('returns true when an added drawing slot is still empty', () => {
+      expect(
+        hasIncompleteConstructionDrawings([
+          {
+            activityDetails: requiresDrawing,
+            constructionDrawings: [uploaded, {}]
           }
         ])
       ).toBe(true)

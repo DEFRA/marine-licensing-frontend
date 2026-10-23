@@ -103,7 +103,7 @@ export const transformProjectDetailsTaskList = (taskList) => [
 
 export const transformSiteDetailsTaskList = (taskList) => [
   {
-    title: { text: 'Site details', classes: taskClasses },
+    title: { text: 'Sites and activities', classes: taskClasses },
     href:
       !taskList.siteDetails || taskList.siteDetails === 'INCOMPLETE'
         ? marineLicenceRoutes.MARINE_LICENCE_SITE_DETAILS

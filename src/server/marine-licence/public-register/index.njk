@@ -42,8 +42,6 @@
     <p class="govuk-body">We will not withhold information for any other reasons.</p>
 
     <p class="govuk-body">You must justify your request. We will review it and decide whether the information can be withheld.</p>
-
-    <h2 class="govuk-heading-m">Do you want to request that information is withheld for either of these reasons?</h2>
   {% endset -%}
 
   {% set reasonHint %}
@@ -79,6 +77,7 @@
     errorMessage: errors['withholdConsent'],
     projectName: projectName,
     contentHtml: publicRegisterContentHtml,
+    legend: "Do you want to request that information is withheld for either of these reasons?",
     items: [
       {
         value: "no",

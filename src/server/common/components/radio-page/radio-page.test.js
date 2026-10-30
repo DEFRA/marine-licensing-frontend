@@ -105,18 +105,64 @@ describe('radioPage Component', () => {
     )
   })
 
-  test('Should render contentHtml as hint content above the error message', () => {
-    $radioPage = renderComponent('radio-page', {
+  describe('with contentHtml', () => {
+    const contentTestData = {
       ...commonTestData,
       isPageHeading: true,
       heading: 'Test heading',
       cancelLink: '#',
       contentHtml: '<ul><li>item one</li><li>item two</li></ul>'
+    }
+
+    test('Should render the heading, caption and content outside the fieldset', () => {
+      $radioPage = renderComponent('radio-page', contentTestData)
+
+      const fieldset = $radioPage('fieldset')
+      expect($radioPage('h1').text().trim()).toBe('Test heading')
+      expect(fieldset.find('h1')).toHaveLength(0)
+      expect(fieldset.find('.govuk-caption-l')).toHaveLength(0)
+      expect(fieldset.find('ul')).toHaveLength(0)
+      expect($radioPage('.govuk-hint')).toHaveLength(0)
+      expect($radioPage('li').first().text().trim()).toBe('item one')
+      expect($radioPage('.govuk-caption-l').text().trim()).toBe('test project')
     })
 
-    const hintDiv = $radioPage('.govuk-hint')
-    expect(hintDiv.find('ul')).toHaveLength(1)
-    expect(hintDiv.find('li')).toHaveLength(2)
-    expect(hintDiv.find('li').first().text().trim()).toBe('item one')
+    test('Should use the heading as a visually hidden legend when no legend is given', () => {
+      $radioPage = renderComponent('radio-page', contentTestData)
+
+      const legend = $radioPage('.govuk-fieldset__legend')
+      expect(legend).toHaveLength(1)
+      expect(legend.hasClass('govuk-visually-hidden')).toBe(true)
+      expect(legend.text().trim()).toBe('Test heading')
+    })
+
+    test('Should render a given legend as a visible medium heading', () => {
+      $radioPage = renderComponent('radio-page', {
+        ...contentTestData,
+        legend: 'Test question'
+      })
+
+      const legend = $radioPage('.govuk-fieldset__legend')
+      expect(legend.hasClass('govuk-fieldset__legend--m')).toBe(true)
+      expect(legend.hasClass('govuk-visually-hidden')).toBe(false)
+      expect(legend.children('h2').text().trim()).toBe('Test question')
+    })
+
+    test('Should keep the heading and content outside the error group', () => {
+      $radioPage = renderComponent('radio-page', {
+        ...contentTestData,
+        legend: 'Test question',
+        errorMessage: { text: 'test error' }
+      })
+
+      const errorGroup = $radioPage('.govuk-form-group--error')
+      expect(errorGroup).toHaveLength(1)
+      expect(errorGroup.find('h2').text().trim()).toBe('Test question')
+      expect(errorGroup.find('.govuk-error-message').text().trim()).toBe(
+        'Error: test error'
+      )
+      expect(errorGroup.find('h1')).toHaveLength(0)
+      expect(errorGroup.find('ul')).toHaveLength(0)
+    })
   })
 })

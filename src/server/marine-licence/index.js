@@ -29,6 +29,7 @@ import { applicationRejectedRoutes } from '#src/server/marine-licence/applicatio
 import { updateAndResubmitRoutes } from '#src/server/marine-licence/update-and-resubmit/index.js'
 import { consultationsRoutes } from '#src/server/marine-licence/consultations/index.js'
 import { consultationDetailsRoutes } from '#src/server/marine-licence/consultation-details/index.js'
+import { consultationResponseRoutes } from '#src/server/marine-licence/consultation-response/index.js'
 
 export const marineLicence = {
   plugin: {
@@ -65,7 +66,8 @@ export const marineLicence = {
         ...applicationRejectedRoutes,
         ...updateAndResubmitRoutes,
         ...consultationsRoutes,
-        ...consultationDetailsRoutes
+        ...consultationDetailsRoutes,
+        ...consultationResponseRoutes
       ])
     }
   }

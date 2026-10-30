@@ -1,4 +1,4 @@
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, queryByRole } from '@testing-library/dom'
 import {
   marineLicenceConsultationDetailsRoutes,
   marineLicenceRoutes,
@@ -14,6 +14,8 @@ import { consulteeSession } from '~/tests/integration/shared/session-fixtures.js
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { vi } from 'vitest'
+import { mockMarineLicenceWithConsultationApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { CONSULTATION_STATUS_CODE } from '#src/server/common/constants/marine-licence.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
@@ -28,13 +30,22 @@ describe('Consultation details', () => {
   const requestForAdviceUrl = withId(
     marineLicenceConsultationDetailsRoutes.MARINE_LICENCE_REQUEST_FOR_ADVICE
   )
+  const consultationResponseUrl = withId(
+    marineLicenceConsultationDetailsRoutes.MARINE_LICENCE_CONSULTATION_RESPONSE
+  )
 
-  const mockConsultation = (consultationType) =>
+  const mockConsultation = ({
+    consultationType,
+    consultationStatus,
+    response
+  }) =>
     mockMarineLicence({
+      ...mockMarineLicenceWithConsultationApplication,
       consultation: {
-        id: marineLicenceId,
-        projectName: 'Test Marine Project',
-        consultationType
+        ...mockMarineLicenceWithConsultationApplication.consultation,
+        consultationType,
+        consultationStatus,
+        response
       }
     })
 
@@ -47,7 +58,7 @@ describe('Consultation details', () => {
       ['APPLICATION_NOTIFICATION', notificationOfApplicationUrl],
       ['REQUEST_FOR_ADVICE', requestForAdviceUrl]
     ])('redirects %s to its page', async (consultationType, expectedUrl) => {
-      mockConsultation(consultationType)
+      mockConsultation({ consultationType })
 
       const response = await makeGetRequest({
         url: withId(
@@ -61,7 +72,7 @@ describe('Consultation details', () => {
     })
 
     test('returns not found for an unknown consultation type', async () => {
-      mockConsultation('UNKNOWN_TYPE')
+      mockConsultation({ consultationType: 'UNKNOWN_TYPE' })
 
       const response = await makeGetRequest({
         url: withId(
@@ -76,7 +87,7 @@ describe('Consultation details', () => {
 
   describe('Notification of application page', () => {
     test('page elements', async () => {
-      mockConsultation('APPLICATION_NOTIFICATION')
+      mockConsultation({ consultationType: 'APPLICATION_NOTIFICATION' })
 
       const document = await loadPage({
         requestUrl: notificationOfApplicationUrl,
@@ -110,8 +121,34 @@ describe('Consultation details', () => {
       ).toBeInTheDocument()
       expect(
         getByRole(document, 'link', { name: 'Respond to the notification' })
-      ).toHaveAttribute('href', '#')
+      ).toHaveAttribute('href', consultationResponseUrl)
       expect(document.querySelector('.govuk-summary-list')).toBeNull()
+    })
+
+    test('shows correct content when already responded', async () => {
+      mockConsultation({
+        consultationType: 'APPLICATION_NOTIFICATION',
+        consultationStatus: CONSULTATION_STATUS_CODE.RESPONDED,
+        response: 'Test response'
+      })
+
+      const document = await loadPage({
+        requestUrl: notificationOfApplicationUrl,
+        server: getServer()
+      })
+
+      expect(
+        queryByRole(document, 'heading', { name: 'If you need to respond' })
+      ).toBeNull()
+      expect(
+        queryByRole(document, 'link', { name: 'Respond to the notification' })
+      ).toBeNull()
+
+      expect(
+        getByRole(document, 'heading', { name: 'Your response' })
+      ).toBeInTheDocument()
+
+      expect(getByText(document, 'Test response')).toBeInTheDocument()
     })
 
     test('returns not found when no consultation is returned', async () => {
@@ -126,7 +163,7 @@ describe('Consultation details', () => {
     })
 
     test('returns not found when the consultation is a request for advice', async () => {
-      mockConsultation('REQUEST_FOR_ADVICE')
+      mockConsultation({ consultationType: 'REQUEST_FOR_ADVICE' })
 
       const response = await makeGetRequest({
         url: notificationOfApplicationUrl,
@@ -139,7 +176,7 @@ describe('Consultation details', () => {
 
   describe('Request for advice page', () => {
     test('page elements', async () => {
-      mockConsultation('REQUEST_FOR_ADVICE')
+      mockConsultation({ consultationType: 'REQUEST_FOR_ADVICE' })
 
       const document = await loadPage({
         requestUrl: requestForAdviceUrl,
@@ -173,7 +210,36 @@ describe('Consultation details', () => {
       ).toBeInTheDocument()
       expect(
         getByRole(document, 'button', { name: 'Respond to the request' })
-      ).toHaveAttribute('href', '#')
+      ).toHaveAttribute('href', consultationResponseUrl)
+    })
+
+    test('shows correct content when already responded', async () => {
+      mockConsultation({
+        consultationType: 'REQUEST_FOR_ADVICE',
+        consultationStatus: CONSULTATION_STATUS_CODE.RESPONDED,
+        response: 'Test response'
+      })
+
+      const document = await loadPage({
+        requestUrl: requestForAdviceUrl,
+        server: getServer()
+      })
+
+      expect(
+        queryByRole(document, 'heading', {
+          name: 'Advice requested by the MMO'
+        })
+      ).toBeNull()
+
+      expect(
+        queryByRole(document, 'button', { name: 'Respond to the request' })
+      ).toBeNull()
+
+      expect(
+        getByRole(document, 'heading', { name: 'Your response' })
+      ).toBeInTheDocument()
+
+      expect(getByText(document, 'Test response')).toBeInTheDocument()
     })
 
     test('returns not found when no consultation is returned', async () => {

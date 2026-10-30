@@ -1,12 +1,12 @@
 import Boom from '@hapi/boom'
-import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import {
-  apiRoutes,
   marineLicenceConsultationDetailsRoutes,
   marineLicenceRoutes,
   routes
 } from '#src/server/common/constants/routes.js'
 import { validateConsulteeUserSession } from '#src/server/common/helpers/user-session-validators.js'
+import { fetchConsultation } from '#src/server/common/helpers/marine-licence/consultation/fetch-consultation.js'
+import { hasResponded } from '#src/server/common/helpers/marine-licence/consultation/utils.js'
 
 export const notificationOfApplicationViewRoute =
   'marine-licence/consultation-details/notification-of-application/index'
@@ -19,15 +19,6 @@ const consultationTypeRoutes = {
     marineLicenceConsultationDetailsRoutes.MARINE_LICENCE_NOTIFICATION_OF_APPLICATION,
   REQUEST_FOR_ADVICE:
     marineLicenceConsultationDetailsRoutes.MARINE_LICENCE_REQUEST_FOR_ADVICE
-}
-
-const fetchConsultation = async (request, marineLicenceId) => {
-  const { payload } = await authenticatedGetRequest(
-    request,
-    apiRoutes.GET_CONSULTATION.replace('{marineLicenceId}', marineLicenceId)
-  )
-
-  return payload?.value?.consultation
 }
 
 export const consultationDetailsController = {
@@ -63,12 +54,21 @@ const createConsultationPageController = (
       throw Boom.notFound('Consultation not found')
     }
 
+    const { response } = consultation
+
     return h.view(viewRoute, {
       pageTitle: heading,
       heading,
       marineLicenceId,
       projectName: consultation.projectName,
+      hasResponded: hasResponded(consultation),
+      consulteeResponse: response,
       viewApplicationLink: `${marineLicenceRoutes.MARINE_LICENCE_VIEW_DETAILS}/${marineLicenceId}`,
+      responseLink:
+        marineLicenceConsultationDetailsRoutes.MARINE_LICENCE_CONSULTATION_RESPONSE.replace(
+          '{marineLicenceId}',
+          marineLicenceId
+        ),
       backLink: routes.CONSULTATIONS
     })
   }

@@ -22,12 +22,21 @@
       <a href="{{ viewApplicationLink }}" class="govuk-link govuk-link--no-visited-state" target="_blank" rel="noopener noreferrer">View the application (opens in new tab)</a>
     </p>
 
+    {% if not hasResponded %}
     <h2 class="govuk-heading-m">Advice requested by the MMO</h2>
 
     {{ govukButton({
       text: "Respond to the request",
-      href: "#"
+      href: responseLink
     }) }}
+    {% endif %}
+
+    {% if consulteeResponse %}
+      <h2 class="govuk-heading-m">Your response</h2>
+
+      <p class="govuk-body">{{ consulteeResponse | escape | nl2br }}</p>
+    {% endif %}
+
   </div>
 </div>
 {% endblock %}

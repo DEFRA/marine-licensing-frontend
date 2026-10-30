@@ -1,0 +1,55 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% set headingWithCaption %}
+  <span class="govuk-caption-l">{{ projectName }}</span>
+  <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ heading }}</h1>
+{% endset %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorSummary %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: errorSummary
+      }) }}
+    {% endif %}
+
+    <form method="POST">
+      <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+      {{ govukTextarea({
+        id: "consultationResponse",
+        name: "consultationResponse",
+        rows: 10,
+        label: {
+          html: headingWithCaption
+        },
+        errorMessage: errors['consultationResponse'],
+        value: payload.consultationResponse
+      }) }}
+
+      {{ govukButton({
+        text: "Send response",
+        classes: "govuk-button--primary",
+        preventDoubleClick: true
+      }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}

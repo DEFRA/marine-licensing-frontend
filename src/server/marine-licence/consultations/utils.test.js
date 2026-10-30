@@ -99,15 +99,21 @@ describe('#formatConsultationsForDisplay', () => {
 })
 
 describe('#getConsultationStatusCell', () => {
-  test('Should render Response needed as a default tag', () => {
+  test('Should render Response needed as a blue tag', () => {
     expect(getConsultationStatusCell('RESPONSE_NEEDED')).toEqual({
-      html: '<strong class="govuk-tag">Response needed</strong>'
+      html: '<strong class="govuk-tag govuk-tag--blue">Response needed</strong>'
     })
   })
 
   test('Should render No response needed as a grey tag', () => {
     expect(getConsultationStatusCell('NO_RESPONSE_NEEDED')).toEqual({
       html: '<strong class="govuk-tag govuk-tag--grey">No response needed</strong>'
+    })
+  })
+
+  test('Should render Responded as a green tag', () => {
+    expect(getConsultationStatusCell('RESPONDED')).toEqual({
+      html: '<strong class="govuk-tag govuk-tag--green">Responded</strong>'
     })
   })
 

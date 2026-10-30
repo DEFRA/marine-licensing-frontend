@@ -193,7 +193,9 @@ export const marineLicenceConsultationDetailsRoutes = {
   MARINE_LICENCE_NOTIFICATION_OF_APPLICATION:
     '/marine-licence/notification-of-application/{marineLicenceId}',
   MARINE_LICENCE_REQUEST_FOR_ADVICE:
-    '/marine-licence/request-for-advice/{marineLicenceId}'
+    '/marine-licence/request-for-advice/{marineLicenceId}',
+  MARINE_LICENCE_CONSULTATION_RESPONSE:
+    '/marine-licence/consultation-response/{marineLicenceId}'
 }
 
 export const defraIdGuidanceRoutes = {
@@ -294,6 +296,7 @@ export const apiRoutes = {
   ADD_SITE_NOTICE_EVIDENCE: '/marine-licence/add-site-notice-evidence',
   DELETE_SITE_NOTICE_EVIDENCE: '/marine-licence/delete-site-notice-evidence',
   GET_CONSULTATION: '/marine-licence/consultation/{marineLicenceId}',
+  UPDATE_CONSULTATION_REQUEST: '/marine-licence/update-consultation-request',
   UPDATE_SITE_NOTICE_RESUBMISSION:
     '/marine-licence/update-site-notice-resubmission',
   GET_CONSULTATIONS: '/marine-licence/consultations'

@@ -8,17 +8,21 @@ import {
 } from './controller.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { apiRoutes, routes } from '#src/server/common/constants/routes.js'
+import { mockMarineLicenceWithConsultationApplication } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
 describe('#consultation-details', () => {
   const authenticatedGetRequestMock = vi.mocked(authenticatedGetRequest)
-  const marineLicenceId = 'test-consultation-id'
+  const { consultation } = mockMarineLicenceWithConsultationApplication
+  const marineLicenceId = consultation.id
   const request = { params: { marineLicenceId } }
 
-  const mockConsultation = (consultation) =>
+  const mockGetConsultation = (consultationType) =>
     authenticatedGetRequestMock.mockResolvedValueOnce({
-      payload: { value: { consultation } }
+      payload: {
+        value: { consultation: { ...consultation, consultationType } }
+      }
     })
 
   describe('#consultationDetailsController', () => {
@@ -34,7 +38,7 @@ describe('#consultation-details', () => {
     ])(
       'Should fetch the consultation and redirect %s to %s',
       async (consultationType, expected) => {
-        mockConsultation({ consultationType })
+        mockGetConsultation(consultationType)
         const h = { redirect: vi.fn() }
 
         await consultationDetailsController.handler(request, h)
@@ -53,10 +57,7 @@ describe('#consultation-details', () => {
 
   describe('#notificationOfApplicationController', () => {
     test('Should fetch the consultation and render the template', async () => {
-      mockConsultation({
-        consultationType: 'APPLICATION_NOTIFICATION',
-        projectName: 'Test Project'
-      })
+      mockGetConsultation('APPLICATION_NOTIFICATION')
       const h = { view: vi.fn() }
 
       await notificationOfApplicationController.handler(request, h)
@@ -69,8 +70,10 @@ describe('#consultation-details', () => {
         pageTitle: 'Notification of a marine licence application',
         heading: 'Notification of a marine licence application',
         marineLicenceId,
-        projectName: 'Test Project',
+        projectName: consultation.projectName,
+        hasResponded: false,
         viewApplicationLink: `/marine-licence/view-details/${marineLicenceId}`,
+        responseLink: `/marine-licence/consultation-response/${marineLicenceId}`,
         backLink: routes.CONSULTATIONS
       })
     })
@@ -78,10 +81,7 @@ describe('#consultation-details', () => {
 
   describe('#requestForAdviceController', () => {
     test('Should fetch the consultation and render the template', async () => {
-      mockConsultation({
-        consultationType: 'REQUEST_FOR_ADVICE',
-        projectName: 'Test Project'
-      })
+      mockGetConsultation('REQUEST_FOR_ADVICE')
       const h = { view: vi.fn() }
 
       await requestForAdviceController.handler(request, h)
@@ -94,8 +94,10 @@ describe('#consultation-details', () => {
         pageTitle: 'Request for advice for a marine licence application',
         heading: 'Request for advice for a marine licence application',
         marineLicenceId,
-        projectName: 'Test Project',
+        projectName: consultation.projectName,
+        hasResponded: false,
         viewApplicationLink: `/marine-licence/view-details/${marineLicenceId}`,
+        responseLink: `/marine-licence/consultation-response/${marineLicenceId}`,
         backLink: routes.CONSULTATIONS
       })
     })

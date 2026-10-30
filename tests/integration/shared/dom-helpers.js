@@ -42,7 +42,7 @@ export const getInputInFieldset = ({
 export const getFieldsetByHeading = ({ document, fieldsetLabel }) =>
   within(document)
     .getByText(fieldsetLabel, {
-      selector: 'h1'
+      selector: 'h1, h2'
     })
     .closest('fieldset')
 

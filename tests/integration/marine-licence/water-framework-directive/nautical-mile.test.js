@@ -83,8 +83,7 @@ describe('Water Framework Directive Nautical mile', () => {
         document,
         fieldsetLabel:
           'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
-        inputLabel: 'Yes',
-        findByHeading: true
+        inputLabel: 'Yes'
       })
     ).not.toBeChecked()
     expect(
@@ -92,8 +91,7 @@ describe('Water Framework Directive Nautical mile', () => {
         document,
         fieldsetLabel:
           'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
-        inputLabel: 'No',
-        findByHeading: true
+        inputLabel: 'No'
       })
     ).not.toBeChecked()
   })
@@ -115,8 +113,7 @@ describe('Water Framework Directive Nautical mile', () => {
         document,
         fieldsetLabel:
           'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
-        inputLabel: 'Yes',
-        findByHeading: true
+        inputLabel: 'Yes'
       })
     ).toBeChecked()
   })
@@ -176,8 +173,7 @@ describe('Water Framework Directive Nautical mile', () => {
       fieldsetLabel:
         'Are your proposed works within one nautical mile (1.85km) of the low-water line, or in a tidal river or estuary?',
       errorMessage:
-        'Select whether your proposed works are located within one nautical mile (1.85km) of the coast',
-      findByHeading: true
+        'Select whether your proposed works are located within one nautical mile (1.85km) of the coast'
     })
   })
 })

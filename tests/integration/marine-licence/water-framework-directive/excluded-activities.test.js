@@ -96,8 +96,7 @@ describe('Water Framework Directive Excluded Activities', () => {
         document,
         fieldsetLabel:
           'Are your proposed works limited to one of the following excluded activities?',
-        inputLabel: 'Yes',
-        findByHeading: true
+        inputLabel: 'Yes'
       })
     ).not.toBeChecked()
     expect(
@@ -105,8 +104,7 @@ describe('Water Framework Directive Excluded Activities', () => {
         document,
         fieldsetLabel:
           'Are your proposed works limited to one of the following excluded activities?',
-        inputLabel: 'No',
-        findByHeading: true
+        inputLabel: 'No'
       })
     ).not.toBeChecked()
   })
@@ -128,8 +126,7 @@ describe('Water Framework Directive Excluded Activities', () => {
         document,
         fieldsetLabel:
           'Are your proposed works limited to one of the following excluded activities?',
-        inputLabel: 'Yes',
-        findByHeading: true
+        inputLabel: 'Yes'
       })
     ).toBeChecked()
   })
@@ -144,8 +141,7 @@ describe('Water Framework Directive Excluded Activities', () => {
       fieldsetLabel:
         'Are your proposed works limited to one of the following excluded activities?',
       errorMessage:
-        'Select whether your proposed works are limited to one of the excluded activities',
-      findByHeading: true
+        'Select whether your proposed works are limited to one of the excluded activities'
     })
   })
 

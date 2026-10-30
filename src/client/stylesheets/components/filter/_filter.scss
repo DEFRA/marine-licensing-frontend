@@ -25,6 +25,11 @@
   max-width: calc(100% - 50px);
 }
 
+.moj-filter__options .govuk-radios__conditional:has(.govuk-form-group--error) {
+  border-left: none;
+  padding-left: 0;
+}
+
 .js-enabled {
   .moj-filter__selected {
     display: block;

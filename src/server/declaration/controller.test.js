@@ -25,6 +25,7 @@ import {
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { mockExemption } from '~/src/server/test-helpers/mocks/exemption.js'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
+import { config } from '#src/config/config.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/server/common/helpers/exemptions/session-cache/utils.js')
@@ -258,6 +259,49 @@ describe('#declarationSubmitController', () => {
       await expect(
         declarationSubmitController.handler(mockRequest, mockH)
       ).rejects.toThrow(errorMessages.MARINE_LICENCE_SUBMISSION_FAILED)
+    })
+
+    describe('with payments enabled', () => {
+      beforeEach(() => {
+        const realGet = config.get.bind(config)
+        vi.spyOn(config, 'get').mockImplementation((key) =>
+          key === 'payments' ? { enabled: true } : realGet(key)
+        )
+        mockH.redirect = vi.fn()
+        vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+          payload: {
+            message: 'success',
+            value: { nextUrl: 'https://pay.example/next' }
+          }
+        })
+      })
+
+      test('starts a payment and redirects to GOV.UK Pay instead of submitting', async () => {
+        await declarationSubmitController.handler(mockRequest, mockH)
+
+        expect(authRequests.authenticatedPostRequest).toHaveBeenCalledWith(
+          mockRequest,
+          apiRoutes.MARINE_LICENCE_PAYMENT,
+          {
+            id: mockMarineLicenceApplication.id,
+            userEmail: 'john.doe@example.com',
+            userName: 'Test User'
+          }
+        )
+        expect(authRequests.authenticatedPostRequest).toHaveBeenCalledTimes(1)
+        expect(clearMarineLicenceCache).not.toHaveBeenCalled()
+        expect(mockH.redirect).toHaveBeenCalledWith('https://pay.example/next')
+      })
+
+      test('throws when the payment response has no next url', async () => {
+        vi.spyOn(authRequests, 'authenticatedPostRequest').mockResolvedValue({
+          payload: { message: 'success', value: {} }
+        })
+
+        await expect(
+          declarationSubmitController.handler(mockRequest, mockH)
+        ).rejects.toThrow(errorMessages.MARINE_LICENCE_SUBMISSION_FAILED)
+      })
     })
   })
 })

@@ -17,12 +17,21 @@ const GOOGLE_ANALYTICS_HOSTS = [
   'https://*.analytics.google.com'
 ]
 
-const baseDirectives = ({ uploaderServiceHost, cspRedirectHosts }) => ({
+const baseDirectives = ({
+  uploaderServiceHost,
+  cspRedirectHosts,
+  paymentHosts
+}) => ({
   'base-uri': [SELF],
   'connect-src': [SELF],
   'default-src': [SELF],
   'font-src': [SELF],
-  'form-action': [SELF, uploaderServiceHost, ...cspRedirectHosts],
+  'form-action': [
+    SELF,
+    uploaderServiceHost,
+    ...cspRedirectHosts,
+    ...paymentHosts
+  ],
   'frame-src': [SELF],
   'frame-ancestors': [NONE],
   'img-src': [SELF, 'https://tile.openstreetmap.org'],
@@ -96,12 +105,13 @@ export const buildContentSecurityPolicy = ({
   nonce,
   uploaderServiceHost,
   cspRedirectHosts,
+  paymentHosts,
   clarityProjectId,
   googleTagManagerKey,
   includePreviewHosts
 }) => {
   const directives = mergeDirectives(
-    baseDirectives({ uploaderServiceHost, cspRedirectHosts }),
+    baseDirectives({ uploaderServiceHost, cspRedirectHosts, paymentHosts }),
     clarityDirectives(clarityProjectId),
     googleTagManagerDirectives(googleTagManagerKey),
     googleTagManagerPreviewDirectives(googleTagManagerKey, includePreviewHosts),
@@ -119,6 +129,9 @@ export const contentSecurityPolicy = {
     const settings = {
       uploaderServiceHost: config.get('cdpUploader.cdpUploadServiceBaseUrl'),
       cspRedirectHosts: config.get('defraId.cspRedirectHosts'),
+      paymentHosts: config.get('payments.enabled')
+        ? config.get('payments.formActionHosts')
+        : [],
       clarityProjectId: config.get('clarityProjectId'),
       googleTagManagerKey: config.get('googleTagManagerKey'),
       includePreviewHosts: config.get('cdpEnvironment') !== 'prod'

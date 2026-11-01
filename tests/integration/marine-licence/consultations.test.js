@@ -14,6 +14,7 @@ import {
 import { getUserSession } from '~/src/server/common/plugins/auth/utils.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { CONSULTATION_STATUS_CODE } from '#src/server/common/constants/marine-licence.js'
 
 vi.mock('~/src/server/common/plugins/auth/utils.js')
 
@@ -62,6 +63,24 @@ describe('Consultations', () => {
       'Response needed',
       '1 Oct 2026'
     ])
+  })
+
+  test('shows a Responded status for responded consultations', async () => {
+    mockMarineLicence({
+      consultations: [
+        {
+          ...mockConsultations[0],
+          consultationStatus: CONSULTATION_STATUS_CODE.RESPONDED
+        }
+      ]
+    })
+
+    const document = await loadConsultationsPage()
+
+    expect(getByText(document, 'Responded')).toHaveClass(
+      'govuk-tag',
+      'govuk-tag--green'
+    )
   })
 
   test('shows the empty message when there are no consultations', async () => {

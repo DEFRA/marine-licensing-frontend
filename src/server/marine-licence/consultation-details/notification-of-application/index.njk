@@ -21,11 +21,21 @@
       <a href="{{ viewApplicationLink }}" class="govuk-link govuk-link--no-visited-state" target="_blank" rel="noopener noreferrer">View the application (opens in new tab)</a>
     </p>
 
+    {% if not hasResponded %}
     <h2 class="govuk-heading-m">If you need to respond</h2>
 
     <p class="govuk-body">
-      <a href="#" class="govuk-link govuk-link--no-visited-state">Respond to the notification</a>
+      <a href="{{ responseLink }}" class="govuk-link govuk-link--no-visited-state">Respond to the notification</a>
     </p>
+    {% endif %}
+
+
+    {% if consulteeResponse %}
+      <h2 class="govuk-heading-m">Your response</h2>
+
+      <p class="govuk-body">{{ consulteeResponse | escape | nl2br }}</p>
+    {% endif %}
+
   </div>
 </div>
 {% endblock %}

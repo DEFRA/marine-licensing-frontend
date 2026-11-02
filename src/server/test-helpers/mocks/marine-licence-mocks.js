@@ -103,8 +103,8 @@ export const mockMarinePlanPolicies = [
 ]
 
 export const mockMarinePlanPolicyResponses = {
-  'S-CC-1': 'My first consideration.',
-  'S-CC-2': 'My second consideration.'
+  'S-CC-1': { response: 'My first consideration.' },
+  'S-CC-2': { response: 'My second consideration.' }
 }
 
 export const mockSiteNoticeEvidence = {

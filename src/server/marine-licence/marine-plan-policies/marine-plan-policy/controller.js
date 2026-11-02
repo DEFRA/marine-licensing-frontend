@@ -66,7 +66,7 @@ const loadPolicyContext = async (request) => {
     policyCode,
     projectName,
     policy,
-    existingResponse: marinePlanPolicyResponses?.[policyCode] ?? '',
+    existingResponse: marinePlanPolicyResponses?.[policyCode]?.response ?? '',
     returnTo: request.yar?.get(RETURN_TO_CACHE_KEY)
   }
 }

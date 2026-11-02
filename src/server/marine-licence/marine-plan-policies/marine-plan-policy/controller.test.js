@@ -24,7 +24,7 @@ const licenceData = {
     },
     { policyCode: 'SW-BIO-1', policy: 'Biodiversity wording' }
   ],
-  marinePlanPolicyResponses: { 'SW-BIO-1': 'My saved answer' }
+  marinePlanPolicyResponses: { 'SW-BIO-1': { response: 'My saved answer' } }
 }
 
 describe('#marinePlanPolicyController (GET)', () => {

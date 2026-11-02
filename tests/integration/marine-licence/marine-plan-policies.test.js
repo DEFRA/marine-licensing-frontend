@@ -92,7 +92,7 @@ describe('Marine plan policies (policy list) page', () => {
   test('shows "Completed" for answered policies and a red "Incomplete" tag for the rest', async () => {
     mockMarineLicence({
       ...mockMarineLicenceWithMarinePlanPolicies,
-      marinePlanPolicyResponses: { 'SW-AGG-2': 'Our response' }
+      marinePlanPolicyResponses: { 'SW-AGG-2': { response: 'Our response' } }
     })
 
     const document = await loadPolicyListPage()

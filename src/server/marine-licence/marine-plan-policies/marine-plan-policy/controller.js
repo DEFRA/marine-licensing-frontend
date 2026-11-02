@@ -70,6 +70,8 @@ const loadPolicyContext = async (request) => {
     projectName,
     policy,
     existingResponse: marinePlanPolicyResponses?.[policyCode]?.response ?? '',
+    existingRequiresDocumentation:
+      marinePlanPolicyResponses?.[policyCode]?.requiresDocumentation === true,
     returnTo: request.yar?.get(RETURN_TO_CACHE_KEY)
   }
 }
@@ -103,7 +105,12 @@ export const marinePlanPolicyController = {
       MARINE_PLAN_POLICY_VIEW_ROUTE,
       buildRenderModel({
         ...context,
-        payload: { policyConsideration: context.existingResponse }
+        payload: {
+          policyConsideration: context.existingResponse,
+          documentationCheck: context.existingRequiresDocumentation
+            ? 'requiresDocumentation'
+            : undefined
+        }
       })
     )
   }
@@ -124,7 +131,8 @@ export const marinePlanPolicySubmitController = {
             'string.empty': errorMessages.POLICY_CONSIDERATION_REQUIRED,
             'any.required': errorMessages.POLICY_CONSIDERATION_REQUIRED,
             'string.max': errorMessages.POLICY_CONSIDERATION_MAX_LENGTH
-          })
+          }),
+        documentationCheck: joi.string().valid('requiresDocumentation')
       }),
       failAction: async (request, h, err) => {
         const context = await loadPolicyContext(request)
@@ -160,7 +168,9 @@ export const marinePlanPolicySubmitController = {
       {
         id,
         policyCode,
-        response: request.payload.policyConsideration
+        response: request.payload.policyConsideration,
+        requiresDocumentation:
+          request.payload.documentationCheck === 'requiresDocumentation'
       }
     )
 

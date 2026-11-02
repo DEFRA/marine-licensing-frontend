@@ -192,10 +192,39 @@ describe('#marinePlanPolicySubmitController (POST)', () => {
     expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
       '/marine-licence/marine-plan-policy-response',
-      { id: 'lic-1', policyCode: 'SW-BIO-1', response: 'My considered answer' }
+      {
+        id: 'lic-1',
+        policyCode: 'SW-BIO-1',
+        response: 'My considered answer',
+        requiresDocumentation: false
+      }
     )
     expect(h.redirect).toHaveBeenCalledWith(
       marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+    )
+  })
+
+  test('sends requiresDocumentation true when the documentation checkbox is checked', async () => {
+    const h = {
+      redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+      view: vi.fn()
+    }
+
+    await marinePlanPolicySubmitController.handler(
+      {
+        params: { policyCode: 'SW-BIO-1' },
+        payload: {
+          policyConsideration: 'My considered answer',
+          documentationCheck: 'requiresDocumentation'
+        }
+      },
+      h
+    )
+
+    expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      '/marine-licence/marine-plan-policy-response',
+      expect.objectContaining({ requiresDocumentation: true })
     )
   })
 

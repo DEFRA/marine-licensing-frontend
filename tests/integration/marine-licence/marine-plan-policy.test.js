@@ -37,7 +37,10 @@ describe('Marine plan policy (consideration) page', () => {
           category: 'Environmental',
           policy: '<p>Intro</p><ol><li>first</li><li>second</li></ol>'
         }
-      ]
+      ],
+      marinePlanPolicyResponses: {
+        'SW-BIO-1': { response: 'My answer', requiresDocumentation: true }
+      }
     })
   })
 
@@ -62,6 +65,9 @@ describe('Marine plan policy (consideration) page', () => {
       'South West Biodiversity 1 (SW-BIO-1)'
     )
     expect(document.getElementById('policyConsideration')).not.toBeNull()
+    expect(
+      document.querySelector('input[name="documentationCheck"]')
+    ).toBeChecked()
   })
 
   test('shows a min length error when the consideration response is under 70 characters', async () => {

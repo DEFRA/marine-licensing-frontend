@@ -1,9 +1,17 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "marine-licence/policy-wording/macro.njk" import appMarineLicencePolicyWording %}
+
+{% set requiresDocumentationHtml %}
+<span class="govuk-body">My consideration refers to an assessment, report or other document</span>
+<span class="govuk-hint govuk-checkboxes__hint">
+  Only select this if your consideration relies on information in a document. You still need to explain your consideration in full in the text box. We’ll ask you to upload the document and tell us where the relevant information is at the bottom of the policy list page.
+</span>
+{% endset %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -56,6 +64,18 @@
           },
           errorMessage: errors['policyConsideration'],
           value: payload.policyConsideration
+        }) }}
+
+        {{ govukCheckboxes({
+          name: "documentationCheck",
+          classes: "govuk-checkbox--single",
+          items: [
+            {
+              value: "requiresDocumentation",
+              html: requiresDocumentationHtml,
+              checked: payload.documentationCheck == "requiresDocumentation"
+            }
+          ]
         }) }}
 
         <div class="govuk-button-group">

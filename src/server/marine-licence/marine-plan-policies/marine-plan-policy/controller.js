@@ -26,11 +26,14 @@ const FIND_OUT_MORE_BASE =
   'https://environment.data.gov.uk/marine-plans-explorer/policy/'
 
 const MAX_RESPONSE_LENGTH = 2000
+const MIN_POLICY_RESPONSE_LENGTH = 70
 
 export const errorMessages = {
   POLICY_CONSIDERATION_REQUIRED: 'Enter how you have considered this policy',
   POLICY_CONSIDERATION_MAX_LENGTH:
-    'Policy consideration must be 2000 characters or less'
+    'Policy consideration must be 2000 characters or less',
+  POLICY_CONSIDERATION_MIN_LENGTH:
+    'Your consideration must be 70 characters or more. If you do not explain fully how you have considered this policy, we will reject your application.'
 }
 
 const getPolicyReturnLink = (returnTo, policy) => {
@@ -113,9 +116,11 @@ export const marinePlanPolicySubmitController = {
         policyConsideration: joi
           .string()
           .trim()
+          .min(MIN_POLICY_RESPONSE_LENGTH)
           .max(MAX_RESPONSE_LENGTH)
           .required()
           .messages({
+            'string.min': errorMessages.POLICY_CONSIDERATION_MIN_LENGTH,
             'string.empty': errorMessages.POLICY_CONSIDERATION_REQUIRED,
             'any.required': errorMessages.POLICY_CONSIDERATION_REQUIRED,
             'string.max': errorMessages.POLICY_CONSIDERATION_MAX_LENGTH

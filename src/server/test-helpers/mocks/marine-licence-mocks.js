@@ -621,6 +621,20 @@ export const mockPolygonMarineLicence = {
   ]
 }
 
+export const mockConsultation = {
+  id: '6a1b2c3d4e5f6a7b8c9d0e3f',
+  projectName: 'Test Marine Project',
+  consultationType: 'REQUEST_FOR_ADVICE',
+  applicationReference: 'MLA/2026/10003',
+  consultationStatus: 'RESPONSE_NEEDED',
+  consultationStartDate: '2026-10-20T09:00:00.000Z'
+}
+
+export const mockMarineLicenceWithConsultationApplication = {
+  ...mockMarineLicenceApplication,
+  consultation: mockConsultation
+}
+
 export const mockConsultations = [
   {
     id: '6a1b2c3d4e5f6a7b8c9d0e1f',

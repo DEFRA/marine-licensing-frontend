@@ -1,4 +1,4 @@
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, within } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -70,7 +70,7 @@ describe('Public register', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Sharing your application information on the public register',
+          'Do you want to request that information is withheld for either of these reasons?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -79,7 +79,7 @@ describe('Public register', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Sharing your application information on the public register',
+          'Do you want to request that information is withheld for either of these reasons?',
         inputLabel: 'No',
         findByHeading: true
       })
@@ -104,7 +104,7 @@ describe('Public register', () => {
       getInputInFieldset({
         document,
         fieldsetLabel:
-          'Sharing your application information on the public register',
+          'Do you want to request that information is withheld for either of these reasons?',
         inputLabel: 'Yes',
         findByHeading: true
       })
@@ -133,11 +133,25 @@ describe('Public register', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Sharing your application information on the public register',
+        'Do you want to request that information is withheld for either of these reasons?',
       errorMessage:
-        'Select whether you want to request that information is withheld',
+        'Select if you want to request that information is withheld',
       findByHeading: true
     })
+
+    const errorGroup = document.querySelector('.govuk-form-group--error')
+    expect(
+      within(errorGroup).getByRole('heading', {
+        level: 2,
+        name: 'Do you want to request that information is withheld for either of these reasons?'
+      })
+    ).toBeInTheDocument()
+    expect(
+      within(errorGroup).queryByRole('heading', { level: 1 })
+    ).not.toBeInTheDocument()
+    expect(
+      within(errorGroup).queryByText('Requesting information is withheld')
+    ).not.toBeInTheDocument()
   })
 
   test('should show a validation error when "yes" is selected but details are missing', async () => {
@@ -160,7 +174,7 @@ describe('Public register', () => {
     expectFieldsetError({
       document,
       fieldsetLabel:
-        'Sharing your application information on the public register',
+        'Do you want to request that information is withheld for either of these reasons?',
       errorMessage: 'Enter details of what you want withheld and why',
       findByHeading: true,
       useErrorClass: true

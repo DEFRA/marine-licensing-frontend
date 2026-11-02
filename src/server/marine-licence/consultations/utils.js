@@ -7,6 +7,7 @@ import {
 } from '#src/server/common/constants/routes.js'
 import {
   CONSULTATION_STATUS,
+  CONSULTATION_STATUS_CODE,
   CONSULTATION_TYPE
 } from '#src/server/common/constants/marine-licence.js'
 
@@ -19,6 +20,12 @@ export const fetchConsultations = async (request) => {
   return payload?.value?.consultations ?? []
 }
 
+const consultationStatusTagClasses = {
+  [CONSULTATION_STATUS_CODE.RESPONSE_NEEDED]: 'govuk-tag govuk-tag--blue',
+  [CONSULTATION_STATUS_CODE.NO_RESPONSE_NEEDED]: 'govuk-tag govuk-tag--grey',
+  [CONSULTATION_STATUS_CODE.RESPONDED]: 'govuk-tag govuk-tag--green'
+}
+
 export const getConsultationStatusCell = (status) => {
   const label = CONSULTATION_STATUS[status]
 
@@ -26,10 +33,9 @@ export const getConsultationStatusCell = (status) => {
     return { text: '-' }
   }
 
-  const tagClass =
-    status === 'NO_RESPONSE_NEEDED' ? 'govuk-tag govuk-tag--grey' : 'govuk-tag'
-
-  return { html: `<strong class="${tagClass}">${label}</strong>` }
+  return {
+    html: `<strong class="${consultationStatusTagClasses[status]}">${label}</strong>`
+  }
 }
 
 export const formatConsultationsForDisplay = (consultations) =>

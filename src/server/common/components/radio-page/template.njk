@@ -9,6 +9,8 @@
     {% set buttonText = "Continue" %}
 {% endif %}
 
+{% set headingInLegend = params.isPageHeading and not params.contentHtml %}
+
 {% set headingWithCaption %}
     {% if params.projectName %}
         <span class="govuk-caption-l">{{ params.projectName }}</span>
@@ -18,6 +20,29 @@
     {% endif %}
     <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ params.heading }}</h1>
 {% endset %}
+
+{% if headingInLegend %}
+    {% set fieldset = {
+        legend: {
+            html: headingWithCaption,
+            classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
+        }
+    } %}
+{% elif params.contentHtml and params.legend %}
+    {% set fieldset = {
+        legend: {
+            html: '<h2 class="govuk-fieldset__heading">' + (params.legend | escape) + '</h2>',
+            classes: "govuk-fieldset__legend--m"
+        }
+    } %}
+{% elif params.contentHtml %}
+    {% set fieldset = {
+        legend: {
+            text: params.heading,
+            classes: "govuk-visually-hidden"
+        }
+    } %}
+{% endif %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -29,11 +54,15 @@
             }) }}
         {% endif %}
 
-        {% if not params.isPageHeading and params.projectName %}
-            <span class="govuk-caption-l">{{ params.projectName }}</span>
-        {% endif %}
-
-        {% if params.isPageHeading %} {% else %}
+        {% if params.contentHtml %}
+            {{ headingWithCaption | safe }}
+            <div class="govuk-!-margin-top-6">
+                {{ params.contentHtml | safe }}
+            </div>
+        {% elif not params.isPageHeading %}
+            {% if params.projectName %}
+                <span class="govuk-caption-l">{{ params.projectName }}</span>
+            {% endif %}
             <h1 class="govuk-heading-l">{{ params.heading }}</h1>
         {% endif %}
 
@@ -45,13 +74,8 @@
                 idPrefix: params.name,
                 name: params.name,
                 value: params.value,
-                fieldset: {
-                    legend: {
-                        html: headingWithCaption,
-                        classes: "govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-6"
-                    }
-                } if params.isPageHeading,
-                hint: { html: params.contentHtml } if params.contentHtml else params.hint,
+                fieldset: fieldset,
+                hint: params.hint,
                 errorMessage: params.errorMessage,
                 items: params.items
             }) }}

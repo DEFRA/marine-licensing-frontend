@@ -112,8 +112,8 @@
     "vitest": "^4.1.11",
     "vitest-axe": "^0.1.0",
     "vitest-fetch-mock": "^0.4.5",
-    "webpack": "^5.112.0",
-    "webpack-assets-manifest": "6.5.4",
+    "webpack": "^5.112.2",
+    "webpack-assets-manifest": "6.5.5",
     "webpack-cli": "7.2.3"
   },
   "overrides": {

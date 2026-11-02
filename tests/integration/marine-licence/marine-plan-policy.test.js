@@ -86,6 +86,24 @@ describe('Marine plan policy (consideration) page', () => {
     )
   })
 
+  test('shows the documentation min length error when the checkbox is checked', async () => {
+    const document = await submitPolicyForm({
+      policyConsideration: 'a'.repeat(69),
+      documentationCheck: 'requiresDocumentation'
+    })
+
+    validateErrors(
+      [
+        {
+          field: 'policyConsideration',
+          message:
+            errorMessages.POLICY_CONSIDERATION_MIN_LENGTH_WITH_DOCUMENTATION
+        }
+      ],
+      document
+    )
+  })
+
   test('shows a max length error when the consideration response exceeds 2000 characters', async () => {
     const document = await submitPolicyForm({
       policyConsideration: 'a'.repeat(2001)

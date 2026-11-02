@@ -33,7 +33,9 @@ export const errorMessages = {
   POLICY_CONSIDERATION_MAX_LENGTH:
     'Policy consideration must be 2000 characters or less',
   POLICY_CONSIDERATION_MIN_LENGTH:
-    'Your consideration must be 70 characters or more. If you do not explain fully how you have considered this policy, we will reject your application.'
+    'Your consideration must be 70 characters or more. If you do not explain fully how you have considered this policy, we will reject your application.',
+  POLICY_CONSIDERATION_MIN_LENGTH_WITH_DOCUMENTATION:
+    'Your consideration must be 70 characters or more. Have you explained it in full, rather than only referring to your document? If not, we will reject your application.'
 }
 
 const getPolicyReturnLink = (returnTo, policy) => {
@@ -131,6 +133,13 @@ export const marinePlanPolicySubmitController = {
             'string.empty': errorMessages.POLICY_CONSIDERATION_REQUIRED,
             'any.required': errorMessages.POLICY_CONSIDERATION_REQUIRED,
             'string.max': errorMessages.POLICY_CONSIDERATION_MAX_LENGTH
+          })
+          .when('documentationCheck', {
+            is: 'requiresDocumentation',
+            then: joi.string().messages({
+              'string.min':
+                errorMessages.POLICY_CONSIDERATION_MIN_LENGTH_WITH_DOCUMENTATION
+            })
           }),
         documentationCheck: joi.string().valid('requiresDocumentation')
       }),

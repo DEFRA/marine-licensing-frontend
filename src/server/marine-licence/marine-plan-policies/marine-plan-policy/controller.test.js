@@ -52,7 +52,7 @@ describe('#marinePlanPolicyController (GET)', () => {
       backLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
       marinePlanPolicyGuidanceLink:
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
-      payload: { policyConsideration: '' }
+      payload: { policyConsideration: '', documentationCheck: false }
     })
   })
 
@@ -66,7 +66,10 @@ describe('#marinePlanPolicyController (GET)', () => {
     expect(h.view).toHaveBeenCalledWith(
       MARINE_PLAN_POLICY_VIEW_ROUTE,
       expect.objectContaining({
-        payload: { policyConsideration: 'My saved answer' }
+        payload: {
+          policyConsideration: 'My saved answer',
+          documentationCheck: false
+        }
       })
     )
   })

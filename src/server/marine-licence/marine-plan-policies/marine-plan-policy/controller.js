@@ -110,8 +110,6 @@ export const marinePlanPolicyController = {
         payload: {
           policyConsideration: context.existingResponse,
           documentationCheck: context.existingRequiresDocumentation
-            ? 'requiresDocumentation'
-            : undefined
         }
       })
     )

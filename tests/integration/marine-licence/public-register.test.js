@@ -42,6 +42,21 @@ describe('Public register', () => {
     )
   })
 
+  test('reason character count counts user-perceived characters', async () => {
+    mockMarineLicence(marineLicence)
+
+    const document = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      server: getServer()
+    })
+
+    const characterCount = document
+      .querySelector('#reason')
+      .closest('[data-module="govuk-character-count"]')
+    expect(characterCount).toHaveAttribute('data-count-type', 'characters')
+    expect(characterCount).toHaveAttribute('data-maxlength', '1000')
+  })
+
   test('back link from Check Your Answers', async () => {
     mockMarineLicence(marineLicence)
 

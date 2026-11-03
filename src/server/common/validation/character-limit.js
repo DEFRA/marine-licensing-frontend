@@ -1,4 +1,4 @@
-export const CHARACTER_LIMIT_BACKSTOP = 10000
+const CHARACTER_LIMIT_BACKSTOP = 10000
 
 const graphemeSegmenter = new Intl.Segmenter(undefined, {
   granularity: 'grapheme'

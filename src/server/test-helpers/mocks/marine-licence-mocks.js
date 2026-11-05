@@ -377,9 +377,11 @@ export const mockRedactions = {
   },
   marinePlanPolicyResponses: {
     'S-CC-1': {
-      redactedText: 'First ***REDACTED***',
-      redactedAt: '2026-06-01T09:30:00Z',
-      redactedBy: 'Test Internal User'
+      response: {
+        redactedText: 'First ***REDACTED***',
+        redactedAt: '2026-06-01T09:30:00Z',
+        redactedBy: 'Test Internal User'
+      }
     }
   },
   waterFrameworkDirective: {

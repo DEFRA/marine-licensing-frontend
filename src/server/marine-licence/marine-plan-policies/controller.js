@@ -13,7 +13,7 @@ export const MARINE_PLAN_POLICIES_VIEW_ROUTE =
 const HEADING = 'Marine plan policies'
 
 const isCompleted = (responses, policyCode) => {
-  const response = responses?.[policyCode]
+  const response = responses?.[policyCode]?.response
   return typeof response === 'string' && response.trim().length > 0
 }
 

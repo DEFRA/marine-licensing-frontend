@@ -3,7 +3,9 @@ import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
-import { loadPage } from '~/tests/integration/shared/app-server.js'
+import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
+import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
+import { errorMessages } from '~/src/server/marine-licence/marine-plan-policies/marine-plan-policy/controller.js'
 import { mockMarineLicenceWithMarinePlanPolicies } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 
@@ -16,6 +18,15 @@ describe('Marine plan policy (consideration) page', () => {
       server: getServer()
     })
 
+  const submitPolicyForm = async (formData) => {
+    const { document } = await submitForm({
+      requestUrl: getMarinePlanPolicyLink('SW-BIO-1'),
+      server: getServer(),
+      formData
+    })
+    return document
+  }
+
   beforeEach(() => {
     mockMarineLicence({
       ...mockMarineLicenceWithMarinePlanPolicies,
@@ -26,7 +37,10 @@ describe('Marine plan policy (consideration) page', () => {
           category: 'Environmental',
           policy: '<p>Intro</p><ol><li>first</li><li>second</li></ol>'
         }
-      ]
+      ],
+      marinePlanPolicyResponses: {
+        'SW-BIO-1': { response: 'My answer', requiresDocumentation: true }
+      }
     })
   })
 
@@ -51,5 +65,58 @@ describe('Marine plan policy (consideration) page', () => {
       'South West Biodiversity 1 (SW-BIO-1)'
     )
     expect(document.getElementById('policyConsideration')).not.toBeNull()
+    expect(
+      document.querySelector('input[name="documentationCheck"]')
+    ).toBeChecked()
+  })
+
+  test('shows a min length error when the consideration response is under 70 characters', async () => {
+    const document = await submitPolicyForm({
+      policyConsideration: 'a'.repeat(69)
+    })
+
+    validateErrors(
+      [
+        {
+          field: 'policyConsideration',
+          message: errorMessages.POLICY_CONSIDERATION_MIN_LENGTH
+        }
+      ],
+      document
+    )
+  })
+
+  test('shows the documentation min length error when the checkbox is checked', async () => {
+    const document = await submitPolicyForm({
+      policyConsideration: 'a'.repeat(69),
+      documentationCheck: 'requiresDocumentation'
+    })
+
+    validateErrors(
+      [
+        {
+          field: 'policyConsideration',
+          message:
+            errorMessages.POLICY_CONSIDERATION_MIN_LENGTH_WITH_DOCUMENTATION
+        }
+      ],
+      document
+    )
+  })
+
+  test('shows a max length error when the consideration response exceeds 2000 characters', async () => {
+    const document = await submitPolicyForm({
+      policyConsideration: 'a'.repeat(2001)
+    })
+
+    validateErrors(
+      [
+        {
+          field: 'policyConsideration',
+          message: errorMessages.POLICY_CONSIDERATION_MAX_LENGTH
+        }
+      ],
+      document
+    )
   })
 })

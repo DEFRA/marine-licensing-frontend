@@ -121,7 +121,10 @@ export const buildRedactedMarinePlanPolicies = (marineLicence) => {
     ...section,
     policies: section.policies.map((policy) => ({
       ...policy,
-      response: publishedText(responses[policy.policyCode], policy.response)
+      response: publishedText(
+        responses[policy.policyCode]?.response,
+        policy.response
+      )
     }))
   }))
 }

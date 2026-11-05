@@ -19,8 +19,8 @@
         policyCode: policy.policyCode,
         label: "marine plan policy " + policy.policyCode + " consideration",
         originalText: policy.response,
-        redaction: params.redactions.marinePlanPolicyResponses[policy.policyCode],
-        isRedacted: params.redactions.marinePlanPolicyResponses[policy.policyCode],
+        redaction: params.redactions.marinePlanPolicyResponses[policy.policyCode].response,
+        isRedacted: params.redactions.marinePlanPolicyResponses[policy.policyCode] | length,
         saveUrl: params.redactionSaveUrl,
         csrfToken: params.csrfToken
       }) }}

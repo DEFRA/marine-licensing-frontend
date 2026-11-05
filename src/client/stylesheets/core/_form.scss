@@ -13,3 +13,17 @@
     margin-top: 0;
   }
 }
+
+.govuk-checkbox--single {
+  .govuk-label {
+    .govuk-checkboxes__hint {
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  .govuk-body {
+    display: block;
+    margin-bottom: 5px;
+  }
+}

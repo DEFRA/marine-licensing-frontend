@@ -29,7 +29,9 @@ describe('buildMarinePlanPoliciesData', () => {
           policy: 'First wording'
         }
       ],
-      marinePlanPolicyResponses: { 'S-CC-1': 'My consideration' }
+      marinePlanPolicyResponses: {
+        'S-CC-1': { response: 'My consideration' }
+      }
     })
 
     expect(result).toEqual([

@@ -24,7 +24,7 @@ const licenceData = {
     },
     { policyCode: 'SW-BIO-1', policy: 'Biodiversity wording' }
   ],
-  marinePlanPolicyResponses: { 'SW-BIO-1': 'My saved answer' }
+  marinePlanPolicyResponses: { 'SW-BIO-1': { response: 'My saved answer' } }
 }
 
 describe('#marinePlanPolicyController (GET)', () => {
@@ -52,7 +52,7 @@ describe('#marinePlanPolicyController (GET)', () => {
       backLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
       marinePlanPolicyGuidanceLink:
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
-      payload: { policyConsideration: '' }
+      payload: { policyConsideration: '', documentationCheck: false }
     })
   })
 
@@ -66,7 +66,10 @@ describe('#marinePlanPolicyController (GET)', () => {
     expect(h.view).toHaveBeenCalledWith(
       MARINE_PLAN_POLICY_VIEW_ROUTE,
       expect.objectContaining({
-        payload: { policyConsideration: 'My saved answer' }
+        payload: {
+          policyConsideration: 'My saved answer',
+          documentationCheck: false
+        }
       })
     )
   })
@@ -192,10 +195,39 @@ describe('#marinePlanPolicySubmitController (POST)', () => {
     expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
       '/marine-licence/marine-plan-policy-response',
-      { id: 'lic-1', policyCode: 'SW-BIO-1', response: 'My considered answer' }
+      {
+        id: 'lic-1',
+        policyCode: 'SW-BIO-1',
+        response: 'My considered answer',
+        requiresDocumentation: false
+      }
     )
     expect(h.redirect).toHaveBeenCalledWith(
       marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+    )
+  })
+
+  test('sends requiresDocumentation true when the documentation checkbox is checked', async () => {
+    const h = {
+      redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+      view: vi.fn()
+    }
+
+    await marinePlanPolicySubmitController.handler(
+      {
+        params: { policyCode: 'SW-BIO-1' },
+        payload: {
+          policyConsideration: 'My considered answer',
+          documentationCheck: 'requiresDocumentation'
+        }
+      },
+      h
+    )
+
+    expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      '/marine-licence/marine-plan-policy-response',
+      expect.objectContaining({ requiresDocumentation: true })
     )
   })
 

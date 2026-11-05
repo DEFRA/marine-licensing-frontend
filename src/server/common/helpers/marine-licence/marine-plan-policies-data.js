@@ -17,7 +17,7 @@ export const buildMarinePlanPoliciesData = (marineLicence) => {
         policyCode: policy.policyCode,
         displayTitle: formatPolicyTitle(policy),
         wording: policy.policy ?? '',
-        response: responses[policy.policyCode] ?? '',
+        response: responses[policy.policyCode]?.response ?? '',
         changeHref: getMarinePlanPolicyLink(policy.policyCode)
       }))
     })

@@ -221,8 +221,8 @@ describe('buildRedactedMarinePlanPolicies', () => {
       { policyCode: 'S-CC-2', policy: 'Second wording' }
     ],
     marinePlanPolicyResponses: {
-      'S-CC-1': 'First consideration',
-      'S-CC-2': 'Second consideration'
+      'S-CC-1': { response: 'First consideration' },
+      'S-CC-2': { response: 'Second consideration' }
     }
   }
 
@@ -231,7 +231,7 @@ describe('buildRedactedMarinePlanPolicies', () => {
       ...marineLicence,
       redactions: {
         marinePlanPolicyResponses: {
-          'S-CC-1': { redactedText: 'First ***REDACTED***' }
+          'S-CC-1': { response: { redactedText: 'First ***REDACTED***' } }
         }
       }
     })

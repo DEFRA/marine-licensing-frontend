@@ -210,8 +210,10 @@ describe('Marine Licence Marine Plan Policies Component', () => {
         redactions: {
           marinePlanPolicyResponses: {
             'E-AGG-3': {
-              redactedText: 'Redacted by MMO',
-              redactedTextValue: 'Redacted by MMO'
+              response: {
+                redactedText: 'Redacted by MMO',
+                redactedTextValue: 'Redacted by MMO'
+              }
             }
           }
         }

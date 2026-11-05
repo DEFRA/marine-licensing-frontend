@@ -103,8 +103,14 @@ export const mockMarinePlanPolicies = [
 ]
 
 export const mockMarinePlanPolicyResponses = {
-  'S-CC-1': 'My first consideration.',
-  'S-CC-2': 'My second consideration.'
+  'S-CC-1': {
+    response: 'My first consideration.',
+    requiresDocumentation: true
+  },
+  'S-CC-2': {
+    response: 'My second consideration.',
+    requiresDocumentation: false
+  }
 }
 
 export const mockSiteNoticeEvidence = {
@@ -371,9 +377,11 @@ export const mockRedactions = {
   },
   marinePlanPolicyResponses: {
     'S-CC-1': {
-      redactedText: 'First ***REDACTED***',
-      redactedAt: '2026-06-01T09:30:00Z',
-      redactedBy: 'Test Internal User'
+      response: {
+        redactedText: 'First ***REDACTED***',
+        redactedAt: '2026-06-01T09:30:00Z',
+        redactedBy: 'Test Internal User'
+      }
     }
   },
   waterFrameworkDirective: {

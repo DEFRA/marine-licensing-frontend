@@ -80,6 +80,8 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_COMPLETION_DATE: '/marine-licence/completion-date',
   MARINE_LICENCE_CHECK_YOUR_ANSWERS: '/marine-licence/check-your-answers',
   MARINE_LICENCE_CONFIRMATION: '/marine-licence/confirmation',
+  MARINE_LICENCE_PAYMENT_RETURN: '/marine-licence/payment/return',
+  MARINE_LICENCE_PAYMENT_RETRY: '/marine-licence/payment/retry',
   MARINE_LICENCE_APPLICATION_TRANSFERRED:
     '/marine-licence/application-transferred',
   MARINE_LICENCE_APPLICATION_REJECTED: '/marine-licence/application-rejected',
@@ -268,6 +270,7 @@ export const apiRoutes = {
   SUBMIT_EXEMPTION: '/exemption/submit',
   ADD_ACTIVITY_TO_SITE: '/marine-licence/add-activity-details',
   SUBMIT_MARINE_LICENCE: '/marine-licence/submit',
+  MARINE_LICENCE_PAYMENT: '/marine-licence/payment',
   UPDATE_MARINE_LICENCE_SITE: '/marine-licence/site',
   UPDATE_MARINE_LICENCE_SITE_DETAILS: '/marine-licence/site-details',
   MARINE_LICENCE_PROJECT_BACKGROUND: '/marine-licence/project-background',

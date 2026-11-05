@@ -13,6 +13,8 @@ import { authenticatedPostRequest } from '#src/server/common/helpers/authenticat
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
 import { getBackLink } from '#src/server/declaration/utils.js'
+import { redirectToPayment } from '#src/server/marine-licence/payment/utils.js'
+import { config } from '#src/config/config.js'
 import {
   apiRoutes,
   marineLicenceRoutes,
@@ -58,6 +60,14 @@ const submitMarineLicence = async (request, h) => {
 
     if (!displayName || !email) {
       throw new Error(errorMessages.USER_SESSION_NOT_FOUND)
+    }
+
+    if (config.get('payments').enabled) {
+      return await redirectToPayment(request, h, {
+        id,
+        userName: displayName,
+        userEmail: email
+      })
     }
 
     const { payload: response } = await authenticatedPostRequest(

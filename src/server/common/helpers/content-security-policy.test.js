@@ -10,6 +10,8 @@ const configValues = vi.hoisted(() => ({
     'https://dcidmtest.b2clogin.com',
     'https://your-account.cpdev.cui.defra.gov.uk'
   ],
+  'payments.enabled': false,
+  'payments.formActionHosts': ['https://card.payments.service.gov.uk'],
   clarityProjectId: '123',
   googleTagManagerKey: '',
   cdpEnvironment: 'local'
@@ -25,6 +27,7 @@ const baseOptions = {
   nonce: 'abc123',
   uploaderServiceHost: 'http://uploader',
   cspRedirectHosts: ['https://dcidmtest.b2clogin.com'],
+  paymentHosts: [],
   clarityProjectId: '',
   googleTagManagerKey: '',
   includePreviewHosts: false
@@ -48,6 +51,17 @@ describe('buildContentSecurityPolicy', () => {
     expect(directive(header, 'media-src')).toBe("media-src 'self'")
     expect(directive(header, 'object-src')).toBe("object-src 'none'")
     expect(directive(header, 'style-src')).toBe("style-src 'self'")
+  })
+
+  test('adds the payment hosts to form-action', () => {
+    const header = buildContentSecurityPolicy({
+      ...baseOptions,
+      paymentHosts: ['https://card.payments.service.gov.uk']
+    })
+
+    expect(directive(header, 'form-action')).toBe(
+      "form-action 'self' http://uploader https://dcidmtest.b2clogin.com https://card.payments.service.gov.uk"
+    )
   })
 
   test('ends script-src with the nonce and includes the govuk-frontend hash', () => {
@@ -192,6 +206,7 @@ describe('contentSecurityPolicy plugin', () => {
     configValues.googleTagManagerKey = ''
     configValues.clarityProjectId = '123'
     configValues.cdpEnvironment = 'local'
+    configValues['payments.enabled'] = false
     mockResponse = {
       header: vi.fn().mockReturnThis(),
       isBoom: false,
@@ -280,5 +295,26 @@ describe('contentSecurityPolicy plugin', () => {
     const [, header] = mockResponse.header.mock.calls[0]
     expect(header).toContain('https://www.googletagmanager.com')
     expect(header).not.toContain('https://tagmanager.google.com')
+  })
+
+  test('omits the payment hosts when payments are disabled', () => {
+    onPreResponseHandler(mockRequest, mockH)
+
+    const [, header] = mockResponse.header.mock.calls[0]
+    expect(header).not.toContain('payments.service.gov.uk')
+  })
+
+  test('adds the payment hosts when payments are enabled', async () => {
+    configValues['payments.enabled'] = true
+    server = { ext: vi.fn() }
+    await contentSecurityPolicy.register(server)
+    const handler = server.ext.mock.calls[0][1]
+
+    handler(mockRequest, mockH)
+
+    const [, header] = mockResponse.header.mock.calls[0]
+    expect(directive(header, 'form-action')).toContain(
+      'https://card.payments.service.gov.uk'
+    )
   })
 })

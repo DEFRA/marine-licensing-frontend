@@ -308,6 +308,20 @@ export const config = convict({
       env: 'ENABLE_MARINE_LICENCE'
     }
   },
+  payments: {
+    enabled: {
+      doc: 'Take the marine licence application fee through GOV.UK Pay before submitting',
+      format: Boolean,
+      default: false,
+      env: 'PAYMENTS_ENABLED'
+    },
+    formActionHosts: {
+      doc: 'The GOV.UK Pay hosts that the declaration form redirects to, for CSP form-action',
+      format: Array,
+      default: ['https://card.payments.service.gov.uk'],
+      env: 'PAYMENTS_FORM_ACTION_HOSTS'
+    }
+  },
   dashboard: {
     userCacheTtl: {
       doc: 'TTL for the cached owner name lookups',

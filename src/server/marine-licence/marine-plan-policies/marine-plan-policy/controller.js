@@ -26,11 +26,16 @@ const FIND_OUT_MORE_BASE =
   'https://environment.data.gov.uk/marine-plans-explorer/policy/'
 
 const MAX_RESPONSE_LENGTH = 2000
+const MIN_POLICY_RESPONSE_LENGTH = 70
 
 export const errorMessages = {
   POLICY_CONSIDERATION_REQUIRED: 'Enter how you have considered this policy',
   POLICY_CONSIDERATION_MAX_LENGTH:
-    'Policy consideration must be 2000 characters or less'
+    'Policy consideration must be 2000 characters or less',
+  POLICY_CONSIDERATION_MIN_LENGTH:
+    'Your consideration must be 70 characters or more. If you do not explain fully how you have considered this policy, we will reject your application.',
+  POLICY_CONSIDERATION_MIN_LENGTH_WITH_DOCUMENTATION:
+    'Your consideration must be 70 characters or more. Have you explained it in full, rather than only referring to your document? If not, we will reject your application.'
 }
 
 const getPolicyReturnLink = (returnTo, policy) => {
@@ -66,7 +71,9 @@ const loadPolicyContext = async (request) => {
     policyCode,
     projectName,
     policy,
-    existingResponse: marinePlanPolicyResponses?.[policyCode] ?? '',
+    existingResponse: marinePlanPolicyResponses?.[policyCode]?.response ?? '',
+    existingRequiresDocumentation:
+      marinePlanPolicyResponses?.[policyCode]?.requiresDocumentation === true,
     returnTo: request.yar?.get(RETURN_TO_CACHE_KEY)
   }
 }
@@ -100,7 +107,10 @@ export const marinePlanPolicyController = {
       MARINE_PLAN_POLICY_VIEW_ROUTE,
       buildRenderModel({
         ...context,
-        payload: { policyConsideration: context.existingResponse }
+        payload: {
+          policyConsideration: context.existingResponse,
+          documentationCheck: context.existingRequiresDocumentation
+        }
       })
     )
   }
@@ -113,13 +123,23 @@ export const marinePlanPolicySubmitController = {
         policyConsideration: joi
           .string()
           .trim()
+          .min(MIN_POLICY_RESPONSE_LENGTH)
           .max(MAX_RESPONSE_LENGTH)
           .required()
           .messages({
+            'string.min': errorMessages.POLICY_CONSIDERATION_MIN_LENGTH,
             'string.empty': errorMessages.POLICY_CONSIDERATION_REQUIRED,
             'any.required': errorMessages.POLICY_CONSIDERATION_REQUIRED,
             'string.max': errorMessages.POLICY_CONSIDERATION_MAX_LENGTH
           })
+          .when('documentationCheck', {
+            is: 'requiresDocumentation',
+            then: joi.string().messages({
+              'string.min':
+                errorMessages.POLICY_CONSIDERATION_MIN_LENGTH_WITH_DOCUMENTATION
+            })
+          }),
+        documentationCheck: joi.string().valid('requiresDocumentation')
       }),
       failAction: async (request, h, err) => {
         const context = await loadPolicyContext(request)
@@ -155,7 +175,9 @@ export const marinePlanPolicySubmitController = {
       {
         id,
         policyCode,
-        response: request.payload.policyConsideration
+        response: request.payload.policyConsideration,
+        requiresDocumentation:
+          request.payload.documentationCheck === 'requiresDocumentation'
       }
     )
 

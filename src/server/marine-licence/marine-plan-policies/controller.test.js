@@ -118,7 +118,9 @@ describe('#marinePlanPoliciesController', () => {
           projectName: 'Test Project',
           marinePlanPoliciesCount: 3,
           marinePlanPolicies: policies,
-          marinePlanPolicyResponses: { 'SW-BIO-1': 'A considered answer' }
+          marinePlanPolicyResponses: {
+            'SW-BIO-1': { response: 'A considered answer' }
+          }
         })
       }
     )

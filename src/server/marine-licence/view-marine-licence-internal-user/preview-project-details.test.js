@@ -231,7 +231,7 @@ describe('buildRedactedMarinePlanPolicies', () => {
       ...marineLicence,
       redactions: {
         marinePlanPolicyResponses: {
-          'S-CC-1': { redactedText: 'First ***REDACTED***' }
+          'S-CC-1': { response: { redactedText: 'First ***REDACTED***' } }
         }
       }
     })

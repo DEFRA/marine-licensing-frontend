@@ -349,7 +349,9 @@ describe('Marine licence redaction preview', () => {
         field: 'marine plan policy consideration',
         redactions: {
           marinePlanPolicyResponses: {
-            'S-CC-1': { redactedText: `First ${REDACTION_LABEL}` }
+            'S-CC-1': {
+              response: { redactedText: `First ${REDACTION_LABEL}` }
+            }
           }
         },
         card: '#marine-plan-policies-card-cross-cutting',

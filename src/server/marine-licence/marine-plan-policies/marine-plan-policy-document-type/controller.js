@@ -1,4 +1,19 @@
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import Boom from '@hapi/boom'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
+import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
+import {
+  errorDescriptionByFieldName,
+  mapErrorsForDisplay
+} from '#src/server/common/helpers/errors.js'
+import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
+import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
+import {
+  MPP_DOCUMENT_TYPE_OTHER_MAX_LENGTH,
+  MPP_DOCUMENT_TYPES
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-type/constants.js'
 import {
   marinePlanPolicyDocumentTypeParamsSchema,
   marinePlanPolicyDocumentTypeSchema
@@ -9,16 +24,51 @@ export const MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE =
 
 const PAGE_TITLE = 'What type of document is this?'
 
-const settings = {
-  pageTitle: PAGE_TITLE,
-  heading: PAGE_TITLE
+export const errorMessages = {
+  DOCUMENT_TYPE_REQUIRED: 'Select the type of document',
+  DOCUMENT_ID_INVALID: 'Select the type of document',
+  DOCUMENT_ID_REQUIRED: 'Select the type of document',
+  DOCUMENT_TYPE_OTHER_REQUIRED: 'Enter a description of the document',
+  DOCUMENT_TYPE_OTHER_MAX_LENGTH: `Description of the document must be ${MPP_DOCUMENT_TYPE_OTHER_MAX_LENGTH} characters or fewer`
 }
 
-const buildView = () => ({
-  ...settings,
+const loadDocumentContext = async (request) => {
+  const marineLicence = getMarineLicenceCache(request)
+
+  if (!marineLicence?.id) {
+    throw Boom.notFound('Marine licence not found')
+  }
+
+  const { id, projectName } = marineLicence
+
+  const { documentId } = request.params
+  const marineLicenceFromServer =
+    await getMarineLicenceService(request).getMarineLicenceById(id)
+
+  const { marinePlanPolicySupportingDocuments } = marineLicenceFromServer
+
+  const document = marinePlanPolicySupportingDocuments?.documents?.find(
+    (item) => item.documentId === documentId
+  )
+
+  if (!document) {
+    throw Boom.notFound('Marine plan policy supporting document not found')
+  }
+
+  return { id, documentId, projectName, document }
+}
+
+const buildView = ({ projectName, payload, errors, errorSummary }) => ({
+  pageTitle: PAGE_TITLE,
+  heading: PAGE_TITLE,
+  projectName,
+  documentTypes: MPP_DOCUMENT_TYPES,
   backLink:
     marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
-  cancelLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+  cancelLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+  payload,
+  errors,
+  errorSummary
 })
 
 export const marinePlanPolicyDocumentTypeController = {
@@ -27,10 +77,19 @@ export const marinePlanPolicyDocumentTypeController = {
       params: marinePlanPolicyDocumentTypeParamsSchema
     }
   },
-  handler(_request, h) {
-    return h
-      .view(MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE, buildView())
-      .takeover()
+  async handler(request, h) {
+    const { projectName, document } = await loadDocumentContext(request)
+
+    return h.view(
+      MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE,
+      buildView({
+        projectName,
+        payload: {
+          documentType: document.documentType,
+          documentTypeOther: document.documentTypeOther
+        }
+      })
+    )
   }
 }
 
@@ -39,16 +98,34 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
     validate: {
       params: marinePlanPolicyDocumentTypeParamsSchema,
       payload: marinePlanPolicyDocumentTypeSchema,
-      failAction: (request, h) => {
+      failAction: async (request, h, err) => {
+        const { projectName } = await loadDocumentContext(request)
+        const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+
         return h
-          .view(MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE, buildView())
+          .view(
+            MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE,
+            buildView({
+              projectName,
+              payload: request.payload,
+              errors: errorDescriptionByFieldName(errorSummary),
+              errorSummary
+            })
+          )
           .takeover()
       }
     }
   },
-  async handler(_request, h) {
-    return h
-      .view(MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE, buildView())
-      .takeover()
+  async handler(request, h) {
+    const { id, documentId } = await loadDocumentContext(request)
+    const { documentType, documentTypeOther } = request.payload
+
+    await authenticatedPatchRequest(
+      request,
+      apiRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE,
+      { id, documentId, documentType, documentTypeOther }
+    )
+
+    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
   }
 }

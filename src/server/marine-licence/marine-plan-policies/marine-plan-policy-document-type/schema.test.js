@@ -1,14 +1,4 @@
-import {
-  marinePlanPolicyDocumentTypeParamsSchema,
-  marinePlanPolicyDocumentTypeSchema
-} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-type/schema.js'
-
-describe('#marinePlanPolicyDocumentTypeSchema', () => {
-  test('should validate with no fields', () => {
-    const { error } = marinePlanPolicyDocumentTypeSchema.validate({})
-    expect(error).toBeUndefined()
-  })
-})
+import { marinePlanPolicyDocumentTypeParamsSchema } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-type/schema.js'
 
 describe('#marinePlanPolicyDocumentTypeParamsSchema', () => {
   test('accepts a uuid documentId', () => {

@@ -113,6 +113,16 @@ export const mockMarinePlanPolicyResponses = {
   }
 }
 
+export const mockMarinePlanPolicyDocument = {
+  documentId: 'c7e4ef70-7c7d-4464-8401-7bf4e6f47351',
+  uploadedFile: { filename: 'ecological-assessment.docx' },
+  s3Location: {
+    s3Bucket: 'test-bucket',
+    s3Key: 'test-key',
+    checksumSha256: 'test-checksum'
+  }
+}
+
 export const mockMarinePlanPolicySupportingDocuments = {
   documents: [],
   required: [],

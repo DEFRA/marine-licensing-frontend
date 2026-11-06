@@ -294,6 +294,8 @@ export const apiRoutes = {
     '/marine-licence/marine-plan-policy-response',
   MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT:
     '/marine-licence/marine-plan-policy-document',
+  MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE:
+    '/marine-licence/marine-plan-policy-document-type',
   CONFIRM_SITE_DETAILS: '/marine-licence/confirm-site-details',
   COPY_MARINE_LICENCE: '/marine-licence/copy-marine-licence',
   REDACT_TEXT: '/marine-licence/redact-text',

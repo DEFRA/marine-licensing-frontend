@@ -11,6 +11,7 @@ import {
   mockMarineLicenceApplication,
   mockMarineLicenceWithConsultationApplication,
   mockMarineLicenceWithMarinePlanPolicies,
+  mockMarinePlanPolicyDocument,
   mockSubmittedMarineLicenceApplication,
   mockWithdrawnMarineLicenceApplication,
   mockTransferredMarineLicenceApplication,
@@ -142,9 +143,16 @@ const marineLicencePages = [
   {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE.replace(
       '{documentId}',
-      'c7e4ef70-7c7d-4464-8401-7bf4e6f47351'
+      mockMarinePlanPolicyDocument.documentId
     ),
-    title: 'What type of document is this?'
+    title: 'What type of document is this?',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      marinePlanPolicySupportingDocuments: {
+        ...mockMarineLicenceApplication.marinePlanPolicySupportingDocuments,
+        documents: [mockMarinePlanPolicyDocument]
+      }
+    }
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,

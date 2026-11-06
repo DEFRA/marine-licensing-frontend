@@ -73,9 +73,14 @@ export const marinePlanPoliciesController = {
       })
     )
 
-    sections.push(
-      addSupportingDocumentsSection(marinePlanPolicySupportingDocuments)
-    )
+    if (
+      marinePlanPolicySupportingDocuments?.status &&
+      marinePlanPolicySupportingDocuments.status !== 'NOT_REQUIRED'
+    ) {
+      sections.push(
+        addSupportingDocumentsSection(marinePlanPolicySupportingDocuments)
+      )
+    }
 
     const completedCount = countCompleted(
       allPolicies,

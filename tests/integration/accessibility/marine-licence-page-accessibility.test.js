@@ -136,6 +136,14 @@ const marineLicencePages = [
     title: 'Marine plan policies guidance'
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
+    title: 'Supporting documents'
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE,
+    title: 'What type of document is this?'
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
     title: 'What are your preferred start and end dates for the licence?'
   },

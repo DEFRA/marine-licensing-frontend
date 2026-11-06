@@ -51,10 +51,9 @@ export const addSupportingDocumentsSection = ({ required, status }) => ({
         classes: 'govuk-link--no-visited-state'
       },
       hint: {
-        text:
-          (required ?? required.length)
-            ? `Still needed for ${stillNeededText(required)}`
-            : ''
+        text: required?.length
+          ? `Still needed for ${stillNeededText(required)}`
+          : ''
       },
       href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
       status:

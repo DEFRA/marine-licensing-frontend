@@ -100,6 +100,27 @@ describe('marine plan policy sections', () => {
       })
     })
 
+    test('lists multiple required policy codes with commas and a final "and"', () => {
+      const [item] = addSupportingDocumentsSection({
+        required: ['S-CC-1', 'S-CC-2', 'S-CC-3'],
+        status: 'INCOMPLETE'
+      }).items
+
+      expect(item.hint.text).toBe('Still needed for S-CC-1, S-CC-2 and S-CC-3')
+    })
+
+    test('shows unknown statuses as "Not yet started"', () => {
+      const [item] = addSupportingDocumentsSection({
+        required: [],
+        status: 'IN_PROGRESS'
+      }).items
+
+      expect(item.status.tag).toEqual({
+        text: 'Not yet started',
+        classes: 'govuk-tag--blue'
+      })
+    })
+
     test('output supporting documents section when no documents required', () => {
       expect(
         addSupportingDocumentsSection(mockMarinePlanPolicySupportingDocuments)

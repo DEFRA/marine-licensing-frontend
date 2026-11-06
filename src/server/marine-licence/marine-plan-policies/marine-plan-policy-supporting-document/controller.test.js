@@ -314,14 +314,14 @@ describe('#marinePlanPolicySupportingDocumentController', () => {
     )
   })
 
-  test('redirects to the marine plan policies page when the upload cannot be initiated', async () => {
+  test('throws so the error page is shown when the upload cannot be initiated', async () => {
     initiate.mockRejectedValue(new Error('CDP down'))
-    const request = createMockRequest()
-    const h = createMockH()
 
-    await marinePlanPolicySupportingDocumentController.handler(request, h)
-
-    expect(request.logger.error).toHaveBeenCalled()
-    expect(h.redirect).toHaveBeenCalledWith(policiesUrl)
+    await expect(
+      marinePlanPolicySupportingDocumentController.handler(
+        createMockRequest(),
+        createMockH()
+      )
+    ).rejects.toThrow('CDP down')
   })
 })

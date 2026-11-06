@@ -24,10 +24,12 @@ export const MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE =
 
 const PAGE_TITLE = 'What type of document is this?'
 
+const SELECT_TYPE_MESSAGE = 'Select the type of document'
+
 export const errorMessages = {
-  DOCUMENT_TYPE_REQUIRED: 'Select the type of document',
-  DOCUMENT_ID_INVALID: 'Select the type of document',
-  DOCUMENT_ID_REQUIRED: 'Select the type of document',
+  DOCUMENT_TYPE_REQUIRED: SELECT_TYPE_MESSAGE,
+  DOCUMENT_ID_INVALID: SELECT_TYPE_MESSAGE,
+  DOCUMENT_ID_REQUIRED: SELECT_TYPE_MESSAGE,
   DOCUMENT_TYPE_OTHER_REQUIRED: 'Enter a description of the document',
   DOCUMENT_TYPE_OTHER_MAX_LENGTH: `Description of the document must be ${MPP_DOCUMENT_TYPE_OTHER_MAX_LENGTH} characters or fewer`
 }

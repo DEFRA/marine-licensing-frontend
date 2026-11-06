@@ -21,28 +21,20 @@ export const marinePlanPolicySupportingDocumentController = {
     const { errorSummary, errors } =
       getMarinePlanPolicySupportingDocumentUploadErrorDisplay(request)
 
-    try {
-      const { uploadUrl } =
-        await initiateMarinePlanPolicySupportingDocumentUpload(request, h)
+    const { uploadUrl } =
+      await initiateMarinePlanPolicySupportingDocumentUpload(request, h)
 
-      return h.view(MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT_VIEW_ROUTE, {
-        pageTitle: PAGE_TITLE,
-        heading: PAGE_TITLE,
-        projectName: getMarineLicenceCache(request).projectName,
-        uploadUrl,
-        acceptAttribute: DOCUMENT_ACCEPT_ATTRIBUTE,
-        backLink: policiesUrl,
-        cancelLink: policiesUrl,
-        errorSummary,
-        errors
-      })
-    } catch (error) {
-      request.logger.error(
-        { err: error },
-        'Failed to initialise marine plan policy supporting document upload'
-      )
-      return h.redirect(policiesUrl)
-    }
+    return h.view(MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT_VIEW_ROUTE, {
+      pageTitle: PAGE_TITLE,
+      heading: PAGE_TITLE,
+      projectName: getMarineLicenceCache(request).projectName,
+      uploadUrl,
+      acceptAttribute: DOCUMENT_ACCEPT_ATTRIBUTE,
+      backLink: policiesUrl,
+      cancelLink: policiesUrl,
+      errorSummary,
+      errors
+    })
   }
 }
 

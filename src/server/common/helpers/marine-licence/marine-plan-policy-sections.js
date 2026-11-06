@@ -2,7 +2,7 @@ import { sortByPolicyCode } from '#src/server/common/helpers/marine-licence/sort
 import {
   getMarinePlanPolicyTagStyle,
   MARINE_PLAN_POLICY_STATUS
-} from '../../constants/marin-plan-policies.js'
+} from '../../constants/marine-plan-policies.js'
 import { marineLicenceRoutes } from '../../constants/routes.js'
 
 export const UNCATEGORISED_SECTION = 'Other'
@@ -29,18 +29,10 @@ const compareSections = (a, b) => {
   return a.localeCompare(b)
 }
 
-const stillNeededText = (requiredPolicyCodes) => {
-  let formattedText = ``
+const policyCodeList = new Intl.ListFormat('en-GB', { type: 'conjunction' })
 
-  requiredPolicyCodes.forEach((policy, index) => {
-    formattedText += policy
-    if (index !== requiredPolicyCodes.length - 1) {
-      formattedText += ' and '
-    }
-  })
-
-  return formattedText
-}
+const toKnownStatus = (status) =>
+  Object.hasOwn(MARINE_PLAN_POLICY_STATUS, status) ? status : 'INCOMPLETE'
 
 export const addSupportingDocumentsSection = ({ required, status }) => ({
   heading: 'Supporting documents',
@@ -52,7 +44,7 @@ export const addSupportingDocumentsSection = ({ required, status }) => ({
       },
       hint: {
         text: required?.length
-          ? `Still needed for ${stillNeededText(required)}`
+          ? `Still needed for ${policyCodeList.format(required)}`
           : ''
       },
       href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
@@ -62,8 +54,8 @@ export const addSupportingDocumentsSection = ({ required, status }) => ({
           : {
               classes: 'govuk-task-list__status--nowrap',
               tag: {
-                text: MARINE_PLAN_POLICY_STATUS[status],
-                classes: getMarinePlanPolicyTagStyle(status)
+                text: MARINE_PLAN_POLICY_STATUS[toKnownStatus(status)],
+                classes: getMarinePlanPolicyTagStyle(toKnownStatus(status))
               }
             }
     }

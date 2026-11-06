@@ -113,6 +113,18 @@ export const mockMarinePlanPolicyResponses = {
   }
 }
 
+export const mockMarinePlanPolicySupportingDocuments = {
+  documents: [],
+  required: [],
+  status: 'COMPLETED'
+}
+
+export const mockIncompleteMarinePlanPolicySupportingDocuments = {
+  documents: [],
+  required: ['S-CC-1'],
+  status: 'INCOMPLETE'
+}
+
 export const mockSiteNoticeEvidence = {
   locationName: 'North pier',
   dateDisplayed: { day: '22', month: '05', year: '2026' },
@@ -203,7 +215,8 @@ export const mockMarineLicenceApplication = {
   ],
   waterFrameworkDirective,
   marinePlanPolicies: mockMarinePlanPolicies,
-  marinePlanPolicyResponses: mockMarinePlanPolicyResponses
+  marinePlanPolicyResponses: mockMarinePlanPolicyResponses,
+  marinePlanPolicySupportingDocuments: mockMarinePlanPolicySupportingDocuments
 }
 
 export const mockSubmittedMarineLicenceApplication = {

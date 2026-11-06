@@ -1,9 +1,14 @@
 import {
+  addSupportingDocumentsSection,
   getPolicySection,
   getPolicySectionSlug,
   groupPoliciesBySection,
   UNCATEGORISED_SECTION
 } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
+import {
+  mockIncompleteMarinePlanPolicySupportingDocuments,
+  mockMarinePlanPolicySupportingDocuments
+} from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('marine plan policy sections', () => {
   describe('getPolicySection', () => {
@@ -62,6 +67,60 @@ describe('marine plan policy sections', () => {
         { heading: 'Social', slug: 'social', codes: ['S-TR-1'] },
         { heading: 'Other', slug: 'other', codes: ['S-AGG-1'] }
       ])
+    })
+  })
+
+  describe('addSupportingDocumentsSection', () => {
+    test('output supporting documents section when documents required', () => {
+      expect(
+        addSupportingDocumentsSection(
+          mockIncompleteMarinePlanPolicySupportingDocuments
+        )
+      ).toEqual({
+        heading: 'Supporting documents',
+        items: [
+          {
+            hint: {
+              text: 'Still needed for S-CC-1'
+            },
+            href: '/marine-licence/marine-plan-policy/supporting-document-upload',
+            status: {
+              classes: 'govuk-task-list__status--nowrap',
+              tag: {
+                classes: 'govuk-tag--blue',
+                text: 'Not yet started'
+              }
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Upload supporting documents'
+            }
+          }
+        ]
+      })
+    })
+
+    test('output supporting documents section when no documents required', () => {
+      expect(
+        addSupportingDocumentsSection(mockMarinePlanPolicySupportingDocuments)
+      ).toEqual({
+        heading: 'Supporting documents',
+        items: [
+          {
+            hint: {
+              text: ''
+            },
+            href: '/marine-licence/marine-plan-policy/supporting-document-upload',
+            status: {
+              text: 'Completed'
+            },
+            title: {
+              classes: 'govuk-link--no-visited-state',
+              text: 'Upload supporting documents'
+            }
+          }
+        ]
+      })
     })
   })
 })

@@ -184,7 +184,11 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_MARINE_PLAN_POLICIES_HOLDING:
     '/marine-licence/marine-plan-policies-holding',
   MARINE_LICENCE_MARINE_PLAN_POLICY:
-    '/marine-licence/marine-plan-policy/{policyCode}'
+    '/marine-licence/marine-plan-policy/{policyCode}',
+  MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT:
+    '/marine-licence/marine-plan-policy/supporting-document-upload',
+  MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE:
+    '/marine-licence/marine-plan-policy/supporting-document-type'
 }
 
 export const marineLicenceConsultationDetailsRoutes = {

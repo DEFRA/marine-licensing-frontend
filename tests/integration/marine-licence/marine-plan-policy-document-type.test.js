@@ -111,6 +111,17 @@ describe('Marine plan policy document type page', () => {
     expect(statusCode).toBe(statusCodes.notFound)
   })
 
+  test('returns 404 when there is no marine licence in the session', async () => {
+    mockMarineLicence({})
+
+    const { statusCode } = await makeGetRequest({
+      url: documentTypeUrl(),
+      server: getServer()
+    })
+
+    expect(statusCode).toBe(statusCodes.notFound)
+  })
+
   test('returns 400 when the documentId is not a uuid', async () => {
     const { statusCode } = await makeGetRequest({
       url: documentTypeUrl('not-a-uuid'),

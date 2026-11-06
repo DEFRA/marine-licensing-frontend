@@ -9,6 +9,7 @@ import {
   mockIncompleteMarinePlanPolicySupportingDocuments,
   mockMarinePlanPolicySupportingDocuments
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { getMarinePlanPolicyTagStyle } from '#src/server/common/constants/marine-plan-policies.js'
 
 describe('marine plan policy sections', () => {
   describe('getPolicySection', () => {
@@ -142,6 +143,15 @@ describe('marine plan policy sections', () => {
           }
         ]
       })
+    })
+  })
+
+  describe('getMarinePlanPolicyTagStyle', () => {
+    test.each([
+      ['INCOMPLETE', 'govuk-tag--blue'],
+      ['COMPLETED', '']
+    ])('returns the tag style for %s', (status, expected) => {
+      expect(getMarinePlanPolicyTagStyle(status)).toBe(expected)
     })
   })
 })

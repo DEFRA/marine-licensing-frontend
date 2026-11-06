@@ -1,5 +1,8 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
-import { marinePlanPolicyDocumentTypeSchema } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-type/schema.js'
+import {
+  marinePlanPolicyDocumentTypeParamsSchema,
+  marinePlanPolicyDocumentTypeSchema
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-type/schema.js'
 
 export const MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/marine-plan-policy-document-type/index'
@@ -19,6 +22,11 @@ const buildView = () => ({
 })
 
 export const marinePlanPolicyDocumentTypeController = {
+  options: {
+    validate: {
+      params: marinePlanPolicyDocumentTypeParamsSchema
+    }
+  },
   handler(_request, h) {
     return h
       .view(MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE, buildView())
@@ -29,6 +37,7 @@ export const marinePlanPolicyDocumentTypeController = {
 export const marinePlanPolicyDocumentTypeSubmitController = {
   options: {
     validate: {
+      params: marinePlanPolicyDocumentTypeParamsSchema,
       payload: marinePlanPolicyDocumentTypeSchema,
       failAction: (request, h) => {
         return h

@@ -11,11 +11,11 @@ describe('marinePlanPolicySupportingDocumentRoutes routes', () => {
     )
   })
 
-  test('post route is formatted correctly', () => {
+  test('upload and wait route is formatted correctly', () => {
     expect(marinePlanPolicySupportingDocumentRoutes[1]).toEqual(
       expect.objectContaining({
-        method: 'POST',
-        path: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT
+        method: 'GET',
+        path: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT_UPLOAD_AND_WAIT
       })
     )
   })

@@ -137,10 +137,13 @@ const marineLicencePages = [
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
-    title: 'Supporting documents'
+    title: 'Upload a supporting document'
   },
   {
-    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE,
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE.replace(
+      '{documentId}',
+      'c7e4ef70-7c7d-4464-8401-7bf4e6f47351'
+    ),
     title: 'What type of document is this?'
   },
   {

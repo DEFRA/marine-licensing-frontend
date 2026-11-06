@@ -52,7 +52,7 @@ export const addSupportingDocumentsSection = ({ required, status }) => ({
       },
       hint: {
         text:
-          required && required.length
+          (required ?? required.length)
             ? `Still needed for ${stillNeededText(required)}`
             : ''
       },

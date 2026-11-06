@@ -12,7 +12,6 @@ import {
   DOCUMENT_UPLOAD_SESSION_KEY
 } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/constants.js'
 
-// TODO: confirm the backend s3 path for marine plan policy supporting documents.
 const DOCUMENT_S3_PATH = 'marine-licence/marine-plan-policy'
 
 export const getMarinePlanPolicySupportingDocumentUploadSession = (request) =>

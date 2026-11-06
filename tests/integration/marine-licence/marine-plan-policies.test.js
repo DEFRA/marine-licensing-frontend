@@ -7,6 +7,7 @@ import {
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import { mockMarineLicenceWithMarinePlanPolicies } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
+import { mockIncompleteMarinePlanPolicySupportingDocuments } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 describe('Marine plan policies (policy list) page', () => {
   const getServer = setupTestServer()
@@ -62,6 +63,10 @@ describe('Marine plan policies (policy list) page', () => {
           'South West Biodiversity 1 (SW-BIO-1)',
           'South West Marine protected areas 1 (SW-MPA-1)'
         ]
+      },
+      {
+        heading: 'Supporting documents',
+        policies: ['Upload supporting documents']
       }
     ])
   })
@@ -74,11 +79,7 @@ describe('Marine plan policies (policy list) page', () => {
         name: 'South West Aggregates 2 (SW-AGG-2)'
       })
     ).toHaveAttribute('href', getMarinePlanPolicyLink('SW-AGG-2'))
-    expect(document.querySelectorAll('.govuk-task-list__link')).toHaveLength(3)
-  })
-
-  test('Continue button and back link both return to the task list', async () => {
-    const document = await loadPolicyListPage()
+    expect(document.querySelectorAll('.govuk-task-list__link')).toHaveLength(4)
 
     expect(getByRole(document, 'button', { name: 'Continue' })).toHaveAttribute(
       'href',
@@ -114,5 +115,52 @@ describe('Marine plan policies (policy list) page', () => {
       expect(tag).toHaveClass('govuk-tag--red')
     }
     expect(document.body).not.toHaveTextContent('Not yet started')
+  })
+
+  test('show correct text when incomplete supporting documents', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceWithMarinePlanPolicies,
+      marinePlanPolicySupportingDocuments:
+        mockIncompleteMarinePlanPolicySupportingDocuments
+    })
+
+    const document = await loadPolicyListPage()
+
+    const section = [...document.querySelectorAll('.govuk-task-list')].at(-1)
+
+    const sectionData = {
+      heading: section.previousElementSibling.textContent.trim(),
+      policies: [
+        ...section.querySelectorAll('.govuk-task-list__name-and-hint')
+      ].map((el) => el.textContent.replace(/\s+/g, ' ').trim())
+    }
+
+    expect(sectionData).toEqual({
+      heading: 'Supporting documents',
+      policies: ['Upload supporting documents Still needed for S-CC-1']
+    })
+  })
+
+  test('does not show supporting documents if NOT_REQUIRED status', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceWithMarinePlanPolicies,
+      marinePlanPolicySupportingDocuments: {
+        ...mockIncompleteMarinePlanPolicySupportingDocuments,
+        status: 'NOT_REQUIRED'
+      }
+    })
+
+    const document = await loadPolicyListPage()
+
+    const section = [...document.querySelectorAll('.govuk-task-list')].at(-1)
+
+    const sectionData = {
+      heading: section.previousElementSibling.textContent.trim(),
+      policies: [
+        ...section.querySelectorAll('.govuk-task-list__name-and-hint')
+      ].map((el) => el.textContent.replace(/\s+/g, ' ').trim())
+    }
+
+    expect(sectionData.heading).not.toEqual('Supporting documents')
   })
 })

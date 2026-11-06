@@ -1,0 +1,48 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+  {{ appBackLink({
+    backLink: backLink
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {% set documentTypeOtherHtml %}
+    {{ govukInput({
+      id: "documentTypeOther",
+      name: "documentTypeOther",
+      label: {
+        text: "Describe the document"
+      },
+      errorMessage: errors['documentTypeOther'],
+      value: payload.documentTypeOther
+    }) }}
+  {% endset -%}
+
+  {% set documentTypeItems = [] %}
+  {% for value, text in documentTypes %}
+    {% if value == "other" %}
+      {% set _ = documentTypeItems.push({ value: value, text: text, conditional: { html: documentTypeOtherHtml } }) %}
+    {% else %}
+      {% set _ = documentTypeItems.push({ value: value, text: text }) %}
+    {% endif %}
+  {% endfor %}
+
+  {{ appRadioPage({
+    name: "documentType",
+    errorSummary: errorSummary,
+    errors: errors,
+    heading: heading,
+    isPageHeading: true,
+    value: payload.documentType,
+    errorMessage: errors['documentType'],
+    projectName: projectName,
+    items: documentTypeItems,
+    csrfToken: csrfToken,
+    buttonText: "Save and continue",
+    cancelLink: cancelLink
+  }) }}
+{% endblock %}

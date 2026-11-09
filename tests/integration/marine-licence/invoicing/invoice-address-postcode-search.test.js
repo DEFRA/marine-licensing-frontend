@@ -16,7 +16,11 @@ import {
   expectInputValue
 } from '~/tests/integration/shared/expect-utils.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { invoiceAddressPostcodeSearchSettings } from '~/src/server/common/validation/invoicing/constants.js'
+import {
+  ADDRESS_SOURCE,
+  INVOICE_TYPE_OPTIONS,
+  invoiceAddressPostcodeSearchSettings
+} from '~/src/server/common/validation/invoicing/constants.js'
 import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import * as addressLookup from '~/src/server/common/helpers/marine-licence/invoicing/address-lookup.js'
 import {
@@ -142,6 +146,67 @@ describe('Invoice address postcode search', () => {
       inputLabel: 'Property name or number (optional)',
       value: 'Tyneside House'
     })
+  })
+
+  describe('when there is no previous search', () => {
+    const savedUkAddress = {
+      addressLine1: '25 CHANDLERS HOUSE GAOL FERRY STEPS',
+      addressTown: 'BRISTOL',
+      addressPostcode: 'BS1 6WD'
+    }
+
+    const loadWithSavedAddress = (invoiceAddressSource) => {
+      mockMarineLicence({
+        ...mockMarineLicenceApplication,
+        invoicing: {
+          invoiceAddressType: INVOICE_TYPE_OPTIONS.UK,
+          invoiceAddress: savedUkAddress,
+          invoiceAddressSource
+        }
+      })
+
+      return loadPage({
+        requestUrl: `${marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH}?action=change`,
+        server: getServer()
+      })
+    }
+
+    test('defaults the postcode from a saved looked-up address', async () => {
+      const document = await loadWithSavedAddress(ADDRESS_SOURCE.LOOKUP)
+
+      expectInputValue({ document, inputLabel: 'Postcode', value: 'BS1 6WD' })
+      expectInputValue({
+        document,
+        inputLabel: 'Property name or number (optional)',
+        value: ''
+      })
+    })
+
+    test('leaves the postcode empty for a saved manually entered address', async () => {
+      const document = await loadWithSavedAddress(ADDRESS_SOURCE.MANUAL)
+
+      expectInputValue({ document, inputLabel: 'Postcode', value: '' })
+    })
+  })
+
+  test('a previous search takes precedence over a saved looked-up address', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      invoicing: {
+        invoiceAddressType: INVOICE_TYPE_OPTIONS.UK,
+        invoiceAddress: { addressPostcode: 'BS1 6WD' },
+        invoiceAddressSource: ADDRESS_SOURCE.LOOKUP,
+        invoiceAddressSearch: { postcode: 'NE4 7AR' }
+      }
+    })
+
+    const document = await loadPage({
+      requestUrl:
+        marineLicenceRoutes.MARINE_LICENCE_INVOICE_ADDRESS_POSTCODE_SEARCH,
+      server: getServer()
+    })
+
+    expectInputValue({ document, inputLabel: 'Postcode', value: 'NE4 7AR' })
   })
 
   test('page content when using the change link', async () => {

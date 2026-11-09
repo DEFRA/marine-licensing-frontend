@@ -61,8 +61,8 @@ describe('#formatConsultationsForDisplay', () => {
         {
           html: `<a href="${expectedLink}" class="govuk-link govuk-link--no-visited-state">Test Project</a>`
         },
-        { text: 'Request for advice' },
         { text: 'MLA/2026/10001' },
+        { text: 'Request for advice' },
         {
           html: '<strong class="govuk-tag govuk-tag--grey">No response needed</strong>'
         },

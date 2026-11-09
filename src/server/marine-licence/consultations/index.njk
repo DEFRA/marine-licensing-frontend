@@ -12,15 +12,15 @@
           captionClasses: "govuk-visually-hidden",
           head: [
             { text: "Application name" },
+            { text: "Reference" },           
             { text: "Type" },
-            { text: "Reference" },
             { text: "Status" },
             { text: "Received" }
           ],
           rows: consultations
         }) }}
       {% else %}
-        <p class="govuk-body">There are no consultations to display.</p>
+        <p class="govuk-body">There are no consultations to show.</p>
       {% endif %}
     </div>
   </div>

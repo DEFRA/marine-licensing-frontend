@@ -46,8 +46,8 @@ export const formatConsultationsForDisplay = (consultations) =>
         consultation.id
       )}" class="govuk-link govuk-link--no-visited-state">${escapeHtml(consultation.projectName)}</a>`
     },
-    { text: CONSULTATION_TYPE[consultation.consultationType] || '-' },
     { text: consultation.applicationReference || '-' },
+    { text: CONSULTATION_TYPE[consultation.consultationType] || '-' },
     getConsultationStatusCell(consultation.consultationStatus),
     {
       text: consultation.consultationStartDate

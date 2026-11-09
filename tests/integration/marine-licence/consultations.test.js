@@ -46,8 +46,8 @@ describe('Consultations', () => {
     )
     expect(headers).toEqual([
       'Application name',
-      'Type',
       'Reference',
+      'Type',
       'Status',
       'Received'
     ])
@@ -58,8 +58,8 @@ describe('Consultations', () => {
     )
     expect(cells).toEqual([
       'Harbour wall repair',
-      'Application notification',
       'MLA/2026/10001',
+      'Application notification',
       'Response needed',
       '1 Oct 2026'
     ])
@@ -89,7 +89,7 @@ describe('Consultations', () => {
     const document = await loadConsultationsPage()
 
     expect(
-      getByText(document, 'There are no consultations to display.')
+      getByText(document, 'There are no consultations to show.')
     ).toBeInTheDocument()
   })
 

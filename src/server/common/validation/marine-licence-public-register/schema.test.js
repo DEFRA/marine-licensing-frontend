@@ -8,12 +8,24 @@ describe('#marineLicencePublicRegisterSchema', () => {
     expect(error).toBeUndefined()
   })
 
-  test('should validate when information is withheld with details', () => {
-    const { error } = marineLicencePublicRegisterSchema.validate({
-      withholdConsent: 'yes',
-      reason: 'Some details'
+  test.each(['nationalSecurity', 'commercialConfidentiality'])(
+    'should validate when information is withheld for %s',
+    (withholdReason) => {
+      const { error } = marineLicencePublicRegisterSchema.validate({
+        withholdConsent: 'yes',
+        withholdReason
+      })
+      expect(error).toBeUndefined()
+    }
+  )
+
+  test('should strip a withhold reason when no information is withheld', () => {
+    const { error, value } = marineLicencePublicRegisterSchema.validate({
+      withholdConsent: 'no',
+      withholdReason: 'nationalSecurity'
     })
     expect(error).toBeUndefined()
+    expect(value).toEqual({ withholdConsent: 'no' })
   })
 
   test('should fail on empty payload', () => {
@@ -28,19 +40,18 @@ describe('#marineLicencePublicRegisterSchema', () => {
     expect(error.message).toBe('PUBLIC_REGISTER_WITHHOLD_CONSENT_REQUIRED')
   })
 
-  test('should fail when withholding but details are empty', () => {
-    const { error } = marineLicencePublicRegisterSchema.validate({
-      withholdConsent: 'yes',
-      reason: ''
-    })
-    expect(error.message).toBe('PUBLIC_REGISTER_REASON_REQUIRED')
-  })
-
-  test('should fail when details exceed 1000 characters', () => {
-    const { error } = marineLicencePublicRegisterSchema.validate({
-      withholdConsent: 'yes',
-      reason: 'x'.repeat(1001)
-    })
-    expect(error.message).toBe('PUBLIC_REGISTER_REASON_MAX_LENGTH')
-  })
+  test.each([
+    { name: 'missing', withholdReason: undefined },
+    { name: 'empty', withholdReason: '' },
+    { name: 'not a known reason', withholdReason: 'other' }
+  ])(
+    'should fail when withholding and the reason is $name',
+    ({ withholdReason }) => {
+      const { error } = marineLicencePublicRegisterSchema.validate({
+        withholdConsent: 'yes',
+        withholdReason
+      })
+      expect(error.message).toBe('PUBLIC_REGISTER_WITHHOLD_REASON_REQUIRED')
+    }
+  )
 })

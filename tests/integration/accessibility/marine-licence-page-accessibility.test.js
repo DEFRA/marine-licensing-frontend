@@ -129,7 +129,7 @@ const marineLicencePages = [
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-    title: 'Sharing your application information on the public register'
+    title: 'Withholding information from the public register'
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
@@ -511,6 +511,22 @@ describe('Marine licence page accessibility checks (Axe)', () => {
         formData: { postcode: 'ZZ1 1ZZ', propertyNameOrNumber: '' }
       })
 
+      await runAxeChecks(document.documentElement)
+    })
+  })
+  describe('"Withholding information from the public register" page in an error state', () => {
+    test('has no accessibility violations when Yes is selected without a reason', async () => {
+      mockMarineLicence(mockMarineLicenceApplication)
+
+      const { document } = await submitForm({
+        requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+        server: getServer(),
+        formData: { withholdConsent: 'yes' }
+      })
+
+      expect(
+        document.querySelector('.govuk-radios__conditional .govuk-error-message')
+      ).toBeInTheDocument()
       await runAxeChecks(document.documentElement)
     })
   })

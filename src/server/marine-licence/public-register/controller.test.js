@@ -14,7 +14,7 @@ describe('#publicRegister', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    publicRegister: { withholdConsent: 'yes', reason: 'Some details' }
+    publicRegister: { withholdConsent: 'yes', withholdReason: 'nationalSecurity' }
   }
 
   beforeEach(() => {
@@ -65,7 +65,7 @@ describe('#publicRegister', () => {
           {
             payload: {
               withholdConsent: 'yes',
-              reason: 'Some details'
+              withholdReason: 'nationalSecurity'
             },
             query: {}
           },
@@ -105,6 +105,32 @@ describe('#publicRegister', () => {
       )
     })
 
+    test('Should not save a withhold reason when no information is withheld', async () => {
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
+      }
+
+      await publicRegisterSubmitController.handler(
+        {
+          payload: { withholdConsent: 'no', withholdReason: 'nationalSecurity' },
+          query: {}
+        },
+        h
+      )
+
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        '/marine-licence/public-register',
+        { id: mockLicence.id, withholdConsent: 'no' }
+      )
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        expect.objectContaining({ publicRegister: { withholdConsent: 'no' } })
+      )
+    })
+
     test('Should correctly redirect to check your answers when parameter is present', async () => {
       const h = {
         redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
@@ -113,7 +139,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { withholdConsent: 'yes', reason: 'Some details' },
+          payload: { withholdConsent: 'yes', withholdReason: 'nationalSecurity' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -125,14 +151,14 @@ describe('#publicRegister', () => {
         {
           id: mockLicence.id,
           withholdConsent: 'yes',
-          reason: 'Some details'
+          withholdReason: 'nationalSecurity'
         }
       )
       expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
         expect.any(Object),
         h,
         expect.objectContaining({
-          publicRegister: { withholdConsent: 'yes', reason: 'Some details' }
+          publicRegister: { withholdConsent: 'yes', withholdReason: 'nationalSecurity' }
         })
       )
       expect(h.redirect).toHaveBeenCalledWith(
@@ -148,8 +174,8 @@ describe('#publicRegister', () => {
               validation: {
                 details: [
                   {
-                    field: 'reason',
-                    message: 'PUBLIC_REGISTER_REASON_REQUIRED',
+                    field: 'withholdReason',
+                    message: 'PUBLIC_REGISTER_WITHHOLD_REASON_REQUIRED',
                     type: 'any.required'
                   }
                 ]
@@ -168,7 +194,7 @@ describe('#publicRegister', () => {
         {
           payload: {
             withholdConsent: 'yes',
-            reason: 'Some details'
+            withholdReason: 'nationalSecurity'
           },
           query: {}
         },
@@ -181,11 +207,11 @@ describe('#publicRegister', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           payload: {
             withholdConsent: 'yes',
-            reason: 'Some details'
+            withholdReason: 'nationalSecurity'
           },
           errors: expect.objectContaining({
-            reason: expect.objectContaining({
-              text: 'Enter details of what you want withheld and why'
+            withholdReason: expect.objectContaining({
+              text: 'Select a reason why you want to withhold information'
             })
           })
         })

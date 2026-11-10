@@ -14,7 +14,10 @@ describe('#publicRegister', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    publicRegister: { withholdConsent: 'yes', withholdReason: 'nationalSecurity' }
+    publicRegister: {
+      withholdConsent: 'yes',
+      withholdReason: 'nationalSecurity'
+    }
   }
 
   beforeEach(() => {
@@ -113,7 +116,10 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { withholdConsent: 'no', withholdReason: 'nationalSecurity' },
+          payload: {
+            withholdConsent: 'no',
+            withholdReason: 'nationalSecurity'
+          },
           query: {}
         },
         h
@@ -139,7 +145,10 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { withholdConsent: 'yes', withholdReason: 'nationalSecurity' },
+          payload: {
+            withholdConsent: 'yes',
+            withholdReason: 'nationalSecurity'
+          },
           query: { from: 'check-your-answers' }
         },
         h
@@ -158,7 +167,10 @@ describe('#publicRegister', () => {
         expect.any(Object),
         h,
         expect.objectContaining({
-          publicRegister: { withholdConsent: 'yes', withholdReason: 'nationalSecurity' }
+          publicRegister: {
+            withholdConsent: 'yes',
+            withholdReason: 'nationalSecurity'
+          }
         })
       )
       expect(h.redirect).toHaveBeenCalledWith(

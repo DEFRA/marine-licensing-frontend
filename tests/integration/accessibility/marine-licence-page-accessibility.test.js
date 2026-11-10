@@ -525,7 +525,9 @@ describe('Marine licence page accessibility checks (Axe)', () => {
       })
 
       expect(
-        document.querySelector('.govuk-radios__conditional .govuk-error-message')
+        document.querySelector(
+          '.govuk-radios__conditional .govuk-error-message'
+        )
       ).toBeInTheDocument()
       await runAxeChecks(document.documentElement)
     })

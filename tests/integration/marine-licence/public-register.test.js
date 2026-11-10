@@ -127,9 +127,7 @@ describe('Public register', () => {
     expect(topLevelRadios.map((input) => input.value)).toEqual(['yes', 'no'])
 
     const yes = getQuestionInput(document, 'Yes')
-    const conditional = document.getElementById(
-      yes.dataset.ariaControls
-    )
+    const conditional = document.getElementById(yes.dataset.ariaControls)
     expect(conditional).toHaveClass('govuk-radios__conditional')
 
     const reasonFieldset = getFieldsetByLabel({
@@ -141,10 +139,9 @@ describe('Public register', () => {
       'type',
       'radio'
     )
-    expect(getReasonInput(document, COMMERCIAL_CONFIDENTIALITY)).toHaveAttribute(
-      'type',
-      'radio'
-    )
+    expect(
+      getReasonInput(document, COMMERCIAL_CONFIDENTIALITY)
+    ).toHaveAttribute('type', 'radio')
     expect(within(reasonFieldset).queryByRole('textbox')).toBeNull()
   })
 
@@ -154,7 +151,9 @@ describe('Public register', () => {
     expect(getQuestionInput(document, 'Yes')).not.toBeChecked()
     expect(getQuestionInput(document, 'No')).not.toBeChecked()
     expect(getReasonInput(document, NATIONAL_SECURITY)).not.toBeChecked()
-    expect(getReasonInput(document, COMMERCIAL_CONFIDENTIALITY)).not.toBeChecked()
+    expect(
+      getReasonInput(document, COMMERCIAL_CONFIDENTIALITY)
+    ).not.toBeChecked()
   })
 
   test('form state when information is withheld with a reason', async () => {

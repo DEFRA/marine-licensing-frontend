@@ -26,7 +26,8 @@ import {
 import {
   buildNoAddressesFoundError,
   buildLookupUnavailableError,
-  buildTooManyAddressesError
+  buildTooManyAddressesError,
+  getInitialSearchPayload
 } from '#src/server/marine-licence/invoicing/invoice-address-postcode-search/utils.js'
 
 export const INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE =
@@ -85,7 +86,7 @@ export const invoiceAddressPostcodeSearchController = {
     return h.view(INVOICE_ADDRESS_POSTCODE_SEARCH_VIEW_ROUTE, {
       ...getPageParams(action, invoicing),
       projectName: marineLicence.projectName,
-      payload: invoicing.invoiceAddressSearch ?? {}
+      payload: getInitialSearchPayload(invoicing)
     })
   }
 }

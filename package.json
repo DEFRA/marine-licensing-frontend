@@ -93,7 +93,7 @@
     "allure-commandline": "^2.46.1",
     "allure-vitest": "^3.14.0",
     "audit-ci": "7.1.0",
-    "autoprefixer": "^10.6.1",
+    "autoprefixer": "^10.6.2",
     "babel-loader": "^10.1.1",
     "cheerio": "^1.2.0",
     "copy-webpack-plugin": "^14.0.0",
@@ -114,7 +114,7 @@
     "vitest-fetch-mock": "^0.4.5",
     "webpack": "^5.112.2",
     "webpack-assets-manifest": "6.5.5",
-    "webpack-cli": "7.2.3"
+    "webpack-cli": "7.3.1"
   },
   "overrides": {
     "nanoid": "^3.3.18",

@@ -8,11 +8,15 @@ export const WITHHOLD_REASON = {
   COMMERCIAL_CONFIDENTIALITY: 'commercialConfidentiality'
 }
 
-export const withholdReasonLabels = {
+const withholdReasonLabels = {
   [WITHHOLD_REASON.NATIONAL_SECURITY]: 'National security reasons',
   [WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY]:
     'Commercial or industrial confidentiality reasons'
 }
+
+export const withholdReasonItems = Object.values(WITHHOLD_REASON).map(
+  (value) => ({ value, text: withholdReasonLabels[value] })
+)
 
 export const marineLicencePublicRegisterErrorMessages = {
   PUBLIC_REGISTER_WITHHOLD_CONSENT_REQUIRED:

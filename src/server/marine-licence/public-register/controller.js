@@ -12,7 +12,7 @@ import { marineLicencePublicRegisterSchema } from '#src/server/common/validation
 import {
   marineLicencePublicRegisterErrorMessages,
   marineLicencePublicRegisterSettings,
-  withholdReasonLabels
+  withholdReasonItems
 } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 
@@ -20,7 +20,7 @@ export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
 
 const pageSettings = {
   ...marineLicencePublicRegisterSettings,
-  withholdReasonLabels
+  withholdReasonItems
 }
 
 export const publicRegisterController = {

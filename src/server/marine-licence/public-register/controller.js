@@ -11,24 +11,18 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { marineLicencePublicRegisterSchema } from '#src/server/common/validation/marine-licence-public-register/schema.js'
 import {
   marineLicencePublicRegisterErrorMessages,
-  marineLicencePublicRegisterSettings,
-  withholdReasonItems
+  marineLicencePublicRegisterSettings
 } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
-
-const pageSettings = {
-  ...marineLicencePublicRegisterSettings,
-  withholdReasonItems
-}
 
 export const publicRegisterController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
-      ...pageSettings,
+      ...marineLicencePublicRegisterSettings,
       projectName: marineLicence.projectName,
       payload: marineLicence.publicRegister ?? {},
       backLink: getCommonRedirectLink(request)
@@ -45,7 +39,7 @@ export const publicRegisterSubmitController = {
         const backLink = getCommonRedirectLink(request)
         return createFailAction({
           viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
-          settings: pageSettings,
+          settings: marineLicencePublicRegisterSettings,
           errorMessages: marineLicencePublicRegisterErrorMessages,
           projectName,
           backLink,
@@ -97,7 +91,7 @@ export const publicRegisterSubmitController = {
       const errors = errorDescriptionByFieldName(errorSummary)
 
       return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
-        ...pageSettings,
+        ...marineLicencePublicRegisterSettings,
         payload,
         projectName: marineLicence.projectName,
         backLink: getCommonRedirectLink(request),

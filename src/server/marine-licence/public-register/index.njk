@@ -60,7 +60,16 @@
         }
       },
       errorMessage: errors['withholdReason'],
-      items: withholdReasonItems
+      items: [
+        {
+          value: "nationalSecurity",
+          text: "National security reasons"
+        },
+        {
+          value: "commercialConfidentiality",
+          text: "Commercial or industrial confidentiality reasons"
+        }
+      ]
     }) }}
   {% endset -%}
 

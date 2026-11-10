@@ -55,8 +55,8 @@ describe('#getInitialSearchPayload', () => {
     invoiceAddressType: INVOICE_TYPE_OPTIONS.UK,
     invoiceAddressSource: ADDRESS_SOURCE.LOOKUP,
     invoiceAddress: {
-      addressLine1: '1 HIGH STREET',
-      addressPostcode: 'BS1 6WD'
+      addressLine1: 'THE QUAY',
+      addressPostcode: 'BH15 1HP'
     }
   }
 
@@ -73,7 +73,7 @@ describe('#getInitialSearchPayload', () => {
 
   test('returns the postcode of a saved looked-up address', () => {
     expect(getInitialSearchPayload(savedLookup)).toEqual({
-      postcode: 'BS1 6WD'
+      postcode: 'BH15 1HP'
     })
   })
 

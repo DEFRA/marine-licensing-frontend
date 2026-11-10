@@ -150,9 +150,10 @@ describe('Invoice address postcode search', () => {
 
   describe('when there is no previous search', () => {
     const savedUkAddress = {
-      addressLine1: '25 CHANDLERS HOUSE GAOL FERRY STEPS',
-      addressTown: 'BRISTOL',
-      addressPostcode: 'BS1 6WD'
+      addressLine1: 'THE QUAY',
+      addressTown: 'POOLE',
+      addressCounty: 'DORSET',
+      addressPostcode: 'BH15 1HP'
     }
 
     const loadWithSavedAddress = (invoiceAddressSource) => {
@@ -174,7 +175,7 @@ describe('Invoice address postcode search', () => {
     test('defaults the postcode from a saved looked-up address', async () => {
       const document = await loadWithSavedAddress(ADDRESS_SOURCE.LOOKUP)
 
-      expectInputValue({ document, inputLabel: 'Postcode', value: 'BS1 6WD' })
+      expectInputValue({ document, inputLabel: 'Postcode', value: 'BH15 1HP' })
       expectInputValue({
         document,
         inputLabel: 'Property name or number (optional)',
@@ -194,7 +195,7 @@ describe('Invoice address postcode search', () => {
       ...mockMarineLicenceApplication,
       invoicing: {
         invoiceAddressType: INVOICE_TYPE_OPTIONS.UK,
-        invoiceAddress: { addressPostcode: 'BS1 6WD' },
+        invoiceAddress: { addressPostcode: 'BH15 1HP' },
         invoiceAddressSource: ADDRESS_SOURCE.LOOKUP,
         invoiceAddressSearch: { postcode: 'NE4 7AR' }
       }

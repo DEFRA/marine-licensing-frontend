@@ -1,5 +1,6 @@
 import joi from 'joi'
 import { WITHHOLD_REASON } from '#src/server/common/validation/marine-licence-public-register/constants.js'
+import { withCharacterLimit } from '#src/server/common/validation/character-limit.js'
 
 export const marineLicencePublicRegisterSchema = joi.object({
   withholdConsent: joi.string().valid('yes', 'no').required().messages({

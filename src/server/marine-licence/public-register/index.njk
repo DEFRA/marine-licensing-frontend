@@ -50,14 +50,13 @@
   {% endset -%}
 
   {% set conditionalHtml %}
-    {{ govukRadios({
-      idPrefix: "withholdReason",
-      name: "withholdReason",
-      value: payload.withholdReason,
-      fieldset: {
-        legend: {
-          text: "Select a reason"
-        }
+    {{ govukCharacterCount({
+      id: "reason",
+      name: "reason",
+      maxlength: 1000,
+      countType: "characters",
+      label: {
+        text: "Provide details of what you want withheld and why"
       },
       errorMessage: errors['withholdReason'],
       items: [

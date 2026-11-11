@@ -9,30 +9,13 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 import { getMarinePlanPolicyLink } from '#src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
+import { mockMarineLicenceWithMarinePlanPolicies } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('~/src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('~/src/services/marine-licence-service/index.js')
 
 describe('#marinePlanPoliciesController', () => {
   const mockRequest = createMockRequest()
-
-  const policies = [
-    {
-      policyCode: 'SW-MPA-1',
-      title: 'South West Marine protected areas 1',
-      category: 'Environmental'
-    },
-    {
-      policyCode: 'SW-AGG-2',
-      title: 'South West Aggregates 2',
-      category: 'Economic'
-    },
-    {
-      policyCode: 'SW-BIO-1',
-      title: 'South West Biodiversity 1',
-      category: 'Environmental'
-    }
-  ]
 
   const incomplete = {
     tag: { text: 'Incomplete', classes: 'govuk-tag--red' }
@@ -49,11 +32,9 @@ describe('#marinePlanPoliciesController', () => {
       id: 'test-id'
     })
     vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
-      getMarineLicenceById: vi.fn().mockResolvedValue({
-        projectName: 'Test Project',
-        marinePlanPoliciesCount: 3,
-        marinePlanPolicies: policies
-      })
+      getMarineLicenceById: vi
+        .fn()
+        .mockResolvedValue(mockMarineLicenceWithMarinePlanPolicies)
     })
   })
 
@@ -106,6 +87,24 @@ describe('#marinePlanPoliciesController', () => {
             row('SW-BIO-1', 'South West Biodiversity 1 (SW-BIO-1)'),
             row('SW-MPA-1', 'South West Marine protected areas 1 (SW-MPA-1)')
           ]
+        },
+        {
+          heading: 'Supporting documents',
+          items: [
+            {
+              hint: {
+                text: ''
+              },
+              href: '/marine-licence/marine-plan-policy/supporting-document-upload',
+              status: {
+                text: 'Completed'
+              },
+              title: {
+                classes: 'govuk-link--no-visited-state',
+                text: 'Upload supporting documents'
+              }
+            }
+          ]
         }
       ]
     })
@@ -115,9 +114,8 @@ describe('#marinePlanPoliciesController', () => {
     vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
       {
         getMarineLicenceById: vi.fn().mockResolvedValue({
+          ...mockMarineLicenceWithMarinePlanPolicies,
           projectName: 'Test Project',
-          marinePlanPoliciesCount: 3,
-          marinePlanPolicies: policies,
           marinePlanPolicyResponses: {
             'SW-BIO-1': { response: 'A considered answer' }
           }

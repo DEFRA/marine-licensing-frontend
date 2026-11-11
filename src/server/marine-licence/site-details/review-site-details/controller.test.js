@@ -535,7 +535,7 @@ describe('#reviewSiteDetails', () => {
       )
     })
 
-    test('should redirect to check-your-answers when flash returnTo is set and siteDetails is not COMPLETED', async () => {
+    test('should redirect to task list when the user came from check-your-answers and siteDetails is not COMPLETED', async () => {
       getMarineLicenceCacheSpy.mockReturnValueOnce({
         id: 'test-id',
         siteDetails: []
@@ -550,6 +550,7 @@ describe('#reviewSiteDetails', () => {
 
       const h = createMockHandler('redirect')
       const request = createMockRequest({ payload: {} })
+      request.query = { from: 'check-your-answers' }
       request.yar.flash.mockReturnValue([
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       ])
@@ -557,6 +558,9 @@ describe('#reviewSiteDetails', () => {
       await reviewSiteDetailsSubmitController.handler(request, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+      expect(h.redirect).not.toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       )
     })

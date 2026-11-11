@@ -548,6 +548,15 @@ export const mockMarineLicenceWithMarinePlanPolicies = {
   ]
 }
 
+export const withReadyToSend = (marineLicence) => ({
+  ...marineLicence,
+  taskList: { ...mockMarineLicenceTaskList },
+  siteDetailsDataComplete: true,
+  marinePlanPolicyJob: 'ready',
+  marinePlanPoliciesCount: 1,
+  marinePlanPolicyResponseCount: 1
+})
+
 export const mockFileUploadMarineLicence = {
   ...mockMarineLicenceApplication,
   siteDetails: [

@@ -6,14 +6,9 @@ import {
 } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { setProjectType } from '#src/server/common/helpers/session-cache/utils.js'
 import {
-  transformFeeEstimateTaskList,
-  transformProjectDetailsTaskList,
-  transformSiteDetailsTaskList,
-  transformOtherPermissionsTaskList,
-  transformSharingTaskList,
-  transformWaterFrameworkDirectiveTaskList,
-  transformMarinePlanPoliciesTaskList
-} from '#src/server/marine-licence/task-list/utils.js'
+  hasCompletedAllTasks,
+  transformTaskLists
+} from '#src/server/marine-licence/task-list/ready-to-send.js'
 import { authenticatedGetRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { PROJECT_TYPE } from '#src/server/common/constants/projects.js'
@@ -30,34 +25,6 @@ const headingText = 'Marine licence start page'
 const taskListViewSettings = {
   pageTitle: headingText,
   heading: headingText
-}
-
-function transformTaskLists(
-  taskList,
-  isCitizen,
-  {
-    waterFrameworkDirective,
-    marinePlanPolicyJob,
-    marinePlanPoliciesCount,
-    marinePlanPolicyResponseCount
-  }
-) {
-  return {
-    feeEstimate: transformFeeEstimateTaskList(taskList),
-    otherPermissions: transformOtherPermissionsTaskList(taskList, isCitizen),
-    sharing: transformSharingTaskList(taskList),
-    projectDetails: transformProjectDetailsTaskList(taskList),
-    siteDetails: transformSiteDetailsTaskList(taskList),
-    waterFrameworkDirective: transformWaterFrameworkDirectiveTaskList(
-      taskList,
-      waterFrameworkDirective
-    ),
-    marinePlanPolicies: transformMarinePlanPoliciesTaskList(taskList, {
-      marinePlanPolicyJob,
-      marinePlanPoliciesCount,
-      marinePlanPolicyResponseCount
-    })
-  }
 }
 
 async function updateLicenceSession(request, h, licenceData, hasCancel) {
@@ -141,15 +108,7 @@ export const taskListController = {
 
     await updateLicenceSession(request, h, payload.value, hasCancel)
 
-    const hasCompletedAllTasks = [
-      ...transformed.otherPermissions,
-      ...transformed.sharing,
-      ...transformed.projectDetails,
-      ...transformed.siteDetails,
-      ...transformed.waterFrameworkDirective,
-      ...transformed.feeEstimate,
-      ...transformed.marinePlanPolicies
-    ].every((task) => task.status.text === 'Completed')
+    const allTasksCompleted = hasCompletedAllTasks(transformed)
 
     return h.view(TASK_LIST_VIEW_ROUTE, {
       ...taskListViewSettings,
@@ -163,7 +122,7 @@ export const taskListController = {
       marinePlanPoliciesTaskList: transformed.marinePlanPolicies,
       marinePlanPolicyGuidanceLink:
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
-      hasCompletedAllTasks
+      hasCompletedAllTasks: allTasksCompleted
     })
   }
 }

@@ -19,10 +19,7 @@ describe('exemption route', () => {
     exemption.plugin.register(server)
 
     expect(server.ext).toHaveBeenCalledTimes(2)
-    expect(server.ext).toHaveBeenCalledWith(
-      'onPostAuth',
-      expect.any(Function)
-    )
+    expect(server.ext).toHaveBeenCalledWith('onPostAuth', expect.any(Function))
     expect(server.ext).toHaveBeenCalledWith(
       'onPreResponse',
       expect.any(Function)

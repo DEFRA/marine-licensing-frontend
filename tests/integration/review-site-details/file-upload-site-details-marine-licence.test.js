@@ -158,10 +158,17 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
     })
 
     test('should show a validation error rather than redirecting when returnTo flash is set but siteDetails is COMPLETED', async () => {
+      vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi
+          .fn()
+          .mockResolvedValue(withReadyToSend(testScenarios[0].marineLicence))
+      })
+
       const cyaResponse = await makeGetRequest({
         server: getServer(),
         url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       })
+      expect(cyaResponse.statusCode).toBe(statusCodes.ok)
 
       const sessionCookie = cyaResponse.headers['set-cookie']
       const cookieHeader = Array.isArray(sessionCookie)

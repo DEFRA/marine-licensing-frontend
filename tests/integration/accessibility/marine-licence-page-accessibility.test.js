@@ -20,7 +20,8 @@ import {
   mockResubmissionTaskId,
   mockResubmissionWithAllPhotos,
   mockResubmittedMarineLicence,
-  mockApplicationTaskContactId
+  mockApplicationTaskContactId,
+  withReadyToSend
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   mockMarineLicence,
@@ -335,12 +336,13 @@ const marineLicencePages = [
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
-    title: 'Check your answers before sending your information'
+    title: 'Check your answers before sending your information',
+    marineLicence: withReadyToSend(mockMarineLicenceApplication)
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
     title: 'Check your answers before sending your information',
-    marineLicence: mockManualCoordinatesMarineLicence
+    marineLicence: withReadyToSend(mockManualCoordinatesMarineLicence)
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_DELETE,

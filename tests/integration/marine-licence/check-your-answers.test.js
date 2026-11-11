@@ -1,4 +1,4 @@
-import { getByRole, queryByRole } from '@testing-library/dom'
+import { getByRole } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -6,10 +6,16 @@ import {
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage } from '~/tests/integration/shared/app-server.js'
 import {
+  makeGetRequest,
+  makePostRequest
+} from '~/src/server/test-helpers/server-requests.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import {
   mockFileUploadMarineLicence,
   mockManualCoordinatesMarineLicence,
   mockCircularMarineLicence,
-  mockPolygonMarineLicence
+  mockPolygonMarineLicence,
+  withReadyToSend
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
 import { validateWaterFrameworkDirective } from '~/tests/integration/shared/summary-card-validators.js'
@@ -35,7 +41,9 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
   const loadCyaPage = async (marineLicence) => {
     mockMarineLicence(marineLicence)
     vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
-      getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
+      getMarineLicenceById: vi
+        .fn()
+        .mockResolvedValue(withReadyToSend(marineLicence))
     })
     return loadPage({
       requestUrl: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
@@ -231,31 +239,55 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
     })
   })
 
-  describe('licence with no sites', () => {
-    let document
-
-    beforeEach(async () => {
-      document = await loadCyaPage({
+  describe('licence that is not ready to send', () => {
+    test('redirects to the task list when the licence has no sites', async () => {
+      const marineLicence = {
         ...mockFileUploadMarineLicence,
         siteDetails: []
-      })
-    })
-
-    test('does not render site or activity cards', () => {
-      expect(
-        queryByRole(document, 'heading', { level: 2, name: 'Site 1' })
-      ).not.toBeInTheDocument()
-      expect(document.querySelector('#site-location-card')).toBeFalsy()
-    })
-
-    test('still renders the project details card', () => {
-      expect(
-        getByRole(document, 'heading', {
-          level: 2,
-          name: 'Application details'
+      }
+      mockMarineLicence(marineLicence)
+      vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          ...withReadyToSend(marineLicence),
+          taskList: {
+            ...withReadyToSend(marineLicence).taskList,
+            siteDetails: 'INCOMPLETE'
+          },
+          siteDetailsDataComplete: false
         })
-      ).toBeInTheDocument()
-      validateWaterFrameworkDirective(document, expectedWfdContent)
+      })
+
+      const response = await makeGetRequest({
+        server: getServer(),
+        url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
+    test('redirects to the task list on continue when the licence is not ready to send', async () => {
+      const readyLicence = withReadyToSend(mockFileUploadMarineLicence)
+      mockMarineLicence(mockFileUploadMarineLicence)
+      vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          ...readyLicence,
+          taskList: { ...readyLicence.taskList, siteDetails: 'IN_PROGRESS' }
+        })
+      })
+
+      const response = await makePostRequest({
+        server: getServer(),
+        url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
+        formData: {}
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
     })
   })
 

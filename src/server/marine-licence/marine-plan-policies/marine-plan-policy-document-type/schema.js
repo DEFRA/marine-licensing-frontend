@@ -32,8 +32,8 @@ export const marinePlanPolicyDocumentTypeSchema = joi.object({
 })
 
 export const marinePlanPolicyDocumentTypeParamsSchema = joi.object({
-  documentId: joi.string().uuid().required().messages({
-    'string.uuid': 'DOCUMENT_ID_INVALID',
+  documentId: joi.string().guid().required().messages({
+    'string.guid': 'DOCUMENT_ID_INVALID',
     'any.required': 'DOCUMENT_ID_REQUIRED'
   })
 })

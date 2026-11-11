@@ -6,6 +6,7 @@ export const DOCUMENT_ACCEPT_ATTRIBUTE = '.pdf,.doc,.docx,.odt'
 export const DOCUMENT_ALLOWED_MIME_TYPES = [
   'application/pdf',
   'application/msword',
+  'application/x-cfb',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/vnd.oasis.opendocument.text'
 ]

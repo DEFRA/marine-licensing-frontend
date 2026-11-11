@@ -124,13 +124,39 @@ describe('#marinePlanPolicySupportingDocumentUploadAndWaitController', () => {
     )
   })
 
+  test('accepts a .doc file detected as a CFB container', async () => {
+    vi.mocked(authRequests.authenticatedPostRequest).mockResolvedValue({
+      payload: { value: { documentId } }
+    })
+
+    const { h } = await runWait({
+      status: 'ready',
+      filename: 'notice.DOC',
+      s3Location: { detectedContentType: 'application/x-cfb' }
+    })
+
+    expect(authRequests.authenticatedPostRequest).toHaveBeenCalled()
+    expect(h.redirect).toHaveBeenCalledWith(
+      `/marine-licence/marine-plan-policy/supporting-document-type/${documentId}`
+    )
+  })
+
   test.each([
-    ['not a PDF or document', { detectedContentType: 'application/x-rar' }],
-    ['of unknown type', {}]
-  ])('rejects a file that is %s', async (_, s3Location) => {
+    [
+      'not a PDF or document',
+      'notice.rar',
+      { detectedContentType: 'application/x-rar' }
+    ],
+    ['of unknown type', 'notice.rar', {}],
+    [
+      'a non-Word CFB file',
+      'sheet.xls',
+      { detectedContentType: 'application/x-cfb' }
+    ]
+  ])('rejects a file that is %s', async (_, filename, s3Location) => {
     const result = await runWait({
       status: 'ready',
-      filename: 'notice.rar',
+      filename,
       s3Location
     })
 

@@ -30,8 +30,15 @@ const rejectionMessage = (errorCode) => {
   return REJECTION_MESSAGES[errorCode] ?? getCdpErrorMessageFromCode(errorCode)
 }
 
-const isAllowedFileType = (s3Location) =>
-  DOCUMENT_ALLOWED_MIME_TYPES.includes(s3Location?.detectedContentType)
+const CFB_MIME_TYPE = 'application/x-cfb'
+
+const isAllowedFileType = ({ s3Location, filename }) => {
+  const detected = s3Location?.detectedContentType
+  if (detected === CFB_MIME_TYPE) {
+    return /\.doc$/i.test(filename ?? '')
+  }
+  return DOCUMENT_ALLOWED_MIME_TYPES.includes(detected)
+}
 
 const failUpload = async ({ request, h, uploadPageUrl }, message) => {
   await setMarinePlanPolicySupportingDocumentUploadSession(request, h, {
@@ -43,7 +50,7 @@ const failUpload = async ({ request, h, uploadPageUrl }, message) => {
 const saveDocument = async (status, context) => {
   const { request, h, noUploadUrl, persistDocument, buildReturnUrl } = context
 
-  if (!isAllowedFileType(status.s3Location)) {
+  if (!isAllowedFileType(status)) {
     return failUpload(context, DOCUMENT_FILE_TYPE_ERROR_MESSAGE)
   }
 

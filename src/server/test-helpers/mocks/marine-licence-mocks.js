@@ -113,6 +113,28 @@ export const mockMarinePlanPolicyResponses = {
   }
 }
 
+export const mockMarinePlanPolicyDocument = {
+  documentId: 'c7e4ef70-7c7d-4464-8401-7bf4e6f47351',
+  uploadedFile: { filename: 'ecological-assessment.docx' },
+  s3Location: {
+    s3Bucket: 'test-bucket',
+    s3Key: 'test-key',
+    checksumSha256: 'test-checksum'
+  }
+}
+
+export const mockMarinePlanPolicySupportingDocuments = {
+  documents: [],
+  required: [],
+  status: 'COMPLETED'
+}
+
+export const mockIncompleteMarinePlanPolicySupportingDocuments = {
+  documents: [],
+  required: ['S-CC-1'],
+  status: 'INCOMPLETE'
+}
+
 export const mockSiteNoticeEvidence = {
   locationName: 'North pier',
   dateDisplayed: { day: '22', month: '05', year: '2026' },
@@ -203,7 +225,8 @@ export const mockMarineLicenceApplication = {
   ],
   waterFrameworkDirective,
   marinePlanPolicies: mockMarinePlanPolicies,
-  marinePlanPolicyResponses: mockMarinePlanPolicyResponses
+  marinePlanPolicyResponses: mockMarinePlanPolicyResponses,
+  marinePlanPolicySupportingDocuments: mockMarinePlanPolicySupportingDocuments
 }
 
 export const mockSubmittedMarineLicenceApplication = {

@@ -264,6 +264,34 @@ describe('#checkYourAnswersContinueController', () => {
     expect(mockH.redirect).toHaveBeenCalledWith(routes.DECLARATION)
   })
 
+  describe('when only special legal powers is unfinished', () => {
+    beforeEach(() => {
+      const readyLicence = withReadyToSend(mockMarineLicenceApplication)
+      mockGetMarineLicenceById.mockResolvedValue({
+        ...readyLicence,
+        taskList: { ...readyLicence.taskList, specialLegalPowers: 'INCOMPLETE' }
+      })
+    })
+
+    test('redirects a citizen to the declaration', async () => {
+      await checkYourAnswersContinueController.handler({}, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.DECLARATION)
+    })
+
+    test('redirects an employee to the task list', async () => {
+      vi.mocked(getUserSession).mockResolvedValue({
+        userRelationshipType: 'Employee'
+      })
+
+      await checkYourAnswersContinueController.handler({}, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+  })
+
   test('redirects to the task list when the application is not ready to send', async () => {
     const readyLicence = withReadyToSend(mockMarineLicenceApplication)
     mockGetMarineLicenceById.mockResolvedValue({

@@ -1,9 +1,14 @@
 import {
   buildNoAddressesFoundError,
   buildLookupUnavailableError,
-  buildTooManyAddressesError
+  buildTooManyAddressesError,
+  getInitialSearchPayload
 } from '#src/server/marine-licence/invoicing/invoice-address-postcode-search/utils.js'
-import { invoiceAddressPostcodeSearchErrorMessages } from '#src/server/common/validation/invoicing/constants.js'
+import {
+  ADDRESS_SOURCE,
+  INVOICE_TYPE_OPTIONS,
+  invoiceAddressPostcodeSearchErrorMessages
+} from '#src/server/common/validation/invoicing/constants.js'
 
 describe('#invoiceAddressPostcodeSearchUtils', () => {
   test.each([
@@ -42,5 +47,55 @@ describe('#invoiceAddressPostcodeSearchUtils', () => {
     expect(buildLookupUnavailableError().errorSummary[0].text).not.toBe(
       buildNoAddressesFoundError().errorSummary[0].text
     )
+  })
+})
+
+describe('#getInitialSearchPayload', () => {
+  const savedLookup = {
+    invoiceAddressType: INVOICE_TYPE_OPTIONS.UK,
+    invoiceAddressSource: ADDRESS_SOURCE.LOOKUP,
+    invoiceAddress: {
+      addressLine1: 'THE QUAY',
+      addressPostcode: 'BH15 1HP'
+    }
+  }
+
+  test('returns the previous search when there is one', () => {
+    const invoiceAddressSearch = {
+      postcode: 'NE4 7AR',
+      propertyNameOrNumber: 'Tyneside House'
+    }
+
+    expect(
+      getInitialSearchPayload({ ...savedLookup, invoiceAddressSearch })
+    ).toEqual(invoiceAddressSearch)
+  })
+
+  test('returns the postcode of a saved looked-up address', () => {
+    expect(getInitialSearchPayload(savedLookup)).toEqual({
+      postcode: 'BH15 1HP'
+    })
+  })
+
+  test.each([
+    [
+      'a manually entered address',
+      { ...savedLookup, invoiceAddressSource: ADDRESS_SOURCE.MANUAL }
+    ],
+    [
+      'an address with no recorded source',
+      { ...savedLookup, invoiceAddressSource: undefined }
+    ],
+    [
+      'an international address',
+      {
+        ...savedLookup,
+        invoiceAddressType: INVOICE_TYPE_OPTIONS.INTERNATIONAL
+      }
+    ],
+    ['no saved address', { ...savedLookup, invoiceAddress: undefined }],
+    ['no invoicing details', undefined]
+  ])('returns an empty payload for %s', (_description, invoicing) => {
+    expect(getInitialSearchPayload(invoicing)).toEqual({})
   })
 })

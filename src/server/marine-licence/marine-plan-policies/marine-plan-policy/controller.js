@@ -32,10 +32,8 @@ export const errorMessages = {
   POLICY_CONSIDERATION_REQUIRED: 'Enter how you have considered this policy',
   POLICY_CONSIDERATION_MAX_LENGTH:
     'Policy consideration must be 2000 characters or less',
-  POLICY_CONSIDERATION_MIN_LENGTH:
-    'Your consideration must be 70 characters or more. If you do not explain fully how you have considered this policy, we will reject your application.',
-  POLICY_CONSIDERATION_MIN_LENGTH_WITH_DOCUMENTATION:
-    'Your consideration must be 70 characters or more. Have you explained it in full, rather than only referring to your document? If not, we will reject your application.'
+  POLICY_CONSIDERATION_MIN_LENGTH: `Your consideration must be ${MIN_POLICY_RESPONSE_LENGTH} characters or more. If you do not explain fully how you have considered this policy, we will reject your application.`,
+  POLICY_CONSIDERATION_MIN_LENGTH_WITH_DOCUMENTATION: `Your consideration must be ${MIN_POLICY_RESPONSE_LENGTH} characters or more. Have you explained it in full, rather than only referring to your document? If not, we will reject your application.`
 }
 
 const getPolicyReturnLink = (returnTo, policy) => {

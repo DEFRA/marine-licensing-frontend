@@ -37,7 +37,8 @@ describe('Consultation details', () => {
   const mockConsultation = ({
     consultationType,
     consultationStatus,
-    response
+    response,
+    notes
   }) =>
     mockMarineLicence({
       ...mockMarineLicenceWithConsultationApplication,
@@ -45,7 +46,8 @@ describe('Consultation details', () => {
         ...mockMarineLicenceWithConsultationApplication.consultation,
         consultationType,
         consultationStatus,
-        response
+        response,
+        notes
       }
     })
 
@@ -176,7 +178,10 @@ describe('Consultation details', () => {
 
   describe('Request for advice page', () => {
     test('page elements', async () => {
-      mockConsultation({ consultationType: 'REQUEST_FOR_ADVICE' })
+      mockConsultation({
+        consultationType: 'REQUEST_FOR_ADVICE',
+        notes: 'Please advise on fish stocks'
+      })
 
       const document = await loadPage({
         requestUrl: requestForAdviceUrl,
@@ -209,6 +214,9 @@ describe('Consultation details', () => {
         })
       ).toBeInTheDocument()
       expect(
+        getByText(document, 'Please advise on fish stocks')
+      ).toBeInTheDocument()
+      expect(
         getByRole(document, 'button', { name: 'Respond to the request' })
       ).toHaveAttribute('href', consultationResponseUrl)
     })
@@ -226,10 +234,10 @@ describe('Consultation details', () => {
       })
 
       expect(
-        queryByRole(document, 'heading', {
+        getByRole(document, 'heading', {
           name: 'Advice requested by the MMO'
         })
-      ).toBeNull()
+      ).toBeInTheDocument()
 
       expect(
         queryByRole(document, 'button', { name: 'Respond to the request' })

@@ -20,7 +20,7 @@ describe('exemption route', () => {
 
     expect(server.ext).toHaveBeenCalledTimes(2)
     expect(server.ext).toHaveBeenCalledWith(
-      'onPreHandler',
+      'onPostAuth',
       expect.any(Function)
     )
     expect(server.ext).toHaveBeenCalledWith(
@@ -383,7 +383,7 @@ describe('exemption route', () => {
     expect(mockToolkit.redirect).toHaveBeenCalledWith(routes.SIGNIN)
   })
 
-  test('onPreHandler extension should set commonPageViewData', async () => {
+  test('onPostAuth extension should set commonPageViewData', async () => {
     getPageViewCommonData.mockResolvedValue({
       applicantOrganisationName: 'Test Organisation'
     })
@@ -395,8 +395,8 @@ describe('exemption route', () => {
 
     exemption.plugin.register(server)
 
-    const onPreHandlerCallback = server.ext.mock.calls.find(
-      (call) => call[0] === 'onPreHandler'
+    const onPostAuthCallback = server.ext.mock.calls.find(
+      (call) => call[0] === 'onPostAuth'
     )[1]
 
     const mockRequest = {
@@ -406,7 +406,7 @@ describe('exemption route', () => {
     }
     const mockH = { continue: 'continue' }
 
-    const result = await onPreHandlerCallback(mockRequest, mockH)
+    const result = await onPostAuthCallback(mockRequest, mockH)
 
     expect(getPageViewCommonData).toHaveBeenCalledWith(mockRequest)
     expect(mockRequest.app.commonPageViewData).toEqual({
@@ -415,7 +415,7 @@ describe('exemption route', () => {
     expect(result).toBe('continue')
   })
 
-  test('onPreHandler extension should handle no user session', async () => {
+  test('onPostAuth extension should handle no user session', async () => {
     getPageViewCommonData.mockResolvedValue({})
 
     const server = {
@@ -425,14 +425,14 @@ describe('exemption route', () => {
 
     exemption.plugin.register(server)
 
-    const onPreHandlerCallback = server.ext.mock.calls.find(
-      (call) => call[0] === 'onPreHandler'
+    const onPostAuthCallback = server.ext.mock.calls.find(
+      (call) => call[0] === 'onPostAuth'
     )[1]
 
     const mockRequest = { app: {}, query: {}, state: {} }
     const mockH = { continue: 'continue' }
 
-    const result = await onPreHandlerCallback(mockRequest, mockH)
+    const result = await onPostAuthCallback(mockRequest, mockH)
 
     expect(getPageViewCommonData).toHaveBeenCalledWith(mockRequest)
     expect(mockRequest.app.commonPageViewData).toEqual({})

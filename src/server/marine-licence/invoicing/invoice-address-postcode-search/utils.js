@@ -1,5 +1,9 @@
 import { errorDescriptionByFieldName } from '#src/server/common/helpers/errors.js'
-import { invoiceAddressPostcodeSearchErrorMessages } from '#src/server/common/validation/invoicing/constants.js'
+import {
+  ADDRESS_SOURCE,
+  INVOICE_TYPE_OPTIONS,
+  invoiceAddressPostcodeSearchErrorMessages
+} from '#src/server/common/validation/invoicing/constants.js'
 
 const buildPostcodeError = (text) => {
   const errorSummary = [
@@ -30,3 +34,20 @@ export const buildTooManyAddressesError = () =>
   buildPostcodeError(
     invoiceAddressPostcodeSearchErrorMessages.TOO_MANY_ADDRESSES
   )
+
+const isSavedLookupAddress = (invoicing) =>
+  invoicing?.invoiceAddressType === INVOICE_TYPE_OPTIONS.UK &&
+  invoicing.invoiceAddressSource === ADDRESS_SOURCE.LOOKUP &&
+  Boolean(invoicing.invoiceAddress?.addressPostcode)
+
+export const getInitialSearchPayload = (invoicing) => {
+  if (invoicing?.invoiceAddressSearch) {
+    return invoicing.invoiceAddressSearch
+  }
+
+  if (isSavedLookupAddress(invoicing)) {
+    return { postcode: invoicing.invoiceAddress.addressPostcode }
+  }
+
+  return {}
+}

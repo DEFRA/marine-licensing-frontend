@@ -6,6 +6,7 @@ import { deleteMarineLicenceRoutes } from '#src/server/marine-licence/delete/ind
 import { withdrawMarineLicenceRoutes } from '#src/server/marine-licence/withdraw/index.js'
 import { specialLegalPowersRoutes } from '#src/server/marine-licence/special-legal-powers/index.js'
 import { publicRegisterRoutes } from '#src/server/marine-licence/public-register/index.js'
+import { publicRegisterNationalSecurityRoutes } from '#src/server/marine-licence/public-register-national-security/index.js'
 import { publicConsultationRoutes } from '#src/server/marine-licence/public-consultation/index.js'
 import { otherAuthoritiesRoutes } from '#src/server/marine-licence/other-authorities/index.js'
 import { harbourAuthorityRoutes } from '#src/server/marine-licence/harbour-authority/index.js'
@@ -44,6 +45,7 @@ export const marineLicence = {
         ...withdrawMarineLicenceRoutes,
         ...specialLegalPowersRoutes,
         ...publicRegisterRoutes,
+        ...publicRegisterNationalSecurityRoutes,
         ...publicConsultationRoutes,
         ...otherAuthoritiesRoutes,
         ...harbourAuthorityRoutes,

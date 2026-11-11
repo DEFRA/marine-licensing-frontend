@@ -11,11 +11,40 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { marineLicencePublicRegisterSchema } from '#src/server/common/validation/marine-licence-public-register/schema.js'
 import {
   marineLicencePublicRegisterErrorMessages,
-  marineLicencePublicRegisterSettings
+  marineLicencePublicRegisterSettings,
+  WITHHOLD_REASON
 } from '#src/server/common/validation/marine-licence-public-register/constants.js'
-import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import {
+  getCommonRedirectLink,
+  withCheckYourAnswersQuery
+} from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
+
+const isNationalSecurity = (publicRegister) =>
+  publicRegister?.withholdConsent === 'yes' &&
+  publicRegister.withholdReason === WITHHOLD_REASON.NATIONAL_SECURITY
+
+const keepNationalSecurityAnswers = (publicRegister, existing) => {
+  if (!isNationalSecurity(publicRegister) || !isNationalSecurity(existing)) {
+    return publicRegister
+  }
+  const { nationalSecurityApproval, reason } = existing
+  return {
+    ...publicRegister,
+    ...(nationalSecurityApproval && { nationalSecurityApproval }),
+    ...(reason && { reason })
+  }
+}
+
+const getNextPage = (request, publicRegister) =>
+  isNationalSecurity(publicRegister)
+    ? withCheckYourAnswersQuery(
+        request,
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
+      )
+    : getCommonRedirectLink(request)
 
 export const publicRegisterController = {
   async handler(request, h) {
@@ -71,10 +100,13 @@ export const publicRegisterSubmitController = {
 
       await setMarineLicenceCache(request, h, {
         ...marineLicence,
-        publicRegister
+        publicRegister: keepNationalSecurityAnswers(
+          publicRegister,
+          marineLicence.publicRegister
+        )
       })
 
-      return h.redirect(getCommonRedirectLink(request))
+      return h.redirect(getNextPage(request, publicRegister))
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details

@@ -1,0 +1,99 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "radio-page/macro.njk" import appRadioPage %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% set nationalSecurityContentHtml %}
+    <p class="govuk-body">This covers the security and wellbeing of the UK, its people, its institutions and its system of government. It may include information about:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>protection against terrorism or hostile state activity</li>
+      <li>critical national infrastructure</li>
+      <li>defence and military capability</li>
+      <li>national resilience and preparedness</li>
+      <li>international security co-operation</li>
+      <li>locations, assets, systems or capabilities that may be vulnerable to hostile acts</li>
+    </ul>
+
+    {{ govukWarningText({
+      text: "You will need approval from the Secretary of State for Defence to withhold information on national security grounds."
+    }) }}
+
+    <p class="govuk-body">We will only withhold the specific information that meets the criteria for withholding information for national security reasons. We will publish the rest of your application and supporting documents.</p>
+
+    <p class="govuk-body">We will decide whether the information you identify meets the criteria. This may delay your application. If we decide it does not, we will publish the information.</p>
+  {% endset -%}
+
+  {% set reasonHint %}
+    <p class="govuk-hint">To help us decide whether your request meets the criteria, you must tell us:</p>
+    {# govuk-hint is required here: govuk-list sets its own text colour #}
+    <ul class="govuk-list govuk-list--bullet govuk-hint">
+      <li>what information you want withheld</li>
+      <li>where it appears in your application or supporting documents</li>
+      <li>why that information is sensitive</li>
+      <li>what harm would be caused by publishing it, and who would be affected</li>
+      <li>details of your approval from the Secretary of State for Defence</li>
+    </ul>
+    <p class="govuk-hint">If we decide to publish any of the information you asked us to withhold, we will tell you before we publish it, and you can withdraw your application if you want to.</p>
+    <p class="govuk-hint govuk-!-margin-bottom-0">Enter a maximum of 1,000 characters</p>
+  {% endset -%}
+
+  {% set conditionalHtml %}
+    {{ govukTextarea({
+      id: "reason",
+      name: "reason",
+      label: {
+        text: "Tell us what you want withheld and why"
+      },
+      hint: {
+        html: reasonHint
+      },
+      errorMessage: errors['reason'],
+      value: payload.reason
+    }) }}
+  {% endset -%}
+
+  {{ appRadioPage({
+    name: "nationalSecurityApproval",
+    errorSummary: errorSummary,
+    heading: heading,
+    isPageHeading: true,
+    value: payload.nationalSecurityApproval,
+    errorMessage: errors['nationalSecurityApproval'],
+    projectName: projectName,
+    contentHtml: nationalSecurityContentHtml,
+    legend: "Do you have approval from the Secretary of State for Defence to withhold information for national security reasons?",
+    items: [
+      {
+        value: "yes",
+        text: "Yes",
+        conditional: {
+          html: conditionalHtml
+        }
+      },
+      {
+        value: "no",
+        text: "No",
+        hint: {
+          text: "If you get approval later, you can come back and change your answer before you submit your application."
+        }
+      }
+    ],
+    csrfToken: csrfToken,
+    cancelLink: cancelLink
+  }) }}
+
+{% endblock %}

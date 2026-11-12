@@ -72,7 +72,7 @@ describe('marine plan policy sections', () => {
   })
 
   describe('addSupportingDocumentsSection', () => {
-    test('output supporting documents section when documents required', () => {
+    test('output supporting documents section as in progress when documents required and some uploaded', () => {
       expect(
         addSupportingDocumentsSection(
           mockIncompleteMarinePlanPolicySupportingDocuments
@@ -88,8 +88,8 @@ describe('marine plan policy sections', () => {
             status: {
               classes: 'govuk-task-list__status--nowrap',
               tag: {
-                classes: 'govuk-tag--blue',
-                text: 'Not yet started'
+                classes: 'govuk-tag--teal',
+                text: 'In progress'
               }
             },
             title: {
@@ -110,10 +110,22 @@ describe('marine plan policy sections', () => {
       expect(item.hint.text).toBe('Still needed for S-CC-1, S-CC-2 and S-CC-3')
     })
 
+    test('shows "Not yet started" when documents are required but none uploaded', () => {
+      const [item] = addSupportingDocumentsSection({
+        ...mockIncompleteMarinePlanPolicySupportingDocuments,
+        documents: []
+      }).items
+
+      expect(item.status.tag).toEqual({
+        text: 'Not yet started',
+        classes: 'govuk-tag--blue'
+      })
+    })
+
     test('shows unknown statuses as "Not yet started"', () => {
       const [item] = addSupportingDocumentsSection({
         documentsOutstanding: [],
-        status: 'IN_PROGRESS'
+        status: 'UNKNOWN'
       }).items
 
       expect(item.status.tag).toEqual({
@@ -149,6 +161,7 @@ describe('marine plan policy sections', () => {
   describe('getMarinePlanPolicyTagStyle', () => {
     test.each([
       ['INCOMPLETE', 'govuk-tag--blue'],
+      ['IN_PROGRESS', 'govuk-tag--teal'],
       ['COMPLETED', '']
     ])('returns the tag style for %s', (status, expected) => {
       expect(getMarinePlanPolicyTagStyle(status)).toBe(expected)

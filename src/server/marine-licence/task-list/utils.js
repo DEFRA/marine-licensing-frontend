@@ -193,7 +193,7 @@ export const transformMarinePlanPoliciesTaskList = (
     }
   ]
 
-  if (taskList.siteDetails !== 'COMPLETED') {
+  if (taskList.siteDetails !== 'COMPLETED' && marinePlanPolicyJob !== 'ready') {
     return cannotStartYet
   }
 

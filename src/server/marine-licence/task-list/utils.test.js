@@ -638,10 +638,9 @@ describe('taskList utils', () => {
     })
 
     test.each([
-      ['INCOMPLETE', 'ready'],
-      ['IN_PROGRESS', 'ready'],
       ['INCOMPLETE', 'pending'],
       ['IN_PROGRESS', 'failed'],
+      ['IN_PROGRESS', null],
       [undefined, undefined]
     ])(
       'returns "Cannot start yet" (no link) when siteDetails=%s and job=%s',
@@ -658,6 +657,31 @@ describe('taskList utils', () => {
               text: 'Cannot start yet',
               classes: 'govuk-task-list__status--cannot-start-yet'
             }
+          }
+        ])
+      }
+    )
+
+    test.each([['INCOMPLETE'], ['IN_PROGRESS']])(
+      'keeps the existing policy status when siteDetails=%s and job=ready',
+      (siteDetails) => {
+        expect(
+          transformMarinePlanPoliciesTaskList(
+            { siteDetails },
+            {
+              marinePlanPolicyJob: 'ready',
+              marinePlanPoliciesCount: 44,
+              marinePlanPolicyResponseCount: 44
+            }
+          )
+        ).toEqual([
+          {
+            title: {
+              text: 'Marine plan policy considerations (44 of 44 completed)',
+              classes: 'govuk-link--no-visited-state'
+            },
+            href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+            status: { text: 'Completed' }
           }
         ])
       }

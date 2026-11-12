@@ -1,6 +1,7 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
@@ -26,8 +27,6 @@
           errorList: errorSummary
         }) }}
       {% endif %}
-
-      <h1 class="govuk-heading-l">{{ heading }}</h1>
 
       <form method="POST" novalidate>
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
@@ -56,8 +55,23 @@
           }) %}
         {% endfor %}
 
+        {% set hintHtml %}
+          {{ govukInsetText({ text: filename }) }}
+          Select every policy this document supports. For each one, tell us where in the document the relevant information is.
+        {% endset %}
+
         {{ govukCheckboxes({
           name: "supportedPolicies",
+          fieldset: {
+            legend: {
+              text: heading,
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--l"
+            }
+          },
+          hint: {
+            html: hintHtml
+          },
           items: policyItems,
           values: payload.supportedPolicies,
           errorMessage: errors["supportedPolicies"]

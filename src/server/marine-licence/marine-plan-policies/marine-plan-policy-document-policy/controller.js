@@ -54,7 +54,12 @@ const loadDocumentContext = async (request) => {
 
   const { documentsOutstanding } = marinePlanPolicySupportingDocuments
 
-  return { documentId, documentsOutstanding, marinePlanPolicies }
+  return {
+    documentId,
+    documentsOutstanding,
+    marinePlanPolicies,
+    filename: document.uploadedFile?.filename
+  }
 }
 
 const documentPolicyUrl = (documentId) =>
@@ -73,12 +78,14 @@ const buildView = ({
   documentId,
   documentsOutstanding,
   marinePlanPolicies,
+  filename,
   payload,
   errors,
   errorSummary
 }) => ({
   pageTitle: PAGE_TITLE,
   heading: PAGE_TITLE,
+  filename,
   options: getPolicyOptions(documentsOutstanding, marinePlanPolicies),
   backLink: documentTypeUrl(documentId),
   cancelLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
@@ -94,17 +101,11 @@ export const marinePlanPolicyDocumentPolicyController = {
     }
   },
   async handler(request, h) {
-    const { documentId, documentsOutstanding, marinePlanPolicies } =
-      await loadDocumentContext(request)
+    const context = await loadDocumentContext(request)
 
     return h.view(
       MARINE_PLAN_POLICY_DOCUMENT_POLICY_VIEW_ROUTE,
-      buildView({
-        documentId,
-        documentsOutstanding,
-        marinePlanPolicies,
-        payload: {}
-      })
+      buildView({ ...context, payload: {} })
     )
   }
 }
@@ -115,8 +116,7 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
       params: marinePlanPolicyDocumentPolicyParamsSchema,
       payload: marinePlanPolicyDocumentPolicySchema,
       failAction: async (request, h, err) => {
-        const { documentId, documentsOutstanding, marinePlanPolicies } =
-          await loadDocumentContext(request)
+        const context = await loadDocumentContext(request)
         const errorSummary = mapErrorsForDisplay(
           err.details ?? [],
           errorMessages
@@ -126,9 +126,7 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
           .view(
             MARINE_PLAN_POLICY_DOCUMENT_POLICY_VIEW_ROUTE,
             buildView({
-              documentId,
-              documentsOutstanding,
-              marinePlanPolicies,
+              ...context,
               payload: request.payload,
               errors: errorDescriptionByFieldName(errorSummary),
               errorSummary

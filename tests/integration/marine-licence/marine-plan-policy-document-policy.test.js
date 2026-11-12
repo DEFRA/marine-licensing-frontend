@@ -72,6 +72,12 @@ describe('Marine plan policy document policy page', () => {
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'Which policies does this document support?'
     )
+    expect(document.querySelector('.govuk-inset-text')).toHaveTextContent(
+      mockMarinePlanPolicyDocument.uploadedFile.filename
+    )
+    expect(document.querySelector('#supportedPolicies-hint')).toHaveTextContent(
+      'Select every policy this document supports. For each one, tell us where in the document the relevant information is.'
+    )
 
     expect(
       getByRole(document, 'checkbox', {
@@ -136,6 +142,9 @@ describe('Marine plan policy document policy page', () => {
       'supportedPolicies',
       'Select the policies this document supports'
     )
+    const errorGroup = document.querySelector('.govuk-form-group--error')
+    expect(errorGroup.querySelector('h1')).toBeInTheDocument()
+    expect(errorGroup.querySelector('.govuk-inset-text')).toBeInTheDocument()
   })
 
   test('shows an error when a selected policy has no location', async () => {

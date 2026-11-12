@@ -124,14 +124,16 @@ export const mockMarinePlanPolicyDocument = {
 }
 
 export const mockMarinePlanPolicySupportingDocuments = {
-  documents: [],
-  required: [],
+  documents: [mockMarinePlanPolicyDocument],
+  requiringDocuments: ['S-CC-1'],
+  documentsOutstanding: [],
   status: 'COMPLETED'
 }
 
 export const mockIncompleteMarinePlanPolicySupportingDocuments = {
-  documents: [],
-  required: ['S-CC-1'],
+  documents: [mockMarinePlanPolicyDocument],
+  requiringDocuments: ['S-CC-1'],
+  documentsOutstanding: ['S-CC-1'],
   status: 'INCOMPLETE'
 }
 

@@ -34,6 +34,12 @@ export const errorMessages = {
   DOCUMENT_TYPE_OTHER_MAX_LENGTH: `Description of the document must be ${MPP_DOCUMENT_TYPE_OTHER_MAX_LENGTH} characters or fewer`
 }
 
+const documentPolicyUrl = (documentId) =>
+  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
+    '{documentId}',
+    documentId
+  )
+
 const loadDocumentContext = async (request) => {
   const marineLicence = getMarineLicenceCache(request)
 
@@ -128,6 +134,6 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
       { id, documentId, documentType, documentTypeOther }
     )
 
-    return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
+    return h.redirect(documentPolicyUrl(documentId))
   }
 }

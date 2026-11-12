@@ -103,7 +103,7 @@ describe('marine plan policy sections', () => {
 
     test('lists multiple required policy codes with commas and a final "and"', () => {
       const [item] = addSupportingDocumentsSection({
-        required: ['S-CC-1', 'S-CC-2', 'S-CC-3'],
+        documentsOutstanding: ['S-CC-1', 'S-CC-2', 'S-CC-3'],
         status: 'INCOMPLETE'
       }).items
 
@@ -112,7 +112,7 @@ describe('marine plan policy sections', () => {
 
     test('shows unknown statuses as "Not yet started"', () => {
       const [item] = addSupportingDocumentsSection({
-        required: [],
+        documentsOutstanding: [],
         status: 'IN_PROGRESS'
       }).items
 

@@ -155,6 +155,14 @@ const marineLicencePages = [
     }
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
+      '{documentId}',
+      mockMarinePlanPolicyDocument.documentId
+    ),
+    title: 'Which policies does this document support?',
+    marineLicence: mockMarineLicenceApplication
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
     title: 'What are your preferred start and end dates for the licence?'
   },

@@ -34,7 +34,10 @@ const policyCodeList = new Intl.ListFormat('en-GB', { type: 'conjunction' })
 const toKnownStatus = (status) =>
   Object.hasOwn(MARINE_PLAN_POLICY_STATUS, status) ? status : 'INCOMPLETE'
 
-export const addSupportingDocumentsSection = ({ required, status }) => ({
+export const addSupportingDocumentsSection = ({
+  documentsOutstanding,
+  status
+}) => ({
   heading: 'Supporting documents',
   items: [
     {
@@ -43,8 +46,8 @@ export const addSupportingDocumentsSection = ({ required, status }) => ({
         classes: 'govuk-link--no-visited-state'
       },
       hint: {
-        text: required?.length
-          ? `Still needed for ${policyCodeList.format(required)}`
+        text: documentsOutstanding?.length
+          ? `Still needed for ${policyCodeList.format(documentsOutstanding)}`
           : ''
       },
       href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,

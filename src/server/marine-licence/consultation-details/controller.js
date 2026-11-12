@@ -60,6 +60,7 @@ const createConsultationPageController = (
       pageTitle: heading,
       heading,
       marineLicenceId,
+      notes: consultation.notes,
       projectName: consultation.projectName,
       hasResponded: hasResponded(consultation),
       consulteeResponse: response,

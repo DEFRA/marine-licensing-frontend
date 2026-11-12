@@ -78,10 +78,11 @@ export const consultationResponseSubmitController = {
       payload: consultationResponseSchema,
       failAction: async (request, h, err) => {
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
+        const consultation = await getConsultation(request)
 
         return h
           .view(CONSULTATION_RESPONSE_VIEW_ROUTE, {
-            ...getViewContext(request, await getConsultation(request)),
+            ...getViewContext(request, consultation),
             payload: request.payload,
             errors: errorDescriptionByFieldName(errorSummary),
             errorSummary

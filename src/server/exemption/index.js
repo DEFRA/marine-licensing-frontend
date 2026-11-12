@@ -18,7 +18,7 @@ export const exemption = {
   plugin: {
     name: 'exemption',
     register(server) {
-      server.ext('onPreHandler', async (request, h) => {
+      server.ext('onPostAuth', async (request, h) => {
         request.app.commonPageViewData = await getPageViewCommonData(request)
         return h.continue
       })

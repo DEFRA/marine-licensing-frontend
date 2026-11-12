@@ -11,6 +11,7 @@ import {
   mockMarineLicenceApplication,
   mockMarineLicenceWithConsultationApplication,
   mockMarineLicenceWithMarinePlanPolicies,
+  mockMarinePlanPolicyDocument,
   mockSubmittedMarineLicenceApplication,
   mockWithdrawnMarineLicenceApplication,
   mockTransferredMarineLicenceApplication,
@@ -135,6 +136,24 @@ const marineLicencePages = [
   {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
     title: 'Marine plan policies guidance'
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
+    title: 'Upload a supporting document'
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE.replace(
+      '{documentId}',
+      mockMarinePlanPolicyDocument.documentId
+    ),
+    title: 'What type of document is this?',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      marinePlanPolicySupportingDocuments: {
+        ...mockMarineLicenceApplication.marinePlanPolicySupportingDocuments,
+        documents: [mockMarinePlanPolicyDocument]
+      }
+    }
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,

@@ -6,7 +6,11 @@ import {
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
-import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '~/src/server/common/constants/routes.js'
+import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import {
   mockMarineLicenceApplication,
   mockMarinePlanPolicies,
@@ -37,7 +41,7 @@ const mockLicenceWithDocument = (document = mockMarinePlanPolicyDocument) =>
     marinePlanPolicySupportingDocuments: {
       ...mockMarineLicenceApplication.marinePlanPolicySupportingDocuments,
       documents: [document],
-      documentsOutstanding: ['S-CC-1', 'S-CC-2']
+      requiringDocuments: ['S-CC-1', 'S-CC-2']
     }
   })
 
@@ -66,7 +70,7 @@ describe('Marine plan policy document policy page', () => {
     expect(document.querySelector(`#${field}-error`)).toHaveTextContent(message)
   }
 
-  test('shows the heading, outstanding policies, and the back, cancel and save links', async () => {
+  test('shows the heading, policies requiring documents, and the back, cancel and save links', async () => {
     const document = await loadDocumentPolicyPage()
 
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
@@ -104,6 +108,25 @@ describe('Marine plan policy document policy page', () => {
     )
   })
 
+  test('pre-selects saved policy links with their locations', async () => {
+    mockLicenceWithDocument({
+      ...mockMarinePlanPolicyDocument,
+      policyLinks: [{ policyCode: 'S-CC-2', location: 'section 4.2' }]
+    })
+
+    const document = await loadDocumentPolicyPage()
+
+    expect(
+      getByRole(document, 'checkbox', { name: policyLabel('S-CC-2') })
+    ).toBeChecked()
+    expect(
+      getByRole(document, 'checkbox', { name: policyLabel('S-CC-1') })
+    ).not.toBeChecked()
+    expect(document.querySelector('#location-S-CC-2')).toHaveValue(
+      'section 4.2'
+    )
+  })
+
   test('shows a location field with hint for each policy', async () => {
     const document = await loadDocumentPolicyPage()
 
@@ -119,13 +142,22 @@ describe('Marine plan policy document policy page', () => {
     }
   })
 
-  test('redirects on success', async () => {
+  test('saves the selected policy links and redirects on success', async () => {
     const { response } = await submitDocumentPolicyForm({
       supportedPolicies: ['S-CC-1'],
-      'location-S-CC-1': 'section 4.2',
+      'location-S-CC-1': ' section 4.2 ',
       'location-S-CC-2': ''
     })
 
+    expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      apiRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_LINKS,
+      {
+        id: mockMarineLicenceApplication.id,
+        documentId,
+        policyLinks: [{ policyCode: 'S-CC-1', location: 'section 4.2' }]
+      }
+    )
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(documentPolicyUrl())
   })
@@ -137,6 +169,7 @@ describe('Marine plan policy document policy page', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.ok)
+    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
     expectFieldError(
       document,
       'supportedPolicies',

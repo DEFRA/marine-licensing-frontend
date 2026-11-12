@@ -1,5 +1,8 @@
 import Boom from '@hapi/boom'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  apiRoutes,
+  marineLicenceRoutes
+} from '#src/server/common/constants/routes.js'
 import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
@@ -12,7 +15,12 @@ import {
   marinePlanPolicyDocumentPolicyParamsSchema,
   marinePlanPolicyDocumentPolicySchema
 } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-policy/schema.js'
-import { getPolicyOptions } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-policy/utils.js'
+import {
+  getPolicyLinks,
+  getPolicyLinksPayload,
+  getPolicyOptions
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-policy/utils.js'
+import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 
 export const MARINE_PLAN_POLICY_DOCUMENT_POLICY_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/marine-plan-policy-document-policy/index'
@@ -52,13 +60,15 @@ const loadDocumentContext = async (request) => {
     throw Boom.notFound('Marine plan policy supporting document not found')
   }
 
-  const { documentsOutstanding } = marinePlanPolicySupportingDocuments
+  const { requiringDocuments } = marinePlanPolicySupportingDocuments
 
   return {
+    id,
     documentId,
-    documentsOutstanding,
+    requiringDocuments,
     marinePlanPolicies,
-    filename: document.uploadedFile?.filename
+    filename: document.uploadedFile?.filename,
+    policyLinks: document.policyLinks
   }
 }
 
@@ -76,7 +86,7 @@ const documentTypeUrl = (documentId) =>
 
 const buildView = ({
   documentId,
-  documentsOutstanding,
+  requiringDocuments,
   marinePlanPolicies,
   filename,
   payload,
@@ -86,7 +96,7 @@ const buildView = ({
   pageTitle: PAGE_TITLE,
   heading: PAGE_TITLE,
   filename,
-  options: getPolicyOptions(documentsOutstanding, marinePlanPolicies),
+  options: getPolicyOptions(requiringDocuments, marinePlanPolicies),
   backLink: documentTypeUrl(documentId),
   cancelLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
   payload,
@@ -105,7 +115,10 @@ export const marinePlanPolicyDocumentPolicyController = {
 
     return h.view(
       MARINE_PLAN_POLICY_DOCUMENT_POLICY_VIEW_ROUTE,
-      buildView({ ...context, payload: {} })
+      buildView({
+        ...context,
+        payload: getPolicyLinksPayload(context.policyLinks)
+      })
     )
   }
 }
@@ -137,7 +150,13 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
     }
   },
   async handler(request, h) {
-    const { documentId } = await loadDocumentContext(request)
+    const { documentId, id } = await loadDocumentContext(request)
+
+    await authenticatedPatchRequest(
+      request,
+      apiRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_LINKS,
+      { id, documentId, policyLinks: getPolicyLinks(request.payload) }
+    )
 
     return h.redirect(documentPolicyUrl(documentId))
   }

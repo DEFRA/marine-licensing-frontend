@@ -133,6 +133,17 @@ const marineLicencePages = [
     title: 'Withholding information from the public register'
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
+    title: 'Withholding information for national security reasons',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity'
+      }
+    }
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
     title: 'Marine plan policies guidance'
   },
@@ -530,6 +541,31 @@ describe('Marine licence page accessibility checks (Axe)', () => {
         formData: { postcode: 'ZZ1 1ZZ', propertyNameOrNumber: '' }
       })
 
+      await runAxeChecks(document.documentElement)
+    })
+  })
+  describe('"Withholding information for national security reasons" page in an error state', () => {
+    test.each([
+      { name: 'no option is selected', formData: {} },
+      {
+        name: 'Yes is selected without details',
+        formData: { nationalSecurityApproval: 'yes', reason: '' }
+      },
+      {
+        name: 'Yes is selected with too many characters',
+        formData: { nationalSecurityApproval: 'yes', reason: 'a'.repeat(1001) }
+      }
+    ])('has no accessibility violations when $name', async ({ formData }) => {
+      mockMarineLicence(mockMarineLicenceApplication)
+
+      const { document } = await submitForm({
+        requestUrl:
+          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
+        server: getServer(),
+        formData
+      })
+
+      expect(document.querySelector('.govuk-error-summary')).toBeInTheDocument()
       await runAxeChecks(document.documentElement)
     })
   })

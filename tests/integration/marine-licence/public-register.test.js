@@ -223,10 +223,31 @@ describe('Public register', () => {
     expect(authenticatedPatchRequest).not.toHaveBeenCalled()
   })
 
-  test('returns to the task list and saves the reason when Yes and a reason are selected', async () => {
+  test('goes to the national security page when national security reasons are selected', async () => {
     const { response } = await submitPublicRegisterForm({
       withholdConsent: 'yes',
       withholdReason: 'nationalSecurity'
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
+    )
+    expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      '/marine-licence/public-register',
+      {
+        id: marineLicence.id,
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity'
+      }
+    )
+  })
+
+  test('returns to the task list when commercial confidentiality reasons are selected', async () => {
+    const { response } = await submitPublicRegisterForm({
+      withholdConsent: 'yes',
+      withholdReason: 'commercialConfidentiality'
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
@@ -239,9 +260,26 @@ describe('Public register', () => {
       {
         id: marineLicence.id,
         withholdConsent: 'yes',
-        withholdReason: 'nationalSecurity'
+        withholdReason: 'commercialConfidentiality'
       }
     )
+  })
+
+  test('keeps earlier selections when the user comes Back from the national security page', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity',
+        nationalSecurityApproval: 'yes',
+        reason: 'Details of the berth'
+      }
+    })
+
+    const document = await loadPublicRegisterPage()
+
+    expect(getQuestionInput(document, 'Yes')).toBeChecked()
+    expect(getReasonInput(document, NATIONAL_SECURITY)).toBeChecked()
   })
 
   test('returns to the task list without a reason when No is selected', async () => {

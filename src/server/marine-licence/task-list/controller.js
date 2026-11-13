@@ -91,7 +91,8 @@ export const taskListController = {
       waterFrameworkDirective,
       marinePlanPolicyJob,
       marinePlanPoliciesCount,
-      marinePlanPolicyResponseCount
+      marinePlanPolicyResponseCount,
+      siteDetailsDataComplete
     } = payload.value
     const { userRelationshipType } = userSession
 
@@ -102,7 +103,8 @@ export const taskListController = {
         waterFrameworkDirective,
         marinePlanPolicyJob,
         marinePlanPoliciesCount,
-        marinePlanPolicyResponseCount
+        marinePlanPolicyResponseCount,
+        siteDetailsDataComplete
       }
     )
 

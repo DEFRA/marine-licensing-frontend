@@ -81,7 +81,8 @@ describe('#taskListController', () => {
         waterFrameworkDirective: { nauticalMile: 'no' },
         marinePlanPolicyJob: 'ready',
         marinePlanPoliciesCount: 44,
-        marinePlanPolicyResponseCount: 12
+        marinePlanPolicyResponseCount: 12,
+        siteDetailsDataComplete: true
       }
     }
 
@@ -258,7 +259,8 @@ describe('#taskListController', () => {
       {
         marinePlanPolicyJob: 'ready',
         marinePlanPoliciesCount: 44,
-        marinePlanPolicyResponseCount: 12
+        marinePlanPolicyResponseCount: 12,
+        siteDetailsDataComplete: true
       }
     )
 
@@ -307,7 +309,8 @@ describe('#taskListController', () => {
         },
         marinePlanPolicyJob: null,
         marinePlanPoliciesCount: 0,
-        marinePlanPolicyResponseCount: 0
+        marinePlanPolicyResponseCount: 0,
+        siteDetailsDataComplete: false
       }
     }
 
@@ -334,7 +337,8 @@ describe('#taskListController', () => {
       {
         marinePlanPolicyJob: null,
         marinePlanPoliciesCount: 0,
-        marinePlanPolicyResponseCount: 0
+        marinePlanPolicyResponseCount: 0,
+        siteDetailsDataComplete: false
       }
     )
   })

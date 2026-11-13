@@ -15,7 +15,8 @@ export const transformTaskLists = (
     waterFrameworkDirective,
     marinePlanPolicyJob,
     marinePlanPoliciesCount,
-    marinePlanPolicyResponseCount
+    marinePlanPolicyResponseCount,
+    siteDetailsDataComplete
   }
 ) => ({
   feeEstimate: transformFeeEstimateTaskList(taskList),
@@ -30,7 +31,8 @@ export const transformTaskLists = (
   marinePlanPolicies: transformMarinePlanPoliciesTaskList(taskList, {
     marinePlanPolicyJob,
     marinePlanPoliciesCount,
-    marinePlanPolicyResponseCount
+    marinePlanPolicyResponseCount,
+    siteDetailsDataComplete
   })
 })
 

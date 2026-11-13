@@ -180,7 +180,8 @@ export const transformMarinePlanPoliciesTaskList = (
   {
     marinePlanPolicyJob,
     marinePlanPoliciesCount,
-    marinePlanPolicyResponseCount
+    marinePlanPolicyResponseCount,
+    siteDetailsDataComplete
   }
 ) => {
   const cannotStartYet = [
@@ -193,7 +194,13 @@ export const transformMarinePlanPoliciesTaskList = (
     }
   ]
 
-  if (taskList.siteDetails !== 'COMPLETED' && marinePlanPolicyJob !== 'ready') {
+  const onlyIncompleteSiteDataOutstanding =
+    marinePlanPolicyJob === 'ready' && siteDetailsDataComplete === false
+
+  if (
+    taskList.siteDetails !== 'COMPLETED' &&
+    !onlyIncompleteSiteDataOutstanding
+  ) {
     return cannotStartYet
   }
 

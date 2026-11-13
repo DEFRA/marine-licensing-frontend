@@ -1,0 +1,94 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+{{ super() }}
+  <nav>
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <form method="POST" novalidate>
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        {% set policyItems = [] %}
+        {% for option in options %}
+          {% set locationField = "location-" + option.value %}
+          {% set locationHtml %}
+            {{ govukInput({
+              id: locationField,
+              name: locationField,
+              label: {
+                text: "Where is the information in this document?"
+              },
+              hint: {
+                text: "For example, section 4.2 or pages 12 to 15"
+              },
+              errorMessage: errors[locationField],
+              value: payload[locationField]
+            }) }}
+          {% endset %}
+          {% set _ = policyItems.push({
+            value: option.value,
+            text: option.text,
+            conditional: { html: locationHtml }
+          }) %}
+        {% endfor %}
+
+        {% set hintHtml %}
+          {{ govukInsetText({ text: filename }) }}
+          Select every policy this document supports. For each one, tell us where in the document the relevant information is.
+        {% endset %}
+
+        {{ govukCheckboxes({
+          name: "supportedPolicies",
+          fieldset: {
+            legend: {
+              text: heading,
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--l"
+            }
+          },
+          hint: {
+            html: hintHtml
+          },
+          items: policyItems,
+          values: payload.supportedPolicies,
+          errorMessage: errors["supportedPolicies"]
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            preventDoubleClick: true
+          }) }}
+
+          {{ appCancelButton({
+            cancelLink: cancelLink
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

@@ -137,6 +137,12 @@ describe('Marine plan policy document type page', () => {
       documentTypeOther: 'ignored'
     })
 
+    const expectedUrl =
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
+        '{documentId}',
+        documentId
+      )
+
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
       apiRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE,
@@ -148,9 +154,7 @@ describe('Marine plan policy document type page', () => {
       }
     )
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
-    )
+    expect(response.headers.location).toBe(expectedUrl)
   })
 
   test('saves "other" with its description', async () => {

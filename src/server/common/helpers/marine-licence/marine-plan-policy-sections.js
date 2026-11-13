@@ -34,7 +34,29 @@ const policyCodeList = new Intl.ListFormat('en-GB', { type: 'conjunction' })
 const toKnownStatus = (status) =>
   Object.hasOwn(MARINE_PLAN_POLICY_STATUS, status) ? status : 'INCOMPLETE'
 
-export const addSupportingDocumentsSection = ({ required, status }) => ({
+const getSupportingDocumentsStatus = (status, documents) => {
+  const knownStatus = toKnownStatus(status)
+  return knownStatus === 'INCOMPLETE' && documents?.length
+    ? 'IN_PROGRESS'
+    : knownStatus
+}
+
+const getSupportingDocumentsStatusItem = (status) =>
+  status === 'COMPLETED'
+    ? { text: MARINE_PLAN_POLICY_STATUS.COMPLETED }
+    : {
+        classes: 'govuk-task-list__status--nowrap',
+        tag: {
+          text: MARINE_PLAN_POLICY_STATUS[status],
+          classes: getMarinePlanPolicyTagStyle(status)
+        }
+      }
+
+export const addSupportingDocumentsSection = ({
+  documents,
+  documentsOutstanding,
+  status
+}) => ({
   heading: 'Supporting documents',
   items: [
     {
@@ -43,21 +65,14 @@ export const addSupportingDocumentsSection = ({ required, status }) => ({
         classes: 'govuk-link--no-visited-state'
       },
       hint: {
-        text: required?.length
-          ? `Still needed for ${policyCodeList.format(required)}`
+        text: documentsOutstanding?.length
+          ? `Still needed for ${policyCodeList.format(documentsOutstanding)}`
           : ''
       },
       href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
-      status:
-        status === 'COMPLETED'
-          ? { text: MARINE_PLAN_POLICY_STATUS.COMPLETED }
-          : {
-              classes: 'govuk-task-list__status--nowrap',
-              tag: {
-                text: MARINE_PLAN_POLICY_STATUS[toKnownStatus(status)],
-                classes: getMarinePlanPolicyTagStyle(toKnownStatus(status))
-              }
-            }
+      status: getSupportingDocumentsStatusItem(
+        getSupportingDocumentsStatus(status, documents)
+      )
     }
   ]
 })

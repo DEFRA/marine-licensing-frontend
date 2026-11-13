@@ -40,6 +40,12 @@ export const getMarinePlanPolicyDocumentTypeUrl = (documentId) =>
     encodeURIComponent(documentId)
   )
 
+export const getMarinePlanPolicyDocumentPolicyUrl = (documentId) =>
+  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
+    '{documentId}',
+    encodeURIComponent(documentId)
+  )
+
 export const buildSupportingDocument = (status) => ({
   uploadedFile: { filename: status.filename },
   s3Location: {

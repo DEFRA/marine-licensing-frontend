@@ -9,7 +9,9 @@ import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicenceApplication,
-  mockMarinePlanPolicyDocument
+  mockMarinePlanPolicies,
+  mockMarinePlanPolicyDocument,
+  mockMarinePlanPolicySupportingDocuments
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 const documentPolicyUrl =
@@ -31,7 +33,39 @@ describe('Marine plan policy documents review page', () => {
   }
 
   beforeEach(() => {
-    mockMarineLicence(mockMarineLicenceApplication)
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      marinePlanPolicySupportingDocuments: {
+        ...mockMarinePlanPolicySupportingDocuments,
+        documents: [
+          {
+            ...mockMarinePlanPolicyDocument,
+            documentType: 'ecological-assessment',
+            policyLinks: mockMarinePlanPolicies.map(({ policyCode }) => ({
+              policyCode,
+              location: 'Section 2'
+            }))
+          }
+        ]
+      }
+    })
+  })
+
+  test('shows a summary card for each document', async () => {
+    const document = await loadDocumentsReviewPage()
+    const card = document.querySelector('.govuk-summary-card')
+    const [type, policies] = card.querySelectorAll('.govuk-summary-list__value')
+
+    expect(card.querySelector('.govuk-summary-card__title')).toHaveTextContent(
+      mockMarinePlanPolicyDocument.uploadedFile.filename
+    )
+    expect(type).toHaveTextContent('Ecological Assessment')
+    expect(
+      [...policies.querySelectorAll('li')].map((li) => li.textContent)
+    ).toEqual([
+      'South Climate change 2 (S-CC-2) - Section 2',
+      'South Climate change 1 (S-CC-1) - Section 2'
+    ])
   })
 
   test('shows the expected page content', async () => {

@@ -76,6 +76,9 @@ describe('Marine plan policy document policy page', () => {
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'Which policies does this document support?'
     )
+    expect(document.querySelector('.govuk-caption-l')).toHaveTextContent(
+      mockMarineLicenceApplication.projectName
+    )
     expect(document.querySelector('.govuk-inset-text')).toHaveTextContent(
       mockMarinePlanPolicyDocument.uploadedFile.filename
     )
@@ -159,7 +162,9 @@ describe('Marine plan policy document policy page', () => {
       }
     )
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(documentPolicyUrl())
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    )
   })
 
   test('shows an error when no policies are selected', async () => {

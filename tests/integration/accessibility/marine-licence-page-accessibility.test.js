@@ -163,6 +163,11 @@ const marineLicencePages = [
     marineLicence: mockMarineLicenceApplication
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW,
+    title: 'Supporting documents',
+    marineLicence: mockMarineLicenceApplication
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
     title: 'What are your preferred start and end dates for the licence?'
   },

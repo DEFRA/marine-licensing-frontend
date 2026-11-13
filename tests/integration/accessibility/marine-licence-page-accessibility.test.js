@@ -134,7 +134,14 @@ const marineLicencePages = [
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
-    title: 'Withholding information for national security reasons'
+    title: 'Withholding information for national security reasons',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity'
+      }
+    }
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,

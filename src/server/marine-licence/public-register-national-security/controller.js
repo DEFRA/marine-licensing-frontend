@@ -17,23 +17,25 @@ import {
   getCommonRedirectLink,
   withCheckYourAnswersQuery
 } from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import {
+  getNationalSecurityAnswers,
+  isNationalSecurity
+} from '#src/server/common/helpers/marine-licence/public-register.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE =
   'marine-licence/public-register-national-security/index'
 
-const getLinks = (request) => ({
-  backLink: withCheckYourAnswersQuery(
+const getPublicRegisterLink = (request) =>
+  withCheckYourAnswersQuery(
     request,
     marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-  ),
+  )
+
+const getLinks = (request) => ({
+  backLink: getPublicRegisterLink(request),
   cancelLink: getCommonRedirectLink(request)
 })
-
-const getSavedAnswers = (publicRegister) => {
-  const { nationalSecurityApproval, reason } = publicRegister ?? {}
-  return { nationalSecurityApproval, reason }
-}
 
 const withAnswers = (publicRegister, answers) => ({
   withholdConsent: publicRegister?.withholdConsent,
@@ -45,10 +47,14 @@ export const publicRegisterNationalSecurityController = {
   handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
+    if (!isNationalSecurity(marineLicence.publicRegister)) {
+      return h.redirect(getPublicRegisterLink(request))
+    }
+
     return h.view(PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE, {
       ...marineLicencePublicRegisterNationalSecuritySettings,
       projectName: marineLicence.projectName,
-      payload: getSavedAnswers(marineLicence.publicRegister),
+      payload: getNationalSecurityAnswers(marineLicence.publicRegister),
       ...getLinks(request)
     })
   }
@@ -77,6 +83,10 @@ export const publicRegisterNationalSecuritySubmitController = {
   async handler(request, h) {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
+
+    if (!isNationalSecurity(marineLicence.publicRegister)) {
+      return h.redirect(getPublicRegisterLink(request))
+    }
 
     try {
       const answers = {

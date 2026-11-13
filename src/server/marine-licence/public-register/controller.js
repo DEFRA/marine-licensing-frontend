@@ -11,26 +11,26 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { marineLicencePublicRegisterSchema } from '#src/server/common/validation/marine-licence-public-register/schema.js'
 import {
   marineLicencePublicRegisterErrorMessages,
-  marineLicencePublicRegisterSettings,
-  WITHHOLD_REASON
+  marineLicencePublicRegisterSettings
 } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 import {
   getCommonRedirectLink,
   withCheckYourAnswersQuery
 } from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import {
+  getNationalSecurityAnswers,
+  isNationalSecurity
+} from '#src/server/common/helpers/marine-licence/public-register.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
-
-const isNationalSecurity = (publicRegister) =>
-  publicRegister?.withholdConsent === 'yes' &&
-  publicRegister.withholdReason === WITHHOLD_REASON.NATIONAL_SECURITY
 
 const keepNationalSecurityAnswers = (publicRegister, existing) => {
   if (!isNationalSecurity(publicRegister) || !isNationalSecurity(existing)) {
     return publicRegister
   }
-  const { nationalSecurityApproval, reason } = existing
+  const { nationalSecurityApproval, reason } =
+    getNationalSecurityAnswers(existing)
   return {
     ...publicRegister,
     ...(nationalSecurityApproval && { nationalSecurityApproval }),

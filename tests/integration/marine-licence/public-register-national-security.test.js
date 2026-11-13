@@ -9,6 +9,7 @@ import {
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { setMarineLicenceCache } from '~/src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 import {
   expectFieldsetError,
   expectInputError
@@ -137,6 +138,32 @@ describe('Public register: national security', () => {
       marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
     )
   })
+
+  test.each([
+    { withholdConsent: 'yes', withholdReason: 'commercialConfidentiality' },
+    { withholdConsent: 'no' }
+  ])(
+    'sends the user back to the withholding information page when the reason is %o',
+    async (publicRegister) => {
+      mockMarineLicence({ ...marineLicence, publicRegister })
+
+      const getResponse = await makeGetRequest({
+        url: PAGE_URL,
+        server: getServer()
+      })
+      const { response: postResponse } = await submitNationalSecurityForm({
+        nationalSecurityApproval: 'no'
+      })
+
+      for (const response of [getResponse, postResponse]) {
+        expect(response.statusCode).toBe(statusCodes.redirect)
+        expect(response.headers.location).toBe(
+          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+        )
+      }
+      expect(authenticatedPatchRequest).not.toHaveBeenCalled()
+    }
+  )
 
   test('shows an error when neither option is selected', async () => {
     const { document } = await submitNationalSecurityForm({})

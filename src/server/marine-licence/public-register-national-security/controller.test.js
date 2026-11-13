@@ -28,6 +28,12 @@ describe('#publicRegisterNationalSecurity', () => {
     view: vi.fn().mockReturnValue({ takeover: vi.fn() })
   })
 
+  const notNationalSecurity = [
+    { withholdConsent: 'yes', withholdReason: 'commercialConfidentiality' },
+    { withholdConsent: 'no' },
+    undefined
+  ]
+
   beforeEach(() => {
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({})
     vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(mockLicence)
@@ -93,9 +99,52 @@ describe('#publicRegisterNationalSecurity', () => {
         })
       )
     })
+
+    test.each(notNationalSecurity)(
+      'redirects to the withholding information page when the reason is %o',
+      (publicRegister) => {
+        vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+          ...mockLicence,
+          publicRegister
+        })
+        const h = createH()
+
+        publicRegisterNationalSecurityController.handler(
+          { query: { from: 'check-your-answers' } },
+          h
+        )
+
+        expect(h.redirect).toHaveBeenCalledWith(
+          `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?from=check-your-answers`
+        )
+        expect(h.view).not.toHaveBeenCalled()
+      }
+    )
   })
 
   describe('#publicRegisterNationalSecuritySubmitController', () => {
+    test.each(notNationalSecurity)(
+      'does not save and redirects to the withholding information page when the reason is %o',
+      async (publicRegister) => {
+        vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+          ...mockLicence,
+          publicRegister
+        })
+        const h = createH()
+
+        await publicRegisterNationalSecuritySubmitController.handler(
+          { payload: { nationalSecurityApproval: 'no' }, query: {} },
+          h
+        )
+
+        expect(h.redirect).toHaveBeenCalledWith(
+          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+        )
+        expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
+        expect(cacheUtils.setMarineLicenceCache).not.toHaveBeenCalled()
+      }
+    )
+
     test('saves an approval with a reason and reloads the page', async () => {
       const h = createH()
 

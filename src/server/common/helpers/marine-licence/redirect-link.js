@@ -6,8 +6,7 @@ const isFromCheckYourAnswers = (request) =>
 export const withCheckYourAnswersQuery = (request, path) =>
   isFromCheckYourAnswers(request) ? `${path}?from=check-your-answers` : path
 
-export const getCommonRedirectLink = (request) => {
-  return isFromCheckYourAnswers(request)
+export const getCommonRedirectLink = (request) =>
+  isFromCheckYourAnswers(request)
     ? marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
     : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-}

@@ -1,4 +1,3 @@
-import Boom from '@hapi/boom'
 import {
   apiRoutes,
   marineLicenceRoutes
@@ -7,8 +6,11 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
-import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
+import { loadMarinePlanPolicyDocument } from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
+import {
+  getMarinePlanPolicyDocumentPolicyUrl,
+  getMarinePlanPolicyDocumentTypeUrl
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/utils.js'
 
 import {
   MPP_DOCUMENT_LOCATION_MAX_LENGTH,
@@ -34,50 +36,19 @@ export const errorMessages = {
 }
 
 const loadDocumentContext = async (request) => {
-  const marineLicence = getMarineLicenceCache(request)
-
-  if (!marineLicence?.id) {
-    throw Boom.notFound('Marine licence not found')
-  }
-
-  const { id } = marineLicence
-  const { documentId } = request.params
-  const marineLicenceFromServer =
-    await getMarineLicenceService(request).getMarineLicenceById(id)
-
-  const { marinePlanPolicySupportingDocuments, marinePlanPolicies } =
-    marineLicenceFromServer
-  const document = marinePlanPolicySupportingDocuments?.documents?.find(
-    (item) => item.documentId === documentId
-  )
-
-  if (!document) {
-    throw Boom.notFound('Marine plan policy supporting document not found')
-  }
-
-  const { requiringDocuments } = marinePlanPolicySupportingDocuments
+  const { id, documentId, document, marineLicence } =
+    await loadMarinePlanPolicyDocument(request)
 
   return {
     id,
     documentId,
-    requiringDocuments,
-    marinePlanPolicies,
+    requiringDocuments:
+      marineLicence.marinePlanPolicySupportingDocuments.requiringDocuments,
+    marinePlanPolicies: marineLicence.marinePlanPolicies,
     filename: document.uploadedFile?.filename,
     policyLinks: document.policyLinks
   }
 }
-
-const documentPolicyUrl = (documentId) =>
-  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
-    '{documentId}',
-    documentId
-  )
-
-const documentTypeUrl = (documentId) =>
-  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE.replace(
-    '{documentId}',
-    documentId
-  )
 
 const buildView = ({
   documentId,
@@ -92,7 +63,7 @@ const buildView = ({
   heading: PAGE_TITLE,
   filename,
   options: getPolicyOptions(requiringDocuments, marinePlanPolicies),
-  backLink: documentTypeUrl(documentId),
+  backLink: getMarinePlanPolicyDocumentTypeUrl(documentId),
   cancelLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
   payload,
   errors,
@@ -164,6 +135,6 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
       { id, documentId, policyLinks: getPolicyLinks(request.payload) }
     )
 
-    return h.redirect(documentPolicyUrl(documentId))
+    return h.redirect(getMarinePlanPolicyDocumentPolicyUrl(documentId))
   }
 }

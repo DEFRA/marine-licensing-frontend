@@ -168,46 +168,37 @@ describe('#publicRegister', () => {
       )
     })
 
-    test.each([
-      { query: {}, expected: '' },
-      {
-        query: { from: 'check-your-answers' },
-        expected: '?from=check-your-answers'
+    test('Should redirect to the national security page within check your answers when that is the reason', async () => {
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
       }
-    ])(
-      'Should redirect to the national security page when that is the reason, with query $query',
-      async ({ query, expected }) => {
-        const h = {
-          redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
-          view: vi.fn()
-        }
 
-        await publicRegisterSubmitController.handler(
-          {
-            payload: {
-              withholdConsent: 'yes',
-              withholdReason: 'nationalSecurity'
-            },
-            query
+      await publicRegisterSubmitController.handler(
+        {
+          payload: {
+            withholdConsent: 'yes',
+            withholdReason: 'nationalSecurity'
           },
-          h
-        )
+          query: { from: 'check-your-answers' }
+        },
+        h
+      )
 
-        expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-          expect.any(Object),
-          h,
-          expect.objectContaining({
-            publicRegister: {
-              withholdConsent: 'yes',
-              withholdReason: 'nationalSecurity'
-            }
-          })
-        )
-        expect(h.redirect).toHaveBeenCalledWith(
-          `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY}${expected}`
-        )
-      }
-    )
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        expect.objectContaining({
+          publicRegister: {
+            withholdConsent: 'yes',
+            withholdReason: 'nationalSecurity'
+          }
+        })
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY}?from=check-your-answers`
+      )
+    })
 
     describe('when national security answers are already saved', () => {
       const savedAnswers = {

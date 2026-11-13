@@ -44,7 +44,7 @@ const withAnswers = (publicRegister, answers) => ({
 })
 
 export const publicRegisterNationalSecurityController = {
-  handler(request, h) {
+  async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
     if (!isNationalSecurity(marineLicence.publicRegister)) {
@@ -98,7 +98,7 @@ export const publicRegisterNationalSecuritySubmitController = {
 
       await authenticatedPatchRequest(
         request,
-        '/marine-licence/public-register/national-security',
+        '/marine-licence/public-register-national-security',
         { ...answers, id: marineLicence.id }
       )
 

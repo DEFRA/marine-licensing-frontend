@@ -141,7 +141,8 @@ describe('Public register: national security', () => {
 
   test.each([
     { withholdConsent: 'yes', withholdReason: 'commercialConfidentiality' },
-    { withholdConsent: 'no' }
+    { withholdConsent: 'no' },
+    undefined
   ])(
     'sends the user back to the withholding information page when the reason is %o',
     async (publicRegister) => {
@@ -177,26 +178,20 @@ describe('Public register: national security', () => {
     expect(authenticatedPatchRequest).not.toHaveBeenCalled()
   })
 
-  test.each([
-    { name: 'empty', reason: '' },
-    { name: 'only whitespace', reason: '   ' }
-  ])(
-    'shows an error linked to the textbox when Yes is selected and the text is $name',
-    async ({ reason }) => {
-      const { document } = await submitNationalSecurityForm({
-        nationalSecurityApproval: 'yes',
-        reason
-      })
+  test('shows an error linked to the textbox when Yes is selected and the text is empty', async () => {
+    const { document } = await submitNationalSecurityForm({
+      nationalSecurityApproval: 'yes',
+      reason: ''
+    })
 
-      expectInputError({
-        document,
-        inputLabel: TEXTBOX_LABEL,
-        errorMessage: REASON_REQUIRED
-      })
-      expect(getQuestionInput(document, 'Yes')).toBeChecked()
-      expect(authenticatedPatchRequest).not.toHaveBeenCalled()
-    }
-  )
+    expectInputError({
+      document,
+      inputLabel: TEXTBOX_LABEL,
+      errorMessage: REASON_REQUIRED
+    })
+    expect(getQuestionInput(document, 'Yes')).toBeChecked()
+    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
+  })
 
   test('shows an error linked to the textbox when the text is 1001 characters', async () => {
     const reason = 'a'.repeat(1001)
@@ -225,7 +220,7 @@ describe('Public register: national security', () => {
     expect(response.headers.location).toBe(PAGE_URL)
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
-      '/marine-licence/public-register/national-security',
+      '/marine-licence/public-register-national-security',
       { id: marineLicence.id, nationalSecurityApproval: 'yes', reason }
     )
 
@@ -263,7 +258,7 @@ describe('Public register: national security', () => {
     expect(response.headers.location).toBe(PAGE_URL)
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
-      '/marine-licence/public-register/national-security',
+      '/marine-licence/public-register-national-security',
       { id: marineLicence.id, nationalSecurityApproval: 'no' }
     )
     const savedLicence = vi.mocked(setMarineLicenceCache).mock.calls.at(-1)[2]

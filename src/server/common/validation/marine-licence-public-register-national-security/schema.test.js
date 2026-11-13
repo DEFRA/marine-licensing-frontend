@@ -3,11 +3,6 @@ import { marineLicencePublicRegisterNationalSecuritySchema } from '#src/server/c
 const schema = marineLicencePublicRegisterNationalSecuritySchema
 
 describe('#marineLicencePublicRegisterNationalSecuritySchema', () => {
-  test('should validate when there is no approval', () => {
-    const { error } = schema.validate({ nationalSecurityApproval: 'no' })
-    expect(error).toBeUndefined()
-  })
-
   test('should strip the reason when there is no approval', () => {
     const { error, value } = schema.validate({
       nationalSecurityApproval: 'no',

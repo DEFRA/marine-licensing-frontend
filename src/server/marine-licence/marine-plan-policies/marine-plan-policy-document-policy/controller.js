@@ -33,11 +33,6 @@ export const errorMessages = {
   DOCUMENT_LOCATION_MAX_LENGTH: `The location of the information in the document must be ${MPP_DOCUMENT_LOCATION_MAX_LENGTH} characters or fewer`
 }
 
-export const MPP_DOCUMENT_POLICY_OPTIONS = [
-  { value: '1', text: '1' },
-  { value: '2', text: '2' }
-]
-
 const loadDocumentContext = async (request) => {
   const marineLicence = getMarineLicenceCache(request)
 
@@ -113,6 +108,10 @@ export const marinePlanPolicyDocumentPolicyController = {
   async handler(request, h) {
     const context = await loadDocumentContext(request)
 
+    if (!context.requiringDocuments.length) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
+    }
+
     return h.view(
       MARINE_PLAN_POLICY_DOCUMENT_POLICY_VIEW_ROUTE,
       buildView({
@@ -130,6 +129,13 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
       payload: marinePlanPolicyDocumentPolicySchema,
       failAction: async (request, h, err) => {
         const context = await loadDocumentContext(request)
+
+        if (!context.requiringDocuments.length) {
+          return h
+            .redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
+            .takeover()
+        }
+
         const errorSummary = mapErrorsForDisplay(
           err.details ?? [],
           errorMessages

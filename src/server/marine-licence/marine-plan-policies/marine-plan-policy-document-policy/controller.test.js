@@ -2,7 +2,10 @@ import { vi } from 'vitest'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as marineLicenceService from '#src/services/marine-licence-service/index.js'
-import { marinePlanPolicyDocumentPolicySubmitController } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-policy/controller.js'
+import {
+  marinePlanPolicyDocumentPolicyController,
+  marinePlanPolicyDocumentPolicySubmitController
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-policy/controller.js'
 import {
   apiRoutes,
   marineLicenceRoutes
@@ -79,5 +82,31 @@ describe('#marinePlanPolicyDocumentPolicySubmitController', () => {
       )
     ).rejects.toThrow('API down')
     expect(h.redirect).not.toHaveBeenCalled()
+  })
+})
+
+describe('#marinePlanPolicyDocumentPolicyController', () => {
+  test('redirects to the task list when no policies require documents', async () => {
+    vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValue({ id: 'lic-1' })
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById: vi.fn().mockResolvedValue({
+        marinePlanPolicies: [],
+        marinePlanPolicySupportingDocuments: {
+          documents: [{ documentId }],
+          requiringDocuments: []
+        }
+      })
+    })
+    const h = { redirect: vi.fn(), view: vi.fn() }
+
+    await marinePlanPolicyDocumentPolicyController.handler(
+      { params: { documentId } },
+      h
+    )
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+    )
+    expect(h.view).not.toHaveBeenCalled()
   })
 })

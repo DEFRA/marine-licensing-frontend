@@ -79,6 +79,7 @@ describe('marine plan policy sections', () => {
         )
       ).toEqual({
         heading: 'Supporting documents',
+        slug: 'supporting-documents',
         items: [
           {
             hint: {
@@ -139,6 +140,7 @@ describe('marine plan policy sections', () => {
         addSupportingDocumentsSection(mockMarinePlanPolicySupportingDocuments)
       ).toEqual({
         heading: 'Supporting documents',
+        slug: 'supporting-documents',
         items: [
           {
             hint: {

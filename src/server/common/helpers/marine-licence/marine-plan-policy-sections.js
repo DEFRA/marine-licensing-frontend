@@ -58,6 +58,7 @@ export const addSupportingDocumentsSection = ({
   status
 }) => ({
   heading: 'Supporting documents',
+  slug: 'supporting-documents',
   items: [
     {
       title: {

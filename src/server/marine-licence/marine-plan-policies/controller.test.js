@@ -90,6 +90,7 @@ describe('#marinePlanPoliciesController', () => {
         },
         {
           heading: 'Supporting documents',
+          slug: 'supporting-documents',
           items: [
             {
               hint: {

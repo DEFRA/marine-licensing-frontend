@@ -1,5 +1,6 @@
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { DOCUMENT_ACCEPT_ATTRIBUTE } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/constants.js'
 import { handleSupportingDocumentUploadStatus } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/upload-status.js'
 import {
@@ -16,22 +17,34 @@ const PAGE_TITLE = 'Upload a supporting document'
 
 const policiesUrl = marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
 
+const getReturnLink = async (request, marineLicenceId) => {
+  const { marinePlanPolicySupportingDocuments } =
+    await getMarineLicenceService(request).getMarineLicenceById(marineLicenceId)
+  return marinePlanPolicySupportingDocuments?.documents?.length
+    ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    : policiesUrl
+}
+
 export const marinePlanPolicySupportingDocumentController = {
   async handler(request, h) {
     const { errorSummary, errors } =
       getMarinePlanPolicySupportingDocumentUploadErrorDisplay(request)
 
+    const { id, projectName } = getMarineLicenceCache(request)
+
     const { uploadUrl } =
       await initiateMarinePlanPolicySupportingDocumentUpload(request, h)
+
+    const returnLink = await getReturnLink(request, id)
 
     return h.view(MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT_VIEW_ROUTE, {
       pageTitle: PAGE_TITLE,
       heading: PAGE_TITLE,
-      projectName: getMarineLicenceCache(request).projectName,
+      projectName,
       uploadUrl,
       acceptAttribute: DOCUMENT_ACCEPT_ATTRIBUTE,
-      backLink: policiesUrl,
-      cancelLink: policiesUrl,
+      backLink: returnLink,
+      cancelLink: returnLink,
       errorSummary,
       errors
     })

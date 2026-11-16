@@ -59,14 +59,7 @@ describe('#marinePlanPolicyDocumentPolicySubmitController', () => {
       }
     )
     expect(h.redirect).toHaveBeenCalledWith(
-<<<<<<< HEAD
       marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
-=======
-      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
-        '{documentId}',
-        documentId
-      )
->>>>>>> main
     )
   })
 

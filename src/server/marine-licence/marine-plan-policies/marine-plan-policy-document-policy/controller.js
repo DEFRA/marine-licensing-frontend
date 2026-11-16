@@ -6,7 +6,10 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { loadMarinePlanPolicyDocument } from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
+import {
+  getReturnLink,
+  loadMarinePlanPolicyDocument
+} from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
 import { getMarinePlanPolicyDocumentTypeUrl } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/utils.js'
 
 import {
@@ -44,7 +47,8 @@ const loadDocumentContext = async (request) => {
       marineLicence.marinePlanPolicySupportingDocuments.requiringDocuments,
     marinePlanPolicies: marineLicence.marinePlanPolicies,
     filename: document.uploadedFile?.filename,
-    policyLinks: document.policyLinks
+    policyLinks: document.policyLinks,
+    cancelLink: getReturnLink(marineLicence)
   }
 }
 
@@ -54,6 +58,7 @@ const buildView = ({
   requiringDocuments,
   marinePlanPolicies,
   filename,
+  cancelLink,
   payload,
   errors,
   errorSummary
@@ -64,7 +69,7 @@ const buildView = ({
   filename,
   options: getPolicyOptions(requiringDocuments, marinePlanPolicies),
   backLink: getMarinePlanPolicyDocumentTypeUrl(documentId),
-  cancelLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+  cancelLink,
   payload,
   errors,
   errorSummary

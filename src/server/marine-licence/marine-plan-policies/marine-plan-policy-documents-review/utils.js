@@ -14,14 +14,17 @@ const outputType = (document) => {
   return output
 }
 
+const outputPolicyTitle = (policies, policyCode) => {
+  const policy = policies.find((item) => item.policyCode === policyCode)
+  return escapeHtml(policy ? formatPolicyTitle(policy) : policyCode)
+}
+
 const outputPolicies = (document, policies) => {
   const { policyLinks = [] } = document
 
   const policyList = policyLinks.map(
     (link) =>
-      `<li>${formatPolicyTitle(
-        policies.find((policy) => policy.policyCode === link.policyCode)
-      )} - ${escapeHtml(link.location)}</li>`
+      `<li>${outputPolicyTitle(policies, link.policyCode)} - ${escapeHtml(link.location)}</li>`
   )
 
   return `<ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">${policyList.join('')}</ul>`
@@ -31,7 +34,7 @@ export const createDocumentCards = (
   marinePlanPolicySupportingDocuments,
   marinePlanPolicies
 ) => {
-  const { documents } = marinePlanPolicySupportingDocuments
+  const { documents = [] } = marinePlanPolicySupportingDocuments
 
   const cards = documents.map((document) => ({
     title: document.uploadedFile.filename,

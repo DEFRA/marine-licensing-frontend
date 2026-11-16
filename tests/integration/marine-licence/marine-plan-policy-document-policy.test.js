@@ -107,7 +107,7 @@ describe('Marine plan policy document policy page', () => {
     )
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
     )
   })
 

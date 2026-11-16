@@ -32,6 +32,33 @@ describe('createDocumentCards', () => {
     expect(card.rows[1].value.html).not.toContain('<li>')
   })
 
+  test('falls back to the policy code when the policy is not found', () => {
+    const card = buildCard({
+      ...mockMarinePlanPolicyDocument,
+      policyLinks: [{ policyCode: 'X-<b>-1', location: 'Page 1' }]
+    })
+
+    expect(card.rows[1].value.html).toContain('<li>X-&lt;b&gt;-1 - Page 1</li>')
+  })
+
+  test('escapes the policy title', () => {
+    const card = createDocumentCards(
+      {
+        documents: [
+          {
+            ...mockMarinePlanPolicyDocument,
+            policyLinks: [{ policyCode: 'S-CC-1', location: 'Page 1' }]
+          }
+        ]
+      },
+      [{ policyCode: 'S-CC-1', title: '<b>Climate</b>' }]
+    )[0]
+
+    expect(card.rows[1].value.html).toContain(
+      '<li>&lt;b&gt;Climate&lt;/b&gt; (S-CC-1) - Page 1</li>'
+    )
+  })
+
   test('adds the escaped "other" description on a new line', () => {
     const card = buildCard({
       ...mockMarinePlanPolicyDocument,

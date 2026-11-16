@@ -571,6 +571,18 @@ export const mockMarineLicenceWithMarinePlanPolicies = {
   ]
 }
 
+export const withReadyToSend = (marineLicence) => {
+  const marinePlanPoliciesCount = marineLicence.marinePlanPoliciesCount ?? 1
+  return {
+    ...marineLicence,
+    taskList: { ...mockMarineLicenceTaskList },
+    siteDetailsDataComplete: true,
+    marinePlanPolicyJob: 'ready',
+    marinePlanPoliciesCount,
+    marinePlanPolicyResponseCount: marinePlanPoliciesCount
+  }
+}
+
 export const mockFileUploadMarineLicence = {
   ...mockMarineLicenceApplication,
   siteDetails: [

@@ -13,7 +13,10 @@ import {
 } from '~/src/server/test-helpers/server-requests.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { FEES_TERMS_AND_CONDITIONS_URL } from '~/src/server/marine-licence/fee-estimate/controller.js'
-import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockMarineLicenceApplication,
+  withReadyToSend
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
 
 vi.mock('~/src/services/marine-licence-service/index.js')
@@ -27,7 +30,9 @@ describe('Fee estimate', () => {
 
   const getCheckYourAnswersSessionCookie = async () => {
     vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
-      getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
+      getMarineLicenceById: vi
+        .fn()
+        .mockResolvedValue(withReadyToSend(marineLicence))
     })
 
     const cyaResponse = await makeGetRequest({

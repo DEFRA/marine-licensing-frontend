@@ -2,7 +2,6 @@ import {
   apiRoutes,
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
-import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 import { clearReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
 import { renderFileUploadReview, renderManualEntryReview } from './utils.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/exemptions/session-cache/site-details-utils.js'
@@ -165,17 +164,6 @@ async function handleAddConstructionDrawing(
   )
 }
 
-function handleReturnToRedirect(request, h) {
-  const returnTo = request.yar.flash(RETURN_TO_CACHE_KEY)
-  const redirectPath = Array.isArray(returnTo) ? returnTo[0] : returnTo
-
-  if (!redirectPath) {
-    return { redirected: false }
-  }
-
-  return { redirected: true, response: h.redirect(redirectPath) }
-}
-
 function handleFinishedSiteDetailsValidation(
   request,
   h,
@@ -267,10 +255,6 @@ export const reviewSiteDetailsSubmitController = {
     const { siteDetails, siteDetailsDataComplete } = completeMarineLicence
 
     if (!siteDetailsDataComplete) {
-      const returnTo = handleReturnToRedirect(request, h)
-      if (returnTo.redirected) {
-        return returnTo.response
-      }
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
     }
 

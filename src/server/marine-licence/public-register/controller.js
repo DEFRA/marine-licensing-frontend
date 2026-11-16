@@ -89,14 +89,17 @@ export const publicRegisterSubmitController = {
         ...(isWithholding && { withholdReason: payload.withholdReason })
       }
 
-      await authenticatedPatchRequest(
-        request,
-        '/marine-licence/public-register',
-        {
-          ...publicRegister,
-          id: marineLicence.id
-        }
-      )
+      // Saved by the follow-up page instead, so Cancel there discards this choice
+      if (!isNationalSecurity(publicRegister)) {
+        await authenticatedPatchRequest(
+          request,
+          '/marine-licence/public-register',
+          {
+            ...publicRegister,
+            id: marineLicence.id
+          }
+        )
+      }
 
       await setMarineLicenceCache(request, h, {
         ...marineLicence,

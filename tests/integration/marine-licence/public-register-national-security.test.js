@@ -221,7 +221,12 @@ describe('Public register: national security', () => {
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
       '/marine-licence/public-register-national-security',
-      { id: marineLicence.id, nationalSecurityApproval: 'yes', reason }
+      {
+        ...marineLicence.publicRegister,
+        id: marineLicence.id,
+        nationalSecurityApproval: 'yes',
+        reason
+      }
     )
 
     const savedLicence = vi.mocked(setMarineLicenceCache).mock.calls.at(-1)[2]
@@ -259,7 +264,11 @@ describe('Public register: national security', () => {
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
       '/marine-licence/public-register-national-security',
-      { id: marineLicence.id, nationalSecurityApproval: 'no' }
+      {
+        ...marineLicence.publicRegister,
+        id: marineLicence.id,
+        nationalSecurityApproval: 'no'
+      }
     )
     const savedLicence = vi.mocked(setMarineLicenceCache).mock.calls.at(-1)[2]
     expect(savedLicence.publicRegister).toEqual({

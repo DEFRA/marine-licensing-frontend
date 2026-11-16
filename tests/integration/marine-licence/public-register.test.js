@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { getByRole, getByText, within } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
@@ -6,6 +7,7 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { setMarineLicenceCache } from '~/src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { expectFieldsetError } from '~/tests/integration/shared/expect-utils.js'
 import {
@@ -223,7 +225,7 @@ describe('Public register', () => {
     expect(authenticatedPatchRequest).not.toHaveBeenCalled()
   })
 
-  test('goes to the national security page when national security reasons are selected', async () => {
+  test('goes to the national security page without saving when national security reasons are selected', async () => {
     const { response } = await submitPublicRegisterForm({
       withholdConsent: 'yes',
       withholdReason: 'nationalSecurity'
@@ -233,15 +235,12 @@ describe('Public register', () => {
     expect(response.headers.location).toBe(
       marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
     )
-    expect(authenticatedPatchRequest).toHaveBeenCalledWith(
-      expect.any(Object),
-      '/marine-licence/public-register',
-      {
-        id: marineLicence.id,
-        withholdConsent: 'yes',
-        withholdReason: 'nationalSecurity'
-      }
-    )
+    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
+    const savedLicence = vi.mocked(setMarineLicenceCache).mock.calls.at(-1)[2]
+    expect(savedLicence.publicRegister).toEqual({
+      withholdConsent: 'yes',
+      withholdReason: 'nationalSecurity'
+    })
   })
 
   test('returns to the task list when commercial confidentiality reasons are selected', async () => {

@@ -53,6 +53,35 @@ describe('#publicRegisterNationalSecurity', () => {
       )
     })
 
+    test('saves the withholding choice together with the answers', async () => {
+      const h = createH()
+
+      await publicRegisterNationalSecuritySubmitController.handler(
+        {
+          payload: { nationalSecurityApproval: 'yes', reason: 'Details' },
+          query: {}
+        },
+        h
+      )
+
+      const publicRegister = {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity',
+        nationalSecurityApproval: 'yes',
+        reason: 'Details'
+      }
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        '/marine-licence/public-register-national-security',
+        { ...publicRegister, id: mockLicence.id }
+      )
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        expect.objectContaining({ publicRegister })
+      )
+    })
+
     test('passes errors without validation data to the global handler', async () => {
       const thrownError = { res: { statusCode: 500 }, data: {} }
       vi.spyOn(authRequests, 'authenticatedPatchRequest').mockRejectedValueOnce(

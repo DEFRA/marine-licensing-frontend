@@ -202,6 +202,45 @@ describe('#checkYourAnswersController', () => {
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })
   })
+
+  test('handler should replace unsaved withholding answers with the saved ones', async () => {
+    const savedPublicRegister = { withholdConsent: 'no' }
+    const mockCachedData = {
+      id: 'licence-id',
+      projectName: 'Test Project',
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity'
+      }
+    }
+
+    getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
+    mockGetMarineLicenceById.mockResolvedValue({
+      ...mockCachedData,
+      publicRegister: savedPublicRegister
+    })
+    buildSiteDataMock.mockReturnValue({
+      coordinatesType: null,
+      summaryData: []
+    })
+    buildSummaryDataMock.mockReturnValue({})
+
+    await checkYourAnswersController.handler(mockRequest, mockH)
+
+    const expectedLicence = expect.objectContaining({
+      publicRegister: savedPublicRegister
+    })
+    expect(setMarineLicenceCacheMock).toHaveBeenCalledWith(
+      mockRequest,
+      mockH,
+      expectedLicence
+    )
+    expect(buildSummaryDataMock).toHaveBeenCalledWith(expectedLicence)
+    expect(mockH.view).toHaveBeenCalledWith(
+      CHECK_YOUR_ANSWERS_VIEW_ROUTE,
+      expectedLicence
+    )
+  })
 })
 
 describe('#checkYourAnswersContinueController', () => {

@@ -96,15 +96,17 @@ export const publicRegisterNationalSecuritySubmitController = {
         })
       }
 
+      const publicRegister = withAnswers(marineLicence.publicRegister, answers)
+
       await authenticatedPatchRequest(
         request,
         '/marine-licence/public-register-national-security',
-        { ...answers, id: marineLicence.id }
+        { ...publicRegister, id: marineLicence.id }
       )
 
       await setMarineLicenceCache(request, h, {
         ...marineLicence,
-        publicRegister: withAnswers(marineLicence.publicRegister, answers)
+        publicRegister
       })
 
       return h.redirect(

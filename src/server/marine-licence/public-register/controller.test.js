@@ -68,7 +68,7 @@ describe('#publicRegister', () => {
           {
             payload: {
               withholdConsent: 'yes',
-              withholdReason: 'nationalSecurity'
+              withholdReason: 'commercialConfidentiality'
             },
             query: {}
           },
@@ -168,7 +168,7 @@ describe('#publicRegister', () => {
       )
     })
 
-    test('Should redirect to the national security page within check your answers when that is the reason', async () => {
+    test('Should redirect to the national security page within check your answers without saving to the backend', async () => {
       const h = {
         redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
         view: vi.fn()
@@ -198,6 +198,7 @@ describe('#publicRegister', () => {
       expect(h.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY}?from=check-your-answers`
       )
+      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
     })
 
     describe('when national security answers are already saved', () => {
@@ -288,7 +289,7 @@ describe('#publicRegister', () => {
         {
           payload: {
             withholdConsent: 'yes',
-            withholdReason: 'nationalSecurity'
+            withholdReason: 'commercialConfidentiality'
           },
           query: {}
         },
@@ -301,7 +302,7 @@ describe('#publicRegister', () => {
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
           payload: {
             withholdConsent: 'yes',
-            withholdReason: 'nationalSecurity'
+            withholdReason: 'commercialConfidentiality'
           },
           errors: expect.objectContaining({
             withholdReason: expect.objectContaining({

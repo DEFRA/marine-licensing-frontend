@@ -11,6 +11,7 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
+import { withReadyToSend } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   getRowByKey,
   getSiteDetailsCard,
@@ -149,11 +150,24 @@ describe('ML Review Site Details - Circular Coordinates Integration Tests', () =
       )
     })
 
-    test('should redirect to check-your-answers when returnTo flash is set', async () => {
+    test('should redirect to task list when returnTo is set and siteDetails is not COMPLETED', async () => {
+      vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi
+          .fn()
+          .mockResolvedValueOnce(
+            withReadyToSend(testScenarios[0].marineLicence)
+          )
+          .mockResolvedValue({
+            ...testScenarios[0].marineLicence,
+            siteDetailsDataComplete: false
+          })
+      })
+
       const cyaResponse = await makeGetRequest({
         server: getServer(),
         url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       })
+      expect(cyaResponse.statusCode).toBe(statusCodes.ok)
 
       const sessionCookie = cyaResponse.headers['set-cookie']
       const cookieHeader = Array.isArray(sessionCookie)
@@ -169,7 +183,7 @@ describe('ML Review Site Details - Circular Coordinates Integration Tests', () =
 
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
     })
 

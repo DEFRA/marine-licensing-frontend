@@ -13,6 +13,9 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { getWaterFrameworkDirectiveChangeLink } from '#src/server/marine-licence/check-your-answers/utils.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
+import { isMarineLicenceReadyToSend } from '#src/server/marine-licence/task-list/ready-to-send.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
+import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import {
   FEE_ESTIMATE_AMOUNT,
   FEE_ESTIMATE_MONITORING_AMOUNT
@@ -26,9 +29,31 @@ const checkYourAnswersViewContent = {
 export const CHECK_YOUR_ANSWERS_VIEW_ROUTE =
   'marine-licence/check-your-answers/index'
 
+const isReadyToSend = async (request, marineLicence) => {
+  const userSession = await getUserSession(request, request.state?.userSession)
+  return isMarineLicenceReadyToSend(
+    marineLicence,
+    userSession?.userRelationshipType === USER_TYPES.CITIZEN
+  )
+}
+
+const fetchMarineLicence = (request, id) =>
+  getMarineLicenceService(request).getMarineLicenceById(id)
+
 export const checkYourAnswersController = {
   async handler(request, h) {
     const cachedMarineLicence = getMarineLicenceCache(request)
+    const completeMarineLicence = cachedMarineLicence.id
+      ? await fetchMarineLicence(request, cachedMarineLicence.id)
+      : null
+
+    if (
+      completeMarineLicence &&
+      !(await isReadyToSend(request, completeMarineLicence))
+    ) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+    }
+
     await setReturnToCache(
       request,
       h,
@@ -39,10 +64,7 @@ export const checkYourAnswersController = {
     let waterFrameworkDirective = cachedMarineLicence.waterFrameworkDirective
     let marinePlanPolicySections = []
 
-    if (cachedMarineLicence.id) {
-      const marineLicenceService = getMarineLicenceService(request)
-      const completeMarineLicence =
-        await marineLicenceService.getMarineLicenceById(cachedMarineLicence.id)
+    if (completeMarineLicence) {
       siteData = buildSiteData(completeMarineLicence)
       marinePlanPolicySections = buildMarinePlanPoliciesData(
         completeMarineLicence
@@ -89,7 +111,16 @@ export const checkYourAnswersController = {
 }
 
 export const checkYourAnswersContinueController = {
-  async handler(_request, h) {
+  async handler(request, h) {
+    const { id } = getMarineLicenceCache(request) ?? {}
+
+    if (id) {
+      const marineLicence = await fetchMarineLicence(request, id)
+      if (!(await isReadyToSend(request, marineLicence))) {
+        return h.redirect(marineLicenceRoutes.MARINE_LICENCE_TASK_LIST)
+      }
+    }
+
     return h.redirect(routes.DECLARATION)
   }
 }

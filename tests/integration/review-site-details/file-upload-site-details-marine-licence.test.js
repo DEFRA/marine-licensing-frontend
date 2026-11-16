@@ -2,7 +2,10 @@ import { JSDOM } from 'jsdom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import { testScenarios } from './marine-licence-fixtures/file-upload-fixtures.js'
-import { mockMarineLicenceTaskList } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockMarineLicenceTaskList,
+  withReadyToSend
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   getRowByKey,
   validateActionLink,
@@ -113,22 +116,28 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
       )
     })
 
-    test('should redirect to check-your-answers when returnTo flash is set and siteDetails is not COMPLETED', async () => {
+    test('should redirect to task list when returnTo is set and siteDetails is not COMPLETED', async () => {
       vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
-        getMarineLicenceById: vi.fn().mockResolvedValue({
-          ...testScenarios[0].marineLicence,
-          taskList: {
-            ...mockMarineLicenceTaskList,
-            siteDetails: 'IN_PROGRESS'
-          },
-          siteDetailsDataComplete: false
-        })
+        getMarineLicenceById: vi
+          .fn()
+          .mockResolvedValueOnce(
+            withReadyToSend(testScenarios[0].marineLicence)
+          )
+          .mockResolvedValue({
+            ...testScenarios[0].marineLicence,
+            taskList: {
+              ...mockMarineLicenceTaskList,
+              siteDetails: 'IN_PROGRESS'
+            },
+            siteDetailsDataComplete: false
+          })
       })
 
       const cyaResponse = await makeGetRequest({
         server: getServer(),
         url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       })
+      expect(cyaResponse.statusCode).toBe(statusCodes.ok)
 
       const sessionCookie = cyaResponse.headers['set-cookie']
       const cookieHeader = Array.isArray(sessionCookie)
@@ -144,15 +153,22 @@ describe('ML Review Site Details - File Upload Integration Tests', () => {
 
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       )
     })
 
     test('should show a validation error rather than redirecting when returnTo flash is set but siteDetails is COMPLETED', async () => {
+      vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi
+          .fn()
+          .mockResolvedValue(withReadyToSend(testScenarios[0].marineLicence))
+      })
+
       const cyaResponse = await makeGetRequest({
         server: getServer(),
         url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       })
+      expect(cyaResponse.statusCode).toBe(statusCodes.ok)
 
       const sessionCookie = cyaResponse.headers['set-cookie']
       const cookieHeader = Array.isArray(sessionCookie)

@@ -247,10 +247,12 @@ describe('#checkYourAnswersController', () => {
     }
 
     getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
-    mockGetMarineLicenceById.mockResolvedValue({
-      ...mockCachedData,
-      publicRegister: savedPublicRegister
-    })
+    mockGetMarineLicenceById.mockResolvedValue(
+      withReadyToSend({
+        ...mockCachedData,
+        publicRegister: savedPublicRegister
+      })
+    )
     buildSiteDataMock.mockReturnValue({
       coordinatesType: null,
       summaryData: []

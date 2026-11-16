@@ -42,9 +42,9 @@ const fetchMarineLicence = (request, id) =>
 
 export const checkYourAnswersController = {
   async handler(request, h) {
-    const cachedMarineLicence = getMarineLicenceCache(request)
-    const completeMarineLicence = cachedMarineLicence.id
-      ? await fetchMarineLicence(request, cachedMarineLicence.id)
+    let marineLicence = getMarineLicenceCache(request)
+    const completeMarineLicence = marineLicence.id
+      ? await fetchMarineLicence(request, marineLicence.id)
       : null
 
     if (
@@ -63,10 +63,6 @@ export const checkYourAnswersController = {
     let siteData = { coordinatesType: null, summaryData: [] }
     let marinePlanPolicySections = []
 
-    if (marineLicence.id) {
-      const marineLicenceService = getMarineLicenceService(request)
-      const completeMarineLicence =
-        await marineLicenceService.getMarineLicenceById(marineLicence.id)
     if (completeMarineLicence) {
       siteData = buildSiteData(completeMarineLicence)
       marinePlanPolicySections = buildMarinePlanPoliciesData(

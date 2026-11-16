@@ -82,7 +82,7 @@ describe('Public register: national security', () => {
     expect(
       getByRole(document, 'heading', { level: 2, name: QUESTION })
     ).toBeInTheDocument()
-    getByRole(document, 'button', { name: 'Continue' })
+    getByRole(document, 'button', { name: 'Save and continue' })
   })
 
   test('Yes reveals the textbox and No has a hint', async () => {

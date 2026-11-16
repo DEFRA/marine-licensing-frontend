@@ -17,7 +17,12 @@ import {
   marineLicenceRoutes,
   routes
 } from '#src/server/common/constants/routes.js'
-import { mockMarineLicenceApplication } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockMarineLicenceApplication,
+  withReadyToSend
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
+import { USER_TYPES } from '#src/server/common/constants/user-types.js'
 import {
   FEE_ESTIMATE_AMOUNT,
   FEE_ESTIMATE_MONITORING_AMOUNT
@@ -33,6 +38,7 @@ vi.mock(
   '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
 )
 vi.mock('#src/services/marine-licence-service/index.js')
+vi.mock('#src/server/common/plugins/auth/utils.js')
 vi.mock('#src/server/common/helpers/marine-licence/site-data.js')
 vi.mock('#src/server/common/helpers/marine-licence/summary-data.js')
 vi.mock(
@@ -86,9 +92,13 @@ describe('#checkYourAnswersController', () => {
       getMarineLicenceById: mockGetMarineLicenceById
     })
     mockH = {
-      view: vi.fn()
+      view: vi.fn(),
+      redirect: vi.fn()
     }
     mockRequest = {}
+    vi.mocked(getUserSession).mockResolvedValue({
+      userRelationshipType: USER_TYPES.CITIZEN
+    })
     mockPolicies = [
       {
         policyCode: 'S-CC-1',
@@ -111,7 +121,10 @@ describe('#checkYourAnswersController', () => {
       publicRegisterRoute:
         '/marine-licence/sharing-your-project-information-publicly'
     }
-    const mockCompleteLicence = { ...mockCachedData, siteDetails: [] }
+    const mockCompleteLicence = withReadyToSend({
+      ...mockCachedData,
+      siteDetails: []
+    })
     const mockSummaryData = [{ siteNumber: 1, siteName: 'Test Site' }]
 
     getMarineLicenceCacheMock.mockReturnValue(mockCachedData)
@@ -167,6 +180,25 @@ describe('#checkYourAnswersController', () => {
     })
   })
 
+  test('redirects to the task list when the application is not ready to send', async () => {
+    const readyLicence = withReadyToSend(mockMarineLicenceApplication)
+    getMarineLicenceCacheMock.mockReturnValue({
+      id: mockMarineLicenceApplication.id
+    })
+    mockGetMarineLicenceById.mockResolvedValue({
+      ...readyLicence,
+      taskList: { ...readyLicence.taskList, siteDetails: 'IN_PROGRESS' }
+    })
+
+    await checkYourAnswersController.handler(mockRequest, mockH)
+
+    expect(mockH.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+    expect(mockH.view).not.toHaveBeenCalled()
+    expect(setReturnToCacheMock).not.toHaveBeenCalled()
+  })
+
   test('handler should render with empty site data when no id in cache', async () => {
     const mockCachedData = {
       projectName: 'No Id Project'
@@ -205,17 +237,73 @@ describe('#checkYourAnswersController', () => {
 })
 
 describe('#checkYourAnswersContinueController', () => {
-  test('handler should redirect to declaration', async () => {
-    const mockH = { redirect: vi.fn() }
+  let mockH
+  let mockGetMarineLicenceById
+
+  beforeEach(() => {
+    mockH = { redirect: vi.fn() }
+    mockGetMarineLicenceById = vi.fn()
+    vi.mocked(getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById: mockGetMarineLicenceById
+    })
+    vi.mocked(getMarineLicenceCache).mockReturnValue({
+      id: mockMarineLicenceApplication.id
+    })
+    vi.mocked(getUserSession).mockResolvedValue({
+      userRelationshipType: USER_TYPES.CITIZEN
+    })
+  })
+
+  test('redirects to the declaration when the application is ready to send', async () => {
+    mockGetMarineLicenceById.mockResolvedValue(
+      withReadyToSend(mockMarineLicenceApplication)
+    )
+
     await checkYourAnswersContinueController.handler({}, mockH)
+
     expect(mockH.redirect).toHaveBeenCalledWith(routes.DECLARATION)
   })
-})
 
-describe('#checkYourAnswersContinueController', () => {
-  test('handler should redirect to declaration', async () => {
-    const mockH = { redirect: vi.fn() }
+  describe('when only special legal powers is unfinished', () => {
+    beforeEach(() => {
+      const readyLicence = withReadyToSend(mockMarineLicenceApplication)
+      mockGetMarineLicenceById.mockResolvedValue({
+        ...readyLicence,
+        taskList: { ...readyLicence.taskList, specialLegalPowers: 'INCOMPLETE' }
+      })
+    })
+
+    test('redirects a citizen to the declaration', async () => {
+      await checkYourAnswersContinueController.handler({}, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(routes.DECLARATION)
+    })
+
+    test('redirects an employee to the task list', async () => {
+      vi.mocked(getUserSession).mockResolvedValue({
+        userRelationshipType: 'Employee'
+      })
+
+      await checkYourAnswersContinueController.handler({}, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+  })
+
+  test('redirects to the task list when the application is not ready to send', async () => {
+    const readyLicence = withReadyToSend(mockMarineLicenceApplication)
+    mockGetMarineLicenceById.mockResolvedValue({
+      ...readyLicence,
+      taskList: { ...readyLicence.taskList, siteDetails: 'IN_PROGRESS' }
+    })
+
     await checkYourAnswersContinueController.handler({}, mockH)
-    expect(mockH.redirect).toHaveBeenCalledWith(routes.DECLARATION)
+
+    expect(mockH.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+    expect(mockH.redirect).not.toHaveBeenCalledWith(routes.DECLARATION)
   })
 })

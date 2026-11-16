@@ -6,7 +6,7 @@ import {
 describe('#marine plan policy document urls', () => {
   test('builds the document policy url', () => {
     expect(getMarinePlanPolicyDocumentPolicyUrl('abc-123')).toBe(
-      '/marine-licence/marine-plan-policy/document-policy/abc-123'
+      '/marine-licence/marine-plan-policy/supporting-document-policy/abc-123'
     )
   })
 
@@ -18,7 +18,7 @@ describe('#marine plan policy document urls', () => {
 
   test('encodes the document id', () => {
     expect(getMarinePlanPolicyDocumentPolicyUrl('a/b')).toBe(
-      '/marine-licence/marine-plan-policy/document-policy/a%2Fb'
+      '/marine-licence/marine-plan-policy/supporting-document-policy/a%2Fb'
     )
   })
 })

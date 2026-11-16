@@ -16,6 +16,7 @@ import {
 import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
   getNationalSecurityAnswers,
+  getReasonPageLinks,
   isNationalSecurity
 } from '#src/server/common/helpers/marine-licence/public-register.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
@@ -23,16 +24,9 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 export const PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE =
   'marine-licence/public-register-national-security/index'
 
-const getPublicRegisterLink = (request) =>
-  withCheckYourAnswersQuery(
-    request,
-    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-  )
+const getLinks = getReasonPageLinks
 
-const getLinks = (request) => ({
-  backLink: getPublicRegisterLink(request),
-  cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-})
+const getPublicRegisterLink = (request) => getLinks(request).backLink
 
 const withAnswers = (publicRegister, answers) => ({
   withholdConsent: publicRegister?.withholdConsent,

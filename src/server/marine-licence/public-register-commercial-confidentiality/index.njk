@@ -1,0 +1,96 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "cancel-button/macro.njk" import appCancelButton %}
+
+{% block beforeContent %}
+{{ super() }}
+<nav>
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+</nav>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <span class="govuk-caption-l">{{ projectName }}</span>
+
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      <p class="govuk-body">This applies where publishing would harm a legitimate commercial interest that is protected by law. It may include:</p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>trade secrets</li>
+        <li>proprietary methods, techniques or processes</li>
+        <li>intellectual property</li>
+        <li>commercial agreements and contractual arrangements</li>
+        <li>pricing structures, cost models or financial information</li>
+        <li>future commercial plans, strategies or investment decisions</li>
+        <li>sensitive operational or technical information that gives a competitive advantage</li>
+      </ul>
+
+      <p class="govuk-body">The information must not already be publicly available, and must be subject to a legally recognised duty of confidentiality.</p>
+
+      <p class="govuk-body">Publishing it would need to cause real harm that you can identify. Wanting to keep it private, being open to public scrutiny or worrying about your reputation is not enough.</p>
+
+      <p class="govuk-body">We will only withhold the specific information that meets the criteria for withholding information for commercial or industrial confidentiality reasons. We will publish the rest of your application and supporting documents.</p>
+
+      <p class="govuk-body">We will decide whether the information you identify meets the criteria. This may delay your application. If we decide it does not, we will publish the information.</p>
+
+      {% set reasonHint %}
+        <p class="govuk-hint">To help us decide whether your request meets the criteria, you must tell us:</p>
+        {# govuk-hint is required here: govuk-list sets its own text colour #}
+        <ul class="govuk-list govuk-list--bullet govuk-hint">
+          <li>what information you want withheld</li>
+          <li>where it appears in your application or supporting documents</li>
+          <li>why that information is sensitive</li>
+          <li>what harm would be caused by publishing it, and who would be affected</li>
+        </ul>
+        <p class="govuk-hint">If we decide to publish any of the information you asked us to withhold, we will tell you before we publish it, and you can withdraw your application if you want to.</p>
+        <p class="govuk-hint govuk-!-margin-bottom-0">Enter a maximum of 1,000 characters</p>
+      {% endset -%}
+
+      <form method="POST">
+        <input type="hidden" name="csrfToken" value="{{ csrfToken }}" />
+
+        {{ govukTextarea({
+          id: "reason",
+          name: "reason",
+          label: {
+            text: "Tell us what you want withheld and why",
+            classes: "govuk-label--m"
+          },
+          hint: {
+            html: reasonHint
+          },
+          errorMessage: errors['reason'],
+          value: payload.reason
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            classes: "govuk-button--primary"
+          }) }}
+          {{ appCancelButton({
+            cancelLink: cancelLink
+          }) }}
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

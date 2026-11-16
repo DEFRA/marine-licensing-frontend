@@ -66,10 +66,7 @@ describe('#publicRegister', () => {
       await expect(
         publicRegisterSubmitController.handler(
           {
-            payload: {
-              withholdConsent: 'yes',
-              withholdReason: 'commercialConfidentiality'
-            },
+            payload: { withholdConsent: 'no' },
             query: {}
           },
           h
@@ -145,10 +142,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: {
-            withholdConsent: 'yes',
-            withholdReason: 'commercialConfidentiality'
-          },
+          payload: { withholdConsent: 'no' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -157,14 +151,33 @@ describe('#publicRegister', () => {
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/marine-licence/public-register',
-        {
-          id: mockLicence.id,
-          withholdConsent: 'yes',
-          withholdReason: 'commercialConfidentiality'
-        }
+        { id: mockLicence.id, withholdConsent: 'no' }
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      )
+    })
+
+    test('Should redirect to the commercial confidentiality page without saving to the backend', async () => {
+      const h = { redirect: vi.fn(), view: vi.fn() }
+      const payload = {
+        withholdConsent: 'yes',
+        withholdReason: 'commercialConfidentiality'
+      }
+
+      await publicRegisterSubmitController.handler(
+        { payload, query: { from: 'check-your-answers' } },
+        h
+      )
+
+      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        expect.objectContaining({ publicRegister: payload })
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY}?from=check-your-answers`
       )
     })
 
@@ -255,9 +268,6 @@ describe('#publicRegister', () => {
           h,
           expect.objectContaining({ publicRegister: payload })
         )
-        expect(h.redirect).toHaveBeenCalledWith(
-          marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-        )
       })
     })
 
@@ -287,10 +297,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: {
-            withholdConsent: 'yes',
-            withholdReason: 'commercialConfidentiality'
-          },
+          payload: { withholdConsent: 'yes' },
           query: {}
         },
         h
@@ -300,10 +307,7 @@ describe('#publicRegister', () => {
         PUBLIC_REGISTER_VIEW_ROUTE,
         expect.objectContaining({
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-          payload: {
-            withholdConsent: 'yes',
-            withholdReason: 'commercialConfidentiality'
-          },
+          payload: { withholdConsent: 'yes' },
           errors: expect.objectContaining({
             withholdReason: expect.objectContaining({
               text: 'Select a reason why you want to withhold information'

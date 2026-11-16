@@ -39,7 +39,9 @@ export const marinePlanPolicyDocumentsReviewController = {
         getValidatedReferrerPath(request.headers?.referer) ??
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
       continueLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
-      documents
+      documents,
+      newUploadLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT
     })
   }
 }

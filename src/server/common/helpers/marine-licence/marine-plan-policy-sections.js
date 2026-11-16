@@ -70,7 +70,9 @@ export const addSupportingDocumentsSection = ({
           ? `Still needed for ${policyCodeList.format(documentsOutstanding)}`
           : ''
       },
-      href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
+      href: documents?.length
+        ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+        : marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
       status: getSupportingDocumentsStatusItem(
         getSupportingDocumentsStatus(status, documents)
       )

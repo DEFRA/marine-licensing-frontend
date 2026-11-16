@@ -36,6 +36,14 @@
 
       {% endfor %}
 
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: "Add new document",
+          classes: 'govuk-button--secondary',
+          href: newUploadLink
+        }) }}
+      </div>
+
       {{ govukButton({
         text: "Continue",
         href: continueLink

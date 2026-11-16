@@ -96,7 +96,7 @@ describe('#marinePlanPoliciesController', () => {
               hint: {
                 text: ''
               },
-              href: '/marine-licence/marine-plan-policy/supporting-document-upload',
+              href: '/marine-licence/marine-plan-policy/supporting-documents-review',
               status: {
                 text: 'Completed'
               },

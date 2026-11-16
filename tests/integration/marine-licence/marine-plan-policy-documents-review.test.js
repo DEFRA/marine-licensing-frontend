@@ -83,6 +83,13 @@ describe('Marine plan policy documents review page', () => {
       'href',
       documentPolicyUrl
     )
+    expect(
+      getByRole(document, 'button', { name: 'Add new document' })
+    ).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT
+    )
+
     expect(getByRole(document, 'button', { name: 'Continue' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES

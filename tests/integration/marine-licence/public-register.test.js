@@ -1,31 +1,67 @@
 import { getByRole, getByText, within } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
+import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
+import { expectFieldsetError } from '~/tests/integration/shared/expect-utils.js'
 import {
-  expectFieldsetError,
-  expectInputValue
-} from '~/tests/integration/shared/expect-utils.js'
-import { getInputInFieldset } from '~/tests/integration/shared/dom-helpers.js'
+  getFieldsetByLabel,
+  getInputInFieldset
+} from '~/tests/integration/shared/dom-helpers.js'
+
+const QUESTION =
+  'Do you want to ask us to withhold any information from the public register?'
+const REASON_LEGEND = 'Select a reason'
+const NATIONAL_SECURITY = 'National security reasons'
+const COMMERCIAL_CONFIDENTIALITY =
+  'Commercial or industrial confidentiality reasons'
 
 describe('Public register', () => {
   const getServer = setupTestServer()
   const marineLicence = {
     id: 'marine-licence-123',
     projectName: 'Test Marine Project',
-    publicRegister: { withholdConsent: undefined, reason: '' }
+    publicRegister: undefined
   }
 
-  test('page elements', async () => {
-    mockMarineLicence(marineLicence)
-
-    const document = await loadPage({
+  const loadPublicRegisterPage = () =>
+    loadPage({
       requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       server: getServer()
     })
+
+  const submitPublicRegisterForm = (formData) =>
+    submitForm({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      server: getServer(),
+      formData
+    })
+
+  const getQuestionInput = (document, inputLabel) =>
+    getInputInFieldset({
+      document,
+      fieldsetLabel: QUESTION,
+      inputLabel,
+      findByHeading: true
+    })
+
+  const getReasonInput = (document, inputLabel) =>
+    getInputInFieldset({
+      document,
+      fieldsetLabel: REASON_LEGEND,
+      inputLabel
+    })
+
+  beforeEach(() => {
+    mockMarineLicence(marineLicence)
+  })
+
+  test('page elements', async () => {
+    const document = await loadPublicRegisterPage()
 
     expect(getByText(document, 'Test Marine Project')).toBeInTheDocument()
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
@@ -33,33 +69,110 @@ describe('Public register', () => {
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
-      'Sharing your application information on the public register'
+      'Withholding information from the public register'
     )
-    getByRole(document, 'button', { name: 'Save and continue' })
+    expect(document.title).toContain(
+      'Withholding information from the public register'
+    )
+    getByText(
+      document,
+      /We are required by law to publish information about your application on the MMO’s public register\./
+    )
+    getByText(document, 'We cannot withhold information for any other reason.')
+    getByRole(document, 'button', { name: 'Continue' })
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
   })
 
-  test('reason character count counts user-perceived characters', async () => {
-    mockMarineLicence(marineLicence)
+  test('shows the personal information help in a details component', async () => {
+    const document = await loadPublicRegisterPage()
 
-    const document = await loadPage({
-      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-      server: getServer()
+    const details = document.querySelector('details.govuk-details')
+    expect(
+      within(details).getByText(
+        'Help with personal information in your application'
+      )
+    ).toHaveClass('govuk-details__summary-text')
+    within(details).getByText(
+      /This includes the names and addresses of applicants, licence holders, agents and contractors\./
+    )
+    within(details).getByText(
+      /This includes names, contact details and signatures\./
+    )
+    within(details).getByText(/This may delay your decision\./)
+  })
+
+  test('shows the national security warning', async () => {
+    const document = await loadPublicRegisterPage()
+
+    const warning = document.querySelector('.govuk-warning-text')
+    expect(warning).toHaveTextContent(
+      'You will need approval from the Secretary of State for Defence to withhold information on national security grounds.'
+    )
+  })
+
+  test('shows Yes before No, with the reasons revealed by Yes', async () => {
+    const document = await loadPublicRegisterPage()
+
+    const questionFieldset = getByText(document, QUESTION, {
+      selector: 'h2'
+    }).closest('fieldset')
+    const topLevelRadios = [
+      ...questionFieldset.querySelectorAll(
+        ':scope > .govuk-radios > .govuk-radios__item input'
+      )
+    ]
+    expect(topLevelRadios.map((input) => input.value)).toEqual(['yes', 'no'])
+
+    const yes = getQuestionInput(document, 'Yes')
+    const conditional = document.getElementById(yes.dataset.ariaControls)
+    expect(conditional).toHaveClass('govuk-radios__conditional')
+
+    const reasonFieldset = getFieldsetByLabel({
+      document,
+      fieldsetLabel: REASON_LEGEND
+    })
+    expect(conditional).toContainElement(reasonFieldset)
+    expect(getReasonInput(document, NATIONAL_SECURITY)).toHaveAttribute(
+      'type',
+      'radio'
+    )
+    expect(
+      getReasonInput(document, COMMERCIAL_CONFIDENTIALITY)
+    ).toHaveAttribute('type', 'radio')
+    expect(within(reasonFieldset).queryByRole('textbox')).toBeNull()
+  })
+
+  test('form state when no decision set', async () => {
+    const document = await loadPublicRegisterPage()
+
+    expect(getQuestionInput(document, 'Yes')).not.toBeChecked()
+    expect(getQuestionInput(document, 'No')).not.toBeChecked()
+    expect(getReasonInput(document, NATIONAL_SECURITY)).not.toBeChecked()
+    expect(
+      getReasonInput(document, COMMERCIAL_CONFIDENTIALITY)
+    ).not.toBeChecked()
+  })
+
+  test('form state when information is withheld with a reason', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'commercialConfidentiality'
+      }
     })
 
-    const characterCount = document
-      .querySelector('#reason')
-      .closest('[data-module="govuk-character-count"]')
-    expect(characterCount).toHaveAttribute('data-count-type', 'characters')
-    expect(characterCount).toHaveAttribute('data-maxlength', '1000')
+    const document = await loadPublicRegisterPage()
+
+    expect(getQuestionInput(document, 'Yes')).toBeChecked()
+    expect(getReasonInput(document, NATIONAL_SECURITY)).not.toBeChecked()
+    expect(getReasonInput(document, COMMERCIAL_CONFIDENTIALITY)).toBeChecked()
   })
 
   test('back link from Check Your Answers', async () => {
-    mockMarineLicence(marineLicence)
-
     const document = await loadPage({
       requestUrl:
         marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER +
@@ -73,126 +186,78 @@ describe('Public register', () => {
     )
   })
 
-  test('public register form state when no decision set', async () => {
-    mockMarineLicence(marineLicence)
-
-    const document = await loadPage({
-      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-      server: getServer()
-    })
-
-    expect(
-      getInputInFieldset({
-        document,
-        fieldsetLabel:
-          'Do you want to request that information is withheld for either of these reasons?',
-        inputLabel: 'Yes',
-        findByHeading: true
-      })
-    ).not.toBeChecked()
-    expect(
-      getInputInFieldset({
-        document,
-        fieldsetLabel:
-          'Do you want to request that information is withheld for either of these reasons?',
-        inputLabel: 'No',
-        findByHeading: true
-      })
-    ).not.toBeChecked()
-  })
-
-  test('public register form state when information is withheld and details set', async () => {
-    mockMarineLicence({
-      ...marineLicence,
-      publicRegister: {
-        withholdConsent: 'yes',
-        reason: 'Some reason'
-      }
-    })
-
-    const document = await loadPage({
-      requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-      server: getServer()
-    })
-
-    expect(
-      getInputInFieldset({
-        document,
-        fieldsetLabel:
-          'Do you want to request that information is withheld for either of these reasons?',
-        inputLabel: 'Yes',
-        findByHeading: true
-      })
-    ).toBeChecked()
-    expectInputValue({
-      document,
-      inputLabel: 'Provide details of what you want withheld and why',
-      value: 'Some reason'
-    })
-  })
-
-  test('should show a validation error when submitted without an answer', async () => {
-    mockMarineLicence(marineLicence)
-
-    const submitPublicRegisterForm = async (formData) => {
-      const { document } = await submitForm({
-        requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-        server: getServer(),
-        formData
-      })
-      return document
-    }
-
-    const document = await submitPublicRegisterForm({ reason: '' })
+  test('shows a validation error when submitted without an answer', async () => {
+    const { document } = await submitPublicRegisterForm({})
 
     expectFieldsetError({
       document,
-      fieldsetLabel:
-        'Do you want to request that information is withheld for either of these reasons?',
+      fieldsetLabel: QUESTION,
       errorMessage:
-        'Select if you want to request that information is withheld',
+        'Select whether you want to request that information is withheld',
       findByHeading: true
     })
-
-    const errorGroup = document.querySelector('.govuk-form-group--error')
-    expect(
-      within(errorGroup).getByRole('heading', {
-        level: 2,
-        name: 'Do you want to request that information is withheld for either of these reasons?'
-      })
-    ).toBeInTheDocument()
-    expect(
-      within(errorGroup).queryByRole('heading', { level: 1 })
-    ).not.toBeInTheDocument()
-    expect(
-      within(errorGroup).queryByText('Requesting information is withheld')
-    ).not.toBeInTheDocument()
+    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
   })
 
-  test('should show a validation error when "yes" is selected but details are missing', async () => {
-    mockMarineLicence(marineLicence)
+  test('shows a validation error linked to the first reason when Yes is selected without a reason', async () => {
+    const errorMessage = 'Select a reason why you want to withhold information'
 
-    const submitPublicRegisterForm = async (formData) => {
-      const { document } = await submitForm({
-        requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-        server: getServer(),
-        formData
-      })
-      return document
-    }
-
-    const document = await submitPublicRegisterForm({
-      withholdConsent: 'yes',
-      reason: ''
+    const { document } = await submitPublicRegisterForm({
+      withholdConsent: 'yes'
     })
 
     expectFieldsetError({
       document,
-      fieldsetLabel:
-        'Do you want to request that information is withheld for either of these reasons?',
-      errorMessage: 'Enter details of what you want withheld and why',
-      findByHeading: true,
+      fieldsetLabel: REASON_LEGEND,
+      errorMessage,
       useErrorClass: true
     })
+    const summaryLink = within(getByRole(document, 'alert')).getByRole('link', {
+      name: errorMessage
+    })
+    expect(summaryLink).toHaveAttribute('href', '#withholdReason')
+    expect(document.getElementById('withholdReason')).toBe(
+      getReasonInput(document, NATIONAL_SECURITY)
+    )
+    expect(getQuestionInput(document, 'Yes')).toBeChecked()
+    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
+  })
+
+  test('returns to the task list and saves the reason when Yes and a reason are selected', async () => {
+    const { response } = await submitPublicRegisterForm({
+      withholdConsent: 'yes',
+      withholdReason: 'nationalSecurity'
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+    expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      '/marine-licence/public-register',
+      {
+        id: marineLicence.id,
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity'
+      }
+    )
+  })
+
+  test('returns to the task list without a reason when No is selected', async () => {
+    const { response } = await submitPublicRegisterForm({
+      withholdConsent: 'no',
+      withholdReason: 'nationalSecurity'
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+    expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      '/marine-licence/public-register',
+      { id: marineLicence.id, withholdConsent: 'no' }
+    )
   })
 })

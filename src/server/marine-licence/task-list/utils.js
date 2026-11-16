@@ -39,7 +39,7 @@ const setStatus = (task) => {
 export const transformSharingTaskList = (taskList) => [
   {
     title: {
-      text: 'Public register',
+      text: 'Information published on the public register',
       classes: taskClasses
     },
     href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,

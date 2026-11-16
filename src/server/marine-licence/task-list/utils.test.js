@@ -467,7 +467,7 @@ describe('taskList utils', () => {
           status: { text: 'Completed' },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Public register'
+            text: 'Information published on the public register'
           }
         }
       ])
@@ -486,7 +486,7 @@ describe('taskList utils', () => {
           },
           title: {
             classes: 'govuk-link--no-visited-state',
-            text: 'Public register'
+            text: 'Information published on the public register'
           }
         }
       ])
@@ -507,7 +507,7 @@ describe('taskList utils', () => {
             },
             title: {
               classes: 'govuk-link--no-visited-state',
-              text: 'Public register'
+              text: 'Information published on the public register'
             }
           }
         ])

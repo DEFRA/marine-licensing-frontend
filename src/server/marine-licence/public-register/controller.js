@@ -57,7 +57,7 @@ export const publicRegisterSubmitController = {
       const isWithholding = payload.withholdConsent === 'yes'
       const publicRegister = {
         withholdConsent: payload.withholdConsent,
-        ...(isWithholding && { reason: payload.reason })
+        ...(isWithholding && { withholdReason: payload.withholdReason })
       }
 
       await authenticatedPatchRequest(

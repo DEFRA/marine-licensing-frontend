@@ -13,4 +13,4 @@ export const MPP_DOCUMENT_TYPES = {
 
 export const MPP_DOCUMENT_TYPE_OTHER = 'other'
 
-export const MPP_DOCUMENT_TYPE_OTHER_MAX_LENGTH = 1000
+export const MPP_DOCUMENT_TYPE_OTHER_MAX_LENGTH = 70

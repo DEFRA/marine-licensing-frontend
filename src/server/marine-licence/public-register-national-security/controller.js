@@ -13,10 +13,7 @@ import {
   marineLicencePublicRegisterNationalSecurityErrorMessages,
   marineLicencePublicRegisterNationalSecuritySettings
 } from '#src/server/common/validation/marine-licence-public-register-national-security/constants.js'
-import {
-  getCommonRedirectLink,
-  withCheckYourAnswersQuery
-} from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
   getNationalSecurityAnswers,
   isNationalSecurity
@@ -34,7 +31,7 @@ const getPublicRegisterLink = (request) =>
 
 const getLinks = (request) => ({
   backLink: getPublicRegisterLink(request),
-  cancelLink: getCommonRedirectLink(request)
+  cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
 })
 
 const withAnswers = (publicRegister, answers) => ({

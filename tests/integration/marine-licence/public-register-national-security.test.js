@@ -124,7 +124,7 @@ describe('Public register: national security', () => {
     )
   })
 
-  test('Back and Cancel stay within check your answers', async () => {
+  test('Back stays within check your answers and Cancel still goes to the task list', async () => {
     const document = await loadNationalSecurityPage(
       `${PAGE_URL}?from=check-your-answers`
     )
@@ -135,7 +135,7 @@ describe('Public register: national security', () => {
     )
     expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
       'href',
-      marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
   })
 

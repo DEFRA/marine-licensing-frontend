@@ -91,7 +91,6 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
         publicRegister
       })
 
-      // TODO ML-1673: go to the next page in the withholding information journey
       return h.redirect(
         withCheckYourAnswersQuery(
           request,

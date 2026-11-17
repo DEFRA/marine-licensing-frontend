@@ -23,6 +23,10 @@ const outputPolicyTitle = (policies, policyCode) => {
 const outputPolicies = (document, policies) => {
   const { policyLinks = [] } = document
 
+  if (!policyLinks.length) {
+    return ''
+  }
+
   const policyList = policyLinks.map(
     (link) =>
       `<li>${outputPolicyTitle(policies, link.policyCode)} - ${escapeHtml(link.location)}</li>`

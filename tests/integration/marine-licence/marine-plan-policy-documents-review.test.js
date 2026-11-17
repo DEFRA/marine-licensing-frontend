@@ -20,6 +20,12 @@ const documentPolicyUrl =
     mockMarinePlanPolicyDocument.documentId
   )
 
+const documentTypeUrl =
+  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE.replace(
+    '{documentId}',
+    mockMarinePlanPolicyDocument.documentId
+  )
+
 describe('Marine plan policy documents review page', () => {
   const getServer = setupTestServer()
 
@@ -66,6 +72,19 @@ describe('Marine plan policy documents review page', () => {
       'South Climate change 2 (S-CC-2) - Section 2',
       'South Climate change 1 (S-CC-1) - Section 2'
     ])
+
+    const changeLink = card.querySelectorAll('.govuk-summary-list__actions a')
+    expect(changeLink.length).toBe(2)
+
+    expect(changeLink[0].textContent).toContain('Change')
+    expect(changeLink[0].getAttribute('href')).toBe(
+      `${documentTypeUrl}?from=supporting-documents-review`
+    )
+
+    expect(changeLink[1].textContent).toContain('Change')
+    expect(changeLink[1].getAttribute('href')).toBe(
+      `${documentPolicyUrl}?from=supporting-documents-review`
+    )
   })
 
   test('shows the expected page content', async () => {

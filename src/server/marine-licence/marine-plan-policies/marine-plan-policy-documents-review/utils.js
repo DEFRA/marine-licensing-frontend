@@ -1,6 +1,7 @@
 import { MPP_DOCUMENT_TYPES } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-type/constants.js'
 import { formatPolicyTitle } from '#src/server/common/helpers/marine-licence/marine-plan-policy-title.js'
 import escapeHtml from 'lodash/escape.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 const outputType = (document) => {
   const { documentType } = document
@@ -45,6 +46,18 @@ export const createDocumentCards = (
         },
         value: {
           html: outputType(document)
+        },
+        actions: {
+          items: [
+            {
+              href: `${marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE.replace(
+                '{documentId}',
+                encodeURIComponent(document.documentId)
+              )}?from=supporting-documents-review`,
+              text: 'Change',
+              visuallyHiddenText: 'type'
+            }
+          ]
         }
       },
       {
@@ -53,6 +66,18 @@ export const createDocumentCards = (
         },
         value: {
           html: outputPolicies(document, marinePlanPolicies)
+        },
+        actions: {
+          items: [
+            {
+              href: `${marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
+                '{documentId}',
+                encodeURIComponent(document.documentId)
+              )}?from=supporting-documents-review`,
+              text: 'Change',
+              visuallyHiddenText: 'policies'
+            }
+          ]
         }
       }
     ]

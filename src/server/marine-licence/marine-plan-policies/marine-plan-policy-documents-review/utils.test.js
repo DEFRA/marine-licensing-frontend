@@ -29,7 +29,7 @@ describe('createDocumentCards', () => {
     const card = buildCard(mockMarinePlanPolicyDocument)
 
     expect(card.rows[0].value.html).toBe('')
-    expect(card.rows[1].value.html).not.toContain('<li>')
+    expect(card.rows[1].value.html).toBe('')
   })
 
   test('falls back to the policy code when the policy is not found', () => {

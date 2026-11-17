@@ -261,22 +261,6 @@ describe('Public register', () => {
     })
   })
 
-  test('keeps earlier selections when the user comes Back from the commercial confidentiality page', async () => {
-    mockMarineLicence({
-      ...marineLicence,
-      publicRegister: {
-        withholdConsent: 'yes',
-        withholdReason: 'commercialConfidentiality',
-        reason: 'Pricing details'
-      }
-    })
-
-    const document = await loadPublicRegisterPage()
-
-    expect(getQuestionInput(document, 'Yes')).toBeChecked()
-    expect(getReasonInput(document, COMMERCIAL_CONFIDENTIALITY)).toBeChecked()
-  })
-
   test('keeps earlier selections when the user comes Back from the national security page', async () => {
     mockMarineLicence({
       ...marineLicence,

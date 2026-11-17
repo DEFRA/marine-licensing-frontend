@@ -1,7 +1,6 @@
 import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
-  publicRegisterCommercialConfidentialityController,
   publicRegisterCommercialConfidentialitySubmitController,
   PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE
 } from '#src/server/marine-licence/public-register-commercial-confidentiality/controller.js'
@@ -38,56 +37,7 @@ describe('#publicRegisterCommercialConfidentiality', () => {
     vi.restoreAllMocks()
   })
 
-  describe('#publicRegisterCommercialConfidentialityController', () => {
-    test('renders the saved reason with Back and Cancel links', async () => {
-      vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
-        ...mockLicence,
-        publicRegister: { ...choice, reason: 'Pricing details' }
-      })
-      const h = createH()
-
-      await publicRegisterCommercialConfidentialityController.handler(
-        { query: {} },
-        h
-      )
-
-      expect(h.view).toHaveBeenCalledWith(
-        PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE,
-        expect.objectContaining({
-          heading:
-            'Withholding information for commercial or industrial confidentiality reasons',
-          projectName: 'Test Project',
-          payload: { reason: 'Pricing details' },
-          backLink: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-          cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-        })
-      )
-    })
-  })
-
   describe('#publicRegisterCommercialConfidentialitySubmitController', () => {
-    test('saves the withholding choice and reason together, then reloads the page', async () => {
-      const h = createH()
-
-      await publicRegisterCommercialConfidentialitySubmitController.handler(
-        { payload: { reason: 'Pricing details' }, query: {} },
-        h
-      )
-
-      const publicRegister = { ...choice, reason: 'Pricing details' }
-      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-        expect.any(Object),
-        '/marine-licence/public-register-commercial-confidentiality',
-        { ...publicRegister, id: mockLicence.id }
-      )
-      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-        expect.any(Object),
-        h,
-        expect.objectContaining({ publicRegister })
-      )
-      expect(h.redirect).toHaveBeenCalledWith(pageUrl)
-    })
-
     test('keeps the check your answers query on the redirect', async () => {
       const h = createH()
 

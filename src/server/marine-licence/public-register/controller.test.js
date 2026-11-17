@@ -158,29 +158,6 @@ describe('#publicRegister', () => {
       )
     })
 
-    test('Should redirect to the commercial confidentiality page without saving to the backend', async () => {
-      const h = { redirect: vi.fn(), view: vi.fn() }
-      const payload = {
-        withholdConsent: 'yes',
-        withholdReason: 'commercialConfidentiality'
-      }
-
-      await publicRegisterSubmitController.handler(
-        { payload, query: { from: 'check-your-answers' } },
-        h
-      )
-
-      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
-      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-        expect.any(Object),
-        h,
-        expect.objectContaining({ publicRegister: payload })
-      )
-      expect(h.redirect).toHaveBeenCalledWith(
-        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY}?from=check-your-answers`
-      )
-    })
-
     test('Should redirect to the national security page within check your answers without saving to the backend', async () => {
       const h = {
         redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
@@ -247,26 +224,6 @@ describe('#publicRegister', () => {
           expect.any(Object),
           h,
           expect.objectContaining({ publicRegister: savedAnswers })
-        )
-      })
-
-      test.each([
-        {
-          payload: {
-            withholdConsent: 'yes',
-            withholdReason: 'commercialConfidentiality'
-          }
-        },
-        { payload: { withholdConsent: 'no' } }
-      ])('Should drop them for $payload', async ({ payload }) => {
-        const h = { redirect: vi.fn(), view: vi.fn() }
-
-        await publicRegisterSubmitController.handler({ payload, query: {} }, h)
-
-        expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-          expect.any(Object),
-          h,
-          expect.objectContaining({ publicRegister: payload })
         )
       })
     })

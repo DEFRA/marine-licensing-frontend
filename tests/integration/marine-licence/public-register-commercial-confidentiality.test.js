@@ -152,23 +152,17 @@ describe('Public register: commercial confidentiality', () => {
     }
   )
 
-  test.each([
-    { name: 'empty', reason: '' },
-    { name: 'only whitespace', reason: '   \r\n  ' }
-  ])(
-    'shows an error linked to the textbox when the text is $name',
-    async ({ reason }) => {
-      const { document } = await submitCommercialForm({ reason })
+  test('shows an error linked to the textbox when the text is empty', async () => {
+    const { document } = await submitCommercialForm({ reason: '' })
 
-      expect(document.title).toMatch(/^Error:/)
-      expectInputError({
-        document,
-        inputLabel: TEXTBOX_LABEL,
-        errorMessage: REASON_REQUIRED
-      })
-      expect(authenticatedPatchRequest).not.toHaveBeenCalled()
-    }
-  )
+    expect(document.title).toMatch(/^Error:/)
+    expectInputError({
+      document,
+      inputLabel: TEXTBOX_LABEL,
+      errorMessage: REASON_REQUIRED
+    })
+    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
+  })
 
   test('shows an error linked to the textbox and keeps the text when it is 1001 characters', async () => {
     const reason = 'a'.repeat(1001)

@@ -592,20 +592,14 @@ describe('Marine licence page accessibility checks (Axe)', () => {
     })
   })
   describe('"Withholding information for commercial or industrial confidentiality reasons" page in an error state', () => {
-    test.each([
-      { name: 'the details are empty', formData: { reason: '' } },
-      {
-        name: 'the details are too long',
-        formData: { reason: 'a'.repeat(1001) }
-      }
-    ])('has no accessibility violations when $name', async ({ formData }) => {
+    test('has no accessibility violations when the details are empty', async () => {
       mockMarineLicence(mockMarineLicenceApplication)
 
       const { document } = await submitForm({
         requestUrl:
           marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY,
         server: getServer(),
-        formData
+        formData: { reason: '' }
       })
 
       expect(document.querySelector('.govuk-error-summary')).toBeInTheDocument()

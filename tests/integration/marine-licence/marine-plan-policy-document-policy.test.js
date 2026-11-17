@@ -1,4 +1,4 @@
-import { getByRole, within } from '@testing-library/dom'
+import { getByRole, queryByRole, within } from '@testing-library/dom'
 import {
   mockMarineLicence,
   setupTestServer
@@ -249,5 +249,59 @@ describe('Marine plan policy document policy page', () => {
     })
 
     expect(statusCode).toBe(statusCodes.badRequest)
+  })
+
+  test('shows the expected page content when in change mode', async () => {
+    const server = getServer()
+    const document = await loadPage({
+      requestUrl: `${documentPolicyUrl()}?action=change`,
+      server
+    })
+
+    expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
+      'Which policies does this document support?'
+    )
+
+    expect(document.querySelector('.govuk-caption-l')).toHaveTextContent(
+      mockMarineLicenceApplication.projectName
+    )
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    )
+
+    expect(
+      queryByRole(document, 'link', { name: 'Cancel' })
+    ).not.toBeInTheDocument()
+
+    expect(
+      getByRole(document, 'button', { name: 'Save and continue' })
+    ).toBeInTheDocument()
+
+    const { response } = await submitForm({
+      requestUrl: `${documentPolicyUrl()}?action=change`,
+      server,
+      formData: {
+        supportedPolicies: ['S-CC-1'],
+        'location-S-CC-1': ' section 4.2 ',
+        'location-S-CC-2': ''
+      }
+    })
+
+    expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      apiRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_LINKS,
+      {
+        id: mockMarineLicenceApplication.id,
+        documentId,
+        policyLinks: [{ policyCode: 'S-CC-1', location: 'section 4.2' }]
+      }
+    )
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    )
   })
 })

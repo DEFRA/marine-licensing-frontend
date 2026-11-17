@@ -42,9 +42,9 @@ const fetchMarineLicence = (request, id) =>
 
 export const checkYourAnswersController = {
   async handler(request, h) {
-    const cachedMarineLicence = getMarineLicenceCache(request)
-    const completeMarineLicence = cachedMarineLicence.id
-      ? await fetchMarineLicence(request, cachedMarineLicence.id)
+    let marineLicence = getMarineLicenceCache(request)
+    const completeMarineLicence = marineLicence.id
+      ? await fetchMarineLicence(request, marineLicence.id)
       : null
 
     if (
@@ -61,7 +61,6 @@ export const checkYourAnswersController = {
     )
 
     let siteData = { coordinatesType: null, summaryData: [] }
-    let waterFrameworkDirective = cachedMarineLicence.waterFrameworkDirective
     let marinePlanPolicySections = []
 
     if (completeMarineLicence) {
@@ -70,17 +69,19 @@ export const checkYourAnswersController = {
         completeMarineLicence
       )
 
-      // A user may have cancelled out of the WFD flow part way and returned to this page
-      // So it is necessary to reset the cache of this property to the server value
-      waterFrameworkDirective = completeMarineLicence.waterFrameworkDirective
+      // A user may have cancelled out of the WFD or withholding information flow
+      // part way, so these must be reset to the server values
+      marineLicence = {
+        ...marineLicence,
+        waterFrameworkDirective: completeMarineLicence.waterFrameworkDirective,
+        publicRegister: completeMarineLicence.publicRegister
+      }
 
-      await setMarineLicenceCache(request, h, {
-        ...cachedMarineLicence,
-        waterFrameworkDirective
-      })
+      await setMarineLicenceCache(request, h, marineLicence)
     }
 
-    const formattedMarineLicence = buildSummaryData(cachedMarineLicence)
+    const { waterFrameworkDirective } = marineLicence
+    const formattedMarineLicence = buildSummaryData(marineLicence)
 
     const waterFrameworkDirectiveData = waterFrameworkReviewData(
       waterFrameworkDirective
@@ -88,7 +89,7 @@ export const checkYourAnswersController = {
 
     return h.view(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       ...checkYourAnswersViewContent,
-      ...cachedMarineLicence,
+      ...marineLicence,
       coordinatesType: siteData.coordinatesType,
       summaryData: siteData.summaryData,
       reviewSiteDetailsRoute:

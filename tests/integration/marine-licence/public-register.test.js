@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { getByRole, getByText, within } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
@@ -6,6 +7,7 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
+import { setMarineLicenceCache } from '~/src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { expectFieldsetError } from '~/tests/integration/shared/expect-utils.js'
 import {
@@ -223,10 +225,28 @@ describe('Public register', () => {
     expect(authenticatedPatchRequest).not.toHaveBeenCalled()
   })
 
-  test('returns to the task list and saves the reason when Yes and a reason are selected', async () => {
+  test('goes to the national security page without saving when national security reasons are selected', async () => {
     const { response } = await submitPublicRegisterForm({
       withholdConsent: 'yes',
       withholdReason: 'nationalSecurity'
+    })
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
+    )
+    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
+    const savedLicence = vi.mocked(setMarineLicenceCache).mock.calls.at(-1)[2]
+    expect(savedLicence.publicRegister).toEqual({
+      withholdConsent: 'yes',
+      withholdReason: 'nationalSecurity'
+    })
+  })
+
+  test('returns to the task list when commercial confidentiality reasons are selected', async () => {
+    const { response } = await submitPublicRegisterForm({
+      withholdConsent: 'yes',
+      withholdReason: 'commercialConfidentiality'
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
@@ -239,9 +259,26 @@ describe('Public register', () => {
       {
         id: marineLicence.id,
         withholdConsent: 'yes',
-        withholdReason: 'nationalSecurity'
+        withholdReason: 'commercialConfidentiality'
       }
     )
+  })
+
+  test('keeps earlier selections when the user comes Back from the national security page', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity',
+        nationalSecurityApproval: 'yes',
+        reason: 'Details of the berth'
+      }
+    })
+
+    const document = await loadPublicRegisterPage()
+
+    expect(getQuestionInput(document, 'Yes')).toBeChecked()
+    expect(getReasonInput(document, NATIONAL_SECURITY)).toBeChecked()
   })
 
   test('returns to the task list without a reason when No is selected', async () => {

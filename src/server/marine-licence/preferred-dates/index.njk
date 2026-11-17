@@ -51,14 +51,14 @@
               id: "start-date-month",
               name: "month",
               label: "Month",
-              classes: "govuk-input--width-2" + (" govuk-input--error" if errors and errors['start-date-month']),
+              classes: "govuk-input--width-2" + (" govuk-input--error" if errorFields and 'start-date-month' in errorFields),
               value: payload['start-date-month'] if payload
             },
             {
               id: "start-date-year",
               name: "year",
               label: "Year",
-              classes: "govuk-input--width-4" + (" govuk-input--error" if errors and errors['start-date-year']),
+              classes: "govuk-input--width-4" + (" govuk-input--error" if errorFields and 'start-date-year' in errorFields),
               value: payload['start-date-year'] if payload
             }
           ]
@@ -82,14 +82,14 @@
               id: "end-date-month",
               name: "month",
               label: "Month",
-              classes: "govuk-input--width-2" + (" govuk-input--error" if errors and errors['end-date-month']),
+              classes: "govuk-input--width-2" + (" govuk-input--error" if errorFields and 'end-date-month' in errorFields),
               value: payload['end-date-month'] if payload
             },
             {
               id: "end-date-year",
               name: "year",
               label: "Year",
-              classes: "govuk-input--width-4" + (" govuk-input--error" if errors and errors['end-date-year']),
+              classes: "govuk-input--width-4" + (" govuk-input--error" if errorFields and 'end-date-year' in errorFields),
               value: payload['end-date-year'] if payload
             }
           ]

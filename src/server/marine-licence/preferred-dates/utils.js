@@ -15,33 +15,33 @@ const FIELD_END_YEAR = 'end-date-year'
 
 const startEndCodes = new Set([START_MONTH, START_YEAR, END_MONTH, END_YEAR])
 
-const mapStartError = (hasMonth, hasYear) => {
-  if (hasMonth && hasYear) {
-    return {
-      message: 'PREFERRED_START_DATE_REQUIRED',
-      path: [FIELD_START_MONTH]
-    }
-  }
-  if (hasMonth) {
-    return { message: START_MONTH, path: [FIELD_START_MONTH] }
-  }
-  if (hasYear) {
-    return { message: START_YEAR, path: [FIELD_START_YEAR] }
-  }
-  return null
+const START_INCOMPLETE = 'PREFERRED_START_DATE_REQUIRED'
+const END_INCOMPLETE = 'PREFERRED_END_DATE_REQUIRED'
+
+const wholeDateCodes = new Set([
+  'PREFERRED_START_DATE_TODAY_OR_FUTURE',
+  'PREFERRED_END_DATE_TODAY_OR_FUTURE',
+  'PREFERRED_END_DATE_BEFORE_START_DATE'
+])
+
+const dateFields = {
+  [FIELD_START_MONTH]: [FIELD_START_MONTH, FIELD_START_YEAR],
+  [FIELD_START_YEAR]: [FIELD_START_MONTH, FIELD_START_YEAR],
+  [FIELD_END_MONTH]: [FIELD_END_MONTH, FIELD_END_YEAR],
+  [FIELD_END_YEAR]: [FIELD_END_MONTH, FIELD_END_YEAR]
 }
 
-const mapEndError = (hasMonth, hasYear) => {
-  if (hasMonth && hasYear) {
-    return { message: 'PREFERRED_END_DATE_REQUIRED', path: [FIELD_END_MONTH] }
+const mapIncompleteError = (
+  message,
+  hasMonth,
+  hasYear,
+  monthField,
+  yearField
+) => {
+  if (!hasMonth && !hasYear) {
+    return null
   }
-  if (hasMonth) {
-    return { message: END_MONTH, path: [FIELD_END_MONTH] }
-  }
-  if (hasYear) {
-    return { message: END_YEAR, path: [FIELD_END_YEAR] }
-  }
-  return null
+  return { message, path: [hasMonth ? monthField : yearField] }
 }
 
 export const mapPreferredDatesErrors = (details) => {
@@ -56,11 +56,48 @@ export const mapPreferredDatesErrors = (details) => {
 
   const otherDetails = details.filter((d) => !startEndCodes.has(d.message))
   const mappedDetails = [
-    mapStartError(hasStartMonth, hasStartYear),
-    mapEndError(hasEndMonth, hasEndYear)
+    mapIncompleteError(
+      START_INCOMPLETE,
+      hasStartMonth,
+      hasStartYear,
+      FIELD_START_MONTH,
+      FIELD_START_YEAR
+    ),
+    mapIncompleteError(
+      END_INCOMPLETE,
+      hasEndMonth,
+      hasEndYear,
+      FIELD_END_MONTH,
+      FIELD_END_YEAR
+    )
   ].filter(Boolean)
 
   return [...mappedDetails, ...otherDetails]
+}
+
+const isBlank = (value) => !value?.toString().trim()
+
+const fieldsForDetail = ({ message, path }, payload) => {
+  const [field] = path ?? []
+  const fields = dateFields[field]
+  if (!fields) {
+    return [field]
+  }
+  if (wholeDateCodes.has(message)) {
+    return fields
+  }
+  if (message === START_INCOMPLETE || message === END_INCOMPLETE) {
+    return fields.filter((f) => isBlank(payload?.[f]))
+  }
+  return [field]
+}
+
+export const getErrorFields = (details, payload) => {
+  if (!Array.isArray(details)) {
+    return []
+  }
+  const fields = details.flatMap((detail) => fieldsForDetail(detail, payload))
+  return [...new Set(fields)]
 }
 
 export const validateDateRanges = (payload, now = new Date()) => {

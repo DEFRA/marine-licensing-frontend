@@ -8,6 +8,7 @@ import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
 import { preferredDatesSchema } from '#src/server/marine-licence/preferred-dates/schema.js'
 import {
+  getErrorFields,
   mapPreferredDatesErrors,
   validateDateRanges
 } from '#src/server/marine-licence/preferred-dates/utils.js'
@@ -70,7 +71,11 @@ export const showErrorView = (request, h, err, marineLicence) => {
     projectName: marineLicence.projectName,
     backLink: getCommonRedirectLink(request),
     payload: request.payload,
-    params: { startDateHint, endDateHint }
+    params: {
+      startDateHint,
+      endDateHint,
+      errorFields: getErrorFields(err?.details, request.payload)
+    }
   })(request, h, err)
 }
 

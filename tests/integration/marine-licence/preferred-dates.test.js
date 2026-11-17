@@ -11,6 +11,11 @@ import { expectFieldsetError } from '~/tests/integration/shared/expect-utils.js'
 describe('Start and end dates', () => {
   const getServer = setupTestServer()
 
+  const highlightedFields = (document) =>
+    [...document.querySelectorAll('input.govuk-input--error')].map(
+      (input) => input.id
+    )
+
   test('page elements', async () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,
@@ -70,15 +75,22 @@ describe('Start and end dates', () => {
     expectFieldsetError({
       document,
       fieldsetLabel: 'Start date',
-      errorMessage: 'The start date must include a month and a year',
+      errorMessage: 'Enter a complete start date',
       useErrorClass: true
     })
     expectFieldsetError({
       document,
       fieldsetLabel: 'End date',
-      errorMessage: 'The end date must include a month and a year',
+      errorMessage: 'Enter a complete end date',
       useErrorClass: true
     })
+
+    expect(highlightedFields(document)).toEqual([
+      'start-date-month',
+      'start-date-year',
+      'end-date-month',
+      'end-date-year'
+    ])
   })
 
   test('shows start error when only month is missing', async () => {
@@ -98,16 +110,21 @@ describe('Start and end dates', () => {
     expectFieldsetError({
       document,
       fieldsetLabel: 'Start date',
-      errorMessage: 'The start date must have a real month',
+      errorMessage: 'Enter a complete start date',
       useErrorClass: true
     })
 
     expectFieldsetError({
       document,
       fieldsetLabel: 'End date',
-      errorMessage: 'The end date must have a real month',
+      errorMessage: 'Enter a complete end date',
       useErrorClass: true
     })
+
+    expect(highlightedFields(document)).toEqual([
+      'start-date-month',
+      'end-date-month'
+    ])
   })
 
   test('shows start error when only start year is missing', async () => {
@@ -127,16 +144,21 @@ describe('Start and end dates', () => {
     expectFieldsetError({
       document,
       fieldsetLabel: 'Start date',
-      errorMessage: 'The start date must have a real year',
+      errorMessage: 'Enter a complete start date',
       useErrorClass: true
     })
 
     expectFieldsetError({
       document,
       fieldsetLabel: 'End date',
-      errorMessage: 'The end date must have a real year',
+      errorMessage: 'Enter a complete end date',
       useErrorClass: true
     })
+
+    expect(highlightedFields(document)).toEqual([
+      'start-date-year',
+      'end-date-year'
+    ])
   })
 
   test('shows start error when date is in the past', async () => {
@@ -165,6 +187,13 @@ describe('Start and end dates', () => {
       errorMessage: 'The end date must be today or in the future',
       useErrorClass: true
     })
+
+    expect(highlightedFields(document)).toEqual([
+      'start-date-month',
+      'start-date-year',
+      'end-date-month',
+      'end-date-year'
+    ])
   })
 
   test('shows end error when end date is before start date', async () => {
@@ -187,5 +216,10 @@ describe('Start and end dates', () => {
       errorMessage: 'The end date must be after the start date',
       useErrorClass: true
     })
+
+    expect(highlightedFields(document)).toEqual([
+      'end-date-month',
+      'end-date-year'
+    ])
   })
 })

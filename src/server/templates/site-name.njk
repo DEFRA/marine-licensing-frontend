@@ -49,7 +49,7 @@
 
           <div class="govuk-button-group">
             {{ govukButton({
-              text: "Save and continue" if action else "Continue",
+              text: continueButtonText(changeMode),
               classes: "govuk-button--primary"
             }) }}
 

@@ -78,12 +78,12 @@ describe('Marine plan policy documents review page', () => {
 
     expect(changeLink[0].textContent).toContain('Change')
     expect(changeLink[0].getAttribute('href')).toBe(
-      `${documentTypeUrl}?from=supporting-documents-review`
+      `${documentTypeUrl}?action=change`
     )
 
     expect(changeLink[1].textContent).toContain('Change')
     expect(changeLink[1].getAttribute('href')).toBe(
-      `${documentPolicyUrl}?from=supporting-documents-review`
+      `${documentPolicyUrl}?action=change`
     )
   })
 

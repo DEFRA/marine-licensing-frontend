@@ -53,7 +53,7 @@ export const createDocumentCards = (
               href: `${marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE.replace(
                 '{documentId}',
                 encodeURIComponent(document.documentId)
-              )}?from=supporting-documents-review`,
+              )}?action=change`,
               text: 'Change',
               visuallyHiddenText: 'type'
             }
@@ -73,7 +73,7 @@ export const createDocumentCards = (
               href: `${marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
                 '{documentId}',
                 encodeURIComponent(document.documentId)
-              )}?from=supporting-documents-review`,
+              )}?action=change`,
               text: 'Change',
               visuallyHiddenText: 'policies'
             }

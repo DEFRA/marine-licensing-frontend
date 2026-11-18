@@ -185,12 +185,14 @@ describe('Public register: commercial confidentiality', () => {
       reason: `${'a'.repeat(498)}\r\n${'a'.repeat(500)}\r\n`
     }
   ])(
-    'saves $name, reloads the page and shows the saved text',
+    'saves $name, goes to check answers and shows the saved text on return',
     async ({ reason }) => {
       const { response } = await submitCommercialForm({ reason })
 
       expect(response.statusCode).toBe(statusCodes.redirect)
-      expect(response.headers.location).toBe(PAGE_URL)
+      expect(response.headers.location).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+      )
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/marine-licence/public-register-commercial-confidentiality',

@@ -1,8 +1,11 @@
 import {
+  getIncompleteWithholdingPage,
   getNationalSecurityAnswers,
+  getReasonPage,
   isNationalSecurity,
   keepReasonAnswers
 } from './public-register.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 describe('isNationalSecurity', () => {
   test.each([
@@ -99,5 +102,77 @@ describe('keepReasonAnswers', () => {
     }
   ])('drops saved answers when $name', ({ publicRegister, existing }) => {
     expect(keepReasonAnswers(publicRegister, existing)).toEqual(publicRegister)
+  })
+})
+
+describe('getReasonPage', () => {
+  test.each([
+    {
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity'
+      },
+      expected:
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
+    },
+    {
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'commercialConfidentiality'
+      },
+      expected:
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
+    },
+    { publicRegister: { withholdConsent: 'no' }, expected: undefined },
+    { publicRegister: undefined, expected: undefined }
+  ])(
+    'returns $expected for $publicRegister',
+    ({ publicRegister, expected }) => {
+      expect(getReasonPage(publicRegister)).toBe(expected)
+    }
+  )
+})
+
+describe('getIncompleteWithholdingPage', () => {
+  const nationalSecurity = {
+    withholdConsent: 'yes',
+    withholdReason: 'nationalSecurity'
+  }
+  const commercial = {
+    withholdConsent: 'yes',
+    withholdReason: 'commercialConfidentiality'
+  }
+
+  test.each([
+    { name: 'there are no answers', publicRegister: undefined },
+    { name: 'the answer is no', publicRegister: { withholdConsent: 'no' } },
+    {
+      name: 'yes was chosen without a reason',
+      publicRegister: { withholdConsent: 'yes' }
+    }
+  ])('returns the first page when $name', ({ publicRegister }) => {
+    expect(getIncompleteWithholdingPage(publicRegister)).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+    )
+  })
+
+  test('returns the national security page when approval is not answered', () => {
+    expect(getIncompleteWithholdingPage(nationalSecurity)).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
+    )
+  })
+
+  test('returns the commercial page when the reason is missing', () => {
+    expect(getIncompleteWithholdingPage(commercial)).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
+    )
+  })
+
+  test.each([
+    { ...nationalSecurity, nationalSecurityApproval: 'no' },
+    { ...nationalSecurity, nationalSecurityApproval: 'yes', reason: 'Berth' },
+    { ...commercial, reason: 'Pricing details' }
+  ])('returns null when the answers are complete: %o', (publicRegister) => {
+    expect(getIncompleteWithholdingPage(publicRegister)).toBeNull()
   })
 })

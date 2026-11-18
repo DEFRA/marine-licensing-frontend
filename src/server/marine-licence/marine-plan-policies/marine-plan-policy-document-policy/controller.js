@@ -6,11 +6,12 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { loadMarinePlanPolicyDocument } from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
 import {
-  getMarinePlanPolicyDocumentPolicyUrl,
-  getMarinePlanPolicyDocumentTypeUrl
-} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/utils.js'
+  getReturnLink,
+  isChangeMode,
+  loadMarinePlanPolicyDocument
+} from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
+import { getMarinePlanPolicyDocumentTypeUrl } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/utils.js'
 
 import {
   MPP_DOCUMENT_LOCATION_MAX_LENGTH,
@@ -36,35 +37,45 @@ export const errorMessages = {
 }
 
 const loadDocumentContext = async (request) => {
-  const { id, documentId, document, marineLicence } =
+  const { id, documentId, projectName, document, marineLicence } =
     await loadMarinePlanPolicyDocument(request)
+
+  const changeMode = isChangeMode(request)
 
   return {
     id,
     documentId,
+    projectName,
     requiringDocuments:
       marineLicence.marinePlanPolicySupportingDocuments.requiringDocuments,
     marinePlanPolicies: marineLicence.marinePlanPolicies,
     filename: document.uploadedFile?.filename,
-    policyLinks: document.policyLinks
+    policyLinks: document.policyLinks,
+    cancelLink: changeMode ? null : getReturnLink(marineLicence)
   }
 }
 
 const buildView = ({
   documentId,
+  projectName,
   requiringDocuments,
   marinePlanPolicies,
   filename,
+  cancelLink,
   payload,
   errors,
-  errorSummary
+  errorSummary,
+  changeMode
 }) => ({
   pageTitle: PAGE_TITLE,
   heading: PAGE_TITLE,
+  projectName,
   filename,
   options: getPolicyOptions(requiringDocuments, marinePlanPolicies),
-  backLink: getMarinePlanPolicyDocumentTypeUrl(documentId),
-  cancelLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+  backLink: changeMode
+    ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    : getMarinePlanPolicyDocumentTypeUrl(documentId),
+  cancelLink,
   payload,
   errors,
   errorSummary
@@ -83,11 +94,14 @@ export const marinePlanPolicyDocumentPolicyController = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
     }
 
+    const changeMode = isChangeMode(request)
+
     return h.view(
       MARINE_PLAN_POLICY_DOCUMENT_POLICY_VIEW_ROUTE,
       buildView({
         ...context,
-        payload: getPolicyLinksPayload(context.policyLinks)
+        payload: getPolicyLinksPayload(context.policyLinks),
+        changeMode
       })
     )
   }
@@ -112,6 +126,8 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
           errorMessages
         )
 
+        const changeMode = isChangeMode(request)
+
         return h
           .view(
             MARINE_PLAN_POLICY_DOCUMENT_POLICY_VIEW_ROUTE,
@@ -119,7 +135,8 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
               ...context,
               payload: request.payload,
               errors: errorDescriptionByFieldName(errorSummary),
-              errorSummary
+              errorSummary,
+              changeMode
             })
           )
           .takeover()
@@ -135,6 +152,8 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
       { id, documentId, policyLinks: getPolicyLinks(request.payload) }
     )
 
-    return h.redirect(getMarinePlanPolicyDocumentPolicyUrl(documentId))
+    return h.redirect(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    )
   }
 }

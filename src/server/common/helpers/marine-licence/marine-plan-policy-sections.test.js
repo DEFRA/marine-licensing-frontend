@@ -79,12 +79,13 @@ describe('marine plan policy sections', () => {
         )
       ).toEqual({
         heading: 'Supporting documents',
+        slug: 'supporting-documents',
         items: [
           {
             hint: {
               text: 'Still needed for S-CC-1'
             },
-            href: '/marine-licence/marine-plan-policy/supporting-document-upload',
+            href: '/marine-licence/marine-plan-policy/supporting-documents-review',
             status: {
               classes: 'govuk-task-list__status--nowrap',
               tag: {
@@ -120,6 +121,9 @@ describe('marine plan policy sections', () => {
         text: 'Not yet started',
         classes: 'govuk-tag--blue'
       })
+      expect(item.href).toBe(
+        '/marine-licence/marine-plan-policy/supporting-document-upload'
+      )
     })
 
     test('shows unknown statuses as "Not yet started"', () => {
@@ -139,12 +143,13 @@ describe('marine plan policy sections', () => {
         addSupportingDocumentsSection(mockMarinePlanPolicySupportingDocuments)
       ).toEqual({
         heading: 'Supporting documents',
+        slug: 'supporting-documents',
         items: [
           {
             hint: {
               text: ''
             },
-            href: '/marine-licence/marine-plan-policy/supporting-document-upload',
+            href: '/marine-licence/marine-plan-policy/supporting-documents-review',
             status: {
               text: 'Completed'
             },

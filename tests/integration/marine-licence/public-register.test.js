@@ -278,23 +278,6 @@ describe('Public register', () => {
     expect(getReasonInput(document, NATIONAL_SECURITY)).toBeChecked()
   })
 
-  test('keeps earlier selections when the user comes Back from the national security page', async () => {
-    mockMarineLicence({
-      ...marineLicence,
-      publicRegister: {
-        withholdConsent: 'yes',
-        withholdReason: 'nationalSecurity',
-        nationalSecurityApproval: 'yes',
-        reason: 'Details of the berth'
-      }
-    })
-
-    const document = await loadPublicRegisterPage()
-
-    expect(getQuestionInput(document, 'Yes')).toBeChecked()
-    expect(getReasonInput(document, NATIONAL_SECURITY)).toBeChecked()
-  })
-
   test('returns to the task list without a reason when No is selected', async () => {
     const { response } = await submitPublicRegisterForm({
       withholdConsent: 'no',

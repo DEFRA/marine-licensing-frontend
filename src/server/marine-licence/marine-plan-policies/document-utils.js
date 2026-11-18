@@ -8,6 +8,11 @@ export const getReturnLink = (marineLicence) =>
     ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
     : marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
 
+export const isChangeMode = (request) => {
+  const action = request.query.action
+  return action && action === 'change'
+}
+
 export const loadMarinePlanPolicyDocument = async (request) => {
   const cached = getMarineLicenceCache(request)
 

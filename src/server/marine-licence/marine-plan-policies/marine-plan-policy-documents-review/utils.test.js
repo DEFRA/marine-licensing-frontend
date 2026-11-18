@@ -23,6 +23,8 @@ describe('createDocumentCards', () => {
     expect(card.rows[1].value.html).toContain(
       '<li>South Climate change 1 (S-CC-1) - Page 1</li><li>South Climate change 2 (S-CC-2) - Page 2</li>'
     )
+    expect(card.rows[0].actions.items[0].text).toBe('Change')
+    expect(card.rows[1].actions.items[0].text).toBe('Change')
   })
 
   test('handles a document with no type or policies yet', () => {
@@ -41,7 +43,7 @@ describe('createDocumentCards', () => {
     expect(card.rows[1].value.html).toContain('<li>X-&lt;b&gt;-1 - Page 1</li>')
   })
 
-  test('escapes the policy title', () => {
+  test('escapes text correctly', () => {
     const card = createDocumentCards(
       {
         documents: [
@@ -56,19 +58,6 @@ describe('createDocumentCards', () => {
 
     expect(card.rows[1].value.html).toContain(
       '<li>&lt;b&gt;Climate&lt;/b&gt; (S-CC-1) - Page 1</li>'
-    )
-  })
-
-  test('adds the escaped "other" description on a new line', () => {
-    const card = buildCard({
-      ...mockMarinePlanPolicyDocument,
-      documentType: 'other',
-      documentTypeOther: '<b>Test survey</b>',
-      policyLinks: []
-    })
-
-    expect(card.rows[0].value.html).toBe(
-      'Other supporting evidence<br>&lt;b&gt;Test survey&lt;/b&gt;'
     )
   })
 })

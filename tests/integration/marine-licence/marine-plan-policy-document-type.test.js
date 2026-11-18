@@ -204,4 +204,53 @@ describe('Marine plan policy document type page', () => {
     expect(authenticatedPatchRequest).not.toHaveBeenCalled()
     validateErrors([{ field, message }], document)
   })
+
+  test('shows the expected page content when in change mode', async () => {
+    const server = getServer()
+    const document = await loadPage({
+      requestUrl: `${documentTypeUrl()}?action=change`,
+      server
+    })
+
+    expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
+      'What type of document is this?'
+    )
+
+    expect(document.querySelector('.govuk-caption-l')).toHaveTextContent(
+      mockMarineLicenceApplication.projectName
+    )
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    )
+
+    expect(
+      getByRole(document, 'button', { name: 'Save and continue' })
+    ).toBeInTheDocument()
+
+    const { response } = await submitForm({
+      requestUrl: `${documentTypeUrl()}?action=change`,
+      server,
+      formData: {
+        documentType: 'fisheries-assessment'
+      }
+    })
+
+    expect(authenticatedPatchRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      apiRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE,
+      {
+        id: mockMarineLicenceApplication.id,
+        documentId,
+        documentType: 'fisheries-assessment',
+        documentTypeOther: undefined
+      }
+    )
+
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    )
+  })
 })

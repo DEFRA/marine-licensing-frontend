@@ -182,7 +182,7 @@ describe('Public register: commercial confidentiality', () => {
     { name: '1000 characters', reason: 'a'.repeat(1000) },
     {
       name: '1000 characters including line breaks',
-      reason: `${'a'.repeat(498)}\r\n${'a'.repeat(500)}\r\n`
+      reason: `${'a'.repeat(499)}\r\n${'a'.repeat(500)}`
     }
   ])(
     'saves $name, reloads the page and shows the saved text',

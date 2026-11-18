@@ -61,6 +61,9 @@ describe('Marine plan policy document type page', () => {
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'What type of document is this?'
     )
+    expect(document.querySelector('.govuk-inset-text')).toHaveTextContent(
+      mockMarinePlanPolicyDocument.uploadedFile.filename
+    )
     const radios = [...document.querySelectorAll('input[name="documentType"]')]
     expect(radios.map((radio) => radio.value)).toEqual(
       Object.keys(MPP_DOCUMENT_TYPES)

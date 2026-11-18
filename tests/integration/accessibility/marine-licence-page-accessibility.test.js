@@ -180,6 +180,14 @@ const marineLicencePages = [
     marineLicence: mockMarineLicenceApplication
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT.replace(
+      '{documentId}',
+      mockMarinePlanPolicyDocument.documentId
+    ),
+    title: 'Are you sure you want to delete this document?',
+    marineLicence: mockMarineLicenceApplication
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
     title: 'What are your preferred start and end dates for the licence?'
   },

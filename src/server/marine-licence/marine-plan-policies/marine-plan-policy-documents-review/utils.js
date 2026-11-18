@@ -7,6 +7,8 @@ import {
   getMarinePlanPolicyDocumentTypeUrl
 } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/utils.js'
 
+const LINK_CLASSES = 'govuk-link--no-visited-state'
+
 const outputType = (document) => {
   const { documentType } = document
 
@@ -55,7 +57,7 @@ export const createDocumentCards = (
           ),
           text: 'Delete',
           visuallyHiddenText: 'document',
-          classes: 'govuk-link--no-visited-state'
+          classes: LINK_CLASSES
         }
       ]
     },
@@ -73,7 +75,7 @@ export const createDocumentCards = (
               href: `${getMarinePlanPolicyDocumentTypeUrl(document.documentId)}?action=change`,
               text: 'Change',
               visuallyHiddenText: 'type',
-              classes: 'govuk-link--no-visited-state'
+              classes: LINK_CLASSES
             }
           ]
         }
@@ -91,7 +93,7 @@ export const createDocumentCards = (
               href: `${getMarinePlanPolicyDocumentPolicyUrl(document.documentId)}?action=change`,
               text: 'Change',
               visuallyHiddenText: 'policies',
-              classes: 'govuk-link--no-visited-state'
+              classes: LINK_CLASSES
             }
           ]
         }

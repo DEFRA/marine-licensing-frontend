@@ -6,11 +6,11 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { loadMarinePlanPolicyDocument } from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
 import {
-  getMarinePlanPolicyDocumentPolicyUrl,
-  getMarinePlanPolicyDocumentTypeUrl
-} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/utils.js'
+  getReturnLink,
+  loadMarinePlanPolicyDocument
+} from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
+import { getMarinePlanPolicyDocumentTypeUrl } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/utils.js'
 
 import {
   MPP_DOCUMENT_LOCATION_MAX_LENGTH,
@@ -36,35 +36,40 @@ export const errorMessages = {
 }
 
 const loadDocumentContext = async (request) => {
-  const { id, documentId, document, marineLicence } =
+  const { id, documentId, projectName, document, marineLicence } =
     await loadMarinePlanPolicyDocument(request)
 
   return {
     id,
     documentId,
+    projectName,
     requiringDocuments:
       marineLicence.marinePlanPolicySupportingDocuments.requiringDocuments,
     marinePlanPolicies: marineLicence.marinePlanPolicies,
     filename: document.uploadedFile?.filename,
-    policyLinks: document.policyLinks
+    policyLinks: document.policyLinks,
+    cancelLink: getReturnLink(marineLicence)
   }
 }
 
 const buildView = ({
   documentId,
+  projectName,
   requiringDocuments,
   marinePlanPolicies,
   filename,
+  cancelLink,
   payload,
   errors,
   errorSummary
 }) => ({
   pageTitle: PAGE_TITLE,
   heading: PAGE_TITLE,
+  projectName,
   filename,
   options: getPolicyOptions(requiringDocuments, marinePlanPolicies),
   backLink: getMarinePlanPolicyDocumentTypeUrl(documentId),
-  cancelLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+  cancelLink,
   payload,
   errors,
   errorSummary
@@ -135,6 +140,8 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
       { id, documentId, policyLinks: getPolicyLinks(request.payload) }
     )
 
-    return h.redirect(getMarinePlanPolicyDocumentPolicyUrl(documentId))
+    return h.redirect(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    )
   }
 }

@@ -1,7 +1,11 @@
 import { vi } from 'vitest'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as marineLicenceService from '#src/services/marine-licence-service/index.js'
-import { loadMarinePlanPolicyDocument } from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  getReturnLink,
+  loadMarinePlanPolicyDocument
+} from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/services/marine-licence-service/index.js')
@@ -68,6 +72,30 @@ describe('#loadMarinePlanPolicyDocument', () => {
           output: { statusCode: 404 },
           message: 'Marine plan policy supporting document not found'
         }
+      )
+    }
+  )
+})
+
+describe('#getReturnLink', () => {
+  test('returns the supporting documents review page when documents have been uploaded', () => {
+    expect(
+      getReturnLink({
+        marinePlanPolicySupportingDocuments: { documents: [document] }
+      })
+    ).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    )
+  })
+
+  test.each([
+    ['no documents have been uploaded', { documents: [] }],
+    ['the licence has no supporting documents', undefined]
+  ])(
+    'returns the marine plan policies page when %s',
+    (_, marinePlanPolicySupportingDocuments) => {
+      expect(getReturnLink({ marinePlanPolicySupportingDocuments })).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
       )
     }
   )

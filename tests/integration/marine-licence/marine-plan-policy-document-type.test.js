@@ -70,6 +70,10 @@ describe('Marine plan policy document type page', () => {
     })
     expect(document.getElementById('documentTypeOther')).not.toBeNull()
     expect(document.querySelector('input:checked')).toBeNull()
+    expect(getByRole(document, 'link', { name: 'Cancel' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    )
   })
 
   test('selects the saved document type', async () => {

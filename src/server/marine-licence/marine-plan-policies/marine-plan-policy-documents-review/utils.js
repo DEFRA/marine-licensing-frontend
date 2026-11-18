@@ -93,7 +93,8 @@ export const createDocumentCards = (
                 encodeURIComponent(document.documentId)
               )}?action=change`,
               text: 'Change',
-              visuallyHiddenText: 'policies'
+              visuallyHiddenText: 'policies',
+              classes: 'govuk-link--no-visited-state'
             }
           ]
         }

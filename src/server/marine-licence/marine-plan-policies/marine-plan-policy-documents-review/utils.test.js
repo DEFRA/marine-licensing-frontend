@@ -5,7 +5,10 @@ import {
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 const buildCard = (document) =>
-  createDocumentCards({ documents: [document] }, mockMarinePlanPolicies)[0]
+  createDocumentCards(
+    { linkedDocuments: [document] },
+    mockMarinePlanPolicies
+  )[0]
 
 describe('createDocumentCards', () => {
   test('builds a card with the type and a list of linked policies', () => {
@@ -46,7 +49,7 @@ describe('createDocumentCards', () => {
   test('escapes text correctly', () => {
     const card = createDocumentCards(
       {
-        documents: [
+        linkedDocuments: [
           {
             ...mockMarinePlanPolicyDocument,
             policyLinks: [{ policyCode: 'S-CC-1', location: 'Page 1' }]

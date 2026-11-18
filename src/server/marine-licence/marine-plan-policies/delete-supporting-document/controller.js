@@ -13,11 +13,13 @@ export const MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT_VIEW_ROUTE =
 
 const PAGE_TITLE = 'Are you sure you want to delete this document?'
 
+const LINKED_DOCUMENTS = 'linkedDocuments'
+
 const reviewUrl =
   marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
 
 const hasOtherDocuments = (marineLicence, documentId) =>
-  marineLicence.marinePlanPolicySupportingDocuments.documents.some(
+  marineLicence.marinePlanPolicySupportingDocuments.linkedDocuments.some(
     (document) => document.documentId !== documentId
   )
 
@@ -38,8 +40,10 @@ const options = {
 export const marinePlanPolicyDeleteSupportingDocumentController = {
   options,
   async handler(request, h) {
-    const { projectName, document } =
-      await loadMarinePlanPolicyDocument(request)
+    const { projectName, document } = await loadMarinePlanPolicyDocument(
+      request,
+      LINKED_DOCUMENTS
+    )
 
     return h.view(MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT_VIEW_ROUTE, {
       projectName,
@@ -57,7 +61,7 @@ export const marinePlanPolicyDeleteSupportingDocumentSubmitController = {
   options,
   async handler(request, h) {
     const { id, documentId, marineLicence } =
-      await loadMarinePlanPolicyDocument(request)
+      await loadMarinePlanPolicyDocument(request, LINKED_DOCUMENTS)
 
     try {
       await authenticatedPatchRequest(

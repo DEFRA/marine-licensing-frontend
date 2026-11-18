@@ -34,7 +34,7 @@ const mockLicenceWithDocument = (document = mockMarinePlanPolicyDocument) =>
     ...mockMarineLicenceApplication,
     marinePlanPolicySupportingDocuments: {
       ...mockMarineLicenceApplication.marinePlanPolicySupportingDocuments,
-      documents: [document]
+      unlinkedDocuments: [document]
     }
   })
 

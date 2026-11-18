@@ -24,7 +24,7 @@ const documentId = 'c7e4ef70-7c7d-4464-8401-7bf4e6f47351'
 const licenceData = {
   marinePlanPolicies: [],
   marinePlanPolicySupportingDocuments: {
-    documents: [{ documentId }],
+    unlinkedDocuments: [{ documentId }],
     requiringDocuments: ['S-CC-1', 'S-CC-2']
   }
 }
@@ -94,7 +94,7 @@ describe('#marinePlanPolicyDocumentPolicyController', () => {
       getMarineLicenceById: vi.fn().mockResolvedValue({
         marinePlanPolicies: [],
         marinePlanPolicySupportingDocuments: {
-          documents: [{ documentId }],
+          unlinkedDocuments: [{ documentId }],
           requiringDocuments: []
         }
       })

@@ -75,13 +75,13 @@ describe('Start and end dates', () => {
     expectFieldsetError({
       document,
       fieldsetLabel: 'Start date',
-      errorMessage: 'Enter a complete start date',
+      errorMessage: 'The start date must include a month and a year',
       useErrorClass: true
     })
     expectFieldsetError({
       document,
       fieldsetLabel: 'End date',
-      errorMessage: 'Enter a complete end date',
+      errorMessage: 'The end date must include a month and a year',
       useErrorClass: true
     })
 
@@ -110,14 +110,14 @@ describe('Start and end dates', () => {
     expectFieldsetError({
       document,
       fieldsetLabel: 'Start date',
-      errorMessage: 'Enter a complete start date',
+      errorMessage: 'The start date must have a real month',
       useErrorClass: true
     })
 
     expectFieldsetError({
       document,
       fieldsetLabel: 'End date',
-      errorMessage: 'Enter a complete end date',
+      errorMessage: 'The end date must have a real month',
       useErrorClass: true
     })
 
@@ -144,14 +144,14 @@ describe('Start and end dates', () => {
     expectFieldsetError({
       document,
       fieldsetLabel: 'Start date',
-      errorMessage: 'Enter a complete start date',
+      errorMessage: 'The start date must have a real year',
       useErrorClass: true
     })
 
     expectFieldsetError({
       document,
       fieldsetLabel: 'End date',
-      errorMessage: 'Enter a complete end date',
+      errorMessage: 'The end date must have a real year',
       useErrorClass: true
     })
 

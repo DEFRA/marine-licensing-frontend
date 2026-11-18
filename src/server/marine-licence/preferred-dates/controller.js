@@ -74,7 +74,7 @@ export const showErrorView = (request, h, err, marineLicence) => {
     params: {
       startDateHint,
       endDateHint,
-      errorFields: getErrorFields(err?.details, request.payload)
+      errorFields: getErrorFields(err?.details)
     }
   })(request, h, err)
 }

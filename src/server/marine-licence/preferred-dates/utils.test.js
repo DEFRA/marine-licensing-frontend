@@ -49,43 +49,43 @@ describe('#mapPreferredDatesErrors', () => {
     ])
   })
 
-  test('should produce PREFERRED_START_DATE_REQUIRED on the start month when only start month is missing', () => {
+  test('should keep PREFERRED_START_MONTH_REQUIRED with correct path when only start month is missing', () => {
     const details = [
       { message: 'PREFERRED_START_MONTH_REQUIRED', path: ['start-date-month'] }
     ]
     const result = mapPreferredDatesErrors(details)
     expect(result).toEqual([
-      { message: 'PREFERRED_START_DATE_REQUIRED', path: ['start-date-month'] }
+      { message: 'PREFERRED_START_MONTH_REQUIRED', path: ['start-date-month'] }
     ])
   })
 
-  test('should produce PREFERRED_START_DATE_REQUIRED on the start year when only start year is missing', () => {
+  test('should keep PREFERRED_START_YEAR_REQUIRED with correct path when only start year is missing', () => {
     const details = [
       { message: 'PREFERRED_START_YEAR_REQUIRED', path: ['start-date-year'] }
     ]
     const result = mapPreferredDatesErrors(details)
     expect(result).toEqual([
-      { message: 'PREFERRED_START_DATE_REQUIRED', path: ['start-date-year'] }
+      { message: 'PREFERRED_START_YEAR_REQUIRED', path: ['start-date-year'] }
     ])
   })
 
-  test('should produce PREFERRED_END_DATE_REQUIRED on the end month when only end month is missing', () => {
+  test('should keep PREFERRED_END_MONTH_REQUIRED with correct path when only end month is missing', () => {
     const details = [
       { message: 'PREFERRED_END_MONTH_REQUIRED', path: ['end-date-month'] }
     ]
     const result = mapPreferredDatesErrors(details)
     expect(result).toEqual([
-      { message: 'PREFERRED_END_DATE_REQUIRED', path: ['end-date-month'] }
+      { message: 'PREFERRED_END_MONTH_REQUIRED', path: ['end-date-month'] }
     ])
   })
 
-  test('should produce PREFERRED_END_DATE_REQUIRED on the end year when only end year is missing', () => {
+  test('should keep PREFERRED_END_YEAR_REQUIRED with correct path when only end year is missing', () => {
     const details = [
       { message: 'PREFERRED_END_YEAR_REQUIRED', path: ['end-date-year'] }
     ]
     const result = mapPreferredDatesErrors(details)
     expect(result).toEqual([
-      { message: 'PREFERRED_END_DATE_REQUIRED', path: ['end-date-year'] }
+      { message: 'PREFERRED_END_YEAR_REQUIRED', path: ['end-date-year'] }
     ])
   })
 
@@ -96,7 +96,7 @@ describe('#mapPreferredDatesErrors', () => {
     ]
     const result = mapPreferredDatesErrors(details)
     expect(result).toEqual([
-      { message: 'PREFERRED_START_DATE_REQUIRED', path: ['start-date-month'] },
+      { message: 'PREFERRED_START_MONTH_REQUIRED', path: ['start-date-month'] },
       { message: 'SOME_OTHER_ERROR', path: ['other-field'] }
     ])
   })
@@ -262,15 +262,8 @@ describe('#validateDateRanges', () => {
 })
 
 describe('#getErrorFields', () => {
-  const payload = (startMonth, startYear, endMonth, endYear) => ({
-    'start-date-month': startMonth,
-    'start-date-year': startYear,
-    'end-date-month': endMonth,
-    'end-date-year': endYear
-  })
-
   test('should return empty array when there are no details', () => {
-    expect(getErrorFields(undefined, payload('', '', '', ''))).toEqual([])
+    expect(getErrorFields(undefined)).toEqual([])
   })
 
   test('should highlight both fields of each date when nothing is entered', () => {
@@ -278,7 +271,7 @@ describe('#getErrorFields', () => {
       { message: 'PREFERRED_START_DATE_REQUIRED', path: ['start-date-month'] },
       { message: 'PREFERRED_END_DATE_REQUIRED', path: ['end-date-month'] }
     ]
-    expect(getErrorFields(details, payload('', '', '', ''))).toEqual([
+    expect(getErrorFields(details)).toEqual([
       'start-date-month',
       'start-date-year',
       'end-date-month',
@@ -286,12 +279,12 @@ describe('#getErrorFields', () => {
     ])
   })
 
-  test('should highlight only the empty field when a date is incomplete', () => {
+  test('should highlight only the missing field when a date is incomplete', () => {
     const details = [
-      { message: 'PREFERRED_START_DATE_REQUIRED', path: ['start-date-year'] },
-      { message: 'PREFERRED_END_DATE_REQUIRED', path: ['end-date-month'] }
+      { message: 'PREFERRED_START_YEAR_REQUIRED', path: ['start-date-year'] },
+      { message: 'PREFERRED_END_MONTH_REQUIRED', path: ['end-date-month'] }
     ]
-    expect(getErrorFields(details, payload('7', ' ', '', '2027'))).toEqual([
+    expect(getErrorFields(details)).toEqual([
       'start-date-year',
       'end-date-month'
     ])
@@ -308,7 +301,7 @@ describe('#getErrorFields', () => {
         path: ['end-date-month']
       }
     ]
-    expect(getErrorFields(details, payload('1', '2020', '2', '2020'))).toEqual([
+    expect(getErrorFields(details)).toEqual([
       'start-date-month',
       'start-date-year',
       'end-date-month',
@@ -323,25 +316,18 @@ describe('#getErrorFields', () => {
         path: ['end-date-month']
       }
     ]
-    expect(getErrorFields(details, payload('8', '2027', '7', '2027'))).toEqual([
-      'end-date-month',
-      'end-date-year'
-    ])
+    expect(getErrorFields(details)).toEqual(['end-date-month', 'end-date-year'])
   })
 
   test('should highlight the field named in the path for an unrelated error', () => {
     const details = [{ message: 'SOME_OTHER_ERROR', path: ['other-field'] }]
-    expect(getErrorFields(details, payload('8', '2027', '9', '2027'))).toEqual([
-      'other-field'
-    ])
+    expect(getErrorFields(details)).toEqual(['other-field'])
   })
 
   test('should highlight only the invalid field for an invalid value', () => {
     const details = [
       { message: 'PREFERRED_START_MONTH_INVALID', path: ['start-date-month'] }
     ]
-    expect(getErrorFields(details, payload('13', '2027', '8', '2027'))).toEqual(
-      ['start-date-month']
-    )
+    expect(getErrorFields(details)).toEqual(['start-date-month'])
   })
 })

@@ -4,6 +4,7 @@ import * as marineLicenceService from '#src/services/marine-licence-service/inde
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getReturnLink,
+  isChangeMode,
   loadMarinePlanPolicyDocument
 } from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
 
@@ -75,6 +76,32 @@ describe('#loadMarinePlanPolicyDocument', () => {
       )
     }
   )
+})
+
+describe('#isChangeMode', () => {
+  test('correctly returns true', () => {
+    expect(
+      isChangeMode({
+        query: { action: 'change' }
+      })
+    ).toBeTruthy()
+  })
+
+  test('correctly returns false for no url param', () => {
+    expect(
+      isChangeMode({
+        query: { action: 'not-change' }
+      })
+    ).toBeFalsy()
+  })
+
+  test('correctly returns false for incorrect param', () => {
+    expect(
+      isChangeMode({
+        query: {}
+      })
+    ).toBeFalsy()
+  })
 })
 
 describe('#getReturnLink', () => {

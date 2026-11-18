@@ -26,6 +26,10 @@ export const marinePlanPolicyDocumentsReviewController = {
       marinePlanPolicies
     } = await marineLicenceService.getMarineLicenceById(cached.id)
 
+    if (!marinePlanPolicySupportingDocuments?.documents?.length) {
+      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
+    }
+
     const documents = createDocumentCards(
       marinePlanPolicySupportingDocuments,
       marinePlanPolicies

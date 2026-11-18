@@ -8,6 +8,7 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import {
   getReturnLink,
+  isChangeMode,
   loadMarinePlanPolicyDocument
 } from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
 import { getMarinePlanPolicyDocumentTypeUrl } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/utils.js'
@@ -39,6 +40,8 @@ const loadDocumentContext = async (request) => {
   const { id, documentId, projectName, document, marineLicence } =
     await loadMarinePlanPolicyDocument(request)
 
+  const changeMode = isChangeMode(request)
+
   return {
     id,
     documentId,
@@ -48,7 +51,7 @@ const loadDocumentContext = async (request) => {
     marinePlanPolicies: marineLicence.marinePlanPolicies,
     filename: document.uploadedFile?.filename,
     policyLinks: document.policyLinks,
-    cancelLink: getReturnLink(marineLicence)
+    cancelLink: changeMode ? null : getReturnLink(marineLicence)
   }
 }
 
@@ -61,14 +64,17 @@ const buildView = ({
   cancelLink,
   payload,
   errors,
-  errorSummary
+  errorSummary,
+  changeMode
 }) => ({
   pageTitle: PAGE_TITLE,
   heading: PAGE_TITLE,
   projectName,
   filename,
   options: getPolicyOptions(requiringDocuments, marinePlanPolicies),
-  backLink: getMarinePlanPolicyDocumentTypeUrl(documentId),
+  backLink: changeMode
+    ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    : getMarinePlanPolicyDocumentTypeUrl(documentId),
   cancelLink,
   payload,
   errors,
@@ -88,11 +94,14 @@ export const marinePlanPolicyDocumentPolicyController = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
     }
 
+    const changeMode = isChangeMode(request)
+
     return h.view(
       MARINE_PLAN_POLICY_DOCUMENT_POLICY_VIEW_ROUTE,
       buildView({
         ...context,
-        payload: getPolicyLinksPayload(context.policyLinks)
+        payload: getPolicyLinksPayload(context.policyLinks),
+        changeMode
       })
     )
   }
@@ -117,6 +126,8 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
           errorMessages
         )
 
+        const changeMode = isChangeMode(request)
+
         return h
           .view(
             MARINE_PLAN_POLICY_DOCUMENT_POLICY_VIEW_ROUTE,
@@ -124,7 +135,8 @@ export const marinePlanPolicyDocumentPolicySubmitController = {
               ...context,
               payload: request.payload,
               errors: errorDescriptionByFieldName(errorSummary),
-              errorSummary
+              errorSummary,
+              changeMode
             })
           )
           .takeover()

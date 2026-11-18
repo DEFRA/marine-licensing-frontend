@@ -9,6 +9,7 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import {
   getReturnLink,
+  isChangeMode,
   loadMarinePlanPolicyDocument
 } from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
 import { getMarinePlanPolicyDocumentPolicyUrl } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/utils.js'
@@ -42,19 +43,22 @@ const buildView = ({
   document,
   payload,
   errors,
-  errorSummary
+  errorSummary,
+  changeMode
 }) => ({
   pageTitle: PAGE_TITLE,
   heading: PAGE_TITLE,
   projectName,
   filename: document.uploadedFile?.filename,
   documentTypes: MPP_DOCUMENT_TYPES,
-  backLink:
-    marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
-  cancelLink: getReturnLink(marineLicence),
+  backLink: changeMode
+    ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+    : marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
+  cancelLink: changeMode ? null : getReturnLink(marineLicence),
   payload,
   errors,
-  errorSummary
+  errorSummary,
+  changeMode
 })
 
 export const marinePlanPolicyDocumentTypeController = {
@@ -67,12 +71,15 @@ export const marinePlanPolicyDocumentTypeController = {
     const { projectName, document, marineLicence } =
       await loadMarinePlanPolicyDocument(request)
 
+    const changeMode = isChangeMode(request)
+
     return h.view(
       MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE,
       buildView({
         projectName,
         marineLicence,
         document,
+        changeMode,
         payload: {
           documentType: document.documentType,
           documentTypeOther: document.documentTypeOther
@@ -92,6 +99,8 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
           await loadMarinePlanPolicyDocument(request)
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
 
+        const changeMode = isChangeMode(request)
+
         return h
           .view(
             MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE,
@@ -99,6 +108,7 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
               projectName,
               marineLicence,
               document,
+              changeMode,
               payload: request.payload,
               errors: errorDescriptionByFieldName(errorSummary),
               errorSummary
@@ -118,6 +128,12 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
       { id, documentId, documentType, documentTypeOther }
     )
 
-    return h.redirect(getMarinePlanPolicyDocumentPolicyUrl(documentId))
+    const changeMode = isChangeMode(request)
+
+    return h.redirect(
+      changeMode
+        ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+        : getMarinePlanPolicyDocumentPolicyUrl(documentId)
+    )
   }
 }

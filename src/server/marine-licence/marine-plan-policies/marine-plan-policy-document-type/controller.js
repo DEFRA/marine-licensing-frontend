@@ -7,7 +7,10 @@ import {
   errorDescriptionByFieldName,
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
-import { loadMarinePlanPolicyDocument } from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
+import {
+  getReturnLink,
+  loadMarinePlanPolicyDocument
+} from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
 import { getMarinePlanPolicyDocumentPolicyUrl } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/utils.js'
 import {
   MPP_DOCUMENT_TYPE_OTHER_MAX_LENGTH,
@@ -33,14 +36,20 @@ export const errorMessages = {
   DOCUMENT_TYPE_OTHER_MAX_LENGTH: `Description of the document must be ${MPP_DOCUMENT_TYPE_OTHER_MAX_LENGTH} characters or fewer`
 }
 
-const buildView = ({ projectName, payload, errors, errorSummary }) => ({
+const buildView = ({
+  projectName,
+  marineLicence,
+  payload,
+  errors,
+  errorSummary
+}) => ({
   pageTitle: PAGE_TITLE,
   heading: PAGE_TITLE,
   projectName,
   documentTypes: MPP_DOCUMENT_TYPES,
   backLink:
     marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
-  cancelLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+  cancelLink: getReturnLink(marineLicence),
   payload,
   errors,
   errorSummary
@@ -53,13 +62,14 @@ export const marinePlanPolicyDocumentTypeController = {
     }
   },
   async handler(request, h) {
-    const { projectName, document } =
+    const { projectName, document, marineLicence } =
       await loadMarinePlanPolicyDocument(request)
 
     return h.view(
       MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE,
       buildView({
         projectName,
+        marineLicence,
         payload: {
           documentType: document.documentType,
           documentTypeOther: document.documentTypeOther
@@ -75,7 +85,8 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
       params: marinePlanPolicyDocumentTypeParamsSchema,
       payload: marinePlanPolicyDocumentTypeSchema,
       failAction: async (request, h, err) => {
-        const { projectName } = await loadMarinePlanPolicyDocument(request)
+        const { projectName, marineLicence } =
+          await loadMarinePlanPolicyDocument(request)
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
 
         return h
@@ -83,6 +94,7 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
             MARINE_PLAN_POLICY_DOCUMENT_TYPE_VIEW_ROUTE,
             buildView({
               projectName,
+              marineLicence,
               payload: request.payload,
               errors: errorDescriptionByFieldName(errorSummary),
               errorSummary

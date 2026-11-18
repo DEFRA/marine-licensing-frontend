@@ -73,6 +73,10 @@ describe('Marine plan policy documents review page', () => {
       'South Climate change 1 (S-CC-1) - Section 2'
     ])
 
+    const deleteLink = card.querySelectorAll('.govuk-summary-card__actions a')
+    expect(deleteLink.length).toBe(1)
+    expect(deleteLink[0].textContent).toContain('Delete')
+
     const changeLink = card.querySelectorAll('.govuk-summary-list__actions a')
     expect(changeLink.length).toBe(2)
 

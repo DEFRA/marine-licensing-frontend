@@ -43,6 +43,19 @@ export const createDocumentCards = (
 
   const cards = documents.map((document) => ({
     title: document.uploadedFile.filename,
+    actions: {
+      items: [
+        {
+          href: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT.replace(
+            '{documentId}',
+            encodeURIComponent(document.documentId)
+          ),
+          text: 'Delete',
+          visuallyHiddenText: 'document',
+          classes: 'govuk-link--no-visited-state'
+        }
+      ]
+    },
     rows: [
       {
         key: {
@@ -59,7 +72,8 @@ export const createDocumentCards = (
                 encodeURIComponent(document.documentId)
               )}?action=change`,
               text: 'Change',
-              visuallyHiddenText: 'type'
+              visuallyHiddenText: 'type',
+              classes: 'govuk-link--no-visited-state'
             }
           ]
         }

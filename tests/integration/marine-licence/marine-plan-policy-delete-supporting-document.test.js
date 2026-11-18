@@ -24,7 +24,7 @@ const deleteUrl = (id = documentId) =>
     id
   )
 
-const mockLicenceWithDocument = () =>
+const mockLicenceWithDocument = (otherDocuments = []) =>
   mockMarineLicence({
     ...mockMarineLicenceApplication,
     marinePlanPolicySupportingDocuments: {
@@ -36,7 +36,8 @@ const mockLicenceWithDocument = () =>
             policyCode,
             location: 'Section 2'
           }))
-        }
+        },
+        ...otherDocuments
       ]
     }
   })
@@ -104,7 +105,7 @@ describe('Marine plan policy delete supporting document page', () => {
     expect(statusCode).toBe(statusCodes.notFound)
   })
 
-  test('deletes the document and returns to the review page', async () => {
+  test('deletes the last document and returns to the marine plan policies page', async () => {
     const { response } = await submitDeleteForm()
 
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
@@ -115,6 +116,22 @@ describe('Marine plan policy delete supporting document page', () => {
         documentId
       }
     )
+    expect(response.statusCode).toBe(statusCodes.redirect)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+    )
+  })
+
+  test('returns to the review page when other documents remain', async () => {
+    mockLicenceWithDocument([
+      {
+        ...mockMarinePlanPolicyDocument,
+        documentId: '00000000-0000-4000-8000-000000000001'
+      }
+    ])
+
+    const { response } = await submitDeleteForm()
+
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
       marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW

@@ -15,6 +15,11 @@ const PAGE_TITLE = 'Are you sure you want to delete this document?'
 const reviewUrl =
   marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
 
+const hasOtherDocuments = (marineLicence, documentId) =>
+  marineLicence.marinePlanPolicySupportingDocuments.documents.some(
+    (document) => document.documentId !== documentId
+  )
+
 const getPolicyText = (document) => {
   const policyCodes = document.policyLinks?.map((link) => link.policyCode) ?? []
 
@@ -42,7 +47,8 @@ export const marinePlanPolicyDeleteSupportingDocumentController = {
 
 export const marinePlanPolicyDeleteSupportingDocumentSubmitController = {
   async handler(request, h) {
-    const { id, documentId } = await loadMarinePlanPolicyDocument(request)
+    const { id, documentId, marineLicence } =
+      await loadMarinePlanPolicyDocument(request)
 
     try {
       await authenticatedPatchRequest(
@@ -66,6 +72,10 @@ export const marinePlanPolicyDeleteSupportingDocumentSubmitController = {
       )
     }
 
-    return h.redirect(reviewUrl)
+    return h.redirect(
+      hasOtherDocuments(marineLicence, documentId)
+        ? reviewUrl
+        : marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+    )
   }
 }

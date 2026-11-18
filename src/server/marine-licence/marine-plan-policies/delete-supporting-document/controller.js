@@ -6,6 +6,7 @@ import {
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { loadMarinePlanPolicyDocument } from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
 import { policyCodeList } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
+import { marinePlanPolicyDocumentPolicyParamsSchema } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-policy/schema.js'
 
 export const MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/delete-supporting-document/index'
@@ -28,7 +29,14 @@ const getPolicyText = (document) => {
     : ''
 }
 
+const options = {
+  validate: {
+    params: marinePlanPolicyDocumentPolicyParamsSchema
+  }
+}
+
 export const marinePlanPolicyDeleteSupportingDocumentController = {
+  options,
   async handler(request, h) {
     const { projectName, document } =
       await loadMarinePlanPolicyDocument(request)
@@ -46,6 +54,7 @@ export const marinePlanPolicyDeleteSupportingDocumentController = {
 }
 
 export const marinePlanPolicyDeleteSupportingDocumentSubmitController = {
+  options,
   async handler(request, h) {
     const { id, documentId, marineLicence } =
       await loadMarinePlanPolicyDocument(request)

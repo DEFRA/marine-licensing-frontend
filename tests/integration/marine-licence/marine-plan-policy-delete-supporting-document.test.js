@@ -94,6 +94,15 @@ describe('Marine plan policy delete supporting document page', () => {
     expect(statusCode).toBe(statusCodes.notFound)
   })
 
+  test('returns 400 when the documentId is not a uuid', async () => {
+    const { statusCode } = await makeGetRequest({
+      url: deleteUrl('not-a-uuid'),
+      server: getServer()
+    })
+
+    expect(statusCode).toBe(statusCodes.badRequest)
+  })
+
   test('returns 404 when there is no marine licence in the session', async () => {
     mockMarineLicence({})
 

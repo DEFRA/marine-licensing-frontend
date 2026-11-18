@@ -8,6 +8,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import {
+  getDocumentsKey,
   getReturnLink,
   isChangeMode,
   loadMarinePlanPolicyDocument
@@ -69,7 +70,7 @@ export const marinePlanPolicyDocumentTypeController = {
   },
   async handler(request, h) {
     const { projectName, document, marineLicence } =
-      await loadMarinePlanPolicyDocument(request)
+      await loadMarinePlanPolicyDocument(request, getDocumentsKey(request))
 
     const changeMode = isChangeMode(request)
 
@@ -96,7 +97,7 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
       payload: marinePlanPolicyDocumentTypeSchema,
       failAction: async (request, h, err) => {
         const { projectName, marineLicence, document } =
-          await loadMarinePlanPolicyDocument(request)
+          await loadMarinePlanPolicyDocument(request, getDocumentsKey(request))
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
 
         const changeMode = isChangeMode(request)
@@ -119,7 +120,10 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
     }
   },
   async handler(request, h) {
-    const { id, documentId } = await loadMarinePlanPolicyDocument(request)
+    const { id, documentId } = await loadMarinePlanPolicyDocument(
+      request,
+      getDocumentsKey(request)
+    )
     const { documentType, documentTypeOther } = request.payload
 
     await authenticatedPatchRequest(

@@ -3,6 +3,7 @@ import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-c
 import * as marineLicenceService from '#src/services/marine-licence-service/index.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
+  getDocumentsKey,
   getReturnLink,
   isChangeMode,
   loadMarinePlanPolicyDocument
@@ -31,11 +32,11 @@ describe('#loadMarinePlanPolicyDocument', () => {
     })
   })
 
-  test('returns the unlinked document with the licence it belongs to', async () => {
+  test('returns the linked document with the licence it belongs to by default', async () => {
     const marineLicence = {
       marinePlanPolicySupportingDocuments: {
-        linkedDocuments: [{ documentId }],
-        unlinkedDocuments: [{ documentId: 'other-id' }, document]
+        linkedDocuments: [{ documentId: 'other-id' }, document],
+        unlinkedDocuments: [{ documentId }]
       }
     }
     const getMarineLicenceById = mockLicence(marineLicence)
@@ -52,30 +53,17 @@ describe('#loadMarinePlanPolicyDocument', () => {
     })
   })
 
-  test('reads linked documents in change mode', async () => {
-    mockLicence({
-      marinePlanPolicySupportingDocuments: {
-        linkedDocuments: [document],
-        unlinkedDocuments: []
-      }
-    })
-
-    const result = await loadMarinePlanPolicyDocument({
-      ...request,
-      query: { action: 'change' }
-    })
-
-    expect(result.document).toBe(document)
-  })
-
   test('reads the given documents key', async () => {
     mockLicence({
-      marinePlanPolicySupportingDocuments: { linkedDocuments: [document] }
+      marinePlanPolicySupportingDocuments: {
+        linkedDocuments: [],
+        unlinkedDocuments: [document]
+      }
     })
 
     const result = await loadMarinePlanPolicyDocument(
       request,
-      'linkedDocuments'
+      'unlinkedDocuments'
     )
 
     expect(result.document).toBe(document)
@@ -92,8 +80,8 @@ describe('#loadMarinePlanPolicyDocument', () => {
 
   test.each([
     [
-      'the document is only linked',
-      { linkedDocuments: [document], unlinkedDocuments: [] }
+      'the document is only unlinked',
+      { linkedDocuments: [], unlinkedDocuments: [document] }
     ],
     ['the licence has no supporting documents', undefined]
   ])(
@@ -109,6 +97,15 @@ describe('#loadMarinePlanPolicyDocument', () => {
       )
     }
   )
+})
+
+describe('#getDocumentsKey', () => {
+  test.each([
+    [{ action: 'change' }, 'linkedDocuments'],
+    [{}, 'unlinkedDocuments']
+  ])('for query %o returns %s', (query, expected) => {
+    expect(getDocumentsKey({ query })).toBe(expected)
+  })
 })
 
 describe('#isChangeMode', () => {

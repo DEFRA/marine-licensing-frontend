@@ -13,10 +13,13 @@ export const isChangeMode = (request) => {
   return action && action === 'change'
 }
 
-export const loadMarinePlanPolicyDocument = async (request, documentsKey) => {
-  const key =
-    documentsKey ??
-    (isChangeMode(request) ? 'linkedDocuments' : 'unlinkedDocuments')
+export const getDocumentsKey = (request) =>
+  isChangeMode(request) ? 'linkedDocuments' : 'unlinkedDocuments'
+
+export const loadMarinePlanPolicyDocument = async (
+  request,
+  documentsKey = 'linkedDocuments'
+) => {
   const cached = getMarineLicenceCache(request)
 
   if (!cached?.id) {
@@ -29,7 +32,7 @@ export const loadMarinePlanPolicyDocument = async (request, documentsKey) => {
     await getMarineLicenceService(request).getMarineLicenceById(id)
 
   const document = marineLicence.marinePlanPolicySupportingDocuments?.[
-    key
+    documentsKey
   ]?.find((item) => item.documentId === documentId)
 
   if (!document) {

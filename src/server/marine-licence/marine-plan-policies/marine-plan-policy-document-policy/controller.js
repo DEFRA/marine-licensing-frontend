@@ -7,6 +7,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import {
+  getDocumentsKey,
   getReturnLink,
   isChangeMode,
   loadMarinePlanPolicyDocument
@@ -38,7 +39,7 @@ export const errorMessages = {
 
 const loadDocumentContext = async (request) => {
   const { id, documentId, projectName, document, marineLicence } =
-    await loadMarinePlanPolicyDocument(request)
+    await loadMarinePlanPolicyDocument(request, getDocumentsKey(request))
 
   const changeMode = isChangeMode(request)
 

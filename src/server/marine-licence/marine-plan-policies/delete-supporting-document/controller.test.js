@@ -2,9 +2,7 @@ import { vi } from 'vitest'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import {
-  marinePlanPolicyDeleteSupportingDocumentSubmitController
-} from '#src/server/marine-licence/marine-plan-policies/delete-supporting-document/controller.js'
+import { marinePlanPolicyDeleteSupportingDocumentSubmitController } from '#src/server/marine-licence/marine-plan-policies/delete-supporting-document/controller.js'
 import {
   createMockH,
   createMockRequest
@@ -22,7 +20,9 @@ describe('#marinePlanPolicyDeleteSupportingDocument submit', () => {
   }
 
   beforeEach(() => {
-    vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({ id: 'lic-1' })
+    vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+      id: 'lic-1'
+    })
     vi.mocked(getMarineLicenceService).mockReturnValue({
       getMarineLicenceById: vi.fn().mockResolvedValue(marineLicence)
     })

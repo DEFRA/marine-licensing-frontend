@@ -11,7 +11,7 @@ import {
   getCheckAnswersSummary
 } from '#src/server/marine-licence/public-register-check-answers/utils.js'
 
-const PUBLIC_REGISTER_CHECK_ANSWERS_VIEW_ROUTE =
+export const PUBLIC_REGISTER_CHECK_ANSWERS_VIEW_ROUTE =
   'marine-licence/public-register-check-answers/index'
 
 export const publicRegisterCheckAnswersController = {

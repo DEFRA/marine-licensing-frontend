@@ -1,14 +1,11 @@
 import { getByRole, within } from '@testing-library/dom'
-import { JSDOM } from 'jsdom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
   mockMarineLicence,
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
-import { authenticatedPatchRequest } from '~/src/server/common/helpers/authenticated-requests.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
-import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 const PAGE_URL =
   marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
@@ -73,9 +70,7 @@ describe('Public register: check answers', () => {
           value: 'Yes – Commercial or industrial confidentiality reasons'
         },
         { key: 'What you want withheld and why', value: 'Pricing details' }
-      ],
-      backLink:
-        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
+      ]
     },
     {
       name: 'national security with approval',
@@ -88,9 +83,7 @@ describe('Public register: check answers', () => {
         { key: WITHHOLD_QUESTION, value: 'Yes – National security reasons' },
         { key: APPROVAL_QUESTION, value: 'Yes' },
         { key: 'What you want withheld', value: 'Details of the berth' }
-      ],
-      backLink:
-        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
+      ]
     },
     {
       name: 'national security without approval',
@@ -102,42 +95,12 @@ describe('Public register: check answers', () => {
           value:
             'No – If you get approval later, you can come back and change your answer before you submit your application.'
         }
-      ],
-      backLink:
-        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
+      ]
     }
-  ])(
-    'shows the answers and back link for $name',
-    async ({ publicRegister, rows, backLink }) => {
-      const document = await loadCheckAnswersPage(publicRegister)
+  ])('shows the answers for $name', async ({ publicRegister, rows }) => {
+    const document = await loadCheckAnswersPage(publicRegister)
 
-      expect(getRows(document)).toEqual(rows)
-      expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
-        'href',
-        backLink
-      )
-    }
-  )
-
-  test('back link points to the task list when arriving from the task list', async () => {
-    mockMarineLicence({
-      ...marineLicence,
-      publicRegister: { ...nationalSecurity, nationalSecurityApproval: 'no' }
-    })
-
-    const response = await makeGetRequest({
-      url: PAGE_URL,
-      server: getServer(),
-      headers: {
-        referer: `http://localhost${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}`
-      }
-    })
-    const { document } = new JSDOM(response.result).window
-
-    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
-      'href',
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-    )
+    expect(getRows(document)).toEqual(rows)
   })
 
   test('escapes the withheld information and keeps its line breaks', async () => {
@@ -153,29 +116,7 @@ describe('Public register: check answers', () => {
     expect(value.textContent).toContain('Second line')
   })
 
-  test('redirects without confirming when the reason page is not done', async () => {
-    mockMarineLicence({ ...marineLicence, publicRegister: nationalSecurity })
-
-    const getResponse = await makeGetRequest({
-      url: PAGE_URL,
-      server: getServer()
-    })
-    const { response: postResponse } = await submitForm({
-      requestUrl: PAGE_URL,
-      server: getServer(),
-      formData: {}
-    })
-
-    for (const response of [getResponse, postResponse]) {
-      expect(response.statusCode).toBe(statusCodes.redirect)
-      expect(response.headers.location).toBe(
-        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
-      )
-    }
-    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
-  })
-
-  test('Continue confirms the answers and returns to the task list', async () => {
+  test('Continue returns to the task list', async () => {
     mockMarineLicence({
       ...marineLicence,
       publicRegister: { ...nationalSecurity, nationalSecurityApproval: 'no' }
@@ -190,11 +131,6 @@ describe('Public register: check answers', () => {
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-    )
-    expect(authenticatedPatchRequest).toHaveBeenCalledWith(
-      expect.any(Object),
-      '/marine-licence/confirm-public-register',
-      { id: marineLicence.id }
     )
   })
 })

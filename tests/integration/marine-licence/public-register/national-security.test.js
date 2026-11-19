@@ -222,7 +222,7 @@ describe('Public register: national security', () => {
     )
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
-      '/marine-licence/public-register-national-security',
+      '/marine-licence/public-register/national-security',
       {
         ...marineLicence.publicRegister,
         id: marineLicence.id,
@@ -267,7 +267,7 @@ describe('Public register: national security', () => {
     )
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
-      '/marine-licence/public-register-national-security',
+      '/marine-licence/public-register/national-security',
       {
         ...marineLicence.publicRegister,
         id: marineLicence.id,

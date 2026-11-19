@@ -195,7 +195,7 @@ describe('Public register: commercial confidentiality', () => {
       )
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
-        '/marine-licence/public-register-commercial-confidentiality',
+        '/marine-licence/public-register/commercial-confidentiality',
         { ...choice, id: marineLicence.id, reason: reason.trim() }
       )
 

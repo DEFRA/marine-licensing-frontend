@@ -4,7 +4,7 @@ import {
   getReasonPage,
   isNationalSecurity,
   keepReasonAnswers
-} from './public-register.js'
+} from './utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 describe('isNationalSecurity', () => {

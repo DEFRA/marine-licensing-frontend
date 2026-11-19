@@ -1,22 +1,23 @@
 import { vi } from 'vitest'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
-  publicRegisterNationalSecuritySubmitController,
-  PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE
-} from '#src/server/marine-licence/public-register-national-security/controller.js'
+  publicRegisterCommercialConfidentialitySubmitController,
+  PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE
+} from '#src/server/marine-licence/public-register/commercial-confidentiality/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
 
-describe('#publicRegisterNationalSecurity', () => {
+describe('#publicRegisterCommercialConfidentiality', () => {
+  const choice = {
+    withholdConsent: 'yes',
+    withholdReason: 'commercialConfidentiality'
+  }
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    publicRegister: {
-      withholdConsent: 'yes',
-      withholdReason: 'nationalSecurity'
-    }
+    publicRegister: choice
   }
 
   const createH = () => ({
@@ -33,13 +34,13 @@ describe('#publicRegisterNationalSecurity', () => {
     vi.restoreAllMocks()
   })
 
-  describe('#publicRegisterNationalSecuritySubmitController', () => {
+  describe('#publicRegisterCommercialConfidentialitySubmitController', () => {
     test('redirects to the check answers page, keeping the check your answers query', async () => {
       const h = createH()
 
-      await publicRegisterNationalSecuritySubmitController.handler(
+      await publicRegisterCommercialConfidentialitySubmitController.handler(
         {
-          payload: { nationalSecurityApproval: 'no' },
+          payload: { reason: 'Pricing details' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -47,35 +48,6 @@ describe('#publicRegisterNationalSecurity', () => {
 
       expect(h.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS}?from=check-your-answers`
-      )
-    })
-
-    test('saves the withholding choice together with the answers', async () => {
-      const h = createH()
-
-      await publicRegisterNationalSecuritySubmitController.handler(
-        {
-          payload: { nationalSecurityApproval: 'yes', reason: 'Details' },
-          query: {}
-        },
-        h
-      )
-
-      const publicRegister = {
-        withholdConsent: 'yes',
-        withholdReason: 'nationalSecurity',
-        nationalSecurityApproval: 'yes',
-        reason: 'Details'
-      }
-      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
-        expect.any(Object),
-        '/marine-licence/public-register-national-security',
-        { ...publicRegister, id: mockLicence.id }
-      )
-      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-        expect.any(Object),
-        h,
-        expect.objectContaining({ publicRegister })
       )
     })
 
@@ -87,8 +59,8 @@ describe('#publicRegisterNationalSecurity', () => {
       const h = createH()
 
       await expect(
-        publicRegisterNationalSecuritySubmitController.handler(
-          { payload: { nationalSecurityApproval: 'no' }, query: {} },
+        publicRegisterCommercialConfidentialitySubmitController.handler(
+          { payload: { reason: 'Pricing details' }, query: {} },
           h
         )
       ).rejects.toBe(thrownError)
@@ -106,7 +78,7 @@ describe('#publicRegisterNationalSecurity', () => {
                   {
                     field: 'reason',
                     message:
-                      'PUBLIC_REGISTER_NATIONAL_SECURITY_REASON_MAX_LENGTH',
+                      'PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_REASON_MAX_LENGTH',
                     type: 'string.max'
                   }
                 ]
@@ -116,15 +88,15 @@ describe('#publicRegisterNationalSecurity', () => {
         }
       )
       const h = createH()
-      const payload = { nationalSecurityApproval: 'yes', reason: 'Details' }
+      const payload = { reason: 'Pricing details' }
 
-      await publicRegisterNationalSecuritySubmitController.handler(
+      await publicRegisterCommercialConfidentialitySubmitController.handler(
         { payload, query: {} },
         h
       )
 
       expect(h.view).toHaveBeenCalledWith(
-        PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE,
+        PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE,
         expect.objectContaining({
           payload,
           backLink: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,

@@ -7,7 +7,7 @@ import {
   publicRegisterCheckAnswersController,
   publicRegisterCheckAnswersSubmitController,
   PUBLIC_REGISTER_CHECK_ANSWERS_VIEW_ROUTE
-} from '#src/server/marine-licence/public-register-check-answers/controller.js'
+} from '#src/server/marine-licence/public-register/check-answers/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 

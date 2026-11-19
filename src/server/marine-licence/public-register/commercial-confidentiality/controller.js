@@ -17,11 +17,11 @@ import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-lic
 import {
   getReasonPageLinks,
   isCommercialConfidentiality
-} from '#src/server/common/helpers/marine-licence/public-register.js'
+} from '#src/server/marine-licence/public-register/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE =
-  'marine-licence/public-register-commercial-confidentiality/index'
+  'marine-licence/public-register/commercial-confidentiality/index'
 
 const redirectToPublicRegister = (request, h) =>
   h.redirect(getReasonPageLinks(request).backLink)
@@ -82,7 +82,7 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
 
       await authenticatedPatchRequest(
         request,
-        '/marine-licence/public-register-commercial-confidentiality',
+        '/marine-licence/public-register/commercial-confidentiality',
         { ...publicRegister, id: marineLicence.id }
       )
 

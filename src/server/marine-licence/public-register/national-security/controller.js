@@ -18,11 +18,11 @@ import {
   getNationalSecurityAnswers,
   getReasonPageLinks,
   isNationalSecurity
-} from '#src/server/common/helpers/marine-licence/public-register.js'
+} from '#src/server/marine-licence/public-register/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE =
-  'marine-licence/public-register-national-security/index'
+  'marine-licence/public-register/national-security/index'
 
 const redirectToPublicRegister = (request, h) =>
   h.redirect(getReasonPageLinks(request).backLink)
@@ -90,7 +90,7 @@ export const publicRegisterNationalSecuritySubmitController = {
 
       await authenticatedPatchRequest(
         request,
-        '/marine-licence/public-register-national-security',
+        '/marine-licence/public-register/national-security',
         { ...publicRegister, id: marineLicence.id }
       )
 

@@ -1,4 +1,5 @@
 import { getByRole, within } from '@testing-library/dom'
+import { JSDOM } from 'jsdom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import { statusCodes } from '~/src/server/common/constants/status-codes.js'
 import {
@@ -117,6 +118,27 @@ describe('Public register: check answers', () => {
       )
     }
   )
+
+  test('back link points to the task list when arriving from the task list', async () => {
+    mockMarineLicence({
+      ...marineLicence,
+      publicRegister: { ...nationalSecurity, nationalSecurityApproval: 'no' }
+    })
+
+    const response = await makeGetRequest({
+      url: PAGE_URL,
+      server: getServer(),
+      headers: {
+        referer: `http://localhost${marineLicenceRoutes.MARINE_LICENCE_TASK_LIST}`
+      }
+    })
+    const { document } = new JSDOM(response.result).window
+
+    expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    )
+  })
 
   test('escapes the withheld information and keeps its line breaks', async () => {
     const document = await loadCheckAnswersPage({

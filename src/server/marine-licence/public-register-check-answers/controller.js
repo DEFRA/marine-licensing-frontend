@@ -1,15 +1,15 @@
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
-import {
-  getCheckAnswersRedirect,
-  getReasonPage
-} from '#src/server/common/helpers/marine-licence/public-register.js'
+import { getCheckAnswersRedirect } from '#src/server/common/helpers/marine-licence/public-register.js'
 import {
   apiRoutes,
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
 import { publicRegisterCheckAnswersSettings } from '#src/server/marine-licence/public-register-check-answers/constants.js'
-import { getCheckAnswersSummary } from '#src/server/marine-licence/public-register-check-answers/utils.js'
+import {
+  getBackLink,
+  getCheckAnswersSummary
+} from '#src/server/marine-licence/public-register-check-answers/utils.js'
 
 const PUBLIC_REGISTER_CHECK_ANSWERS_VIEW_ROUTE =
   'marine-licence/public-register-check-answers/index'
@@ -27,7 +27,7 @@ export const publicRegisterCheckAnswersController = {
       ...publicRegisterCheckAnswersSettings,
       projectName,
       summary: getCheckAnswersSummary(publicRegister),
-      backLink: getReasonPage(publicRegister)
+      backLink: getBackLink(request, publicRegister)
     })
   }
 }

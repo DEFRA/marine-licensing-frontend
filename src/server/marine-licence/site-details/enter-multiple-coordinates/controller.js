@@ -1,5 +1,4 @@
 import { COORDINATE_SYSTEMS } from '#src/server/common/constants/coordinate-systems.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getMarineLicenceCache,
   updateMarineLicenceSiteDetails,
@@ -22,7 +21,7 @@ import { validateSiteParam } from '#src/server/common/helpers/marine-licence/ses
 import { getSiteDataFromParam } from '#src/server/common/helpers/site-details/site-name.js'
 import { getSiteDetailsBySite } from '#src/server/common/helpers/marine-licence/session-cache/site-details-utils.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
-import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
+import { getReviewSiteDetailsUrl } from '#src/server/marine-licence/site-details/utils/review-site-details-url.js'
 
 const getCoordinateSystemForSite = (siteDetails) =>
   siteDetails.coordinateSystem === COORDINATE_SYSTEMS.OSGB36
@@ -151,8 +150,6 @@ export const multipleCoordinatesSubmitController = {
 
     await saveSiteDetailsToBackend(request, h)
 
-    return h.redirect(
-      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
-    )
+    return h.redirect(getReviewSiteDetailsUrl(siteNumber, action))
   }
 }

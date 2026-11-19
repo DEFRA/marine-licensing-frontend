@@ -1,6 +1,7 @@
 import {
   getNationalSecurityAnswers,
-  isNationalSecurity
+  isNationalSecurity,
+  keepReasonAnswers
 } from './public-register.js'
 
 describe('isNationalSecurity', () => {
@@ -52,5 +53,51 @@ describe('getNationalSecurityAnswers', () => {
       nationalSecurityApproval: undefined,
       reason: undefined
     })
+  })
+})
+
+describe('keepReasonAnswers', () => {
+  const commercial = {
+    withholdConsent: 'yes',
+    withholdReason: 'commercialConfidentiality'
+  }
+  const nationalSecurity = {
+    withholdConsent: 'yes',
+    withholdReason: 'nationalSecurity'
+  }
+
+  test('keeps the commercial reason when commercial is still the reason', () => {
+    expect(
+      keepReasonAnswers(commercial, { ...commercial, reason: 'Pricing' })
+    ).toEqual({ ...commercial, reason: 'Pricing' })
+  })
+
+  test('keeps the national security answers when national security is still the reason', () => {
+    const saved = {
+      ...nationalSecurity,
+      nationalSecurityApproval: 'yes',
+      reason: 'Berth'
+    }
+    expect(keepReasonAnswers(nationalSecurity, saved)).toEqual(saved)
+  })
+
+  test.each([
+    {
+      name: 'the reason changes',
+      publicRegister: nationalSecurity,
+      existing: { ...commercial, reason: 'Pricing' }
+    },
+    {
+      name: 'the answer changes to no',
+      publicRegister: { withholdConsent: 'no' },
+      existing: { ...commercial, reason: 'Pricing' }
+    },
+    {
+      name: 'nothing was saved',
+      publicRegister: commercial,
+      existing: undefined
+    }
+  ])('drops saved answers when $name', ({ publicRegister, existing }) => {
+    expect(keepReasonAnswers(publicRegister, existing)).toEqual(publicRegister)
   })
 })

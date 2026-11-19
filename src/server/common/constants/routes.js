@@ -101,6 +101,8 @@ export const marineLicenceRoutes = {
     '/marine-licence/sharing-your-project-information-publicly',
   MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY:
     '/marine-licence/withholding-information-national-security',
+  MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY:
+    '/marine-licence/withholding-information-commercial-confidentiality',
   MARINE_LICENCE_PUBLIC_CONSULTATION: '/marine-licence/public-consultation',
   MARINE_LICENCE_FILE_UPLOAD: '/marine-licence/upload-file',
   MARINE_LICENCE_SITE_NAME: '/marine-licence/site-name',

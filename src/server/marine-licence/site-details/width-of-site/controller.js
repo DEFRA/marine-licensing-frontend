@@ -15,8 +15,8 @@ import {
   widthOfSiteErrorMessages
 } from '#src/server/common/validation/width-of-site/constants.js'
 import { saveSiteDetailsToBackend } from '#src/server/common/helpers/marine-licence/save-site-details.js'
-import { getSiteDetailsAnchor } from '#src/server/common/helpers/site-details/anchor-utils.js'
 import { getSiteParam } from '#src/server/common/helpers/site-details/site-number-utils.js'
+import { getReviewSiteDetailsUrl } from '#src/server/marine-licence/site-details/utils/review-site-details-url.js'
 
 const widthOfSitePageData = {
   ...widthOfSiteSettings
@@ -91,8 +91,6 @@ export const widthOfSiteSubmitController = {
 
     await saveSiteDetailsToBackend(request, h)
 
-    return h.redirect(
-      `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}${getSiteDetailsAnchor(siteNumber)}`
-    )
+    return h.redirect(getReviewSiteDetailsUrl(siteNumber, request.query.action))
   }
 }

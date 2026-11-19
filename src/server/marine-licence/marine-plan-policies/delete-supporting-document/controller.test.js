@@ -15,7 +15,7 @@ describe('#marinePlanPolicyDeleteSupportingDocument submit', () => {
   const documentId = 'c7e4ef70-7c7d-4464-8401-7bf4e6f47351'
   const marineLicence = {
     marinePlanPolicySupportingDocuments: {
-      documents: [{ documentId }]
+      linkedDocuments: [{ documentId }]
     }
   }
 

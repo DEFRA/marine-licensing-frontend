@@ -17,7 +17,7 @@ const reviewUrl =
   marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
 
 const hasOtherDocuments = (marineLicence, documentId) =>
-  marineLicence.marinePlanPolicySupportingDocuments.documents.some(
+  marineLicence.marinePlanPolicySupportingDocuments.linkedDocuments.some(
     (document) => document.documentId !== documentId
   )
 

@@ -1,5 +1,5 @@
 import {
-  getIncompleteWithholdingPage,
+  getCheckAnswersRedirect,
   getNationalSecurityAnswers,
   getReasonPage,
   isNationalSecurity,
@@ -123,8 +123,8 @@ describe('getReasonPage', () => {
       expected:
         marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
     },
-    { publicRegister: { withholdConsent: 'no' }, expected: undefined },
-    { publicRegister: undefined, expected: undefined }
+    { publicRegister: { withholdConsent: 'no' }, expected: null },
+    { publicRegister: undefined, expected: null }
   ])(
     'returns $expected for $publicRegister',
     ({ publicRegister, expected }) => {
@@ -133,7 +133,7 @@ describe('getReasonPage', () => {
   )
 })
 
-describe('getIncompleteWithholdingPage', () => {
+describe('getCheckAnswersRedirect', () => {
   const nationalSecurity = {
     withholdConsent: 'yes',
     withholdReason: 'nationalSecurity'
@@ -151,19 +151,19 @@ describe('getIncompleteWithholdingPage', () => {
       publicRegister: { withholdConsent: 'yes' }
     }
   ])('returns the first page when $name', ({ publicRegister }) => {
-    expect(getIncompleteWithholdingPage(publicRegister)).toBe(
+    expect(getCheckAnswersRedirect(publicRegister)).toBe(
       marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
     )
   })
 
   test('returns the national security page when approval is not answered', () => {
-    expect(getIncompleteWithholdingPage(nationalSecurity)).toBe(
+    expect(getCheckAnswersRedirect(nationalSecurity)).toBe(
       marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
     )
   })
 
   test('returns the commercial page when the reason is missing', () => {
-    expect(getIncompleteWithholdingPage(commercial)).toBe(
+    expect(getCheckAnswersRedirect(commercial)).toBe(
       marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
     )
   })
@@ -173,6 +173,6 @@ describe('getIncompleteWithholdingPage', () => {
     { ...nationalSecurity, nationalSecurityApproval: 'yes', reason: 'Berth' },
     { ...commercial, reason: 'Pricing details' }
   ])('returns null when the answers are complete: %o', (publicRegister) => {
-    expect(getIncompleteWithholdingPage(publicRegister)).toBeNull()
+    expect(getCheckAnswersRedirect(publicRegister)).toBeNull()
   })
 })

@@ -1,7 +1,7 @@
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import {
-  getIncompleteWithholdingPage,
+  getCheckAnswersRedirect,
   getReasonPage
 } from '#src/server/common/helpers/marine-licence/public-register.js'
 import {
@@ -18,9 +18,9 @@ export const publicRegisterCheckAnswersController = {
   handler(request, h) {
     const { projectName, publicRegister } = getMarineLicenceCache(request)
 
-    const incompletePage = getIncompleteWithholdingPage(publicRegister)
-    if (incompletePage) {
-      return h.redirect(incompletePage)
+    const redirectPage = getCheckAnswersRedirect(publicRegister)
+    if (redirectPage) {
+      return h.redirect(redirectPage)
     }
 
     return h.view(PUBLIC_REGISTER_CHECK_ANSWERS_VIEW_ROUTE, {
@@ -36,9 +36,9 @@ export const publicRegisterCheckAnswersSubmitController = {
   async handler(request, h) {
     const { id, publicRegister } = getMarineLicenceCache(request)
 
-    const incompletePage = getIncompleteWithholdingPage(publicRegister)
-    if (incompletePage) {
-      return h.redirect(incompletePage)
+    const redirectPage = getCheckAnswersRedirect(publicRegister)
+    if (redirectPage) {
+      return h.redirect(redirectPage)
     }
 
     await authenticatedPatchRequest(

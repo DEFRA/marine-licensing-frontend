@@ -9,8 +9,18 @@ const getApprovalRow = (publicRegister) =>
       }
     : null
 
-const getReasonRow = ({ withholdReason, reason }) =>
-  reason ? { key: text.reasonQuestion[withholdReason], value: reason } : null
+const hasReasonAnswer = (publicRegister) =>
+  Boolean(publicRegister.reason) &&
+  (!isNationalSecurity(publicRegister) ||
+    publicRegister.nationalSecurityApproval === 'yes')
+
+const getReasonRow = (publicRegister) =>
+  hasReasonAnswer(publicRegister)
+    ? {
+        key: text.reasonQuestion[publicRegister.withholdReason],
+        value: publicRegister.reason
+      }
+    : null
 
 export const getCheckAnswersSummary = (publicRegister) => ({
   withhold: {

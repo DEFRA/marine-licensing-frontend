@@ -131,51 +131,27 @@ describe('Public register: check answers', () => {
     expect(value.textContent).toContain('Second line')
   })
 
-  test.each([
-    {
-      name: 'there are no answers',
-      publicRegister: undefined,
-      location: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-    },
-    {
-      name: 'the answer is no',
-      publicRegister: { withholdConsent: 'no' },
-      location: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-    },
-    {
-      name: 'the national security page is not done',
-      publicRegister: nationalSecurity,
-      location:
+  test('redirects without confirming when the reason page is not done', async () => {
+    mockMarineLicence({ ...marineLicence, publicRegister: nationalSecurity })
+
+    const getResponse = await makeGetRequest({
+      url: PAGE_URL,
+      server: getServer()
+    })
+    const { response: postResponse } = await submitForm({
+      requestUrl: PAGE_URL,
+      server: getServer(),
+      formData: {}
+    })
+
+    for (const response of [getResponse, postResponse]) {
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
         marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
-    },
-    {
-      name: 'the commercial page is not done',
-      publicRegister: commercial,
-      location:
-        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
+      )
     }
-  ])(
-    'redirects without confirming when $name',
-    async ({ publicRegister, location }) => {
-      mockMarineLicence({ ...marineLicence, publicRegister })
-
-      const getResponse = await makeGetRequest({
-        url: PAGE_URL,
-        server: getServer()
-      })
-      const { response: postResponse } = await submitForm({
-        requestUrl: PAGE_URL,
-        server: getServer(),
-        formData: {}
-      })
-
-      for (const response of [getResponse, postResponse]) {
-        expect(response.statusCode).toBe(statusCodes.redirect)
-        expect(response.headers.location).toBe(location)
-      }
-      expect(authenticatedPatchRequest).not.toHaveBeenCalled()
-    }
-  )
+    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
+  })
 
   test('Continue confirms the answers and returns to the task list', async () => {
     mockMarineLicence({

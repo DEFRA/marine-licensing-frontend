@@ -42,9 +42,9 @@ const reasonPages = {
 export const getReasonPage = (publicRegister) =>
   publicRegister?.withholdConsent === 'yes'
     ? reasonPages[publicRegister.withholdReason]
-    : undefined
+    : null
 
-export const getIncompleteWithholdingPage = (publicRegister) => {
+export const getCheckAnswersRedirect = (publicRegister) => {
   if (isNationalSecurity(publicRegister)) {
     return publicRegister.nationalSecurityApproval
       ? null

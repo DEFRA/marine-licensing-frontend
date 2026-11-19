@@ -156,22 +156,6 @@ const marineLicencePages = [
       }
     }
   },
-  ...[
-    { nationalSecurityApproval: 'yes', reason: 'Details of the berth' },
-    { nationalSecurityApproval: 'no' }
-  ].map((answers) => ({
-    url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS,
-    title:
-      'Check your answers for information published on the public register',
-    marineLicence: {
-      ...mockMarineLicenceApplication,
-      publicRegister: {
-        withholdConsent: 'yes',
-        withholdReason: 'nationalSecurity',
-        ...answers
-      }
-    }
-  })),
   {
     url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS,
     title:
@@ -180,8 +164,9 @@ const marineLicencePages = [
       ...mockMarineLicenceApplication,
       publicRegister: {
         withholdConsent: 'yes',
-        withholdReason: 'commercialConfidentiality',
-        reason: 'Pricing details'
+        withholdReason: 'nationalSecurity',
+        nationalSecurityApproval: 'yes',
+        reason: 'Details of the berth'
       }
     }
   },

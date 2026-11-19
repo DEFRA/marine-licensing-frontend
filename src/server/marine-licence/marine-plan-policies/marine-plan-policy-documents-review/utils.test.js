@@ -30,6 +30,18 @@ describe('createDocumentCards', () => {
     expect(card.rows[1].actions.items[0].text).toBe('Change')
   })
 
+  test('appends the escaped description for an other document type', () => {
+    const card = buildCard({
+      ...mockMarinePlanPolicyDocument,
+      documentType: 'other',
+      documentTypeOther: '<b>Survey</b>'
+    })
+
+    expect(card.rows[0].value.html).toBe(
+      'Other supporting evidence<br>&lt;b&gt;Survey&lt;/b&gt;'
+    )
+  })
+
   test('handles a document with no type or policies yet', () => {
     const card = buildCard(mockMarinePlanPolicyDocument)
 

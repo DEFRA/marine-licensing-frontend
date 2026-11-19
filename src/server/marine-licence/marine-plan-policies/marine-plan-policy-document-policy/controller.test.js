@@ -85,6 +85,31 @@ describe('#marinePlanPolicyDocumentPolicySubmitController', () => {
 
     expect(h.redirect).not.toHaveBeenCalled()
   })
+
+  test('failAction redirects to the task list when no policies require documents', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById: vi.fn().mockResolvedValue({
+        ...licenceData,
+        marinePlanPolicySupportingDocuments: {
+          ...licenceData.marinePlanPolicySupportingDocuments,
+          requiringDocuments: []
+        }
+      })
+    })
+    const h = createMockH()
+
+    await marinePlanPolicyDocumentPolicySubmitController.options.validate.failAction(
+      createMockRequest({ params: { documentId }, payload: {} }),
+      h,
+      { details: [] }
+    )
+
+    expect(h.redirect).toHaveBeenCalledWith(
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+    )
+    expect(h.redirect.mock.results[0].value.takeover).toHaveBeenCalled()
+    expect(h.view).not.toHaveBeenCalled()
+  })
 })
 
 describe('#marinePlanPolicyDocumentPolicyController', () => {

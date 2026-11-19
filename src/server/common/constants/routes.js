@@ -198,7 +198,9 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY:
     '/marine-licence/marine-plan-policy/supporting-document-policy/{documentId}',
   MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW:
-    '/marine-licence/marine-plan-policy/supporting-documents-review'
+    '/marine-licence/marine-plan-policy/supporting-documents-review',
+  MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT:
+    '/marine-licence/marine-plan-policy/delete-supporting-document/{documentId}'
 }
 
 export const marineLicenceConsultationDetailsRoutes = {
@@ -306,6 +308,8 @@ export const apiRoutes = {
     '/marine-licence/marine-plan-policy-document-type',
   MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_LINKS:
     '/marine-licence/marine-plan-policy-document-links',
+  MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_DOCUMENT:
+    '/marine-licence/delete-marine-plan-policy-document',
   CONFIRM_SITE_DETAILS: '/marine-licence/confirm-site-details',
   COPY_MARINE_LICENCE: '/marine-licence/copy-marine-licence',
   REDACT_TEXT: '/marine-licence/redact-text',

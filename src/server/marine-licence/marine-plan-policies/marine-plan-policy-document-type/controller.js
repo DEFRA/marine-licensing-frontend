@@ -40,6 +40,7 @@ export const errorMessages = {
 const buildView = ({
   projectName,
   marineLicence,
+  document,
   payload,
   errors,
   errorSummary,
@@ -48,6 +49,7 @@ const buildView = ({
   pageTitle: PAGE_TITLE,
   heading: PAGE_TITLE,
   projectName,
+  filename: document.uploadedFile?.filename,
   documentTypes: MPP_DOCUMENT_TYPES,
   backLink: changeMode
     ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
@@ -76,6 +78,7 @@ export const marinePlanPolicyDocumentTypeController = {
       buildView({
         projectName,
         marineLicence,
+        document,
         changeMode,
         payload: {
           documentType: document.documentType,
@@ -92,7 +95,7 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
       params: marinePlanPolicyDocumentTypeParamsSchema,
       payload: marinePlanPolicyDocumentTypeSchema,
       failAction: async (request, h, err) => {
-        const { projectName, marineLicence } =
+        const { projectName, marineLicence, document } =
           await loadMarinePlanPolicyDocument(request)
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
 
@@ -104,6 +107,7 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
             buildView({
               projectName,
               marineLicence,
+              document,
               changeMode,
               payload: request.payload,
               errors: errorDescriptionByFieldName(errorSummary),

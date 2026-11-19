@@ -29,7 +29,9 @@ const compareSections = (a, b) => {
   return a.localeCompare(b)
 }
 
-const policyCodeList = new Intl.ListFormat('en-GB', { type: 'conjunction' })
+export const policyCodeList = new Intl.ListFormat('en-GB', {
+  type: 'conjunction'
+})
 
 const toKnownStatus = (status) =>
   Object.hasOwn(MARINE_PLAN_POLICY_STATUS, status) ? status : 'INCOMPLETE'

@@ -15,6 +15,21 @@ const FIELD_END_YEAR = 'end-date-year'
 
 const startEndCodes = new Set([START_MONTH, START_YEAR, END_MONTH, END_YEAR])
 
+const wholeDateCodes = new Set([
+  'PREFERRED_START_DATE_REQUIRED',
+  'PREFERRED_END_DATE_REQUIRED',
+  'PREFERRED_START_DATE_TODAY_OR_FUTURE',
+  'PREFERRED_END_DATE_TODAY_OR_FUTURE',
+  'PREFERRED_END_DATE_BEFORE_START_DATE'
+])
+
+const dateFields = {
+  [FIELD_START_MONTH]: [FIELD_START_MONTH, FIELD_START_YEAR],
+  [FIELD_START_YEAR]: [FIELD_START_MONTH, FIELD_START_YEAR],
+  [FIELD_END_MONTH]: [FIELD_END_MONTH, FIELD_END_YEAR],
+  [FIELD_END_YEAR]: [FIELD_END_MONTH, FIELD_END_YEAR]
+}
+
 const mapStartError = (hasMonth, hasYear) => {
   if (hasMonth && hasYear) {
     return {
@@ -61,6 +76,22 @@ export const mapPreferredDatesErrors = (details) => {
   ].filter(Boolean)
 
   return [...mappedDetails, ...otherDetails]
+}
+
+const fieldsForDetail = ({ message, path }) => {
+  const [field] = path ?? []
+  const fields = dateFields[field]
+  if (fields && wholeDateCodes.has(message)) {
+    return fields
+  }
+  return [field]
+}
+
+export const getErrorFields = (details) => {
+  if (!Array.isArray(details)) {
+    return []
+  }
+  return [...new Set(details.flatMap(fieldsForDetail))]
 }
 
 export const validateDateRanges = (payload, now = new Date()) => {

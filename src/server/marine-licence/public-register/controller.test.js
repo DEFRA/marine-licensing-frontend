@@ -66,10 +66,7 @@ describe('#publicRegister', () => {
       await expect(
         publicRegisterSubmitController.handler(
           {
-            payload: {
-              withholdConsent: 'yes',
-              withholdReason: 'commercialConfidentiality'
-            },
+            payload: { withholdConsent: 'no' },
             query: {}
           },
           h
@@ -145,10 +142,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: {
-            withholdConsent: 'yes',
-            withholdReason: 'commercialConfidentiality'
-          },
+          payload: { withholdConsent: 'no' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -157,11 +151,7 @@ describe('#publicRegister', () => {
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/marine-licence/public-register',
-        {
-          id: mockLicence.id,
-          withholdConsent: 'yes',
-          withholdReason: 'commercialConfidentiality'
-        }
+        { id: mockLicence.id, withholdConsent: 'no' }
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
@@ -236,29 +226,6 @@ describe('#publicRegister', () => {
           expect.objectContaining({ publicRegister: savedAnswers })
         )
       })
-
-      test.each([
-        {
-          payload: {
-            withholdConsent: 'yes',
-            withholdReason: 'commercialConfidentiality'
-          }
-        },
-        { payload: { withholdConsent: 'no' } }
-      ])('Should drop them for $payload', async ({ payload }) => {
-        const h = { redirect: vi.fn(), view: vi.fn() }
-
-        await publicRegisterSubmitController.handler({ payload, query: {} }, h)
-
-        expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-          expect.any(Object),
-          h,
-          expect.objectContaining({ publicRegister: payload })
-        )
-        expect(h.redirect).toHaveBeenCalledWith(
-          marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-        )
-      })
     })
 
     test('Should handle API validation errors in catch block', async () => {
@@ -287,10 +254,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: {
-            withholdConsent: 'yes',
-            withholdReason: 'commercialConfidentiality'
-          },
+          payload: { withholdConsent: 'yes' },
           query: {}
         },
         h
@@ -300,10 +264,7 @@ describe('#publicRegister', () => {
         PUBLIC_REGISTER_VIEW_ROUTE,
         expect.objectContaining({
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-          payload: {
-            withholdConsent: 'yes',
-            withholdReason: 'commercialConfidentiality'
-          },
+          payload: { withholdConsent: 'yes' },
           errors: expect.objectContaining({
             withholdReason: expect.objectContaining({
               text: 'Select a reason why you want to withhold information'

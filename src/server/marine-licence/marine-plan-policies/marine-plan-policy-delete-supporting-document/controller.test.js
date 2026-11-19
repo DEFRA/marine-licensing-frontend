@@ -2,7 +2,7 @@ import { vi } from 'vitest'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
-import { marinePlanPolicyDeleteSupportingDocumentSubmitController } from '#src/server/marine-licence/marine-plan-policies/delete-supporting-document/controller.js'
+import { marinePlanPolicyDeleteSupportingDocumentSubmitController } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-delete-supporting-document/controller.js'
 import {
   createMockH,
   createMockRequest

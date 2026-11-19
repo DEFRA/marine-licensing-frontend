@@ -40,6 +40,12 @@ const mockLicenceWithDocument = (document = mockMarinePlanPolicyDocument) =>
     ...mockMarineLicenceApplication,
     marinePlanPolicySupportingDocuments: {
       ...mockMarineLicenceApplication.marinePlanPolicySupportingDocuments,
+      linkedDocuments: [
+        {
+          ...mockMarinePlanPolicyDocument,
+          documentId: '00000000-0000-4000-8000-000000000001'
+        }
+      ],
       unlinkedDocuments: [document],
       requiringDocuments: ['S-CC-1', 'S-CC-2']
     }
@@ -143,6 +149,18 @@ describe('Marine plan policy document policy page', () => {
         document.querySelector(`#location-${code}-hint`)
       ).toHaveTextContent('For example, section 4.2 or pages 12 to 15')
     }
+  })
+
+  test('redirects to change mode when the document is already linked', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const { statusCode, headers } = await makeGetRequest({
+      url: documentPolicyUrl(),
+      server: getServer()
+    })
+
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(`${documentPolicyUrl()}?action=change`)
   })
 
   test('saves the selected policy links and redirects on success', async () => {

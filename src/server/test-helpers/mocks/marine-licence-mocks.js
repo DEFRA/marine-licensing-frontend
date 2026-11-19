@@ -242,6 +242,7 @@ export const mockMarineLicenceWithUnlinkedDocument = {
   ...mockMarineLicenceApplication,
   marinePlanPolicySupportingDocuments: {
     ...mockMarinePlanPolicySupportingDocuments,
+    linkedDocuments: [],
     unlinkedDocuments: [mockMarinePlanPolicyDocument]
   }
 }

@@ -8,7 +8,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import {
-  getDocumentsKey,
+  getChangeModeRedirectUrl,
   getReturnLink,
   isChangeMode,
   loadMarinePlanPolicyDocument
@@ -69,8 +69,13 @@ export const marinePlanPolicyDocumentTypeController = {
     }
   },
   async handler(request, h) {
-    const { projectName, document, marineLicence } =
-      await loadMarinePlanPolicyDocument(request, getDocumentsKey(request))
+    const { projectName, document, marineLicence, isLinked } =
+      await loadMarinePlanPolicyDocument(request)
+
+    const changeModeUrl = getChangeModeRedirectUrl(request, isLinked)
+    if (changeModeUrl) {
+      return h.redirect(changeModeUrl)
+    }
 
     const changeMode = isChangeMode(request)
 
@@ -97,7 +102,7 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
       payload: marinePlanPolicyDocumentTypeSchema,
       failAction: async (request, h, err) => {
         const { projectName, marineLicence, document } =
-          await loadMarinePlanPolicyDocument(request, getDocumentsKey(request))
+          await loadMarinePlanPolicyDocument(request)
         const errorSummary = mapErrorsForDisplay(err.details, errorMessages)
 
         const changeMode = isChangeMode(request)
@@ -120,10 +125,7 @@ export const marinePlanPolicyDocumentTypeSubmitController = {
     }
   },
   async handler(request, h) {
-    const { id, documentId } = await loadMarinePlanPolicyDocument(
-      request,
-      getDocumentsKey(request)
-    )
+    const { id, documentId } = await loadMarinePlanPolicyDocument(request)
     const { documentType, documentTypeOther } = request.payload
 
     await authenticatedPatchRequest(

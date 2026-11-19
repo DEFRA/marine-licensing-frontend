@@ -13,13 +13,7 @@ export const isChangeMode = (request) => {
   return action && action === 'change'
 }
 
-export const getDocumentsKey = (request) =>
-  isChangeMode(request) ? 'linkedDocuments' : 'unlinkedDocuments'
-
-export const loadMarinePlanPolicyDocument = async (
-  request,
-  documentsKey = 'linkedDocuments'
-) => {
+export const loadMarinePlanPolicyDocument = async (request) => {
   const cached = getMarineLicenceCache(request)
 
   if (!cached?.id) {
@@ -31,13 +25,25 @@ export const loadMarinePlanPolicyDocument = async (
   const marineLicence =
     await getMarineLicenceService(request).getMarineLicenceById(id)
 
-  const document = marineLicence.marinePlanPolicySupportingDocuments?.[
-    documentsKey
-  ]?.find((item) => item.documentId === documentId)
+  const { linkedDocuments = [], unlinkedDocuments = [] } =
+    marineLicence.marinePlanPolicySupportingDocuments ?? {}
+  const document = [...linkedDocuments, ...unlinkedDocuments].find(
+    (item) => item.documentId === documentId
+  )
 
   if (!document) {
     throw Boom.notFound('Marine plan policy supporting document not found')
   }
 
-  return { id, documentId, projectName, document, marineLicence }
+  return {
+    id,
+    documentId,
+    projectName,
+    document,
+    marineLicence,
+    isLinked: linkedDocuments.includes(document)
+  }
 }
+
+export const getChangeModeRedirectUrl = (request, isLinked) =>
+  isLinked && !isChangeMode(request) ? `${request.path}?action=change` : null

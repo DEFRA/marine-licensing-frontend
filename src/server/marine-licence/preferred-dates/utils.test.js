@@ -1,4 +1,5 @@
 import {
+  getErrorFields,
   mapPreferredDatesErrors,
   validateDateRanges
 } from '#src/server/marine-licence/preferred-dates/utils.js'
@@ -257,5 +258,76 @@ describe('#validateDateRanges', () => {
       message: 'PREFERRED_END_DATE_BEFORE_START_DATE',
       path: ['end-date-month']
     })
+  })
+})
+
+describe('#getErrorFields', () => {
+  test('should return empty array when there are no details', () => {
+    expect(getErrorFields(undefined)).toEqual([])
+  })
+
+  test('should highlight both fields of each date when nothing is entered', () => {
+    const details = [
+      { message: 'PREFERRED_START_DATE_REQUIRED', path: ['start-date-month'] },
+      { message: 'PREFERRED_END_DATE_REQUIRED', path: ['end-date-month'] }
+    ]
+    expect(getErrorFields(details)).toEqual([
+      'start-date-month',
+      'start-date-year',
+      'end-date-month',
+      'end-date-year'
+    ])
+  })
+
+  test('should highlight only the missing field when a date is incomplete', () => {
+    const details = [
+      { message: 'PREFERRED_START_YEAR_REQUIRED', path: ['start-date-year'] },
+      { message: 'PREFERRED_END_MONTH_REQUIRED', path: ['end-date-month'] }
+    ]
+    expect(getErrorFields(details)).toEqual([
+      'start-date-year',
+      'end-date-month'
+    ])
+  })
+
+  test('should highlight both fields when a date is in the past', () => {
+    const details = [
+      {
+        message: 'PREFERRED_START_DATE_TODAY_OR_FUTURE',
+        path: ['start-date-month']
+      },
+      {
+        message: 'PREFERRED_END_DATE_TODAY_OR_FUTURE',
+        path: ['end-date-month']
+      }
+    ]
+    expect(getErrorFields(details)).toEqual([
+      'start-date-month',
+      'start-date-year',
+      'end-date-month',
+      'end-date-year'
+    ])
+  })
+
+  test('should highlight both end fields when end date is before start date', () => {
+    const details = [
+      {
+        message: 'PREFERRED_END_DATE_BEFORE_START_DATE',
+        path: ['end-date-month']
+      }
+    ]
+    expect(getErrorFields(details)).toEqual(['end-date-month', 'end-date-year'])
+  })
+
+  test('should highlight the field named in the path for an unrelated error', () => {
+    const details = [{ message: 'SOME_OTHER_ERROR', path: ['other-field'] }]
+    expect(getErrorFields(details)).toEqual(['other-field'])
+  })
+
+  test('should highlight only the invalid field for an invalid value', () => {
+    const details = [
+      { message: 'PREFERRED_START_MONTH_INVALID', path: ['start-date-month'] }
+    ]
+    expect(getErrorFields(details)).toEqual(['start-date-month'])
   })
 })

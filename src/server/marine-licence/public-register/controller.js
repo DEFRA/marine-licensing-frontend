@@ -11,40 +11,29 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { marineLicencePublicRegisterSchema } from '#src/server/common/validation/marine-licence-public-register/schema.js'
 import {
   marineLicencePublicRegisterErrorMessages,
-  marineLicencePublicRegisterSettings
+  marineLicencePublicRegisterSettings,
+  WITHHOLD_REASON
 } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 import {
   getCommonRedirectLink,
   withCheckYourAnswersQuery
 } from '#src/server/common/helpers/marine-licence/redirect-link.js'
-import {
-  getNationalSecurityAnswers,
-  isNationalSecurity
-} from '#src/server/common/helpers/marine-licence/public-register.js'
+import { keepReasonAnswers } from '#src/server/common/helpers/marine-licence/public-register.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
 
-const keepNationalSecurityAnswers = (publicRegister, existing) => {
-  if (!isNationalSecurity(publicRegister) || !isNationalSecurity(existing)) {
-    return publicRegister
-  }
-  const { nationalSecurityApproval, reason } =
-    getNationalSecurityAnswers(existing)
-  return {
-    ...publicRegister,
-    ...(nationalSecurityApproval && { nationalSecurityApproval }),
-    ...(reason && { reason })
-  }
+const reasonPages = {
+  [WITHHOLD_REASON.NATIONAL_SECURITY]:
+    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
+  [WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY]:
+    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
 }
 
-const getNextPage = (request, publicRegister) =>
-  isNationalSecurity(publicRegister)
-    ? withCheckYourAnswersQuery(
-        request,
-        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
-      )
-    : getCommonRedirectLink(request)
+const getReasonPage = (publicRegister) =>
+  publicRegister.withholdConsent === 'yes'
+    ? reasonPages[publicRegister.withholdReason]
+    : undefined
 
 export const publicRegisterController = {
   async handler(request, h) {
@@ -89,8 +78,10 @@ export const publicRegisterSubmitController = {
         ...(isWithholding && { withholdReason: payload.withholdReason })
       }
 
-      // Saved by the follow-up page instead, so Cancel there discards this choice
-      if (!isNationalSecurity(publicRegister)) {
+      const reasonPage = getReasonPage(publicRegister)
+
+      // Saved by the reason page instead, so Cancel there discards this choice
+      if (!reasonPage) {
         await authenticatedPatchRequest(
           request,
           '/marine-licence/public-register',
@@ -103,13 +94,17 @@ export const publicRegisterSubmitController = {
 
       await setMarineLicenceCache(request, h, {
         ...marineLicence,
-        publicRegister: keepNationalSecurityAnswers(
+        publicRegister: keepReasonAnswers(
           publicRegister,
           marineLicence.publicRegister
         )
       })
 
-      return h.redirect(getNextPage(request, publicRegister))
+      return h.redirect(
+        reasonPage
+          ? withCheckYourAnswersQuery(request, reasonPage)
+          : getCommonRedirectLink(request)
+      )
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details

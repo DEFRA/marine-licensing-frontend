@@ -68,7 +68,7 @@ describe('#widthOfSite (marine licence)', () => {
   })
 
   describe('#widthOfSiteSubmitController', () => {
-    test('should call updateMarineLicenceSiteDetails with trimmed width and redirect to review-site-details', async () => {
+    test('should call updateMarineLicenceSiteDetails with trimmed width and redirect to the top of review-site-details for the first site', async () => {
       const h = { redirect: vi.fn() }
       const request = createMockRequest({ payload: { width: ' 500 ' } })
 
@@ -82,6 +82,34 @@ describe('#widthOfSite (marine licence)', () => {
         '500'
       )
       expect(saveSiteDetailsToBackend).toHaveBeenCalledWith(request, h)
+      expect(h.redirect).toHaveBeenCalledWith(
+        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
+      )
+    })
+
+    test('should redirect to the site card on review-site-details when adding a subsequent site', async () => {
+      const h = { redirect: vi.fn() }
+      const request = createMockRequest({
+        payload: { width: '500' },
+        query: { site: '2' }
+      })
+
+      await widthOfSiteSubmitController.handler(request, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-2`
+      )
+    })
+
+    test('should redirect to the site card on review-site-details when changing the first site', async () => {
+      const h = { redirect: vi.fn() }
+      const request = createMockRequest({
+        payload: { width: '500' },
+        query: { site: '1', action: 'change' }
+      })
+
+      await widthOfSiteSubmitController.handler(request, h)
+
       expect(h.redirect).toHaveBeenCalledWith(
         `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
       )

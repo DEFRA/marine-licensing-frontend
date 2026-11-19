@@ -145,6 +145,18 @@ const marineLicencePages = [
     }
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY,
+    title:
+      'Withholding information for commercial or industrial confidentiality reasons',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'commercialConfidentiality'
+      }
+    }
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
     title: 'Marine plan policies guidance'
   },
@@ -172,6 +184,19 @@ const marineLicencePages = [
       mockMarinePlanPolicyDocument.documentId
     ),
     title: 'Which policies does this document support?',
+    marineLicence: mockMarineLicenceApplication
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW,
+    title: 'Supporting documents',
+    marineLicence: mockMarineLicenceApplication
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT.replace(
+      '{documentId}',
+      mockMarinePlanPolicyDocument.documentId
+    ),
+    title: 'Are you sure you want to delete this document?',
     marineLicence: mockMarineLicenceApplication
   },
   {
@@ -573,6 +598,21 @@ describe('Marine licence page accessibility checks (Axe)', () => {
           marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
         server: getServer(),
         formData
+      })
+
+      expect(document.querySelector('.govuk-error-summary')).toBeInTheDocument()
+      await runAxeChecks(document.documentElement)
+    })
+  })
+  describe('"Withholding information for commercial or industrial confidentiality reasons" page in an error state', () => {
+    test('has no accessibility violations when the details are empty', async () => {
+      mockMarineLicence(mockMarineLicenceApplication)
+
+      const { document } = await submitForm({
+        requestUrl:
+          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY,
+        server: getServer(),
+        formData: { reason: '' }
       })
 
       expect(document.querySelector('.govuk-error-summary')).toBeInTheDocument()

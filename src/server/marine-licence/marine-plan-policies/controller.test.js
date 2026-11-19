@@ -90,12 +90,13 @@ describe('#marinePlanPoliciesController', () => {
         },
         {
           heading: 'Supporting documents',
+          slug: 'supporting-documents',
           items: [
             {
               hint: {
                 text: ''
               },
-              href: '/marine-licence/marine-plan-policy/supporting-document-upload',
+              href: '/marine-licence/marine-plan-policy/supporting-documents-review',
               status: {
                 text: 'Completed'
               },

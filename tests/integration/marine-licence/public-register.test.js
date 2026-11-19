@@ -243,7 +243,7 @@ describe('Public register', () => {
     })
   })
 
-  test('returns to the task list when commercial confidentiality reasons are selected', async () => {
+  test('goes to the commercial confidentiality page without saving when commercial confidentiality reasons are selected', async () => {
     const { response } = await submitPublicRegisterForm({
       withholdConsent: 'yes',
       withholdReason: 'commercialConfidentiality'
@@ -251,17 +251,14 @@ describe('Public register', () => {
 
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
     )
-    expect(authenticatedPatchRequest).toHaveBeenCalledWith(
-      expect.any(Object),
-      '/marine-licence/public-register',
-      {
-        id: marineLicence.id,
-        withholdConsent: 'yes',
-        withholdReason: 'commercialConfidentiality'
-      }
-    )
+    expect(authenticatedPatchRequest).not.toHaveBeenCalled()
+    const savedLicence = vi.mocked(setMarineLicenceCache).mock.calls.at(-1)[2]
+    expect(savedLicence.publicRegister).toEqual({
+      withholdConsent: 'yes',
+      withholdReason: 'commercialConfidentiality'
+    })
   })
 
   test('keeps earlier selections when the user comes Back from the national security page', async () => {

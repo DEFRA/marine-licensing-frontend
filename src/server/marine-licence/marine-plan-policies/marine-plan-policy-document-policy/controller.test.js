@@ -10,6 +10,10 @@ import {
   apiRoutes,
   marineLicenceRoutes
 } from '#src/server/common/constants/routes.js'
+import {
+  createMockH,
+  createMockRequest
+} from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#src/server/common/helpers/authenticated-requests.js')
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
@@ -34,14 +38,14 @@ describe('#marinePlanPolicyDocumentPolicySubmitController', () => {
   })
 
   test('saves the selected policy links and redirects', async () => {
-    const request = {
+    const request = createMockRequest({
       params: { documentId },
       payload: {
         supportedPolicies: ['S-CC-1', 'S-CC-2'],
         'location-S-CC-1': 'section 4.2',
         'location-S-CC-2': 'pages 12 to 15'
       }
-    }
+    })
     const h = { redirect: vi.fn() }
 
     await marinePlanPolicyDocumentPolicySubmitController.handler(request, h)
@@ -59,10 +63,7 @@ describe('#marinePlanPolicyDocumentPolicySubmitController', () => {
       }
     )
     expect(h.redirect).toHaveBeenCalledWith(
-      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
-        '{documentId}',
-        documentId
-      )
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
     )
   })
 
@@ -74,13 +75,14 @@ describe('#marinePlanPolicyDocumentPolicySubmitController', () => {
 
     await expect(
       marinePlanPolicyDocumentPolicySubmitController.handler(
-        {
+        createMockRequest({
           params: { documentId },
           payload: { supportedPolicies: ['S-CC-1'], 'location-S-CC-1': 'a' }
-        },
+        }),
         h
       )
     ).rejects.toThrow('API down')
+
     expect(h.redirect).not.toHaveBeenCalled()
   })
 })
@@ -97,10 +99,10 @@ describe('#marinePlanPolicyDocumentPolicyController', () => {
         }
       })
     })
-    const h = { redirect: vi.fn(), view: vi.fn() }
+    const h = createMockH()
 
     await marinePlanPolicyDocumentPolicyController.handler(
-      { params: { documentId } },
+      createMockRequest({ params: { documentId } }),
       h
     )
 

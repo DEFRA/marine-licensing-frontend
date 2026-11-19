@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 import { getCdpUploadService } from '#src/services/cdp-upload-service/index.js'
+import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import {
   MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT_VIEW_ROUTE,
   marinePlanPolicySupportingDocumentController,
@@ -25,6 +26,7 @@ import {
 } from '#src/server/test-helpers/mocks/helpers.js'
 
 vi.mock('#src/services/cdp-upload-service/index.js')
+vi.mock('#src/services/marine-licence-service/index.js')
 
 const marineLicence = { id: 'lic-1', projectName: 'Test Project' }
 const uploadPageUrl = '/upload-page'
@@ -267,6 +269,7 @@ describe('#marinePlanPolicySupportingDocumentUploadAndWaitController', () => {
 
 describe('#marinePlanPolicySupportingDocumentController', () => {
   let initiate
+  let getMarineLicenceById
 
   beforeEach(() => {
     initiate = vi.fn().mockResolvedValue({
@@ -276,6 +279,8 @@ describe('#marinePlanPolicySupportingDocumentController', () => {
     })
     vi.mocked(getCdpUploadService).mockReturnValue({ initiate })
     vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue(marineLicence)
+    getMarineLicenceById = vi.fn().mockResolvedValue({})
+    vi.mocked(getMarineLicenceService).mockReturnValue({ getMarineLicenceById })
   })
 
   test('initiates an upload and renders the upload page', async () => {
@@ -301,9 +306,7 @@ describe('#marinePlanPolicySupportingDocumentController', () => {
       expect.objectContaining({
         heading: 'Upload a supporting document',
         projectName: 'Test Project',
-        uploadUrl: 'https://cdp/upload',
-        backLink: policiesUrl,
-        cancelLink: policiesUrl
+        uploadUrl: 'https://cdp/upload'
       })
     )
   })

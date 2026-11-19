@@ -60,12 +60,16 @@
           Select every policy this document supports. For each one, tell us where in the document the relevant information is.
         {% endset %}
 
+        {% set headingWithCaption %}
+          <span class="govuk-caption-l">{{ projectName }}</span>
+          <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
+        {% endset %}
+
         {{ govukCheckboxes({
           name: "supportedPolicies",
           fieldset: {
             legend: {
-              text: heading,
-              isPageHeading: true,
+              html: headingWithCaption,
               classes: "govuk-fieldset__legend--l"
             }
           },

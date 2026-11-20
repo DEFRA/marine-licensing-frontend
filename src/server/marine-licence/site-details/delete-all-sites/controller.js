@@ -11,6 +11,8 @@ import { authenticatedPatchRequest } from '#src/server/common/helpers/authentica
 const DELETE_ALL_SITES_VIEW_ROUTE = 'templates/delete-all-sites'
 const DELETE_ALL_SITES_PAGE_TITLE =
   'Are you sure you want to delete all site details?'
+const MARINE_PLAN_POLICY_WARNING =
+  "If you've started the Marine plan policies, your answers will also be deleted. You'll need to enter your site details again before you can start the Marine plan policies."
 
 export const deleteAllSitesController = {
   handler(request, h) {
@@ -25,7 +27,8 @@ export const deleteAllSitesController = {
       pageTitle: DELETE_ALL_SITES_PAGE_TITLE,
       heading: DELETE_ALL_SITES_PAGE_TITLE,
       backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-      projectName: marineLicence.projectName
+      projectName: marineLicence.projectName,
+      marinePlanPolicyWarning: MARINE_PLAN_POLICY_WARNING
     })
   }
 }

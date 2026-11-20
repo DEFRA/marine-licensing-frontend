@@ -1,6 +1,11 @@
 import { WITHHOLD_REASON } from '#src/server/common/validation/marine-licence-public-register/constants.js'
-import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import {
+  getCommonRedirectLink,
+  withCheckYourAnswersQuery
+} from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+
+const CHANGE_ACTION = 'change'
 
 const isWithholdingFor = (publicRegister, withholdReason) =>
   publicRegister?.withholdConsent === 'yes' &&
@@ -13,9 +18,17 @@ export const isCommercialConfidentiality = (publicRegister) =>
   isWithholdingFor(publicRegister, WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY)
 
 export const getNationalSecurityAnswers = (publicRegister) => {
-  const { nationalSecurityApproval, reason } = publicRegister ?? {}
+  if (!isNationalSecurity(publicRegister)) {
+    return {}
+  }
+  const { nationalSecurityApproval, reason } = publicRegister
   return { nationalSecurityApproval, reason }
 }
+
+export const getCommercialConfidentialityAnswers = (publicRegister) =>
+  isCommercialConfidentiality(publicRegister)
+    ? { reason: publicRegister.reason }
+    : {}
 
 export const keepReasonAnswers = (publicRegister, existing) => {
   if (
@@ -60,10 +73,45 @@ export const getCheckAnswersRedirect = (publicRegister) => {
   return marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
 }
 
-export const getReasonPageLinks = (request) => ({
-  backLink: withCheckYourAnswersQuery(
+export const isChangeMode = (request, publicRegister) =>
+  request.query?.action === CHANGE_ACTION &&
+  publicRegister?.withholdConsent === 'yes' &&
+  getCheckAnswersRedirect(publicRegister) === null
+
+export const withChangeQuery = (request, path) => {
+  const query = new URLSearchParams({ action: CHANGE_ACTION })
+  if (request.query?.from) {
+    query.set('from', request.query.from)
+  }
+  return `${path}?${query}`
+}
+
+export const getCheckAnswersLink = (request) =>
+  withCheckYourAnswersQuery(
     request,
-    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-  ),
-  cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+  )
+
+const changeModeLinks = (request) => ({
+  backLink: getCheckAnswersLink(request),
+  cancelLink: null
 })
+
+export const getPublicRegisterLinks = (request, publicRegister) => {
+  if (isChangeMode(request, publicRegister)) {
+    return changeModeLinks(request)
+  }
+  const backLink = getCommonRedirectLink(request)
+  return { backLink, cancelLink: backLink }
+}
+
+export const getReasonPageLinks = (request, publicRegister) =>
+  isChangeMode(request, publicRegister)
+    ? changeModeLinks(request)
+    : {
+        backLink: withCheckYourAnswersQuery(
+          request,
+          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+        ),
+        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      }

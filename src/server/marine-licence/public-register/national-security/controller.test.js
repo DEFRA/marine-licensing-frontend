@@ -69,7 +69,7 @@ describe('#publicRegisterNationalSecurity', () => {
       }
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
-        '/marine-licence/public-register/national-security',
+        '/marine-licence/public-register-national-security',
         { ...publicRegister, id: mockLicence.id }
       )
       expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(

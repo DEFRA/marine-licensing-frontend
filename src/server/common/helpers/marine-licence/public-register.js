@@ -32,6 +32,34 @@ export const keepReasonAnswers = (publicRegister, existing) => {
   }
 }
 
+const reasonPages = {
+  [WITHHOLD_REASON.NATIONAL_SECURITY]:
+    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
+  [WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY]:
+    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
+}
+
+export const getReasonPage = (publicRegister) =>
+  publicRegister?.withholdConsent === 'yes'
+    ? reasonPages[publicRegister.withholdReason]
+    : null
+
+export const getCheckAnswersRedirect = (publicRegister) => {
+  if (isNationalSecurity(publicRegister)) {
+    return publicRegister.nationalSecurityApproval
+      ? null
+      : marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
+  }
+
+  if (isCommercialConfidentiality(publicRegister)) {
+    return publicRegister.reason
+      ? null
+      : marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
+  }
+
+  return marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+}
+
 export const getReasonPageLinks = (request) => ({
   backLink: withCheckYourAnswersQuery(
     request,

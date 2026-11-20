@@ -103,6 +103,8 @@ export const marineLicenceRoutes = {
     '/marine-licence/withholding-information-national-security',
   MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY:
     '/marine-licence/withholding-information-commercial-confidentiality',
+  MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS:
+    '/marine-licence/sharing-your-project-information-publicly-check-answers',
   MARINE_LICENCE_PUBLIC_CONSULTATION: '/marine-licence/public-consultation',
   MARINE_LICENCE_FILE_UPLOAD: '/marine-licence/upload-file',
   MARINE_LICENCE_SITE_NAME: '/marine-licence/site-name',
@@ -311,6 +313,7 @@ export const apiRoutes = {
   MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_DOCUMENT:
     '/marine-licence/delete-marine-plan-policy-document',
   CONFIRM_SITE_DETAILS: '/marine-licence/confirm-site-details',
+  CONFIRM_PUBLIC_REGISTER: '/marine-licence/confirm-public-register',
   COPY_MARINE_LICENCE: '/marine-licence/copy-marine-licence',
   REDACT_TEXT: '/marine-licence/redact-text',
   GET_USER_NAMES: '/projects/users',

@@ -492,6 +492,32 @@ describe('taskList utils', () => {
       ])
     })
 
+    test.each([
+      [
+        'check answers page when completed with a withholding request',
+        'COMPLETED',
+        { withholdConsent: 'yes', withholdReason: 'nationalSecurity' },
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+      ],
+      [
+        'first page when completed without a withholding request',
+        'COMPLETED',
+        { withholdConsent: 'no' },
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+      ],
+      [
+        'first page when a withholding request is in progress',
+        'IN_PROGRESS',
+        { withholdConsent: 'yes', withholdReason: 'nationalSecurity' },
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+      ]
+    ])('links to the %s', (_description, status, publicRegister, href) => {
+      expect(
+        transformSharingTaskList({ publicRegister: status }, publicRegister)[0]
+          .href
+      ).toBe(href)
+    })
+
     test.each([null, 'INCOMPLETE', undefined])(
       'correctly returns Not yet started for %s',
       (value) => {

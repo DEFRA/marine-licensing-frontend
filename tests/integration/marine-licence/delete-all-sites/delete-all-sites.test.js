@@ -42,6 +42,12 @@ describe('Marine licence - Delete all sites', () => {
       "You'll lose all the site details you've already entered."
     )
 
+    expect(
+      within(document).getByText(
+        "If you've started the Marine plan policies, your answers will also be deleted. You'll need to enter your site details again before you can start the Marine plan policies."
+      )
+    ).toHaveClass('govuk-body')
+
     const backLink = within(document).getByRole('link', { name: 'Back' })
     expect(backLink).toHaveAttribute(
       'href',

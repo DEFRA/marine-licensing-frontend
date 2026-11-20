@@ -34,7 +34,7 @@ export const policyCodeList = new Intl.ListFormat('en-GB', {
 })
 
 export const outstandingPoliciesText = (documentsOutstanding) =>
-  documentsOutstanding && documentsOutstanding.length
+  documentsOutstanding?.length
     ? `You still need to add a document for ${policyCodeList.format(documentsOutstanding)}, or link one you've already uploaded.`
     : null
 

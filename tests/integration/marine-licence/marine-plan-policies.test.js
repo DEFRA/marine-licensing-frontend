@@ -137,7 +137,7 @@ describe('Marine plan policies (policy list) page', () => {
 
     expect(sectionData).toEqual({
       heading: 'Supporting documents',
-      policies: ['Upload supporting documents Still needed for S-CC-1']
+      policies: ['Upload supporting documents Still needed for S-CC-2']
     })
   })
 

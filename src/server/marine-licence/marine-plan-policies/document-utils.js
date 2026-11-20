@@ -4,7 +4,7 @@ import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 
 export const getReturnLink = (marineLicence) =>
-  marineLicence?.marinePlanPolicySupportingDocuments?.documents?.length
+  marineLicence?.marinePlanPolicySupportingDocuments?.linkedDocuments?.length
     ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
     : marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
 
@@ -25,14 +25,25 @@ export const loadMarinePlanPolicyDocument = async (request) => {
   const marineLicence =
     await getMarineLicenceService(request).getMarineLicenceById(id)
 
-  const document =
-    marineLicence.marinePlanPolicySupportingDocuments?.documents?.find(
-      (item) => item.documentId === documentId
-    )
+  const { linkedDocuments = [], unlinkedDocuments = [] } =
+    marineLicence.marinePlanPolicySupportingDocuments ?? {}
+  const document = [...linkedDocuments, ...unlinkedDocuments].find(
+    (item) => item.documentId === documentId
+  )
 
   if (!document) {
     throw Boom.notFound('Marine plan policy supporting document not found')
   }
 
-  return { id, documentId, projectName, document, marineLicence }
+  return {
+    id,
+    documentId,
+    projectName,
+    document,
+    marineLicence,
+    isLinked: linkedDocuments.includes(document)
+  }
 }
+
+export const getChangeModeRedirectUrl = (request, isLinked) =>
+  isLinked && !isChangeMode(request) ? `${request.path}?action=change` : null

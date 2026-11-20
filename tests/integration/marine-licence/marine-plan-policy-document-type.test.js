@@ -34,7 +34,13 @@ const mockLicenceWithDocument = (document = mockMarinePlanPolicyDocument) =>
     ...mockMarineLicenceApplication,
     marinePlanPolicySupportingDocuments: {
       ...mockMarineLicenceApplication.marinePlanPolicySupportingDocuments,
-      documents: [document]
+      linkedDocuments: [
+        {
+          ...mockMarinePlanPolicyDocument,
+          documentId: '00000000-0000-4000-8000-000000000001'
+        }
+      ],
+      unlinkedDocuments: [document]
     }
   })
 
@@ -107,6 +113,18 @@ describe('Marine plan policy document type page', () => {
     expect(document.getElementById('documentTypeOther')).toHaveValue(
       'Habitat survey'
     )
+  })
+
+  test('redirects to change mode when the document is already linked', async () => {
+    mockMarineLicence(mockMarineLicenceApplication)
+
+    const { statusCode, headers } = await makeGetRequest({
+      url: documentTypeUrl(),
+      server: getServer()
+    })
+
+    expect(statusCode).toBe(statusCodes.redirect)
+    expect(headers.location).toBe(`${documentTypeUrl()}?action=change`)
   })
 
   test('returns 404 when the document is not on the marine licence', async () => {

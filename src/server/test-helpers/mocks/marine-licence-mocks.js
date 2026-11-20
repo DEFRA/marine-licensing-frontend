@@ -124,16 +124,23 @@ export const mockMarinePlanPolicyDocument = {
 }
 
 export const mockMarinePlanPolicySupportingDocuments = {
-  documents: [mockMarinePlanPolicyDocument],
+  linkedDocuments: [mockMarinePlanPolicyDocument],
+  unlinkedDocuments: [],
   requiringDocuments: ['S-CC-1'],
   documentsOutstanding: [],
   status: 'COMPLETED'
 }
 
 export const mockIncompleteMarinePlanPolicySupportingDocuments = {
-  documents: [mockMarinePlanPolicyDocument],
-  requiringDocuments: ['S-CC-1'],
-  documentsOutstanding: ['S-CC-1'],
+  linkedDocuments: [
+    {
+      ...mockMarinePlanPolicyDocument,
+      policyLinks: [{ policyCode: 'S-CC-1', location: 'Page 1' }]
+    }
+  ],
+  unlinkedDocuments: [],
+  requiringDocuments: ['S-CC-1', 'S-CC-2'],
+  documentsOutstanding: ['S-CC-2'],
   status: 'INCOMPLETE'
 }
 
@@ -229,6 +236,15 @@ export const mockMarineLicenceApplication = {
   marinePlanPolicies: mockMarinePlanPolicies,
   marinePlanPolicyResponses: mockMarinePlanPolicyResponses,
   marinePlanPolicySupportingDocuments: mockMarinePlanPolicySupportingDocuments
+}
+
+export const mockMarineLicenceWithUnlinkedDocument = {
+  ...mockMarineLicenceApplication,
+  marinePlanPolicySupportingDocuments: {
+    ...mockMarinePlanPolicySupportingDocuments,
+    linkedDocuments: [],
+    unlinkedDocuments: [mockMarinePlanPolicyDocument]
+  }
 }
 
 export const mockSubmittedMarineLicenceApplication = {

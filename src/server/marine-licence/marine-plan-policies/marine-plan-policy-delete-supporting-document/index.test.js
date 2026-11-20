@@ -1,4 +1,4 @@
-import { marinePlanPolicyDeleteSupportingDocumentRoutes } from '#src/server/marine-licence/marine-plan-policies/delete-supporting-document/index.js'
+import { marinePlanPolicyDeleteSupportingDocumentRoutes } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-delete-supporting-document/index.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 describe('marinePlanPolicyDeleteSupportingDocumentRoutes routes', () => {

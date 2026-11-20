@@ -36,7 +36,9 @@ describe('deleteAllSitesController', () => {
         pageTitle: 'Are you sure you want to delete all site details?',
         heading: 'Are you sure you want to delete all site details?',
         backLink: marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-        projectName: mockManualCoordinatesMarineLicence.projectName
+        projectName: mockManualCoordinatesMarineLicence.projectName,
+        marinePlanPolicyWarning:
+          "If you've started the Marine plan policies, your answers will also be deleted. You'll need to enter your site details again before you can start the Marine plan policies."
       })
     })
 

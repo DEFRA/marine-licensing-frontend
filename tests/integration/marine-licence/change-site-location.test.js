@@ -31,6 +31,12 @@ describe('Change site location', () => {
     expect(inset).toHaveTextContent('Site 1')
     expect(inset).toHaveTextContent(/^Site 1: test site name$/)
 
+    expect(
+      within(document).getByText(
+        "If you've started the Marine plan policies, changing your site location may change which policies are presented."
+      )
+    ).toHaveClass('govuk-body')
+
     const backLink = within(document).getByRole('link', { name: 'Back' })
     expect(backLink).toHaveAttribute(
       'href',

@@ -20,7 +20,7 @@ import {
 import {
   getReasonPage,
   keepReasonAnswers
-} from '#src/server/common/helpers/marine-licence/public-register.js'
+} from '#src/server/marine-licence/public-register/utils.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
 

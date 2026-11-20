@@ -1,7 +1,7 @@
 import {
   marinePlanPolicyDeleteSupportingDocumentController,
   marinePlanPolicyDeleteSupportingDocumentSubmitController
-} from '#src/server/marine-licence/marine-plan-policies/delete-supporting-document/controller.js'
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-delete-supporting-document/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const marinePlanPolicyDeleteSupportingDocumentRoutes = [

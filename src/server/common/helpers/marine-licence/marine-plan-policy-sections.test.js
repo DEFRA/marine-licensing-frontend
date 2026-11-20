@@ -72,24 +72,25 @@ describe('marine plan policy sections', () => {
   })
 
   describe('addSupportingDocumentsSection', () => {
-    test('output supporting documents section when documents required', () => {
+    test('output supporting documents section as in progress when documents required and some uploaded', () => {
       expect(
         addSupportingDocumentsSection(
           mockIncompleteMarinePlanPolicySupportingDocuments
         )
       ).toEqual({
         heading: 'Supporting documents',
+        slug: 'supporting-documents',
         items: [
           {
             hint: {
               text: 'Still needed for S-CC-1'
             },
-            href: '/marine-licence/marine-plan-policy/supporting-document-upload',
+            href: '/marine-licence/marine-plan-policy/supporting-documents-review',
             status: {
               classes: 'govuk-task-list__status--nowrap',
               tag: {
-                classes: 'govuk-tag--blue',
-                text: 'Not yet started'
+                classes: 'govuk-tag--teal',
+                text: 'In progress'
               }
             },
             title: {
@@ -103,17 +104,32 @@ describe('marine plan policy sections', () => {
 
     test('lists multiple required policy codes with commas and a final "and"', () => {
       const [item] = addSupportingDocumentsSection({
-        required: ['S-CC-1', 'S-CC-2', 'S-CC-3'],
+        documentsOutstanding: ['S-CC-1', 'S-CC-2', 'S-CC-3'],
         status: 'INCOMPLETE'
       }).items
 
       expect(item.hint.text).toBe('Still needed for S-CC-1, S-CC-2 and S-CC-3')
     })
 
+    test('shows "Not yet started" when documents are required but none uploaded', () => {
+      const [item] = addSupportingDocumentsSection({
+        ...mockIncompleteMarinePlanPolicySupportingDocuments,
+        documents: []
+      }).items
+
+      expect(item.status.tag).toEqual({
+        text: 'Not yet started',
+        classes: 'govuk-tag--blue'
+      })
+      expect(item.href).toBe(
+        '/marine-licence/marine-plan-policy/supporting-document-upload'
+      )
+    })
+
     test('shows unknown statuses as "Not yet started"', () => {
       const [item] = addSupportingDocumentsSection({
-        required: [],
-        status: 'IN_PROGRESS'
+        documentsOutstanding: [],
+        status: 'UNKNOWN'
       }).items
 
       expect(item.status.tag).toEqual({
@@ -127,12 +143,13 @@ describe('marine plan policy sections', () => {
         addSupportingDocumentsSection(mockMarinePlanPolicySupportingDocuments)
       ).toEqual({
         heading: 'Supporting documents',
+        slug: 'supporting-documents',
         items: [
           {
             hint: {
               text: ''
             },
-            href: '/marine-licence/marine-plan-policy/supporting-document-upload',
+            href: '/marine-licence/marine-plan-policy/supporting-documents-review',
             status: {
               text: 'Completed'
             },
@@ -149,6 +166,7 @@ describe('marine plan policy sections', () => {
   describe('getMarinePlanPolicyTagStyle', () => {
     test.each([
       ['INCOMPLETE', 'govuk-tag--blue'],
+      ['IN_PROGRESS', 'govuk-tag--teal'],
       ['COMPLETED', '']
     ])('returns the tag style for %s', (status, expected) => {
       expect(getMarinePlanPolicyTagStyle(status)).toBe(expected)

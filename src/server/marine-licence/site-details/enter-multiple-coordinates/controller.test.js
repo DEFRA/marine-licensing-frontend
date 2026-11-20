@@ -197,7 +197,7 @@ describe('#multipleCoordinates (marine licence)', () => {
       vi.mocked(saveSiteDetailsToBackend).mockResolvedValue()
     })
 
-    test('should save valid coordinates and redirect to same page', async () => {
+    test('should save valid coordinates and redirect to the top of review-site-details for the first site', async () => {
       getMarineLicenceCacheSpy.mockReturnValue({
         ...mockMarineLicence,
         siteDetails: [{ coordinateSystem: COORDINATE_SYSTEMS.WGS84 }]
@@ -222,9 +222,40 @@ describe('#multipleCoordinates (marine licence)', () => {
         expect.any(Array)
       )
       expect(mockH.redirect).toHaveBeenCalledWith(
-        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
+        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
       )
     })
+
+    test.each([
+      ['adding a subsequent site', { site: '2' }, 2],
+      ['changing the first site', { site: '1', action: 'change' }, 1]
+    ])(
+      'should redirect to the site card on review-site-details when %s',
+      async (_, query, siteNumber) => {
+        getMarineLicenceCacheSpy.mockReturnValue({
+          ...mockMarineLicence,
+          siteDetails: [
+            { coordinateSystem: COORDINATE_SYSTEMS.WGS84 },
+            { coordinateSystem: COORDINATE_SYSTEMS.WGS84 }
+          ]
+        })
+        const payload = {
+          'coordinates[0][latitude]': '51.507400',
+          'coordinates[0][longitude]': '-0.127800',
+          'coordinates[1][latitude]': '51.517500',
+          'coordinates[1][longitude]': '-0.137600',
+          'coordinates[2][latitude]': '51.527600',
+          'coordinates[2][longitude]': '-0.147700'
+        }
+        const request = createMockRequest({ payload, query })
+
+        await multipleCoordinatesSubmitController.handler(request, mockH)
+
+        expect(mockH.redirect).toHaveBeenCalledWith(
+          `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-${siteNumber}`
+        )
+      }
+    )
 
     test('should call saveSiteDetailsToBackend on valid submission', async () => {
       getMarineLicenceCacheSpy.mockReturnValue({
@@ -313,7 +344,7 @@ describe('#multipleCoordinates (marine licence)', () => {
         expect.any(Array)
       )
       expect(mockH.redirect).toHaveBeenCalledWith(
-        `${marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS}#site-details-1`
+        marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS
       )
     })
 

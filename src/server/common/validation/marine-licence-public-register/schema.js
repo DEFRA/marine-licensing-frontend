@@ -1,5 +1,5 @@
 import joi from 'joi'
-import { withCharacterLimit } from '#src/server/common/validation/character-limit.js'
+import { WITHHOLD_REASON } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 
 export const marineLicencePublicRegisterSchema = joi.object({
   withholdConsent: joi.string().valid('yes', 'no').required().messages({
@@ -7,12 +7,17 @@ export const marineLicencePublicRegisterSchema = joi.object({
     'string.empty': 'PUBLIC_REGISTER_WITHHOLD_CONSENT_REQUIRED',
     'any.required': 'PUBLIC_REGISTER_WITHHOLD_CONSENT_REQUIRED'
   }),
-  reason: joi.when('withholdConsent', {
+  withholdReason: joi.when('withholdConsent', {
     is: 'yes',
-    then: withCharacterLimit(joi.string().trim().required(), 1000).messages({
-      'string.empty': 'PUBLIC_REGISTER_REASON_REQUIRED',
-      'any.required': 'PUBLIC_REGISTER_REASON_REQUIRED',
-      'string.max': 'PUBLIC_REGISTER_REASON_MAX_LENGTH'
-    })
+    then: joi
+      .string()
+      .valid(...Object.values(WITHHOLD_REASON))
+      .required()
+      .messages({
+        'any.only': 'PUBLIC_REGISTER_WITHHOLD_REASON_REQUIRED',
+        'string.empty': 'PUBLIC_REGISTER_WITHHOLD_REASON_REQUIRED',
+        'any.required': 'PUBLIC_REGISTER_WITHHOLD_REASON_REQUIRED'
+      }),
+    otherwise: joi.any().strip()
   })
 })

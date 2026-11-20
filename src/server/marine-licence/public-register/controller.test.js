@@ -14,7 +14,10 @@ describe('#publicRegister', () => {
   const mockLicence = {
     projectName: 'Test Project',
     id: 'test-id',
-    publicRegister: { withholdConsent: 'yes', reason: 'Some details' }
+    publicRegister: {
+      withholdConsent: 'yes',
+      withholdReason: 'nationalSecurity'
+    }
   }
 
   beforeEach(() => {
@@ -63,10 +66,7 @@ describe('#publicRegister', () => {
       await expect(
         publicRegisterSubmitController.handler(
           {
-            payload: {
-              withholdConsent: 'yes',
-              reason: 'Some details'
-            },
+            payload: { withholdConsent: 'no' },
             query: {}
           },
           h
@@ -105,6 +105,35 @@ describe('#publicRegister', () => {
       )
     })
 
+    test('Should not save a withhold reason when no information is withheld', async () => {
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
+      }
+
+      await publicRegisterSubmitController.handler(
+        {
+          payload: {
+            withholdConsent: 'no',
+            withholdReason: 'nationalSecurity'
+          },
+          query: {}
+        },
+        h
+      )
+
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+        expect.any(Object),
+        '/marine-licence/public-register',
+        { id: mockLicence.id, withholdConsent: 'no' }
+      )
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        expect.objectContaining({ publicRegister: { withholdConsent: 'no' } })
+      )
+    })
+
     test('Should correctly redirect to check your answers when parameter is present', async () => {
       const h = {
         redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
@@ -113,7 +142,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: { withholdConsent: 'yes', reason: 'Some details' },
+          payload: { withholdConsent: 'no' },
           query: { from: 'check-your-answers' }
         },
         h
@@ -122,22 +151,81 @@ describe('#publicRegister', () => {
       expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/marine-licence/public-register',
-        {
-          id: mockLicence.id,
-          withholdConsent: 'yes',
-          reason: 'Some details'
-        }
-      )
-      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
-        expect.any(Object),
-        h,
-        expect.objectContaining({
-          publicRegister: { withholdConsent: 'yes', reason: 'Some details' }
-        })
+        { id: mockLicence.id, withholdConsent: 'no' }
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
       )
+    })
+
+    test('Should redirect to the national security page within check your answers without saving to the backend', async () => {
+      const h = {
+        redirect: vi.fn().mockReturnValue({ takeover: vi.fn() }),
+        view: vi.fn()
+      }
+
+      await publicRegisterSubmitController.handler(
+        {
+          payload: {
+            withholdConsent: 'yes',
+            withholdReason: 'nationalSecurity'
+          },
+          query: { from: 'check-your-answers' }
+        },
+        h
+      )
+
+      expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+        expect.any(Object),
+        h,
+        expect.objectContaining({
+          publicRegister: {
+            withholdConsent: 'yes',
+            withholdReason: 'nationalSecurity'
+          }
+        })
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY}?from=check-your-answers`
+      )
+      expect(authRequests.authenticatedPatchRequest).not.toHaveBeenCalled()
+    })
+
+    describe('when national security answers are already saved', () => {
+      const savedAnswers = {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity',
+        nationalSecurityApproval: 'yes',
+        reason: 'Details of the berth'
+      }
+
+      beforeEach(() => {
+        vi.spyOn(cacheUtils, 'getMarineLicenceCache').mockReturnValue({
+          ...mockLicence,
+          publicRegister: savedAnswers
+        })
+      })
+
+      test('Should keep them when national security is still the reason', async () => {
+        const h = { redirect: vi.fn(), view: vi.fn() }
+
+        await publicRegisterSubmitController.handler(
+          {
+            payload: {
+              withholdConsent: 'yes',
+              withholdReason: 'nationalSecurity'
+            },
+            query: {}
+          },
+          h
+        )
+
+        expect(cacheUtils.setMarineLicenceCache).toHaveBeenCalledWith(
+          expect.any(Object),
+          h,
+          expect.objectContaining({ publicRegister: savedAnswers })
+        )
+      })
     })
 
     test('Should handle API validation errors in catch block', async () => {
@@ -148,8 +236,8 @@ describe('#publicRegister', () => {
               validation: {
                 details: [
                   {
-                    field: 'reason',
-                    message: 'PUBLIC_REGISTER_REASON_REQUIRED',
+                    field: 'withholdReason',
+                    message: 'PUBLIC_REGISTER_WITHHOLD_REASON_REQUIRED',
                     type: 'any.required'
                   }
                 ]
@@ -166,10 +254,7 @@ describe('#publicRegister', () => {
 
       await publicRegisterSubmitController.handler(
         {
-          payload: {
-            withholdConsent: 'yes',
-            reason: 'Some details'
-          },
+          payload: { withholdConsent: 'yes' },
           query: {}
         },
         h
@@ -179,13 +264,10 @@ describe('#publicRegister', () => {
         PUBLIC_REGISTER_VIEW_ROUTE,
         expect.objectContaining({
           backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
-          payload: {
-            withholdConsent: 'yes',
-            reason: 'Some details'
-          },
+          payload: { withholdConsent: 'yes' },
           errors: expect.objectContaining({
-            reason: expect.objectContaining({
-              text: 'Enter details of what you want withheld and why'
+            withholdReason: expect.objectContaining({
+              text: 'Select a reason why you want to withhold information'
             })
           })
         })

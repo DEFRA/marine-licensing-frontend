@@ -124,14 +124,16 @@ export const mockMarinePlanPolicyDocument = {
 }
 
 export const mockMarinePlanPolicySupportingDocuments = {
-  documents: [],
-  required: [],
+  documents: [mockMarinePlanPolicyDocument],
+  requiringDocuments: ['S-CC-1'],
+  documentsOutstanding: [],
   status: 'COMPLETED'
 }
 
 export const mockIncompleteMarinePlanPolicySupportingDocuments = {
-  documents: [],
-  required: ['S-CC-1'],
+  documents: [mockMarinePlanPolicyDocument],
+  requiringDocuments: ['S-CC-1'],
+  documentsOutstanding: ['S-CC-1'],
   status: 'INCOMPLETE'
 }
 
@@ -569,6 +571,18 @@ export const mockMarineLicenceWithMarinePlanPolicies = {
       policy: 'Biodiversity policy wording.'
     }
   ]
+}
+
+export const withReadyToSend = (marineLicence) => {
+  const marinePlanPoliciesCount = marineLicence.marinePlanPoliciesCount ?? 1
+  return {
+    ...marineLicence,
+    taskList: { ...mockMarineLicenceTaskList },
+    siteDetailsDataComplete: true,
+    marinePlanPolicyJob: 'ready',
+    marinePlanPoliciesCount,
+    marinePlanPolicyResponseCount: marinePlanPoliciesCount
+  }
 }
 
 export const mockFileUploadMarineLicence = {

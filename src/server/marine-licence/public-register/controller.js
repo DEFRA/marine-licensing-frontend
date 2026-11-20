@@ -11,11 +11,29 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { marineLicencePublicRegisterSchema } from '#src/server/common/validation/marine-licence-public-register/schema.js'
 import {
   marineLicencePublicRegisterErrorMessages,
-  marineLicencePublicRegisterSettings
+  marineLicencePublicRegisterSettings,
+  WITHHOLD_REASON
 } from '#src/server/common/validation/marine-licence-public-register/constants.js'
-import { getCommonRedirectLink } from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import {
+  getCommonRedirectLink,
+  withCheckYourAnswersQuery
+} from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import { keepReasonAnswers } from '#src/server/common/helpers/marine-licence/public-register.js'
+import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
+
+const reasonPages = {
+  [WITHHOLD_REASON.NATIONAL_SECURITY]:
+    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
+  [WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY]:
+    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
+}
+
+const getReasonPage = (publicRegister) =>
+  publicRegister.withholdConsent === 'yes'
+    ? reasonPages[publicRegister.withholdReason]
+    : undefined
 
 export const publicRegisterController = {
   async handler(request, h) {
@@ -57,24 +75,36 @@ export const publicRegisterSubmitController = {
       const isWithholding = payload.withholdConsent === 'yes'
       const publicRegister = {
         withholdConsent: payload.withholdConsent,
-        ...(isWithholding && { reason: payload.reason })
+        ...(isWithholding && { withholdReason: payload.withholdReason })
       }
 
-      await authenticatedPatchRequest(
-        request,
-        '/marine-licence/public-register',
-        {
-          ...publicRegister,
-          id: marineLicence.id
-        }
-      )
+      const reasonPage = getReasonPage(publicRegister)
+
+      // Saved by the reason page instead, so Cancel there discards this choice
+      if (!reasonPage) {
+        await authenticatedPatchRequest(
+          request,
+          '/marine-licence/public-register',
+          {
+            ...publicRegister,
+            id: marineLicence.id
+          }
+        )
+      }
 
       await setMarineLicenceCache(request, h, {
         ...marineLicence,
-        publicRegister
+        publicRegister: keepReasonAnswers(
+          publicRegister,
+          marineLicence.publicRegister
+        )
       })
 
-      return h.redirect(getCommonRedirectLink(request))
+      return h.redirect(
+        reasonPage
+          ? withCheckYourAnswersQuery(request, reasonPage)
+          : getCommonRedirectLink(request)
+      )
     } catch (e) {
       const validation = e.data?.payload?.validation
       const details = validation?.details

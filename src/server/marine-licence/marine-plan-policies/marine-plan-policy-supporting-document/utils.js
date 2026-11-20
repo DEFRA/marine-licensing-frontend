@@ -34,10 +34,25 @@ export const getMarinePlanPolicySupportingDocumentUploadErrorDisplay = (
   return uploadError ? createFileUploadErrorDisplay(uploadError, request) : {}
 }
 
+const buildDocumentUrl = (route, documentId) =>
+  route.replace('{documentId}', encodeURIComponent(documentId))
+
 export const getMarinePlanPolicyDocumentTypeUrl = (documentId) =>
-  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE.replace(
-    '{documentId}',
-    encodeURIComponent(documentId)
+  buildDocumentUrl(
+    marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_TYPE,
+    documentId
+  )
+
+export const getMarinePlanPolicyDocumentPolicyUrl = (documentId) =>
+  buildDocumentUrl(
+    marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY,
+    documentId
+  )
+
+export const getMarinePlanPolicyDeleteSupportingDocumentUrl = (documentId) =>
+  buildDocumentUrl(
+    marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT,
+    documentId
   )
 
 export const buildSupportingDocument = (status) => ({

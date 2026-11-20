@@ -39,7 +39,15 @@ jobs:
           npm run lint
           npm run test:ci
       - name: Security audit
-        run: npm run audit
+        run: |
+          # Temporary picomatch allowlist in .audit-ci.jsonc — revisit/remove by this date
+          EXPIRES_ON=2026-12-18
+          TODAY=$(date -u +%F)
+          if ! [[ "$TODAY" < "$EXPIRES_ON" ]]; then
+            echo "::error::Temporary npm audit allowlist for GHSA-fc5q-39xc-vjpf expired on ${EXPIRES_ON}. Revisit picomatch or extend the date with team agreement."
+            exit 1
+          fi
+          npm run audit
 
       - name: Test Docker Image Build
         run: |
@@ -49,7 +57,7 @@ jobs:
 
       - name: SonarCloud Scan
         if: github.actor != 'dependabot[bot]'
-        uses: SonarSource/sonarqube-scan-action@e805d875275f728fac1885b413934be6d7c63f65 #v8
+        uses: SonarSource/sonarqube-scan-action@59202af334b4ba7b5db01b701b8e79f8b3bef0f4 #v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

@@ -39,7 +39,7 @@ const setStatus = (task) => {
 export const transformSharingTaskList = (taskList) => [
   {
     title: {
-      text: 'Public register',
+      text: 'Information published on the public register',
       classes: taskClasses
     },
     href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
@@ -180,7 +180,8 @@ export const transformMarinePlanPoliciesTaskList = (
   {
     marinePlanPolicyJob,
     marinePlanPoliciesCount,
-    marinePlanPolicyResponseCount
+    marinePlanPolicyResponseCount,
+    siteDetailsDataComplete
   }
 ) => {
   const cannotStartYet = [
@@ -193,7 +194,13 @@ export const transformMarinePlanPoliciesTaskList = (
     }
   ]
 
-  if (taskList.siteDetails !== 'COMPLETED') {
+  const onlyIncompleteSiteDataOutstanding =
+    marinePlanPolicyJob === 'ready' && siteDetailsDataComplete === false
+
+  if (
+    taskList.siteDetails !== 'COMPLETED' &&
+    !onlyIncompleteSiteDataOutstanding
+  ) {
     return cannotStartYet
   }
 

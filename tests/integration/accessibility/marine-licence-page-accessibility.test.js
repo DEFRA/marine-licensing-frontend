@@ -21,7 +21,8 @@ import {
   mockResubmissionTaskId,
   mockResubmissionWithAllPhotos,
   mockResubmittedMarineLicence,
-  mockApplicationTaskContactId
+  mockApplicationTaskContactId,
+  withReadyToSend
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import {
   mockMarineLicence,
@@ -130,7 +131,30 @@ const marineLicencePages = [
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-    title: 'Sharing your application information on the public register'
+    title: 'Withholding information from the public register'
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
+    title: 'Withholding information for national security reasons',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity'
+      }
+    }
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY,
+    title:
+      'Withholding information for commercial or industrial confidentiality reasons',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'commercialConfidentiality'
+      }
+    }
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
@@ -153,6 +177,27 @@ const marineLicencePages = [
         documents: [mockMarinePlanPolicyDocument]
       }
     }
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
+      '{documentId}',
+      mockMarinePlanPolicyDocument.documentId
+    ),
+    title: 'Which policies does this document support?',
+    marineLicence: mockMarineLicenceApplication
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW,
+    title: 'Supporting documents',
+    marineLicence: mockMarineLicenceApplication
+  },
+  {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT.replace(
+      '{documentId}',
+      mockMarinePlanPolicyDocument.documentId
+    ),
+    title: 'Are you sure you want to delete this document?',
+    marineLicence: mockMarineLicenceApplication
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
@@ -354,12 +399,13 @@ const marineLicencePages = [
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
-    title: 'Check your answers before sending your information'
+    title: 'Check your answers before sending your information',
+    marineLicence: withReadyToSend(mockMarineLicenceApplication)
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
     title: 'Check your answers before sending your information',
-    marineLicence: mockManualCoordinatesMarineLicence
+    marineLicence: withReadyToSend(mockManualCoordinatesMarineLicence)
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_DELETE,
@@ -530,6 +576,64 @@ describe('Marine licence page accessibility checks (Axe)', () => {
         formData: { postcode: 'ZZ1 1ZZ', propertyNameOrNumber: '' }
       })
 
+      await runAxeChecks(document.documentElement)
+    })
+  })
+  describe('"Withholding information for national security reasons" page in an error state', () => {
+    test.each([
+      { name: 'no option is selected', formData: {} },
+      {
+        name: 'Yes is selected without details',
+        formData: { nationalSecurityApproval: 'yes', reason: '' }
+      },
+      {
+        name: 'Yes is selected with too many characters',
+        formData: { nationalSecurityApproval: 'yes', reason: 'a'.repeat(1001) }
+      }
+    ])('has no accessibility violations when $name', async ({ formData }) => {
+      mockMarineLicence(mockMarineLicenceApplication)
+
+      const { document } = await submitForm({
+        requestUrl:
+          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
+        server: getServer(),
+        formData
+      })
+
+      expect(document.querySelector('.govuk-error-summary')).toBeInTheDocument()
+      await runAxeChecks(document.documentElement)
+    })
+  })
+  describe('"Withholding information for commercial or industrial confidentiality reasons" page in an error state', () => {
+    test('has no accessibility violations when the details are empty', async () => {
+      mockMarineLicence(mockMarineLicenceApplication)
+
+      const { document } = await submitForm({
+        requestUrl:
+          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY,
+        server: getServer(),
+        formData: { reason: '' }
+      })
+
+      expect(document.querySelector('.govuk-error-summary')).toBeInTheDocument()
+      await runAxeChecks(document.documentElement)
+    })
+  })
+  describe('"Withholding information from the public register" page in an error state', () => {
+    test('has no accessibility violations when Yes is selected without a reason', async () => {
+      mockMarineLicence(mockMarineLicenceApplication)
+
+      const { document } = await submitForm({
+        requestUrl: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+        server: getServer(),
+        formData: { withholdConsent: 'yes' }
+      })
+
+      expect(
+        document.querySelector(
+          '.govuk-radios__conditional .govuk-error-message'
+        )
+      ).toBeInTheDocument()
       await runAxeChecks(document.documentElement)
     })
   })

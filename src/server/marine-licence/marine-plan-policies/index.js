@@ -5,6 +5,9 @@ import { marinePlanPoliciesHoldingRoutes } from '#src/server/marine-licence/mari
 import { calculateMarinePlanPoliciesAndWaitRoutes } from '#src/server/marine-licence/marine-plan-policies/calculate-marine-plan-policies-and-wait/index.js'
 import { marinePlanPolicySupportingDocumentRoutes } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-supporting-document/index.js'
 import { marinePlanPolicyDocumentTypeRoutes } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-type/index.js'
+import { marinePlanPolicyDocumentPolicyRoutes } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-policy/index.js'
+import { marinePlanPolicyDocumentsReviewRoutes } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-documents-review/index.js'
+import { marinePlanPolicyDeleteSupportingDocumentRoutes } from '#src/server/marine-licence/marine-plan-policies/delete-supporting-document/index.js'
 
 export const marinePlanPoliciesRoutes = [
   {
@@ -16,5 +19,8 @@ export const marinePlanPoliciesRoutes = [
   ...marinePlanPoliciesHoldingRoutes,
   ...calculateMarinePlanPoliciesAndWaitRoutes,
   ...marinePlanPolicySupportingDocumentRoutes,
-  ...marinePlanPolicyDocumentTypeRoutes
+  ...marinePlanPolicyDocumentTypeRoutes,
+  ...marinePlanPolicyDocumentPolicyRoutes,
+  ...marinePlanPolicyDocumentsReviewRoutes,
+  ...marinePlanPolicyDeleteSupportingDocumentRoutes
 ]

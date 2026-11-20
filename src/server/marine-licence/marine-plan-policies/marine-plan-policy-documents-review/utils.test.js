@@ -43,7 +43,10 @@ describe('createDocumentCards', () => {
   })
 
   test('handles a document with no type or policies yet', () => {
-    const card = buildCard(mockMarinePlanPolicyDocument)
+    const card = buildCard({
+      ...mockMarinePlanPolicyDocument,
+      documentType: undefined
+    })
 
     expect(card.rows[0].value.html).toBe('')
     expect(card.rows[1].value.html).toBe('')

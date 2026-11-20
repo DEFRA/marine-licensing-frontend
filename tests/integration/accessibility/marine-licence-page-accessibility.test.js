@@ -11,6 +11,7 @@ import {
   mockMarineLicenceApplication,
   mockMarineLicenceWithConsultationApplication,
   mockMarineLicenceWithMarinePlanPolicies,
+  mockMarineLicenceWithUnlinkedDocument,
   mockMarinePlanPolicyDocument,
   mockSubmittedMarineLicenceApplication,
   mockWithdrawnMarineLicenceApplication,
@@ -170,13 +171,7 @@ const marineLicencePages = [
       mockMarinePlanPolicyDocument.documentId
     ),
     title: 'What type of document is this?',
-    marineLicence: {
-      ...mockMarineLicenceApplication,
-      marinePlanPolicySupportingDocuments: {
-        ...mockMarineLicenceApplication.marinePlanPolicySupportingDocuments,
-        documents: [mockMarinePlanPolicyDocument]
-      }
-    }
+    marineLicence: mockMarineLicenceWithUnlinkedDocument
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENT_POLICY.replace(
@@ -184,7 +179,7 @@ const marineLicencePages = [
       mockMarinePlanPolicyDocument.documentId
     ),
     title: 'Which policies does this document support?',
-    marineLicence: mockMarineLicenceApplication
+    marineLicence: mockMarineLicenceWithUnlinkedDocument
   },
   {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW,

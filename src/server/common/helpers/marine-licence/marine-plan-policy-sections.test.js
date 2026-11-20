@@ -83,7 +83,7 @@ describe('marine plan policy sections', () => {
         items: [
           {
             hint: {
-              text: 'Still needed for S-CC-1'
+              text: 'Still needed for S-CC-2'
             },
             href: '/marine-licence/marine-plan-policy/supporting-documents-review',
             status: {
@@ -113,8 +113,8 @@ describe('marine plan policy sections', () => {
 
     test('shows "Not yet started" when documents are required but none uploaded', () => {
       const [item] = addSupportingDocumentsSection({
-        ...mockIncompleteMarinePlanPolicySupportingDocuments,
-        documents: []
+        documentsOutstanding: ['S-CC-1'],
+        status: 'INCOMPLETE'
       }).items
 
       expect(item.status.tag).toEqual({

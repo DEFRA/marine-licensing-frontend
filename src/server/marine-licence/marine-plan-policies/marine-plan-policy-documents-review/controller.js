@@ -26,7 +26,7 @@ export const marinePlanPolicyDocumentsReviewController = {
       marinePlanPolicies
     } = await marineLicenceService.getMarineLicenceById(cached.id)
 
-    if (!marinePlanPolicySupportingDocuments?.documents?.length) {
+    if (!marinePlanPolicySupportingDocuments?.linkedDocuments?.length) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
     }
 

@@ -55,7 +55,7 @@ const getSupportingDocumentsStatusItem = (status) =>
       }
 
 export const addSupportingDocumentsSection = ({
-  documents,
+  linkedDocuments,
   documentsOutstanding,
   status
 }) => ({
@@ -72,11 +72,11 @@ export const addSupportingDocumentsSection = ({
           ? `Still needed for ${policyCodeList.format(documentsOutstanding)}`
           : ''
       },
-      href: documents?.length
+      href: linkedDocuments?.length
         ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
         : marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
       status: getSupportingDocumentsStatusItem(
-        getSupportingDocumentsStatus(status, documents)
+        getSupportingDocumentsStatus(status, linkedDocuments)
       )
     }
   ]

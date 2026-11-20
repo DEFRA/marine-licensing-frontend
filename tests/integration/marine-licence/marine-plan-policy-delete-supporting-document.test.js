@@ -29,7 +29,7 @@ const mockLicenceWithDocument = (otherDocuments = []) =>
     ...mockMarineLicenceApplication,
     marinePlanPolicySupportingDocuments: {
       ...mockMarineLicenceApplication.marinePlanPolicySupportingDocuments,
-      documents: [
+      linkedDocuments: [
         {
           ...mockMarinePlanPolicyDocument,
           policyLinks: mockMarinePlanPolicies.map(({ policyCode }) => ({

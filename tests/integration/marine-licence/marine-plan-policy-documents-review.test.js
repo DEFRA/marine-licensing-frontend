@@ -43,7 +43,7 @@ describe('Marine plan policy documents review page', () => {
       ...mockMarineLicenceApplication,
       marinePlanPolicySupportingDocuments: {
         ...mockMarinePlanPolicySupportingDocuments,
-        documents: [
+        linkedDocuments: [
           {
             ...mockMarinePlanPolicyDocument,
             documentType: 'ecological-assessment',

@@ -23,7 +23,7 @@ describe('Marine plan policy supporting document upload page', () => {
       ...mockMarineLicenceApplication,
       marinePlanPolicySupportingDocuments: {
         ...mockMarinePlanPolicySupportingDocuments,
-        documents
+        linkedDocuments: documents
       }
     })
     return loadPage({

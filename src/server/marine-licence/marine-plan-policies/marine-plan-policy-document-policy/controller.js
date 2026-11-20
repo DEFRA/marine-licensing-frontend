@@ -7,6 +7,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import {
+  getChangeModeRedirectUrl,
   getReturnLink,
   isChangeMode,
   loadMarinePlanPolicyDocument
@@ -37,7 +38,7 @@ export const errorMessages = {
 }
 
 const loadDocumentContext = async (request) => {
-  const { id, documentId, projectName, document, marineLicence } =
+  const { id, documentId, projectName, document, marineLicence, isLinked } =
     await loadMarinePlanPolicyDocument(request)
 
   const changeMode = isChangeMode(request)
@@ -51,6 +52,7 @@ const loadDocumentContext = async (request) => {
     marinePlanPolicies: marineLicence.marinePlanPolicies,
     filename: document.uploadedFile?.filename,
     policyLinks: document.policyLinks,
+    isLinked,
     cancelLink: changeMode ? null : getReturnLink(marineLicence)
   }
 }
@@ -92,6 +94,11 @@ export const marinePlanPolicyDocumentPolicyController = {
 
     if (!context.requiringDocuments.length) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
+    }
+
+    const changeModeUrl = getChangeModeRedirectUrl(request, context.isLinked)
+    if (changeModeUrl) {
+      return h.redirect(changeModeUrl)
     }
 
     const changeMode = isChangeMode(request)

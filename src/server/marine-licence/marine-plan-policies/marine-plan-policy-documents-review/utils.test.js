@@ -5,7 +5,10 @@ import {
 } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 const buildCard = (document) =>
-  createDocumentCards({ documents: [document] }, mockMarinePlanPolicies)[0]
+  createDocumentCards(
+    { linkedDocuments: [document] },
+    mockMarinePlanPolicies
+  )[0]
 
 describe('createDocumentCards', () => {
   test('builds a card with the type and a list of linked policies', () => {
@@ -27,6 +30,18 @@ describe('createDocumentCards', () => {
     expect(card.rows[1].actions.items[0].text).toBe('Change')
   })
 
+  test('appends the escaped description for an other document type', () => {
+    const card = buildCard({
+      ...mockMarinePlanPolicyDocument,
+      documentType: 'other',
+      documentTypeOther: '<b>Survey</b>'
+    })
+
+    expect(card.rows[0].value.html).toBe(
+      'Other supporting evidence<br>&lt;b&gt;Survey&lt;/b&gt;'
+    )
+  })
+
   test('handles a document with no type or policies yet', () => {
     const card = buildCard(mockMarinePlanPolicyDocument)
 
@@ -46,7 +61,7 @@ describe('createDocumentCards', () => {
   test('escapes text correctly', () => {
     const card = createDocumentCards(
       {
-        documents: [
+        linkedDocuments: [
           {
             ...mockMarinePlanPolicyDocument,
             policyLinks: [{ policyCode: 'S-CC-1', location: 'Page 1' }]

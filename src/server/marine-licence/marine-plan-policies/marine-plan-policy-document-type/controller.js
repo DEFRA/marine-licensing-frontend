@@ -8,6 +8,7 @@ import {
   mapErrorsForDisplay
 } from '#src/server/common/helpers/errors.js'
 import {
+  getChangeModeRedirectUrl,
   getReturnLink,
   isChangeMode,
   loadMarinePlanPolicyDocument
@@ -68,8 +69,13 @@ export const marinePlanPolicyDocumentTypeController = {
     }
   },
   async handler(request, h) {
-    const { projectName, document, marineLicence } =
+    const { projectName, document, marineLicence, isLinked } =
       await loadMarinePlanPolicyDocument(request)
+
+    const changeModeUrl = getChangeModeRedirectUrl(request, isLinked)
+    if (changeModeUrl) {
+      return h.redirect(changeModeUrl)
+    }
 
     const changeMode = isChangeMode(request)
 

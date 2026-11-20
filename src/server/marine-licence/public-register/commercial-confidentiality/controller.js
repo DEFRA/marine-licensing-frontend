@@ -82,7 +82,7 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
 
       await authenticatedPatchRequest(
         request,
-        '/marine-licence/public-register/commercial-confidentiality',
+        '/marine-licence/public-register-commercial-confidentiality',
         { ...publicRegister, id: marineLicence.id }
       )
 

@@ -90,7 +90,7 @@ export const publicRegisterNationalSecuritySubmitController = {
 
       await authenticatedPatchRequest(
         request,
-        '/marine-licence/public-register/national-security',
+        '/marine-licence/public-register-national-security',
         { ...publicRegister, id: marineLicence.id }
       )
 

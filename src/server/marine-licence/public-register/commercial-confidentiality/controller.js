@@ -16,6 +16,7 @@ import {
 import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
   getCommercialConfidentialityAnswers,
+  getPublicRegisterLink,
   getReasonPageLinks,
   isChangeMode,
   isCommercialConfidentiality
@@ -26,14 +27,6 @@ import { WITHHOLD_REASON } from '#src/server/common/validation/marine-licence-pu
 export const PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE =
   'marine-licence/public-register/commercial-confidentiality/index'
 
-const redirectToPublicRegister = (request, h) =>
-  h.redirect(
-    withCheckYourAnswersQuery(
-      request,
-      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-    )
-  )
-
 const canShowPage = (request, publicRegister) =>
   isCommercialConfidentiality(publicRegister) ||
   isChangeMode(request, publicRegister)
@@ -43,7 +36,7 @@ export const publicRegisterCommercialConfidentialityController = {
     const marineLicence = getMarineLicenceCache(request)
 
     if (!canShowPage(request, marineLicence.publicRegister)) {
-      return redirectToPublicRegister(request, h)
+      return h.redirect(getPublicRegisterLink(request))
     }
 
     return h.view(PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE, {
@@ -86,7 +79,7 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
     const marineLicence = getMarineLicenceCache(request)
 
     if (!canShowPage(request, marineLicence.publicRegister)) {
-      return redirectToPublicRegister(request, h)
+      return h.redirect(getPublicRegisterLink(request))
     }
 
     try {

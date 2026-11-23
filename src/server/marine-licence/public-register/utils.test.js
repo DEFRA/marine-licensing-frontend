@@ -128,6 +128,12 @@ describe('change mode', () => {
     ).toBe('/page?action=change&from=check-your-answers')
   })
 
+  test('withChangeQuery drops any other from value', () => {
+    expect(withChangeQuery({ query: { from: 'elsewhere' } }, '/page')).toBe(
+      '/page?action=change'
+    )
+  })
+
   test.each([getPublicRegisterLinks, getReasonPageLinks])(
     '%o goes back to the review page with no Cancel',
     (getLinks) => {

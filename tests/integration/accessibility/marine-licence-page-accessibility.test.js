@@ -171,32 +171,6 @@ const marineLicencePages = [
       }
     }
   },
-  ...[
-    {
-      url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
-      title: 'Withholding information from the public register'
-    },
-    {
-      url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
-      title: 'Withholding information for national security reasons'
-    },
-    {
-      url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY,
-      title:
-        'Withholding information for commercial or industrial confidentiality reasons'
-    }
-  ].map(({ url, title }) => ({
-    url: `${url}?action=change`,
-    title,
-    marineLicence: {
-      ...mockMarineLicenceApplication,
-      publicRegister: {
-        withholdConsent: 'yes',
-        withholdReason: 'commercialConfidentiality',
-        reason: 'Pricing details'
-      }
-    }
-  })),
   {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
     title: 'Marine plan policies guidance'

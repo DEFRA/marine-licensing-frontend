@@ -22,15 +22,12 @@ import {
   getPublicRegisterLinks,
   getReasonPage,
   isChangeMode,
+  isWithholdingFor,
   keepReasonAnswers,
   withChangeQuery
 } from '#src/server/marine-licence/public-register/utils.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
-
-const isSameWithholdReason = (publicRegister, existing) =>
-  publicRegister.withholdConsent === 'yes' &&
-  publicRegister.withholdReason === existing.withholdReason
 
 // Nothing is saved here in change mode: the reason page commits the new choice
 // with its answers, so Back from there leaves the saved answers untouched
@@ -38,7 +35,7 @@ const getChangeModeRedirect = (request, publicRegister, existing) => {
   if (!isChangeMode(request, existing)) {
     return null
   }
-  if (isSameWithholdReason(publicRegister, existing)) {
+  if (isWithholdingFor(publicRegister, existing.withholdReason)) {
     return getCheckAnswersLink(request)
   }
   const reasonPage = getReasonPage(publicRegister)

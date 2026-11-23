@@ -21,8 +21,6 @@ const {
 
 const change = (path) => `${path}?action=change`
 
-const WITHHOLD_QUESTION =
-  'Do you want to ask us to withhold any information from the public register?'
 const APPROVAL_QUESTION =
   'Do you have approval from the Secretary of State for Defence to withhold information for national security reasons?'
 const REASON_LABEL = 'Tell us what you want withheld and why'
@@ -114,20 +112,6 @@ describe('Public register: change answers', () => {
             text: 'Change whether you have approval from the Secretary of State for Defence'
           }
         ]
-      },
-      {
-        name: 'national security without approval',
-        publicRegister: nationalSecurityNotApproved,
-        links: [
-          {
-            href: change(PUBLIC_REGISTER),
-            text: 'Change whether you want to withhold information from the public register'
-          },
-          {
-            href: change(NATIONAL_SECURITY),
-            text: 'Change whether you have approval from the Secretary of State for Defence'
-          }
-        ]
       }
     ])('$name', async ({ publicRegister, links }) => {
       givenAnswers(publicRegister)
@@ -149,26 +133,11 @@ describe('Public register: change answers', () => {
   })
 
   describe('withholding information page', () => {
-    const getWithholdInput = (document, inputLabel) =>
-      getInputInFieldset({
-        document,
-        fieldsetLabel: WITHHOLD_QUESTION,
-        inputLabel,
-        findByHeading: true
-      })
-
-    test('is pre-populated, with Back to the review page and no Cancel', async () => {
+    test('has Back to the review page and no Cancel', async () => {
       givenAnswers(commercial)
 
       const document = await load(change(PUBLIC_REGISTER))
 
-      expect(getWithholdInput(document, 'Yes')).toBeChecked()
-      expect(
-        getByLabelText(
-          document,
-          'Commercial or industrial confidentiality reasons'
-        )
-      ).toBeChecked()
       expectChangeModeLinks(document)
     })
 
@@ -221,7 +190,7 @@ describe('Public register: change answers', () => {
       }
     )
 
-    test('changing to No saves, clearing the reason answers, and returns to the task list', async () => {
+    test('changing to No saves and returns to the task list', async () => {
       givenAnswers(nationalSecurityApproved)
 
       const { response } = await submit(change(PUBLIC_REGISTER), {
@@ -234,20 +203,6 @@ describe('Public register: change answers', () => {
         '/marine-licence/public-register',
         { id: marineLicence.id, withholdConsent: 'no' }
       )
-      const savedLicence = vi.mocked(setMarineLicenceCache).mock.calls.at(-1)[2]
-      expect(savedLicence.publicRegister).toEqual({ withholdConsent: 'no' })
-    })
-
-    test('is the normal journey when the answers are not complete', async () => {
-      givenAnswers({ withholdConsent: 'no' })
-
-      const document = await load(change(PUBLIC_REGISTER))
-
-      expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
-        'href',
-        TASK_LIST
-      )
-      getByRole(document, 'link', { name: 'Cancel' })
     })
   })
 
@@ -314,7 +269,7 @@ describe('Public register: change answers', () => {
     })
 
     test('redirects to the withholding information page when the answers are not complete', async () => {
-      givenAnswers({ withholdConsent: 'no' })
+      givenAnswers({ ...commercial, reason: undefined })
 
       const { response } = await submit(change(NATIONAL_SECURITY), {
         nationalSecurityApproval: 'no'

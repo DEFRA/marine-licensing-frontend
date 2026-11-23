@@ -1,13 +1,14 @@
 import { WITHHOLD_REASON } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 import {
   getCommonRedirectLink,
+  isFromCheckYourAnswers,
   withCheckYourAnswersQuery
 } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 const CHANGE_ACTION = 'change'
 
-const isWithholdingFor = (publicRegister, withholdReason) =>
+export const isWithholdingFor = (publicRegister, withholdReason) =>
   publicRegister?.withholdConsent === 'yes' &&
   publicRegister.withholdReason === withholdReason
 
@@ -80,11 +81,17 @@ export const isChangeMode = (request, publicRegister) =>
 
 export const withChangeQuery = (request, path) => {
   const query = new URLSearchParams({ action: CHANGE_ACTION })
-  if (request.query?.from) {
+  if (isFromCheckYourAnswers(request)) {
     query.set('from', request.query.from)
   }
   return `${path}?${query}`
 }
+
+export const getPublicRegisterLink = (request) =>
+  withCheckYourAnswersQuery(
+    request,
+    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+  )
 
 export const getCheckAnswersLink = (request) =>
   withCheckYourAnswersQuery(
@@ -109,9 +116,6 @@ export const getReasonPageLinks = (request, publicRegister) =>
   isChangeMode(request, publicRegister)
     ? changeModeLinks(request)
     : {
-        backLink: withCheckYourAnswersQuery(
-          request,
-          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-        ),
+        backLink: getPublicRegisterLink(request),
         cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
       }

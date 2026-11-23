@@ -16,6 +16,7 @@ import {
 import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
   getNationalSecurityAnswers,
+  getPublicRegisterLink,
   getReasonPageLinks,
   isChangeMode,
   isNationalSecurity
@@ -26,14 +27,6 @@ import { WITHHOLD_REASON } from '#src/server/common/validation/marine-licence-pu
 export const PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE =
   'marine-licence/public-register/national-security/index'
 
-const redirectToPublicRegister = (request, h) =>
-  h.redirect(
-    withCheckYourAnswersQuery(
-      request,
-      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-    )
-  )
-
 const canShowPage = (request, publicRegister) =>
   isNationalSecurity(publicRegister) || isChangeMode(request, publicRegister)
 
@@ -42,7 +35,7 @@ export const publicRegisterNationalSecurityController = {
     const marineLicence = getMarineLicenceCache(request)
 
     if (!canShowPage(request, marineLicence.publicRegister)) {
-      return redirectToPublicRegister(request, h)
+      return h.redirect(getPublicRegisterLink(request))
     }
 
     return h.view(PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE, {
@@ -82,7 +75,7 @@ export const publicRegisterNationalSecuritySubmitController = {
     const marineLicence = getMarineLicenceCache(request)
 
     if (!canShowPage(request, marineLicence.publicRegister)) {
-      return redirectToPublicRegister(request, h)
+      return h.redirect(getPublicRegisterLink(request))
     }
 
     try {

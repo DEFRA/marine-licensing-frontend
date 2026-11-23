@@ -3,6 +3,7 @@ import {
   getPolicySection,
   getPolicySectionSlug,
   groupPoliciesBySection,
+  outstandingPoliciesText,
   UNCATEGORISED_SECTION
 } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
 import {
@@ -71,6 +72,22 @@ describe('marine plan policy sections', () => {
     })
   })
 
+  describe('outstandingPoliciesText', () => {
+    test('returns null sections when there are no policies', () => {
+      expect(outstandingPoliciesText([])).toBeNull()
+    })
+
+    test('returns correct text sections when there are outstanding policies', () => {
+      expect(outstandingPoliciesText(['S-CC-1'])).toBe(
+        "You still need to add a document for S-CC-1, or link one you've already uploaded."
+      )
+
+      expect(outstandingPoliciesText(['S-CC-1', 'S-CC-2', 'S-CC-3'])).toBe(
+        "You still need to add a document for S-CC-1, S-CC-2 and S-CC-3, or link one you've already uploaded."
+      )
+    })
+  })
+
   describe('addSupportingDocumentsSection', () => {
     test('output supporting documents section as in progress when documents required and some uploaded', () => {
       expect(
@@ -83,7 +100,7 @@ describe('marine plan policy sections', () => {
         items: [
           {
             hint: {
-              text: 'Still needed for S-CC-1'
+              text: 'Still needed for S-CC-2'
             },
             href: '/marine-licence/marine-plan-policy/supporting-documents-review',
             status: {
@@ -113,8 +130,8 @@ describe('marine plan policy sections', () => {
 
     test('shows "Not yet started" when documents are required but none uploaded', () => {
       const [item] = addSupportingDocumentsSection({
-        ...mockIncompleteMarinePlanPolicySupportingDocuments,
-        documents: []
+        documentsOutstanding: ['S-CC-1'],
+        status: 'INCOMPLETE'
       }).items
 
       expect(item.status.tag).toEqual({

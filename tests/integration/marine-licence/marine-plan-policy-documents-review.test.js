@@ -11,7 +11,8 @@ import {
   mockMarineLicenceApplication,
   mockMarinePlanPolicies,
   mockMarinePlanPolicyDocument,
-  mockMarinePlanPolicySupportingDocuments
+  mockMarinePlanPolicySupportingDocuments,
+  mockIncompleteMarinePlanPolicySupportingDocuments
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 const documentPolicyUrl =
@@ -43,7 +44,7 @@ describe('Marine plan policy documents review page', () => {
       ...mockMarineLicenceApplication,
       marinePlanPolicySupportingDocuments: {
         ...mockMarinePlanPolicySupportingDocuments,
-        documents: [
+        linkedDocuments: [
           {
             ...mockMarinePlanPolicyDocument,
             documentType: 'ecological-assessment',
@@ -102,6 +103,9 @@ describe('Marine plan policy documents review page', () => {
     expect(document.querySelector('.govuk-caption-l')).toHaveTextContent(
       mockMarineLicenceApplication.projectName
     )
+
+    expect(document.querySelector('.govuk-inset-text')).not.toBeInTheDocument()
+
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
       documentPolicyUrl
@@ -116,6 +120,26 @@ describe('Marine plan policy documents review page', () => {
     expect(getByRole(document, 'button', { name: 'Continue' })).toHaveAttribute(
       'href',
       marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+    )
+  })
+
+  test('shows the expected page content when documents outstanding', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      marinePlanPolicySupportingDocuments:
+        mockIncompleteMarinePlanPolicySupportingDocuments
+    })
+
+    const document = await loadDocumentsReviewPage({
+      referer: `http://localhost${documentPolicyUrl}`
+    })
+
+    expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
+      'Supporting documents'
+    )
+
+    expect(document.querySelector('.govuk-inset-text')).toHaveTextContent(
+      "You still need to add a document for S-CC-2, or link one you've already uploaded."
     )
   })
 

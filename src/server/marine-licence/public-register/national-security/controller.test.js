@@ -3,14 +3,11 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   publicRegisterNationalSecuritySubmitController,
   PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE
-} from '#src/server/marine-licence/public-register-national-security/controller.js'
+} from '#src/server/marine-licence/public-register/national-security/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 
 vi.mock('#/src/server/common/helpers/marine-licence/session-cache/utils.js')
-
-const pageUrl =
-  marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
 
 describe('#publicRegisterNationalSecurity', () => {
   const mockLicence = {
@@ -37,7 +34,7 @@ describe('#publicRegisterNationalSecurity', () => {
   })
 
   describe('#publicRegisterNationalSecuritySubmitController', () => {
-    test('keeps the check your answers query on the redirect', async () => {
+    test('redirects to the check answers page, keeping the check your answers query', async () => {
       const h = createH()
 
       await publicRegisterNationalSecuritySubmitController.handler(
@@ -49,7 +46,7 @@ describe('#publicRegisterNationalSecurity', () => {
       )
 
       expect(h.redirect).toHaveBeenCalledWith(
-        `${pageUrl}?from=check-your-answers`
+        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS}?from=check-your-answers`
       )
     })
 

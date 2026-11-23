@@ -33,6 +33,11 @@ export const policyCodeList = new Intl.ListFormat('en-GB', {
   type: 'conjunction'
 })
 
+export const outstandingPoliciesText = (documentsOutstanding) =>
+  documentsOutstanding?.length
+    ? `You still need to add a document for ${policyCodeList.format(documentsOutstanding)}, or link one you've already uploaded.`
+    : null
+
 const toKnownStatus = (status) =>
   Object.hasOwn(MARINE_PLAN_POLICY_STATUS, status) ? status : 'INCOMPLETE'
 
@@ -55,7 +60,7 @@ const getSupportingDocumentsStatusItem = (status) =>
       }
 
 export const addSupportingDocumentsSection = ({
-  documents,
+  linkedDocuments,
   documentsOutstanding,
   status
 }) => ({
@@ -72,11 +77,11 @@ export const addSupportingDocumentsSection = ({
           ? `Still needed for ${policyCodeList.format(documentsOutstanding)}`
           : ''
       },
-      href: documents?.length
+      href: linkedDocuments?.length
         ? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
         : marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
       status: getSupportingDocumentsStatusItem(
-        getSupportingDocumentsStatus(status, documents)
+        getSupportingDocumentsStatus(status, linkedDocuments)
       )
     }
   ]

@@ -36,13 +36,18 @@ const setStatus = (task) => {
   }
 }
 
-export const transformSharingTaskList = (taskList) => [
+const getPublicRegisterHref = (status, publicRegister) =>
+  status === 'COMPLETED' && publicRegister?.withholdConsent === 'yes'
+    ? marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+    : marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+
+export const transformSharingTaskList = (taskList, publicRegister) => [
   {
     title: {
       text: 'Information published on the public register',
       classes: taskClasses
     },
-    href: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+    href: getPublicRegisterHref(taskList.publicRegister, publicRegister),
     status: setStatus(taskList.publicRegister)
   }
 ]

@@ -51,5 +51,7 @@ describe('Delete site', () => {
       name: 'Cancel'
     })
     expect(cancelLink).toHaveAttribute('href', routes.REVIEW_SITE_DETAILS)
+
+    expect(document.body).not.toHaveTextContent('Marine plan policies')
   })
 })

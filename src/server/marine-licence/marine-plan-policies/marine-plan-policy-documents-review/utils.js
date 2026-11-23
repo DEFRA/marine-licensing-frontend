@@ -45,9 +45,9 @@ export const createDocumentCards = (
   marinePlanPolicySupportingDocuments,
   marinePlanPolicies
 ) => {
-  const { documents = [] } = marinePlanPolicySupportingDocuments
+  const { linkedDocuments = [] } = marinePlanPolicySupportingDocuments
 
-  const cards = documents.map((document) => ({
+  const cards = linkedDocuments.map((document) => ({
     title: document.uploadedFile.filename,
     actions: {
       items: [

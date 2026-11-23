@@ -209,7 +209,7 @@ describe('Public register: national security', () => {
     expect(authenticatedPatchRequest).not.toHaveBeenCalled()
   })
 
-  test('saves 1000 characters, reloads the page and shows the saved values', async () => {
+  test('saves 1000 characters, goes to check answers and shows the saved values on return', async () => {
     const reason = 'a'.repeat(1000)
     const { response } = await submitNationalSecurityForm({
       nationalSecurityApproval: 'yes',
@@ -217,7 +217,9 @@ describe('Public register: national security', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(PAGE_URL)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+    )
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
       '/marine-licence/public-register-national-security',
@@ -260,7 +262,9 @@ describe('Public register: national security', () => {
     })
 
     expect(response.statusCode).toBe(statusCodes.redirect)
-    expect(response.headers.location).toBe(PAGE_URL)
+    expect(response.headers.location).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+    )
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
       expect.any(Object),
       '/marine-licence/public-register-national-security',

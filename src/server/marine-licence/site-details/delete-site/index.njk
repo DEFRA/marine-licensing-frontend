@@ -24,6 +24,8 @@
         text: 'Site ' + siteNumber + (': ' + siteName if siteName else '')
       }) }}
 
+      <p class="govuk-body">If you've started the Marine plan policies, deleting this site may change which policies are presented.</p>
+
       <form method="POST">
         <input type="hidden" name="csrfToken" value="{{ csrfToken }}">
         <input type="hidden" name="siteIndex" value="{{ siteIndex }}">

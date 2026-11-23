@@ -4,6 +4,7 @@ import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { getValidatedReferrerPath } from '#src/server/common/helpers/referrer-validation.js'
 import { createDocumentCards } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-documents-review/utils.js'
+import { outstandingPoliciesText } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
 
 export const MARINE_PLAN_POLICY_DOCUMENTS_REVIEW_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/marine-plan-policy-documents-review/index'
@@ -26,7 +27,7 @@ export const marinePlanPolicyDocumentsReviewController = {
       marinePlanPolicies
     } = await marineLicenceService.getMarineLicenceById(cached.id)
 
-    if (!marinePlanPolicySupportingDocuments?.documents?.length) {
+    if (!marinePlanPolicySupportingDocuments?.linkedDocuments?.length) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
     }
 
@@ -45,7 +46,10 @@ export const marinePlanPolicyDocumentsReviewController = {
       continueLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
       documents,
       newUploadLink:
-        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
+      outstandingPoliciesText: outstandingPoliciesText(
+        marinePlanPolicySupportingDocuments.documentsOutstanding
+      )
     })
   }
 }

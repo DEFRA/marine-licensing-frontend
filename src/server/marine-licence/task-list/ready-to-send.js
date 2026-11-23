@@ -16,12 +16,13 @@ export const transformTaskLists = (
     marinePlanPolicyJob,
     marinePlanPoliciesCount,
     marinePlanPolicyResponseCount,
-    siteDetailsDataComplete
+    siteDetailsDataComplete,
+    publicRegister
   }
 ) => ({
   feeEstimate: transformFeeEstimateTaskList(taskList),
   otherPermissions: transformOtherPermissionsTaskList(taskList, isCitizen),
-  sharing: transformSharingTaskList(taskList),
+  sharing: transformSharingTaskList(taskList, publicRegister),
   projectDetails: transformProjectDetailsTaskList(taskList),
   siteDetails: transformSiteDetailsTaskList(taskList),
   waterFrameworkDirective: transformWaterFrameworkDirectiveTaskList(

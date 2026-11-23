@@ -8,54 +8,60 @@ import {
 } from '#src/server/common/helpers/errors.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { createFailAction } from '#src/server/common/helpers/createFailAction.js'
-import { marineLicencePublicRegisterCommercialConfidentialitySchema } from '#src/server/common/validation/marine-licence-public-register-commercial-confidentiality/schema.js'
+import { marineLicencePublicRegisterNationalSecuritySchema } from '#src/server/common/validation/marine-licence-public-register-national-security/schema.js'
 import {
-  marineLicencePublicRegisterCommercialConfidentialityErrorMessages,
-  marineLicencePublicRegisterCommercialConfidentialitySettings
-} from '#src/server/common/validation/marine-licence-public-register-commercial-confidentiality/constants.js'
+  marineLicencePublicRegisterNationalSecurityErrorMessages,
+  marineLicencePublicRegisterNationalSecuritySettings
+} from '#src/server/common/validation/marine-licence-public-register-national-security/constants.js'
 import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
+  getNationalSecurityAnswers,
   getReasonPageLinks,
-  isCommercialConfidentiality
-} from '#src/server/common/helpers/marine-licence/public-register.js'
+  isNationalSecurity
+} from '#src/server/marine-licence/public-register/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
-export const PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE =
-  'marine-licence/public-register-commercial-confidentiality/index'
+export const PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE =
+  'marine-licence/public-register/national-security/index'
 
 const redirectToPublicRegister = (request, h) =>
   h.redirect(getReasonPageLinks(request).backLink)
 
-export const publicRegisterCommercialConfidentialityController = {
+const withAnswers = (publicRegister, answers) => ({
+  withholdConsent: publicRegister?.withholdConsent,
+  withholdReason: publicRegister?.withholdReason,
+  ...answers
+})
+
+export const publicRegisterNationalSecurityController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
-    if (!isCommercialConfidentiality(marineLicence.publicRegister)) {
+    if (!isNationalSecurity(marineLicence.publicRegister)) {
       return redirectToPublicRegister(request, h)
     }
 
-    return h.view(PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE, {
-      ...marineLicencePublicRegisterCommercialConfidentialitySettings,
+    return h.view(PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE, {
+      ...marineLicencePublicRegisterNationalSecuritySettings,
       projectName: marineLicence.projectName,
-      payload: { reason: marineLicence.publicRegister.reason },
+      payload: getNationalSecurityAnswers(marineLicence.publicRegister),
       ...getReasonPageLinks(request)
     })
   }
 }
 
-export const publicRegisterCommercialConfidentialitySubmitController = {
+export const publicRegisterNationalSecuritySubmitController = {
   options: {
     validate: {
-      payload: marineLicencePublicRegisterCommercialConfidentialitySchema,
+      payload: marineLicencePublicRegisterNationalSecuritySchema,
       failAction: (request, h, err) => {
         const { projectName } = getMarineLicenceCache(request)
         const { backLink, cancelLink } = getReasonPageLinks(request)
         return createFailAction({
-          viewRoute: PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE,
-          settings:
-            marineLicencePublicRegisterCommercialConfidentialitySettings,
+          viewRoute: PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE,
+          settings: marineLicencePublicRegisterNationalSecuritySettings,
           errorMessages:
-            marineLicencePublicRegisterCommercialConfidentialityErrorMessages,
+            marineLicencePublicRegisterNationalSecurityErrorMessages,
           projectName,
           backLink,
           payload: request.payload,
@@ -68,21 +74,23 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
 
-    if (!isCommercialConfidentiality(marineLicence.publicRegister)) {
+    if (!isNationalSecurity(marineLicence.publicRegister)) {
       return redirectToPublicRegister(request, h)
     }
 
     try {
-      const { withholdConsent, withholdReason } = marineLicence.publicRegister
-      const publicRegister = {
-        withholdConsent,
-        withholdReason,
-        reason: payload.reason
+      const answers = {
+        nationalSecurityApproval: payload.nationalSecurityApproval,
+        ...(payload.nationalSecurityApproval === 'yes' && {
+          reason: payload.reason
+        })
       }
+
+      const publicRegister = withAnswers(marineLicence.publicRegister, answers)
 
       await authenticatedPatchRequest(
         request,
-        '/marine-licence/public-register-commercial-confidentiality',
+        '/marine-licence/public-register-national-security',
         { ...publicRegister, id: marineLicence.id }
       )
 
@@ -94,7 +102,7 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
       return h.redirect(
         withCheckYourAnswersQuery(
           request,
-          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
+          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
         )
       )
     } catch (e) {
@@ -106,11 +114,11 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
 
       const errorSummary = mapErrorsForDisplay(
         details,
-        marineLicencePublicRegisterCommercialConfidentialityErrorMessages
+        marineLicencePublicRegisterNationalSecurityErrorMessages
       )
 
-      return h.view(PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE, {
-        ...marineLicencePublicRegisterCommercialConfidentialitySettings,
+      return h.view(PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE, {
+        ...marineLicencePublicRegisterNationalSecuritySettings,
         payload,
         projectName: marineLicence.projectName,
         ...getReasonPageLinks(request),

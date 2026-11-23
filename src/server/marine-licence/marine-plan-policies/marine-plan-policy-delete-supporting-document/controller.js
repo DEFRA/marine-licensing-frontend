@@ -9,7 +9,7 @@ import { policyCodeList } from '#src/server/common/helpers/marine-licence/marine
 import { marinePlanPolicyDocumentPolicyParamsSchema } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-policy/schema.js'
 
 export const MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT_VIEW_ROUTE =
-  'marine-licence/marine-plan-policies/delete-supporting-document/index'
+  'marine-licence/marine-plan-policies/marine-plan-policy-delete-supporting-document/index'
 
 const PAGE_TITLE = 'Are you sure you want to delete this document?'
 
@@ -17,7 +17,7 @@ const reviewUrl =
   marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
 
 const hasOtherDocuments = (marineLicence, documentId) =>
-  marineLicence.marinePlanPolicySupportingDocuments.documents.some(
+  marineLicence.marinePlanPolicySupportingDocuments.linkedDocuments.some(
     (document) => document.documentId !== documentId
   )
 

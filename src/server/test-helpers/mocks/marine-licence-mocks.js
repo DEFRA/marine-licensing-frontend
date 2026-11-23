@@ -123,6 +123,12 @@ export const mockMarinePlanPolicyDocument = {
   }
 }
 
+export const mockLinkedMarinePlanPolicyDocument = {
+  ...mockMarinePlanPolicyDocument,
+  documentType: 'ecological-assessment',
+  policyLinks: [{ policyCode: 'S-CC-1', location: 'Page 1' }]
+}
+
 export const mockMarinePlanPolicySupportingDocuments = {
   linkedDocuments: [mockMarinePlanPolicyDocument],
   unlinkedDocuments: [],

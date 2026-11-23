@@ -52,8 +52,39 @@ describe('#marinePlanPolicyController (GET)', () => {
       backLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
       marinePlanPolicyGuidanceLink:
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
-      payload: { policyConsideration: '', documentationCheck: false }
+      payload: { policyConsideration: '', documentationCheck: false },
+      linkedPolicyFormattedList: []
     })
+  })
+
+  test('lists the supporting documents linked to the policy', async () => {
+    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+      getMarineLicenceById: vi.fn().mockResolvedValue({
+        ...licenceData,
+        marinePlanPolicySupportingDocuments: {
+          linkedDocuments: [
+            {
+              uploadedFile: { filename: 'WFD.odt' },
+              policyLinks: [{ policyCode: 'SW-MPA-1', location: 'Page 1' }]
+            },
+            {
+              uploadedFile: { filename: 'Other.pdf' },
+              policyLinks: [{ policyCode: 'SW-BIO-1', location: 'Page 2' }]
+            }
+          ]
+        }
+      })
+    })
+    const h = { view: vi.fn() }
+    await marinePlanPolicyController.handler(
+      { params: { policyCode: 'SW-MPA-1' } },
+      h
+    )
+
+    expect(h.view).toHaveBeenCalledWith(
+      MARINE_PLAN_POLICY_VIEW_ROUTE,
+      expect.objectContaining({ linkedPolicyFormattedList: ['WFD.odt - Page 1'] })
+    )
   })
 
   test('prefills the textarea from a previously saved response', async () => {

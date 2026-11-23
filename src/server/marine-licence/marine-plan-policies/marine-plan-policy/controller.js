@@ -18,6 +18,10 @@ import {
   getPolicySectionSlug
 } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
 import { formatPolicyTitle } from '#src/server/common/helpers/marine-licence/marine-plan-policy-title.js'
+import {
+  getDocumentsForPolicy,
+  getFormattedLinkedPolicies
+} from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
 
 export const MARINE_PLAN_POLICY_VIEW_ROUTE =
   'marine-licence/marine-plan-policies/marine-plan-policy/index'
@@ -53,8 +57,11 @@ const loadPolicyContext = async (request) => {
 
   const { policyCode } = request.params
   const marineLicenceService = getMarineLicenceService(request)
+  const marineLicenceData = await marineLicenceService.getMarineLicenceById(
+    marineLicence.id
+  )
   const { projectName, marinePlanPolicies, marinePlanPolicyResponses } =
-    await marineLicenceService.getMarineLicenceById(marineLicence.id)
+    marineLicenceData
 
   const policy = (marinePlanPolicies ?? []).find(
     (item) => item.policyCode === policyCode
@@ -64,6 +71,15 @@ const loadPolicyContext = async (request) => {
     throw Boom.notFound('Marine plan policy not found')
   }
 
+  const associatedDocuments = getDocumentsForPolicy(
+    marineLicenceData,
+    policyCode
+  )
+  const linkedPolicyFormattedList = getFormattedLinkedPolicies(
+    associatedDocuments,
+    policyCode
+  )
+
   return {
     id: marineLicence.id,
     policyCode,
@@ -72,7 +88,8 @@ const loadPolicyContext = async (request) => {
     existingResponse: marinePlanPolicyResponses?.[policyCode]?.response ?? '',
     existingRequiresDocumentation:
       marinePlanPolicyResponses?.[policyCode]?.requiresDocumentation === true,
-    returnTo: request.yar?.get(RETURN_TO_CACHE_KEY)
+    returnTo: request.yar?.get(RETURN_TO_CACHE_KEY),
+    linkedPolicyFormattedList
   }
 }
 
@@ -81,7 +98,8 @@ const buildRenderModel = ({
   projectName,
   policy,
   payload,
-  returnTo
+  returnTo,
+  linkedPolicyFormattedList
 }) => {
   const title = formatPolicyTitle(policy)
   return {
@@ -93,7 +111,8 @@ const buildRenderModel = ({
     backLink: getPolicyReturnLink(returnTo, policy),
     marinePlanPolicyGuidanceLink:
       marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
-    payload
+    payload,
+    linkedPolicyFormattedList
   }
 }
 
@@ -141,6 +160,7 @@ export const marinePlanPolicySubmitController = {
       }),
       failAction: async (request, h, err) => {
         const context = await loadPolicyContext(request)
+
         const model = buildRenderModel({
           ...context,
           payload: request.payload

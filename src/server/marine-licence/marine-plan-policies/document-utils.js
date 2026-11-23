@@ -47,3 +47,18 @@ export const loadMarinePlanPolicyDocument = async (request) => {
 
 export const getChangeModeRedirectUrl = (request, isLinked) =>
   isLinked && !isChangeMode(request) ? `${request.path}?action=change` : null
+
+export const getFormattedLinkedPolicies = (documents, policyCode) =>
+  documents.map((document) => {
+    const { location } = document.policyLinks.find(
+      (link) => link.policyCode === policyCode
+    )
+    return `${document.uploadedFile.filename} - ${location}`
+  })
+
+export const getDocumentsForPolicy = (marineLicence, policyCode) =>
+  (
+    marineLicence?.marinePlanPolicySupportingDocuments?.linkedDocuments ?? []
+  ).filter(({ policyLinks = [] }) =>
+    policyLinks.some((link) => link.policyCode === policyCode)
+  )

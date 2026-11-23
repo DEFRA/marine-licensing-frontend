@@ -41,7 +41,8 @@ describe('getCheckAnswersSummary', () => {
       {
         href: `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY}?action=change`,
         text: 'Change',
-        visuallyHiddenText: 'what you want withheld and why'
+        visuallyHiddenText: 'what you want withheld and why',
+        classes: 'govuk-link--no-visited-state'
       }
     ])
   })

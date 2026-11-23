@@ -12,7 +12,8 @@ const changeAction = (request, path, visuallyHiddenText) => ({
     {
       href: withChangeQuery(request, path),
       text: 'Change',
-      visuallyHiddenText
+      visuallyHiddenText,
+      classes: 'govuk-link--no-visited-state'
     }
   ]
 })

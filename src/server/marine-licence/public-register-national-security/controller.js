@@ -102,7 +102,7 @@ export const publicRegisterNationalSecuritySubmitController = {
       return h.redirect(
         withCheckYourAnswersQuery(
           request,
-          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
+          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
         )
       )
     } catch (e) {

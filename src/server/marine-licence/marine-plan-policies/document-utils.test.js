@@ -4,6 +4,8 @@ import * as marineLicenceService from '#src/services/marine-licence-service/inde
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   getChangeModeRedirectUrl,
+  getDocumentsForPolicy,
+  getFormattedLinkedPolicies,
   getReturnLink,
   isChangeMode,
   loadMarinePlanPolicyDocument
@@ -158,4 +160,63 @@ describe('#getReturnLink', () => {
       )
     }
   )
+})
+
+describe('#getDocumentsForPolicy', () => {
+  const docA = {
+    documentId: 'a',
+    policyLinks: [
+      { policyCode: 'E-MPA-1', location: 'pages 12 to 15' },
+      { policyCode: 'S-CC-1', location: 'Page 1' }
+    ]
+  }
+  const docB = {
+    documentId: 'b',
+    policyLinks: [{ policyCode: 'S-CC-1', location: 'Page 2' }]
+  }
+  const docC = { documentId: 'c' }
+  const marineLicence = {
+    marinePlanPolicySupportingDocuments: {
+      linkedDocuments: [docA, docB, docC]
+    }
+  }
+
+  it('returns linked documents that reference the policy', () => {
+    expect(getDocumentsForPolicy(marineLicence, 'S-CC-1')).toEqual([docA, docB])
+    expect(getDocumentsForPolicy(marineLicence, 'E-MPA-1')).toEqual([docA])
+  })
+
+  it('returns an empty array when no documents reference the policy', () => {
+    expect(getDocumentsForPolicy(marineLicence, 'X-1')).toEqual([])
+  })
+
+  it.each([undefined, {}, { marinePlanPolicySupportingDocuments: {} }])(
+    'returns an empty array when there are no linked documents (%o)',
+    (licence) => {
+      expect(getDocumentsForPolicy(licence, 'S-CC-1')).toEqual([])
+    }
+  )
+})
+
+describe('#getFormattedLinkedPolicies', () => {
+  it('formats each document as "filename - location" for the given policy', () => {
+    const documents = [
+      {
+        uploadedFile: { filename: 'WFD.odt' },
+        policyLinks: [
+          { policyCode: 'S-CC-1', location: 'Page 1' },
+          { policyCode: 'E-MPA-1', location: 'pages 12 to 15' }
+        ]
+      },
+      {
+        uploadedFile: { filename: 'Report.pdf' },
+        policyLinks: [{ policyCode: 'E-MPA-1', location: 'Appendix A' }]
+      }
+    ]
+
+    expect(getFormattedLinkedPolicies(documents, 'E-MPA-1')).toEqual([
+      'WFD.odt - pages 12 to 15',
+      'Report.pdf - Appendix A'
+    ])
+  })
 })

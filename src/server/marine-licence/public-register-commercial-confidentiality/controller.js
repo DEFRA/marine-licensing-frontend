@@ -94,7 +94,7 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
       return h.redirect(
         withCheckYourAnswersQuery(
           request,
-          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
+          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
         )
       )
     } catch (e) {

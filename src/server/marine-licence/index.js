@@ -8,6 +8,7 @@ import { specialLegalPowersRoutes } from '#src/server/marine-licence/special-leg
 import { publicRegisterRoutes } from '#src/server/marine-licence/public-register/index.js'
 import { publicRegisterNationalSecurityRoutes } from '#src/server/marine-licence/public-register-national-security/index.js'
 import { publicRegisterCommercialConfidentialityRoutes } from '#src/server/marine-licence/public-register-commercial-confidentiality/index.js'
+import { publicRegisterCheckAnswersRoutes } from '#src/server/marine-licence/public-register-check-answers/index.js'
 import { publicConsultationRoutes } from '#src/server/marine-licence/public-consultation/index.js'
 import { otherAuthoritiesRoutes } from '#src/server/marine-licence/other-authorities/index.js'
 import { harbourAuthorityRoutes } from '#src/server/marine-licence/harbour-authority/index.js'
@@ -48,6 +49,7 @@ export const marineLicence = {
         ...publicRegisterRoutes,
         ...publicRegisterNationalSecurityRoutes,
         ...publicRegisterCommercialConfidentialityRoutes,
+        ...publicRegisterCheckAnswersRoutes,
         ...publicConsultationRoutes,
         ...otherAuthoritiesRoutes,
         ...harbourAuthorityRoutes,

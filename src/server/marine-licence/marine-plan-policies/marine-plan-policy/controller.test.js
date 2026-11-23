@@ -83,7 +83,9 @@ describe('#marinePlanPolicyController (GET)', () => {
 
     expect(h.view).toHaveBeenCalledWith(
       MARINE_PLAN_POLICY_VIEW_ROUTE,
-      expect.objectContaining({ linkedPolicyFormattedList: ['WFD.odt - Page 1'] })
+      expect.objectContaining({
+        linkedPolicyFormattedList: ['WFD.odt - Page 1']
+      })
     )
   })
 

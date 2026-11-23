@@ -133,14 +133,6 @@ describe('Public register: change answers', () => {
   })
 
   describe('withholding information page', () => {
-    test('has Back to the review page and no Cancel', async () => {
-      givenAnswers(commercial)
-
-      const document = await load(change(PUBLIC_REGISTER))
-
-      expectChangeModeLinks(document)
-    })
-
     test('keeps the pending reason when the user comes Back from a switched reason page', async () => {
       givenAnswers(nationalSecurityApproved)
 

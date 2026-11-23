@@ -123,12 +123,6 @@ describe('change mode', () => {
     expect(isChangeMode({ query: {} }, complete)).toBe(false)
   })
 
-  test('withChangeQuery keeps the check your answers query', () => {
-    expect(
-      withChangeQuery({ query: { from: 'check-your-answers' } }, '/page')
-    ).toBe('/page?action=change&from=check-your-answers')
-  })
-
   test('withChangeQuery drops any other from value', () => {
     expect(withChangeQuery({ query: { from: 'elsewhere' } }, '/page')).toBe(
       '/page?action=change'

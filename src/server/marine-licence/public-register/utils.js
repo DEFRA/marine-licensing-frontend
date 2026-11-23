@@ -90,14 +90,14 @@ export const withChangeQuery = (request, path, withholdReason) => {
   return `${path}?${query}`
 }
 
-const isWithholdReason = (value) =>
+const isKnownWithholdReason = (value) =>
   Object.values(WITHHOLD_REASON).includes(value)
 
 export const getPublicRegisterAnswers = (request, publicRegister) => {
   const pendingReason = request.query?.withholdReason
   if (
     isChangeMode(request, publicRegister) &&
-    isWithholdReason(pendingReason)
+    isKnownWithholdReason(pendingReason)
   ) {
     return { withholdConsent: 'yes', withholdReason: pendingReason }
   }
@@ -124,30 +124,19 @@ export const getPublicRegisterLinks = (request, publicRegister) => {
   return { backLink, cancelLink: backLink }
 }
 
-const getChangeModeReasonPageBackLink = (
-  request,
-  publicRegister,
-  withholdReason
-) =>
-  isWithholdingFor(publicRegister, withholdReason)
+export const getReasonPageLinks = (request, publicRegister, withholdReason) => {
+  if (!isChangeMode(request, publicRegister)) {
+    return {
+      backLink: getPublicRegisterLink(request),
+      cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    }
+  }
+  const backLink = isWithholdingFor(publicRegister, withholdReason)
     ? getCheckAnswersLink(request)
     : withChangeQuery(
         request,
         marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
         withholdReason
       )
-
-export const getReasonPageLinks = (request, publicRegister, withholdReason) =>
-  isChangeMode(request, publicRegister)
-    ? {
-        backLink: getChangeModeReasonPageBackLink(
-          request,
-          publicRegister,
-          withholdReason
-        ),
-        cancelLink: null
-      }
-    : {
-        backLink: getPublicRegisterLink(request),
-        cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
-      }
+  return { backLink, cancelLink: null }
+}

@@ -3,6 +3,7 @@ import {
   getPolicySection,
   getPolicySectionSlug,
   groupPoliciesBySection,
+  outstandingPoliciesText,
   UNCATEGORISED_SECTION
 } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
 import {
@@ -68,6 +69,22 @@ describe('marine plan policy sections', () => {
         { heading: 'Social', slug: 'social', codes: ['S-TR-1'] },
         { heading: 'Other', slug: 'other', codes: ['S-AGG-1'] }
       ])
+    })
+  })
+
+  describe('outstandingPoliciesText', () => {
+    test('returns null sections when there are no policies', () => {
+      expect(outstandingPoliciesText([])).toBeNull()
+    })
+
+    test('returns correct text sections when there are outstanding policies', () => {
+      expect(outstandingPoliciesText(['S-CC-1'])).toBe(
+        "You still need to add a document for S-CC-1, or link one you've already uploaded."
+      )
+
+      expect(outstandingPoliciesText(['S-CC-1', 'S-CC-2', 'S-CC-3'])).toBe(
+        "You still need to add a document for S-CC-1, S-CC-2 and S-CC-3, or link one you've already uploaded."
+      )
     })
   })
 

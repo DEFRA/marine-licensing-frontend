@@ -33,6 +33,11 @@ export const policyCodeList = new Intl.ListFormat('en-GB', {
   type: 'conjunction'
 })
 
+export const outstandingPoliciesText = (documentsOutstanding) =>
+  documentsOutstanding?.length
+    ? `You still need to add a document for ${policyCodeList.format(documentsOutstanding)}, or link one you've already uploaded.`
+    : null
+
 const toKnownStatus = (status) =>
   Object.hasOwn(MARINE_PLAN_POLICY_STATUS, status) ? status : 'INCOMPLETE'
 

@@ -101,7 +101,7 @@ export const getCheckAnswersLink = (request) =>
 
 const changeModeLinks = (request) => ({
   backLink: getCheckAnswersLink(request),
-  cancelLink: undefined
+  cancelLink: null
 })
 
 export const getPublicRegisterLinks = (request, publicRegister) => {

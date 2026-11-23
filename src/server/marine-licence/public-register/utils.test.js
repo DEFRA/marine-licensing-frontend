@@ -139,7 +139,7 @@ describe('change mode', () => {
     (getLinks) => {
       expect(getLinks(changeRequest, complete)).toEqual({
         backLink: checkAnswers,
-        cancelLink: undefined
+        cancelLink: null
       })
     }
   )

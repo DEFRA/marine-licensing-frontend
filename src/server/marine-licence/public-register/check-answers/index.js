@@ -1,7 +1,7 @@
 import {
   publicRegisterCheckAnswersController,
   publicRegisterCheckAnswersSubmitController
-} from '#src/server/marine-licence/public-register-check-answers/controller.js'
+} from '#src/server/marine-licence/public-register/check-answers/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const publicRegisterCheckAnswersRoutes = [

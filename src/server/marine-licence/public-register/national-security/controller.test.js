@@ -3,7 +3,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   publicRegisterNationalSecuritySubmitController,
   PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE
-} from '#src/server/marine-licence/public-register-national-security/controller.js'
+} from '#src/server/marine-licence/public-register/national-security/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 

@@ -1,7 +1,7 @@
 import {
   publicRegisterCommercialConfidentialityController,
   publicRegisterCommercialConfidentialitySubmitController
-} from '#src/server/marine-licence/public-register-commercial-confidentiality/controller.js'
+} from '#src/server/marine-licence/public-register/commercial-confidentiality/controller.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
 export const publicRegisterCommercialConfidentialityRoutes = [

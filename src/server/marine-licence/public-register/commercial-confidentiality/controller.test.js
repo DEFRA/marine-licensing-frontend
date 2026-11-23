@@ -3,7 +3,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import {
   publicRegisterCommercialConfidentialitySubmitController,
   PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE
-} from '#src/server/marine-licence/public-register-commercial-confidentiality/controller.js'
+} from '#src/server/marine-licence/public-register/commercial-confidentiality/controller.js'
 import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import * as authRequests from '#src/server/common/helpers/authenticated-requests.js'
 

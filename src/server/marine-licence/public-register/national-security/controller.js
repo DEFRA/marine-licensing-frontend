@@ -42,7 +42,11 @@ export const publicRegisterNationalSecurityController = {
       ...marineLicencePublicRegisterNationalSecuritySettings,
       projectName: marineLicence.projectName,
       payload: getNationalSecurityAnswers(marineLicence.publicRegister),
-      ...getReasonPageLinks(request, marineLicence.publicRegister)
+      ...getReasonPageLinks(
+        request,
+        marineLicence.publicRegister,
+        WITHHOLD_REASON.NATIONAL_SECURITY
+      )
     })
   }
 }
@@ -55,7 +59,8 @@ export const publicRegisterNationalSecuritySubmitController = {
         const { projectName, publicRegister } = getMarineLicenceCache(request)
         const { backLink, cancelLink } = getReasonPageLinks(
           request,
-          publicRegister
+          publicRegister,
+          WITHHOLD_REASON.NATIONAL_SECURITY
         )
         return createFailAction({
           viewRoute: PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE,
@@ -125,7 +130,11 @@ export const publicRegisterNationalSecuritySubmitController = {
         ...marineLicencePublicRegisterNationalSecuritySettings,
         payload,
         projectName: marineLicence.projectName,
-        ...getReasonPageLinks(request, marineLicence.publicRegister),
+        ...getReasonPageLinks(
+          request,
+          marineLicence.publicRegister,
+          WITHHOLD_REASON.NATIONAL_SECURITY
+        ),
         errors: errorDescriptionByFieldName(errorSummary),
         errorSummary
       })

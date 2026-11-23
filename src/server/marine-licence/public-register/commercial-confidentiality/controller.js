@@ -45,7 +45,11 @@ export const publicRegisterCommercialConfidentialityController = {
       payload: getCommercialConfidentialityAnswers(
         marineLicence.publicRegister
       ),
-      ...getReasonPageLinks(request, marineLicence.publicRegister)
+      ...getReasonPageLinks(
+        request,
+        marineLicence.publicRegister,
+        WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY
+      )
     })
   }
 }
@@ -58,7 +62,8 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
         const { projectName, publicRegister } = getMarineLicenceCache(request)
         const { backLink, cancelLink } = getReasonPageLinks(
           request,
-          publicRegister
+          publicRegister,
+          WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY
         )
         return createFailAction({
           viewRoute: PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE,
@@ -122,7 +127,11 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
         ...marineLicencePublicRegisterCommercialConfidentialitySettings,
         payload,
         projectName: marineLicence.projectName,
-        ...getReasonPageLinks(request, marineLicence.publicRegister),
+        ...getReasonPageLinks(
+          request,
+          marineLicence.publicRegister,
+          WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY
+        ),
         errors: errorDescriptionByFieldName(errorSummary),
         errorSummary
       })

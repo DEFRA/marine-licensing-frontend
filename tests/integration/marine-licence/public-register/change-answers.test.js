@@ -65,10 +65,10 @@ describe('Public register: change answers', () => {
       })
     )
 
-  const expectChangeModeLinks = (document) => {
+  const expectChangeModeLinks = (document, backLink = CHECK_ANSWERS) => {
     expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
       'href',
-      CHECK_ANSWERS
+      backLink
     )
     expect(queryByRole(document, 'link', { name: 'Cancel' })).toBeNull()
   }
@@ -138,6 +138,25 @@ describe('Public register: change answers', () => {
 
       const document = await load(change(PUBLIC_REGISTER))
 
+      expectChangeModeLinks(document)
+    })
+
+    test('keeps the pending reason when the user comes Back from a switched reason page', async () => {
+      givenAnswers(nationalSecurityApproved)
+
+      const document = await load(
+        `${change(PUBLIC_REGISTER)}&withholdReason=commercialConfidentiality`
+      )
+
+      expect(
+        getByLabelText(
+          document,
+          'Commercial or industrial confidentiality reasons'
+        )
+      ).toBeChecked()
+      expect(
+        getByLabelText(document, 'National security reasons')
+      ).not.toBeChecked()
       expectChangeModeLinks(document)
     })
 
@@ -227,7 +246,7 @@ describe('Public register: change answers', () => {
       expectChangeModeLinks(document)
     })
 
-    test('is blank when switching from commercial confidentiality', async () => {
+    test('is blank when switching from commercial confidentiality, with Back to the withholding page', async () => {
       givenAnswers(commercial)
 
       const document = await load(change(NATIONAL_SECURITY))
@@ -235,7 +254,10 @@ describe('Public register: change answers', () => {
       expect(getApprovalInput(document, 'Yes')).not.toBeChecked()
       expect(getApprovalInput(document, 'No')).not.toBeChecked()
       expect(getByLabelText(document, REASON_LABEL)).toHaveValue('')
-      expectChangeModeLinks(document)
+      expectChangeModeLinks(
+        document,
+        `${change(PUBLIC_REGISTER)}&withholdReason=nationalSecurity`
+      )
     })
 
     test('switching from commercial saves only the national security answers', async () => {
@@ -292,13 +314,16 @@ describe('Public register: change answers', () => {
       expectChangeModeLinks(document)
     })
 
-    test('is blank when switching from national security', async () => {
+    test('is blank when switching from national security, with Back to the withholding page', async () => {
       givenAnswers(nationalSecurityApproved)
 
       const document = await load(change(COMMERCIAL))
 
       expect(getByLabelText(document, REASON_LABEL)).toHaveValue('')
-      expectChangeModeLinks(document)
+      expectChangeModeLinks(
+        document,
+        `${change(PUBLIC_REGISTER)}&withholdReason=commercialConfidentiality`
+      )
     })
 
     test('switching from national security saves only the commercial answers', async () => {

@@ -79,12 +79,29 @@ export const isChangeMode = (request, publicRegister) =>
   publicRegister?.withholdConsent === 'yes' &&
   getCheckAnswersRedirect(publicRegister) === null
 
-export const withChangeQuery = (request, path) => {
+export const withChangeQuery = (request, path, withholdReason) => {
   const query = new URLSearchParams({ action: CHANGE_ACTION })
+  if (withholdReason) {
+    query.set('withholdReason', withholdReason)
+  }
   if (isFromCheckYourAnswers(request)) {
     query.set('from', request.query.from)
   }
   return `${path}?${query}`
+}
+
+const isWithholdReason = (value) =>
+  Object.values(WITHHOLD_REASON).includes(value)
+
+export const getPublicRegisterAnswers = (request, publicRegister) => {
+  const pendingReason = request.query?.withholdReason
+  if (
+    isChangeMode(request, publicRegister) &&
+    isWithholdReason(pendingReason)
+  ) {
+    return { withholdConsent: 'yes', withholdReason: pendingReason }
+  }
+  return publicRegister ?? {}
 }
 
 export const getPublicRegisterLink = (request) =>
@@ -99,22 +116,37 @@ export const getCheckAnswersLink = (request) =>
     marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
   )
 
-const changeModeLinks = (request) => ({
-  backLink: getCheckAnswersLink(request),
-  cancelLink: null
-})
-
 export const getPublicRegisterLinks = (request, publicRegister) => {
   if (isChangeMode(request, publicRegister)) {
-    return changeModeLinks(request)
+    return { backLink: getCheckAnswersLink(request), cancelLink: null }
   }
   const backLink = getCommonRedirectLink(request)
   return { backLink, cancelLink: backLink }
 }
 
-export const getReasonPageLinks = (request, publicRegister) =>
+const getChangeModeReasonPageBackLink = (
+  request,
+  publicRegister,
+  withholdReason
+) =>
+  isWithholdingFor(publicRegister, withholdReason)
+    ? getCheckAnswersLink(request)
+    : withChangeQuery(
+        request,
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+        withholdReason
+      )
+
+export const getReasonPageLinks = (request, publicRegister, withholdReason) =>
   isChangeMode(request, publicRegister)
-    ? changeModeLinks(request)
+    ? {
+        backLink: getChangeModeReasonPageBackLink(
+          request,
+          publicRegister,
+          withholdReason
+        ),
+        cancelLink: null
+      }
     : {
         backLink: getPublicRegisterLink(request),
         cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST

@@ -19,6 +19,7 @@ import {
 } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
   getCheckAnswersLink,
+  getPublicRegisterAnswers,
   getPublicRegisterLinks,
   getReasonPage,
   isChangeMode,
@@ -49,7 +50,7 @@ export const publicRegisterController = {
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
       ...marineLicencePublicRegisterSettings,
       projectName: marineLicence.projectName,
-      payload: marineLicence.publicRegister ?? {},
+      payload: getPublicRegisterAnswers(request, marineLicence.publicRegister),
       ...getPublicRegisterLinks(request, marineLicence.publicRegister)
     })
   }

@@ -11,29 +11,18 @@ import { createFailAction } from '#src/server/common/helpers/createFailAction.js
 import { marineLicencePublicRegisterSchema } from '#src/server/common/validation/marine-licence-public-register/schema.js'
 import {
   marineLicencePublicRegisterErrorMessages,
-  marineLicencePublicRegisterSettings,
-  WITHHOLD_REASON
+  marineLicencePublicRegisterSettings
 } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 import {
   getCommonRedirectLink,
   withCheckYourAnswersQuery
 } from '#src/server/common/helpers/marine-licence/redirect-link.js'
-import { keepReasonAnswers } from '#src/server/common/helpers/marine-licence/public-register.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import {
+  getReasonPage,
+  keepReasonAnswers
+} from '#src/server/common/helpers/marine-licence/public-register.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
-
-const reasonPages = {
-  [WITHHOLD_REASON.NATIONAL_SECURITY]:
-    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY,
-  [WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY]:
-    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY
-}
-
-const getReasonPage = (publicRegister) =>
-  publicRegister.withholdConsent === 'yes'
-    ? reasonPages[publicRegister.withholdReason]
-    : undefined
 
 export const publicRegisterController = {
   async handler(request, h) {

@@ -158,6 +158,20 @@ const marineLicencePages = [
     }
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS,
+    title:
+      'Check your answers for information published on the public register',
+    marineLicence: {
+      ...mockMarineLicenceApplication,
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity',
+        nationalSecurityApproval: 'yes',
+        reason: 'Details of the berth'
+      }
+    }
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
     title: 'Marine plan policies guidance'
   },

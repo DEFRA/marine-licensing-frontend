@@ -77,10 +77,10 @@
     "ol": "^10.11.0",
     "pino": "^10.4.0",
     "pino-pretty": "^13.2.0",
-    "proj4": "^2.22.0",
+    "proj4": "^2.23.0",
     "qrcode": "1.5.4",
     "rfc2047": "^4.0.1",
-    "sanitize-html": "2.18.1"
+    "sanitize-html": "2.18.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^8.0.7",

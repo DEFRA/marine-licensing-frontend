@@ -6,15 +6,19 @@ import {
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
 import { validateErrors } from '~/tests/integration/shared/expect-utils.js'
 import { errorMessages } from '~/src/server/marine-licence/marine-plan-policies/marine-plan-policy/controller.js'
-import { mockMarineLicenceWithMarinePlanPolicies } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
+import {
+  mockLinkedMarinePlanPolicyDocument,
+  mockMarineLicenceApplication,
+  mockMarineLicenceWithMarinePlanPolicies
+} from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
 
 describe('Marine plan policy (consideration) page', () => {
   const getServer = setupTestServer()
 
-  const loadPolicyPage = () =>
+  const loadPolicyPage = (policy = 'SW-BIO-1') =>
     loadPage({
-      requestUrl: getMarinePlanPolicyLink('SW-BIO-1'),
+      requestUrl: getMarinePlanPolicyLink(policy),
       server: getServer()
     })
 
@@ -44,11 +48,41 @@ describe('Marine plan policy (consideration) page', () => {
     })
   })
 
-  test('renders the policy wording as formatted markup', async () => {
+  test('renders the policy page content as formatted markup', async () => {
     const document = await loadPolicyPage()
 
     expect(document.querySelectorAll('.app-policy-wording ol li')).toHaveLength(
       2
+    )
+
+    expect(document.querySelector('.govuk-inset-text')).not.toBeInTheDocument()
+  })
+
+  test('renders the policy associated documents list if it exists', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      marinePlanPolicies: [
+        {
+          policyCode: 'S-CC-1',
+          title: 'SCC1 Title',
+          category: 'Environmental',
+          policy: '<p>Intro</p><ol><li>first</li><li>second</li></ol>'
+        }
+      ],
+      marinePlanPolicySupportingDocuments: {
+        ...mockMarineLicenceApplication.marinePlanPolicySupportingDocuments,
+        linkedDocuments: [mockLinkedMarinePlanPolicyDocument]
+      }
+    })
+
+    const document = await loadPolicyPage('S-CC-1')
+
+    expect(document.querySelector('.govuk-inset-text')).toHaveTextContent(
+      'Documents linked to this policy'
+    )
+
+    expect(document.querySelector('.govuk-inset-text')).toHaveTextContent(
+      `${mockLinkedMarinePlanPolicyDocument.uploadedFile.filename} - ${mockLinkedMarinePlanPolicyDocument.policyLinks[0].location}`
     )
   })
 

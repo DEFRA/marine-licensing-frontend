@@ -209,6 +209,14 @@ const marineLicencePages = [
     marineLicence: mockMarineLicenceApplication
   },
   {
+    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_UNLINK_SUPPORTING_DOCUMENTS.replace(
+      '{policyCode}',
+      'ABC-123'
+    ),
+    title: 'Your consideration no longer refers to a document',
+    marineLicence: mockMarineLicenceApplication
+  },
+  {
     url: marineLicenceRoutes.MARINE_LICENCE_PREFERRED_DATES,
     title: 'What are your preferred start and end dates for the licence?'
   },

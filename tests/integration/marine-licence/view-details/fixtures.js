@@ -178,15 +178,6 @@ export const expectedFeeEstimateCard = {
   ]
 }
 
-export const expectedPublicRegisterCard = {
-  rows: [
-    {
-      key: 'Request that information is withheld',
-      value: 'No'
-    }
-  ]
-}
-
 export const expectedWaterFrameworkDirectiveCard = {
   waterFrameworkDirective: {
     [NAUTICAL_MILE_HEADING]: 'Yes',

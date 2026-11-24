@@ -29,10 +29,13 @@ import {
   expectedTransferredApplicationDetailsCard,
   expectedRejectedApplicationDetailsCard,
   expectedFeeEstimateCard,
-  expectedApplicantActivityCards,
-  expectedPublicRegisterCard
+  expectedApplicantActivityCards
 } from './fixtures.js'
 import { getCardRow } from './utils.js'
+import {
+  getPublicRegisterCardRows,
+  publicRegisterCardScenarios
+} from '#tests/integration/shared/public-register-card-scenarios.js'
 import {
   validateInvoicingCard,
   validateWaterFrameworkDirective
@@ -522,27 +525,27 @@ describe('Marine Licence View Details', () => {
   })
 
   describe('public register card', () => {
-    let document
+    test.each(publicRegisterCardScenarios)(
+      'renders the withholding answers when $name',
+      async ({ publicRegister, expectedRows }) => {
+        const document = await loadViewDetailsPage(getServer(), {
+          ...mockSubmittedMarineLicenceApplication,
+          publicRegister
+        })
 
-    beforeEach(async () => {
-      document = await loadViewDetailsPage(getServer())
-    })
-
-    test('renders the public register card', () => {
-      expect(document.querySelector('#public-register-card')).not.toBeNull()
-    })
-
-    test.each(expectedPublicRegisterCard.rows)(
-      'renders "$key" row with correct value',
-      ({ key, value }) => {
-        const card = document.querySelector('#public-register-card')
-        const row = getCardRow(card, key)
-
-        expect(row).toBeTruthy()
-        expect(
-          row.querySelector('.govuk-summary-list__value').textContent.trim()
-        ).toBe(value)
+        expect(getPublicRegisterCardRows(document)).toEqual(expectedRows)
       }
     )
+
+    test('has no Change link', async () => {
+      const document = await loadViewDetailsPage(getServer(), {
+        ...mockSubmittedMarineLicenceApplication,
+        publicRegister: publicRegisterCardScenarios[2].publicRegister
+      })
+      const card = document.querySelector('#public-register-card')
+
+      expect(card).not.toBeNull()
+      expect(queryByRole(card, 'link', { name: /Change/ })).toBeNull()
+    })
   })
 })

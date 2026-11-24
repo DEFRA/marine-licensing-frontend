@@ -117,9 +117,7 @@ describe('#checkYourAnswersController', () => {
         agree: 'yes',
         details: 'We have statutory powers under the Marine Act.'
       },
-      ...mockMarineLicenceApplication,
-      publicRegisterRoute:
-        '/marine-licence/sharing-your-project-information-publicly'
+      ...mockMarineLicenceApplication
     }
     const mockCompleteLicence = withReadyToSend({
       ...mockCachedData,
@@ -166,7 +164,15 @@ describe('#checkYourAnswersController', () => {
       summaryData: mockSummaryData,
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      publicRegisterRows: [
+        {
+          key: {
+            text: 'Do you want to ask us to withhold any information from the public register?'
+          },
+          value: { text: 'No' }
+        }
+      ],
+      publicRegisterChangeLink: `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?from=check-your-answers`,
       waterFrameworkDirectiveData: expectedWaterFrameworkDirectiveData,
       waterFrameworkDirectiveChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
@@ -228,7 +234,16 @@ describe('#checkYourAnswersController', () => {
       waterFrameworkDirectiveData: {},
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
-      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      publicRegisterRows: [
+        {
+          key: {
+            text: 'Do you want to ask us to withhold any information from the public register?'
+          },
+          value: { text: '' },
+          isIncomplete: true
+        }
+      ],
+      publicRegisterChangeLink: `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?from=check-your-answers`,
       marinePlanPolicySections: [],
       amount: FEE_ESTIMATE_AMOUNT,
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT

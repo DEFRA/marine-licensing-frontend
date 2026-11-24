@@ -1,37 +1,26 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "incomplete-field/macro.njk" import appIncompleteField %}
 
-{% set isWithholding = params.publicRegister.withholdConsent === 'yes' %}
-{% set withholdAnswer = ("Yes" if isWithholding else "No") if params.publicRegister.withholdConsent else "" %}
-
 {% set rows = [] %}
-
-{% set _ = rows.push({
-  key: { text: "Request that information is withheld" },
-  value: { html: appIncompleteField({ text: withholdAnswer }) },
-  classes: "govuk-summary-list__row--no-border"
-}) %}
-
-{% if isWithholding %}
-
-{% set _ = rows.push({
-  key: { text: "Details of information to be withheld and why" },
-  value: { text: params.publicRegister.reason }
-}) %}
-
-{% endif %}
+{% for row in params.rows %}
+  {% set _ = rows.push({
+    key: row.key,
+    value: { html: appIncompleteField({ text: "" }) } if row.isIncomplete else row.value,
+    classes: row.classes
+  }) %}
+{% endfor %}
 
 {{ govukSummaryList({
     card: {
       title: {
-        text: "Sharing your application information publicly"
+        text: "Information published on the public register"
       },
       actions: {
         items: [
           {
-            href: params.changeLink ~ "?from=check-your-answers",
+            href: params.changeLink,
             text: "Change",
-            visuallyHiddenText: " sharing your application information publicly",
+            visuallyHiddenText: " information published on the public register",
             classes: "govuk-link--no-visited-state"
           }
         ]

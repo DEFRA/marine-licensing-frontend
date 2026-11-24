@@ -20,6 +20,10 @@ import {
 import * as marineLicenceService from '~/src/services/marine-licence-service/index.js'
 import { validateWaterFrameworkDirective } from '~/tests/integration/shared/summary-card-validators.js'
 import {
+  getPublicRegisterCardRows,
+  publicRegisterCardScenarios
+} from '~/tests/integration/shared/public-register-card-scenarios.js'
+import {
   NAUTICAL_MILE_HEADING,
   EXCLUDED_ACTIVITIES_HEADING,
   FILE_UPLOAD_HEADING
@@ -169,6 +173,35 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
         activityCard.querySelectorAll('.govuk-summary-list__actions')
       ).toHaveLength(0)
       validateWaterFrameworkDirective(document, expectedWfdContent)
+    })
+  })
+
+  describe('public register card', () => {
+    test.each(publicRegisterCardScenarios)(
+      'renders the withholding answers when $name',
+      async ({ publicRegister, expectedRows }) => {
+        const document = await loadCyaPage({
+          ...mockFileUploadMarineLicence,
+          publicRegister
+        })
+
+        expect(getPublicRegisterCardRows(document)).toEqual(expectedRows)
+      }
+    )
+
+    test('Change link goes to the review withholding answers page when withholding', async () => {
+      const document = await loadCyaPage({
+        ...mockFileUploadMarineLicence,
+        publicRegister: publicRegisterCardScenarios[1].publicRegister
+      })
+
+      expect(
+        document
+          .querySelector('#public-register-card .govuk-summary-card__actions a')
+          .getAttribute('href')
+      ).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS}?from=check-your-answers`
+      )
     })
   })
 

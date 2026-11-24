@@ -11,7 +11,11 @@ import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summ
 import { setReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
-import { getWaterFrameworkDirectiveChangeLink } from '#src/server/marine-licence/check-your-answers/utils.js'
+import {
+  getPublicRegisterChangeLink,
+  getWaterFrameworkDirectiveChangeLink
+} from '#src/server/marine-licence/check-your-answers/utils.js'
+import { buildPublicRegisterRows } from '#src/server/common/helpers/marine-licence/public-register-rows.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
 import { isMarineLicenceReadyToSend } from '#src/server/marine-licence/task-list/ready-to-send.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
@@ -95,7 +99,10 @@ export const checkYourAnswersController = {
       reviewSiteDetailsRoute:
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
       ...formattedMarineLicence,
-      publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      publicRegisterRows: buildPublicRegisterRows(marineLicence.publicRegister),
+      publicRegisterChangeLink: getPublicRegisterChangeLink(
+        marineLicence.publicRegister
+      ),
       waterFrameworkDirectiveData,
       waterFrameworkDirectiveChangeLink: getWaterFrameworkDirectiveChangeLink(
         waterFrameworkDirective

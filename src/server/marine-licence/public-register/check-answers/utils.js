@@ -3,6 +3,7 @@ import {
   isNationalSecurity,
   withChangeQuery
 } from '#src/server/marine-licence/public-register/utils.js'
+import { isFromCheckYourAnswers } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import { extractReferrerPath } from '#src/server/common/helpers/referrer-validation.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { publicRegisterCheckAnswersText as text } from '#src/server/marine-licence/public-register/check-answers/constants.js'
@@ -69,8 +70,12 @@ export const getCheckAnswersSummary = (request, publicRegister) => ({
   reason: getReasonRow(request, publicRegister)
 })
 
-export const getBackLink = (request, publicRegister) =>
-  extractReferrerPath(request.headers?.referer) ===
-  marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+export const getBackLink = (request, publicRegister) => {
+  if (isFromCheckYourAnswers(request)) {
+    return marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+  }
+  return extractReferrerPath(request.headers?.referer) ===
+    marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     ? marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     : getReasonPage(publicRegister)
+}

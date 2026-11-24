@@ -146,6 +146,30 @@ describe('Task List', () => {
     )
   })
 
+  test('should link the public register task to the check answers page when completed with a withholding request', async () => {
+    mockMarineLicence({
+      ...mockMarineLicenceApplication,
+      publicRegister: {
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity',
+        nationalSecurityApproval: 'no'
+      }
+    })
+    const withholdingDocument = await loadPage({
+      requestUrl: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      server: getServer()
+    })
+
+    expect(
+      getByRole(withholdingDocument, 'link', {
+        name: 'Information published on the public register'
+      })
+    ).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+    )
+  })
+
   test('should link "Marine plan policy considerations" to the spinner page (re-trigger) when marinePlanPolicyJob is failed and site details are completed', async () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,

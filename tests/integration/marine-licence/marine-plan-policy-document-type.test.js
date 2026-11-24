@@ -62,6 +62,11 @@ describe('Marine plan policy document type page', () => {
   })
 
   test('lists every document type with an "other" text field', async () => {
+    mockLicenceWithDocument({
+      ...mockMarinePlanPolicyDocument,
+      documentType: undefined
+    })
+
     const document = await loadDocumentTypePage()
 
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(

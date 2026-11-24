@@ -115,12 +115,19 @@ export const mockMarinePlanPolicyResponses = {
 
 export const mockMarinePlanPolicyDocument = {
   documentId: 'c7e4ef70-7c7d-4464-8401-7bf4e6f47351',
+  documentType: 'ecological-assessment',
   uploadedFile: { filename: 'ecological-assessment.docx' },
   s3Location: {
     s3Bucket: 'test-bucket',
     s3Key: 'test-key',
     checksumSha256: 'test-checksum'
   }
+}
+
+export const mockLinkedMarinePlanPolicyDocument = {
+  ...mockMarinePlanPolicyDocument,
+  documentType: 'ecological-assessment',
+  policyLinks: [{ policyCode: 'S-CC-1', location: 'Page 1' }]
 }
 
 export const mockMarinePlanPolicySupportingDocuments = {

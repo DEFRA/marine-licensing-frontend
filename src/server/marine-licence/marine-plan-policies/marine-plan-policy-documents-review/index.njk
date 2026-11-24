@@ -2,6 +2,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% block beforeContent %}
 {{ super() }}
@@ -19,6 +20,12 @@
 
       <span class="govuk-caption-l">{{ projectName }}</span>
       <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+      {% if outstandingPoliciesText %}
+        {{ govukInsetText({
+          text: outstandingPoliciesText
+        }) }}
+      {% endif %}
 
       {% for document in documents %}
 

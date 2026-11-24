@@ -92,7 +92,8 @@ export const taskListController = {
       marinePlanPolicyJob,
       marinePlanPoliciesCount,
       marinePlanPolicyResponseCount,
-      siteDetailsDataComplete
+      siteDetailsDataComplete,
+      publicRegister
     } = payload.value
     const { userRelationshipType } = userSession
 
@@ -104,7 +105,8 @@ export const taskListController = {
         marinePlanPolicyJob,
         marinePlanPoliciesCount,
         marinePlanPolicyResponseCount,
-        siteDetailsDataComplete
+        siteDetailsDataComplete,
+        publicRegister
       }
     )
 

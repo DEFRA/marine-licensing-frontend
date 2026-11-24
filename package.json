@@ -41,7 +41,7 @@
   "author": "Defra DDTS",
   "license": "OGL-UK-3.0",
   "dependencies": {
-    "@defra/hapi-secure-context": "^0.4.1",
+    "@defra/hapi-secure-context": "^0.4.2",
     "@defra/hapi-tracing": "^1.30.2",
     "@elastic/ecs-pino-format": "^1.5.0",
     "@hapi/basic": "^7.0.2",
@@ -99,7 +99,7 @@
     "copy-webpack-plugin": "^14.0.0",
     "eslint": "10.13.0",
     "jsdom": "^31.0.1",
-    "knip": "^6.44.1",
+    "knip": "^6.45.1",
     "neostandard": "0.14.1",
     "postcss-loader": "^8.2.1",
     "prettier": "^3.9.10",

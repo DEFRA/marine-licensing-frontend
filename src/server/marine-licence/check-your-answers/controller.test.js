@@ -172,7 +172,8 @@ describe('#checkYourAnswersController', () => {
           value: { text: 'No' }
         }
       ],
-      publicRegisterChangeLink: `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?from=check-your-answers`,
+      publicRegisterChangeLink:
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       waterFrameworkDirectiveData: expectedWaterFrameworkDirectiveData,
       waterFrameworkDirectiveChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS,
@@ -239,11 +240,11 @@ describe('#checkYourAnswersController', () => {
           key: {
             text: 'Do you want to ask us to withhold any information from the public register?'
           },
-          value: { text: '' },
           isIncomplete: true
         }
       ],
-      publicRegisterChangeLink: `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?from=check-your-answers`,
+      publicRegisterChangeLink:
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       marinePlanPolicySections: [],
       amount: FEE_ESTIMATE_AMOUNT,
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT

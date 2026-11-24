@@ -1,15 +1,13 @@
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { authenticatedPatchRequest } from '#src/server/common/helpers/authenticated-requests.js'
 import { getCheckAnswersRedirect } from '#src/server/marine-licence/public-register/utils.js'
-import {
-  getCommonRedirectLink,
-  withCheckYourAnswersQuery
-} from '#src/server/common/helpers/marine-licence/redirect-link.js'
+import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import { apiRoutes } from '#src/server/common/constants/routes.js'
 import { publicRegisterCheckAnswersSettings } from '#src/server/marine-licence/public-register/check-answers/constants.js'
 import {
   getBackLink,
-  getCheckAnswersSummary
+  getCheckAnswersSummary,
+  getContinueLink
 } from '#src/server/marine-licence/public-register/check-answers/utils.js'
 
 export const PUBLIC_REGISTER_CHECK_ANSWERS_VIEW_ROUTE =
@@ -50,6 +48,6 @@ export const publicRegisterCheckAnswersSubmitController = {
       }
     )
 
-    return h.redirect(getCommonRedirectLink(request))
+    return h.redirect(getContinueLink(request))
   }
 }

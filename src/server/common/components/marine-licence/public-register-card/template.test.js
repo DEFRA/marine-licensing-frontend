@@ -10,7 +10,8 @@ const WITHHOLD_QUESTION =
   'Do you want to ask us to withhold any information from the public register?'
 const APPROVAL_QUESTION =
   'Do you have approval from the Secretary of State for Defence to withhold information for national security reasons?'
-const CHANGE_LINK = `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS}?from=check-your-answers`
+const CHANGE_LINK =
+  marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
 
 const renderCard = (publicRegister, params = {}) =>
   renderComponentJSDOM(COMPONENT, {
@@ -35,13 +36,16 @@ describe('Marine Licence Public Register Card Component', () => {
       ).not.toBeInTheDocument()
     })
 
-    test('shows a card-level change link to the given href when not read-only', () => {
+    test('shows a card-level change link back from check your answers when not read-only', () => {
       const component = renderCard(
         { withholdConsent: 'no' },
         { isReadOnly: false, changeLink: CHANGE_LINK }
       )
       const link = within(component).getByRole('link', { name: /Change/ })
-      expect(link).toHaveAttribute('href', CHANGE_LINK)
+      expect(link).toHaveAttribute(
+        'href',
+        `${CHANGE_LINK}?from=check-your-answers`
+      )
       expect(link).toHaveTextContent(
         'Change information published on the public register'
       )

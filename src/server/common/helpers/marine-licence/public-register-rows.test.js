@@ -130,7 +130,6 @@ describe('buildPublicRegisterRows', () => {
     expect(buildPublicRegisterRows(publicRegister)).toEqual([
       {
         key: { text: WITHHOLD_QUESTION },
-        value: { text: '' },
         isIncomplete: true
       }
     ])

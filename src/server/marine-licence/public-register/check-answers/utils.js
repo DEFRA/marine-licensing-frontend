@@ -70,9 +70,16 @@ export const getCheckAnswersSummary = (request, publicRegister) => ({
   reason: getReasonRow(request, publicRegister)
 })
 
+const CHECK_YOUR_ANSWERS_CARD = `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#public-register-card`
+
+export const getContinueLink = (request) =>
+  isFromCheckYourAnswers(request)
+    ? CHECK_YOUR_ANSWERS_CARD
+    : marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+
 export const getBackLink = (request, publicRegister) => {
   if (isFromCheckYourAnswers(request)) {
-    return marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+    return CHECK_YOUR_ANSWERS_CARD
   }
   return extractReferrerPath(request.headers?.referer) ===
     marineLicenceRoutes.MARINE_LICENCE_TASK_LIST

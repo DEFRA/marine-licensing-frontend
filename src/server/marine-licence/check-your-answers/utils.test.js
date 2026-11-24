@@ -51,9 +51,7 @@ describe('getPublicRegisterChangeLink', () => {
         withholdReason: 'commercialConfidentiality',
         reason: 'Pricing'
       })
-    ).toBe(
-      `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS}?from=check-your-answers`
-    )
+    ).toBe(marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS)
   })
 
   it.each([
@@ -61,7 +59,7 @@ describe('getPublicRegisterChangeLink', () => {
     { name: 'unanswered', publicRegister: undefined }
   ])('links to the withholding question when $name', ({ publicRegister }) => {
     expect(getPublicRegisterChangeLink(publicRegister)).toBe(
-      `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?from=check-your-answers`
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
     )
   })
 })

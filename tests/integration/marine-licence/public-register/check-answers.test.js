@@ -149,7 +149,7 @@ describe('Public register: check answers', () => {
 
       expect(response.statusCode).toBe(statusCodes.redirect)
       expect(response.headers.location).toBe(
-        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+        `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#public-register-card`
       )
     })
 
@@ -163,7 +163,7 @@ describe('Public register: check answers', () => {
 
       expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
         'href',
-        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+        `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#public-register-card`
       )
     })
 

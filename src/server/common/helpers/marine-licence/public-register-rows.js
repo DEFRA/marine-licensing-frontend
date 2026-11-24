@@ -38,7 +38,6 @@ const getWithholdRow = (publicRegister) =>
       }
     : {
         key: { text: text.withholdQuestion },
-        value: { text: '' },
         isIncomplete: true
       }
 

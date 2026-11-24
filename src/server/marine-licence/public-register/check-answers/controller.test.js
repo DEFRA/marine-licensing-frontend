@@ -20,6 +20,8 @@ describe('#publicRegisterCheckAnswers', () => {
   }
   const complete = { ...nationalSecurity, nationalSecurityApproval: 'no' }
 
+  const fromCya = { headers: {}, query: { from: 'check-your-answers' } }
+
   const createH = () => ({ redirect: vi.fn(), view: vi.fn() })
 
   const mockCache = (publicRegister) =>
@@ -67,8 +69,7 @@ describe('#publicRegisterCheckAnswers', () => {
       )
     })
 
-    test('back link and unfinished-answer redirect keep the way back to check your answers', () => {
-      const fromCya = { headers: {}, query: { from: 'check-your-answers' } }
+    test('back link goes to the card on check your answers when changing from there', () => {
       mockCache(complete)
       const h = createH()
 
@@ -77,11 +78,15 @@ describe('#publicRegisterCheckAnswers', () => {
       expect(h.view).toHaveBeenCalledWith(
         PUBLIC_REGISTER_CHECK_ANSWERS_VIEW_ROUTE,
         expect.objectContaining({
-          backLink: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#public-register-card`
         })
       )
+    })
 
+    test('unfinished answers redirect keeps from=check-your-answers', () => {
       mockCache(nationalSecurity)
+      const h = createH()
+
       publicRegisterCheckAnswersController.handler(fromCya, h)
 
       expect(h.redirect).toHaveBeenCalledWith(
@@ -154,7 +159,7 @@ describe('#publicRegisterCheckAnswers', () => {
         { id: 'test-id' }
       )
       expect(h.redirect).toHaveBeenCalledWith(
-        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
+        `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#public-register-card`
       )
     })
   })

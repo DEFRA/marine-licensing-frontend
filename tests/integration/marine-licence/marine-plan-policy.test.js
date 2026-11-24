@@ -120,9 +120,15 @@ describe('Marine plan policy (consideration) page', () => {
       'href',
       marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE
     )
-    expect(
-      document.querySelector('input[name="documentationCheck"]')
-    ).toBeChecked()
+    const documentationCheck = getByRole(document, 'checkbox', {
+      name: 'My consideration refers to an assessment, report or other document'
+    })
+    expect(documentationCheck).toBeChecked()
+    expect(documentationCheck).toHaveAccessibleDescription(
+      expect.stringContaining(
+        'Only select this if your consideration relies on information in a document.'
+      )
+    )
   })
 
   test.each([

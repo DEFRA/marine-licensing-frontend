@@ -43,11 +43,11 @@
       <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>
 
         {{ govukFileUpload({
-            id: "file-id",
+            id: "file",
             name: "file",
             label: {
               html: formLabel,
-              for: "file-id"
+              for: "file"
             },
             multiple: false,
             javascript: true,

@@ -41,6 +41,7 @@ import { runPageAccessibilityTests } from './page-accessibility-tests.js'
 import { loadPage, submitForm } from '../shared/app-server.js'
 import { runAxeChecks } from '~/.vite/axe-helper.js'
 import * as addressLookup from '~/src/server/common/helpers/marine-licence/invoicing/address-lookup.js'
+import * as pendingUnlink from '~/src/server/marine-licence/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')
@@ -206,14 +207,6 @@ const marineLicencePages = [
       mockMarinePlanPolicyDocument.documentId
     ),
     title: 'Are you sure you want to delete this document?',
-    marineLicence: mockMarineLicenceApplication
-  },
-  {
-    url: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_UNLINK_SUPPORTING_DOCUMENTS.replace(
-      '{policyCode}',
-      'ABC-123'
-    ),
-    title: 'Your consideration no longer refers to a document',
     marineLicence: mockMarineLicenceApplication
   },
   {
@@ -543,6 +536,32 @@ describe('Marine licence page accessibility checks (Axe)', () => {
         server: getServer()
       })
 
+      await runAxeChecks(document.documentElement)
+    })
+  })
+
+  // Not in the page list: the page only renders when the policy response page has
+  // stored documents awaiting deletion in the session.
+  describe('"Your consideration no longer refers to a document" page', () => {
+    test('has no accessibility violations', async () => {
+      mockMarineLicence(mockMarineLicenceApplication)
+      vi.spyOn(pendingUnlink, 'getPendingUnlink').mockReturnValue({
+        body: { policyCode: 'S-CC-1' },
+        filenames: ['report.pdf']
+      })
+
+      const document = await loadPage({
+        requestUrl:
+          marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_UNLINK_SUPPORTING_DOCUMENTS.replace(
+            '{policyCode}',
+            'S-CC-1'
+          ),
+        server: getServer()
+      })
+
+      expect(document.querySelector('h1')).toHaveTextContent(
+        'Your consideration no longer refers to a document'
+      )
       await runAxeChecks(document.documentElement)
     })
   })

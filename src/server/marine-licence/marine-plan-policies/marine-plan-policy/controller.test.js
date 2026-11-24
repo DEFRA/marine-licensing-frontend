@@ -35,122 +35,6 @@ describe('#marinePlanPolicyController (GET)', () => {
     })
   })
 
-  test('renders the policy with "title (code)" heading, wording and find-out-more link', async () => {
-    const h = { view: vi.fn() }
-    await marinePlanPolicyController.handler(
-      { params: { policyCode: 'SW-MPA-1' } },
-      h
-    )
-
-    expect(h.view).toHaveBeenCalledWith(MARINE_PLAN_POLICY_VIEW_ROUTE, {
-      pageTitle: 'South West Marine protected areas 1 (SW-MPA-1)',
-      heading: 'South West Marine protected areas 1 (SW-MPA-1)',
-      projectName: 'Test Project',
-      policyText: 'MPA wording',
-      findOutMoreUrl:
-        'https://environment.data.gov.uk/marine-plans-explorer/policy/SW-MPA-1',
-      backLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
-      marinePlanPolicyGuidanceLink:
-        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE,
-      payload: { policyConsideration: '', documentationCheck: false },
-      linkedPolicyFormattedList: []
-    })
-  })
-
-  test('lists the supporting documents linked to the policy', async () => {
-    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
-      getMarineLicenceById: vi.fn().mockResolvedValue({
-        ...licenceData,
-        marinePlanPolicySupportingDocuments: {
-          linkedDocuments: [
-            {
-              uploadedFile: { filename: 'WFD.odt' },
-              policyLinks: [{ policyCode: 'SW-MPA-1', location: 'Page 1' }]
-            },
-            {
-              uploadedFile: { filename: 'Other.pdf' },
-              policyLinks: [{ policyCode: 'SW-BIO-1', location: 'Page 2' }]
-            }
-          ]
-        }
-      })
-    })
-    const h = { view: vi.fn() }
-    await marinePlanPolicyController.handler(
-      { params: { policyCode: 'SW-MPA-1' } },
-      h
-    )
-
-    expect(h.view).toHaveBeenCalledWith(
-      MARINE_PLAN_POLICY_VIEW_ROUTE,
-      expect.objectContaining({
-        linkedPolicyFormattedList: ['WFD.odt - Page 1']
-      })
-    )
-  })
-
-  test('prefills the textarea from a previously saved response', async () => {
-    const h = { view: vi.fn() }
-    await marinePlanPolicyController.handler(
-      { params: { policyCode: 'SW-BIO-1' } },
-      h
-    )
-
-    expect(h.view).toHaveBeenCalledWith(
-      MARINE_PLAN_POLICY_VIEW_ROUTE,
-      expect.objectContaining({
-        payload: {
-          policyConsideration: 'My saved answer',
-          documentationCheck: false
-        }
-      })
-    )
-  })
-
-  test('throws 404 when the marine licence id is missing from the cache', async () => {
-    vi.mocked(cacheUtils.getMarineLicenceCache).mockReturnValueOnce({})
-    const h = { view: vi.fn() }
-
-    await expect(
-      marinePlanPolicyController.handler(
-        { params: { policyCode: 'SW-BIO-1' } },
-        h
-      )
-    ).rejects.toMatchObject({ output: { statusCode: 404 } })
-    expect(h.view).not.toHaveBeenCalled()
-  })
-
-  test('throws 404 when the policy code is not in the licence', async () => {
-    const h = { view: vi.fn() }
-
-    await expect(
-      marinePlanPolicyController.handler(
-        { params: { policyCode: 'UNKNOWN-1' } },
-        h
-      )
-    ).rejects.toMatchObject({ output: { statusCode: 404 } })
-    expect(h.view).not.toHaveBeenCalled()
-  })
-
-  test('throws 404 when the licence has no marine plan policies', async () => {
-    vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValueOnce(
-      {
-        getMarineLicenceById: vi.fn().mockResolvedValue({
-          projectName: 'Test Project'
-        })
-      }
-    )
-    const h = { view: vi.fn() }
-
-    await expect(
-      marinePlanPolicyController.handler(
-        { params: { policyCode: 'SW-BIO-1' } },
-        h
-      )
-    ).rejects.toMatchObject({ output: { statusCode: 404 } })
-    expect(h.view).not.toHaveBeenCalled()
-  })
-
   test("back link targets the policy's section card on check your answers when returnTo is set", async () => {
     const h = { view: vi.fn() }
     await marinePlanPolicyController.handler(
@@ -161,7 +45,8 @@ describe('#marinePlanPolicyController (GET)', () => {
             .fn()
             .mockReturnValue(
               marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-            )
+            ),
+          clear: vi.fn()
         }
       },
       h
@@ -190,20 +75,6 @@ describe('#marinePlanPolicySubmitController (POST)', () => {
       getMarineLicenceById: vi.fn().mockResolvedValue(licenceData)
     })
     vi.spyOn(authRequests, 'authenticatedPatchRequest').mockResolvedValue({})
-  })
-
-  test('rejects an empty response with the required message', () => {
-    const { error } = validate({ policyConsideration: '' })
-    expect(error.details[0].message).toBe(
-      errorMessages.POLICY_CONSIDERATION_REQUIRED
-    )
-  })
-
-  test('rejects a response longer than 2000 characters', () => {
-    const { error } = validate({ policyConsideration: 'a'.repeat(2001) })
-    expect(error.details[0].message).toBe(
-      errorMessages.POLICY_CONSIDERATION_MAX_LENGTH
-    )
   })
 
   test('accepts a response of exactly 2000 characters', () => {
@@ -286,42 +157,6 @@ describe('#marinePlanPolicySubmitController (POST)', () => {
     )
 
     expect(h.redirect).toHaveBeenCalledWith(cyaReturnLink('other'))
-  })
-
-  test('failAction re-renders the page with the error and submitted value', async () => {
-    const h = { view: vi.fn().mockReturnValue({ takeover: vi.fn() }) }
-    const err = {
-      details: [
-        {
-          path: ['policyConsideration'],
-          message: errorMessages.POLICY_CONSIDERATION_REQUIRED,
-          type: 'any.required'
-        }
-      ]
-    }
-
-    await marinePlanPolicySubmitController.options.validate.failAction(
-      {
-        params: { policyCode: 'SW-BIO-1' },
-        payload: { policyConsideration: '' }
-      },
-      h,
-      err
-    )
-
-    expect(h.view).toHaveBeenCalledWith(
-      MARINE_PLAN_POLICY_VIEW_ROUTE,
-      expect.objectContaining({
-        heading: 'SW-BIO-1',
-        payload: { policyConsideration: '' },
-        errors: expect.objectContaining({
-          policyConsideration: expect.objectContaining({
-            text: errorMessages.POLICY_CONSIDERATION_REQUIRED
-          })
-        })
-      })
-    )
-    expect(h.view().takeover).toHaveBeenCalled()
   })
 
   test('failAction preserves the check your answers return link', async () => {

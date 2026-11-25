@@ -55,6 +55,35 @@ describe('Marine Licence Marine Plan Policies Component', () => {
     ])
   })
 
+  test('output supporting documents', () => {
+    const $ = renderComponent('marine-licence/marine-plan-policies-card', {
+      sections: [
+        ...sections,
+        {
+          heading: 'Economic',
+          slug: 'economic',
+          cardId: 'marine-plan-policies-card-economic',
+          policies: [
+            {
+              ...policies[0],
+              policyCode: 'S-CAB-1',
+              supportingDocuments: ['Test Document - page 1']
+            }
+          ]
+        }
+      ]
+    })
+
+    const html = $.html()
+    expect(html).toContain('Supporting documents')
+
+    expect(
+      $('.govuk-list')
+        .map((_, el) => $(el).text().trim())
+        .get()
+    ).toEqual(['Test Document - page 1'])
+  })
+
   test('shows the display title as the row key', () => {
     const $ = renderComponent('marine-licence/marine-plan-policies-card', {
       sections

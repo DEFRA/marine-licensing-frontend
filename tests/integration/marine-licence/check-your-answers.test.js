@@ -1,4 +1,4 @@
-import { getByRole } from '@testing-library/dom'
+import { getByRole, within } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -24,6 +24,7 @@ import {
   EXCLUDED_ACTIVITIES_HEADING,
   FILE_UPLOAD_HEADING
 } from '~/src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
+import { mockLinkedMarinePlanPolicyDocument } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('~/src/services/marine-licence-service/index.js')
 
@@ -322,6 +323,13 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
 
     beforeEach(async () => {
       document = await loadCyaPage(mockFileUploadMarineLicence)
+      document = await loadCyaPage({
+        ...mockFileUploadMarineLicence,
+        marinePlanPolicySupportingDocuments: {
+          ...mockFileUploadMarineLicence.marinePlanPolicySupportingDocuments,
+          linkedDocuments: [mockLinkedMarinePlanPolicyDocument]
+        }
+      })
     })
 
     test('renders the marine plan policies card with the correct title', () => {
@@ -347,6 +355,15 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       expect(card.textContent).toContain('Policy information')
       expect(card.textContent).toContain('Your consideration')
       expect(card.textContent).toContain('My first consideration.')
+      expect(card.textContent).toContain('Supporting documents')
+
+      const list = within(card).getByRole('list')
+      const listItems = within(list).queryByRole('listitem')
+      expect(listItems.textContent).toBe(
+        `${mockLinkedMarinePlanPolicyDocument.uploadedFile.filename} - Page 1`
+      )
+
+      expect(card.textContent).toContain('Supporting documents')
     })
 
     test('renders a Change link for each policy row', () => {

@@ -4,6 +4,15 @@ import {
   groupPoliciesBySection
 } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
 import { formatPolicyTitle } from '#src/server/common/helpers/marine-licence/marine-plan-policy-title.js'
+import {
+  getDocumentsForPolicy,
+  getFormattedLinkedPolicies
+} from '#src/server/marine-licence/marine-plan-policies/document-utils.js'
+
+const getSupportingDocuments = (marineLicence, policyCode) => {
+  const associatedDocuments = getDocumentsForPolicy(marineLicence, policyCode)
+  return getFormattedLinkedPolicies(associatedDocuments, policyCode)
+}
 
 export const buildMarinePlanPoliciesData = (marineLicence) => {
   const policies = marineLicence?.marinePlanPolicies ?? []
@@ -18,7 +27,11 @@ export const buildMarinePlanPoliciesData = (marineLicence) => {
         displayTitle: formatPolicyTitle(policy),
         wording: policy.policy ?? '',
         response: responses[policy.policyCode]?.response ?? '',
-        changeHref: getMarinePlanPolicyLink(policy.policyCode)
+        changeHref: getMarinePlanPolicyLink(policy.policyCode),
+        supportingDocuments: getSupportingDocuments(
+          marineLicence,
+          policy.policyCode
+        )
       }))
     })
   )

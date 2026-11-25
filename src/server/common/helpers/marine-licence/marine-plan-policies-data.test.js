@@ -20,6 +20,7 @@ describe('buildMarinePlanPoliciesData', () => {
           policyCode: 'S-CAB-1',
           title: 'South Cables 1',
           category: 'Economic',
+          supportingDocuments: [],
           policy: 'Cables wording'
         },
         {
@@ -43,6 +44,7 @@ describe('buildMarinePlanPoliciesData', () => {
           {
             policyCode: 'S-CC-1',
             displayTitle: 'South Climate change 1 (S-CC-1)',
+            supportingDocuments: [],
             wording: 'First wording',
             response: 'My consideration',
             changeHref: getMarinePlanPolicyLink('S-CC-1')
@@ -50,6 +52,7 @@ describe('buildMarinePlanPoliciesData', () => {
           {
             policyCode: 'S-CC-2',
             displayTitle: 'South Climate change 2 (S-CC-2)',
+            supportingDocuments: [],
             wording: 'Second wording',
             response: '',
             changeHref: getMarinePlanPolicyLink('S-CC-2')
@@ -65,6 +68,7 @@ describe('buildMarinePlanPoliciesData', () => {
             policyCode: 'S-CAB-1',
             displayTitle: 'South Cables 1 (S-CAB-1)',
             wording: 'Cables wording',
+            supportingDocuments: [],
             response: '',
             changeHref: getMarinePlanPolicyLink('S-CAB-1')
           }

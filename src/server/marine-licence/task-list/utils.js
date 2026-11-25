@@ -147,7 +147,7 @@ const buildNotStartedTask = (href) => [
   }
 ]
 
-const getMarinePlanPoliciesStatus = (total, completed) => {
+const getMarinePlanPoliciesStatus = (total, completed, taskStatus) => {
   if (typeof total !== 'number') {
     return {
       status: NOT_STARTED_STATUS,
@@ -162,7 +162,7 @@ const getMarinePlanPoliciesStatus = (total, completed) => {
     }
   }
 
-  if (completed >= total) {
+  if (completed >= total && taskStatus === 'COMPLETED') {
     return {
       status: { text: 'Completed' },
       suffix: ` (${total} of ${total} completed)`
@@ -223,7 +223,8 @@ export const transformMarinePlanPoliciesTaskList = (
 
   const { status, suffix } = getMarinePlanPoliciesStatus(
     marinePlanPoliciesCount,
-    marinePlanPolicyResponseCount
+    marinePlanPolicyResponseCount,
+    taskList.marinePlanPolicies
   )
 
   return [

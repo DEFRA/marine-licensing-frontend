@@ -20,7 +20,7 @@ import {
 import {
   clearPendingUnlink,
   setPendingUnlink
-} from '#src/server/marine-licence/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
 import { formatPolicyTitle } from '#src/server/common/helpers/marine-licence/marine-plan-policy-title.js'
 import {
   getDocumentsForPolicy,

@@ -11,10 +11,10 @@ import { getMarinePlanPolicyLink } from '#src/server/common/helpers/marine-licen
 import {
   clearPendingUnlink,
   getPendingUnlink
-} from '#src/server/marine-licence/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
 
 export const MARINE_PLAN_POLICY_UNLINK_SUPPORTING_DOCUMENTS_VIEW_ROUTE =
-  'marine-licence/marine-plan-policy-unlink-supporting-documents/index'
+  'marine-licence/marine-plan-policies/marine-plan-policy-unlink-supporting-documents/index'
 
 const PAGE_TITLE = 'Your consideration no longer refers to a document'
 

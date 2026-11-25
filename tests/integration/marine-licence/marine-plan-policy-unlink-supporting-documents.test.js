@@ -17,10 +17,10 @@ import {
   clearPendingUnlink,
   getPendingUnlink,
   setPendingUnlink
-} from '~/src/server/marine-licence/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
+} from '~/src/server/marine-licence/marine-plan-policies/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
 
 vi.mock(
-  '~/src/server/marine-licence/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
+  '~/src/server/marine-licence/marine-plan-policies/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
 )
 
 const policyCode = 'S-CC-1'

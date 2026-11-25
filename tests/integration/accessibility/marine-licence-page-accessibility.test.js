@@ -41,7 +41,7 @@ import { runPageAccessibilityTests } from './page-accessibility-tests.js'
 import { loadPage, submitForm } from '../shared/app-server.js'
 import { runAxeChecks } from '~/.vite/axe-helper.js'
 import * as addressLookup from '~/src/server/common/helpers/marine-licence/invoicing/address-lookup.js'
-import * as pendingUnlink from '~/src/server/marine-licence/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
+import * as pendingUnlink from '~/src/server/marine-licence/marine-plan-policies/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 vi.mock('~/src/server/common/helpers/defraid-login/session-cache.js')

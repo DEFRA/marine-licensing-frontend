@@ -2,7 +2,7 @@ import {
   clearPendingUnlink,
   getPendingUnlink,
   setPendingUnlink
-} from '#src/server/marine-licence/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
 import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 const KEY = 'marinePlanPolicyUnlinkPayload'

@@ -7,6 +7,7 @@
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% from "marine-licence/water-framework-directive-card/macro.njk" import appMarineLicenceWaterFrameworkDirectiveCard %}
 {% from "marine-licence/marine-plan-policies-card/macro.njk" import appMarineLicenceMarinePlanPoliciesCard %}
+{% from "marine-licence/marine-plan-policy-documents-card/macro.njk" import appMarineLicenceMarinePlanPolicyDocumentsCard %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "marine-licence/construction-drawing-card/macro.njk" import appMarineLicenceConstructionDrawingCard %}
 
@@ -141,6 +142,12 @@
         marineLicenceId: marineLicenceId,
         redactionSaveUrl: redactionSaveUrl,
         csrfToken: csrfToken
+      }) }}
+
+      {{ appMarineLicenceMarinePlanPolicyDocumentsCard({
+        documents: marinePlanPolicyDocuments,
+        titlePrefix: "Supporting document - ",
+        isReadOnly: true
       }) }}
 
       {{ appMarineLicenceWaterFrameworkDirectiveCard({

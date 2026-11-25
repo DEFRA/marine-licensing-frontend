@@ -10,6 +10,7 @@ import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summ
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
+import { buildMarinePlanPolicyDocumentsData } from '#src/server/common/helpers/marine-licence/marine-plan-policy-documents-data.js'
 import { PROJECT_STATUS } from '#src/server/common/constants/projects.js'
 import { buildApplicationDetailsCardData } from '#src/server/marine-licence/view-details/utils.js'
 import {
@@ -116,6 +117,8 @@ const buildViewModel = async ({
     invoicingChangeLink:
       marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
     marinePlanPolicySections: buildMarinePlanPoliciesData(marineLicence),
+    marinePlanPolicyDocuments:
+      buildMarinePlanPolicyDocumentsData(marineLicence),
     applicationTasks,
     amount: FEE_ESTIMATE_AMOUNT,
     monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT,

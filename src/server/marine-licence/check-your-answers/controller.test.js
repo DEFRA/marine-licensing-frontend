@@ -8,6 +8,7 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summary-data.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
+import { buildMarinePlanPolicyDocumentsData } from '#src/server/common/helpers/marine-licence/marine-plan-policy-documents-data.js'
 import {
   checkYourAnswersController,
   checkYourAnswersContinueController,
@@ -44,6 +45,9 @@ vi.mock('#src/server/common/helpers/marine-licence/summary-data.js')
 vi.mock(
   '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
 )
+vi.mock(
+  '#src/server/common/helpers/marine-licence/marine-plan-policy-documents-data.js'
+)
 
 const expectedInvoicingData = mockMarineLicenceApplication.invoicing
 
@@ -79,6 +83,7 @@ describe('#checkYourAnswersController', () => {
   let mockH
   let mockGetMarineLicenceById
   let mockPolicies
+  const mockDocuments = [{ filename: 'survey.pdf' }]
 
   const getMarineLicenceCacheMock = vi.mocked(getMarineLicenceCache)
   const setMarineLicenceCacheMock = vi.mocked(setMarineLicenceCache)
@@ -108,6 +113,7 @@ describe('#checkYourAnswersController', () => {
       }
     ]
     vi.mocked(buildMarinePlanPoliciesData).mockReturnValue(mockPolicies)
+    vi.mocked(buildMarinePlanPolicyDocumentsData).mockReturnValue(mockDocuments)
   })
 
   test('handler should render with correct context including site data', async () => {
@@ -157,6 +163,9 @@ describe('#checkYourAnswersController', () => {
     expect(buildMarinePlanPoliciesData).toHaveBeenCalledWith(
       mockCompleteLicence
     )
+    expect(buildMarinePlanPolicyDocumentsData).toHaveBeenCalledWith(
+      mockCompleteLicence
+    )
     expect(mockH.view).toHaveBeenCalledWith(CHECK_YOUR_ANSWERS_VIEW_ROUTE, {
       pageTitle: 'Check your answers before sending your information',
       backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
@@ -175,6 +184,8 @@ describe('#checkYourAnswersController', () => {
       invoicingChangeLink:
         marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
       marinePlanPolicySections: mockPolicies,
+      marinePlanPolicyDocuments: mockDocuments,
+      marinePlanPolicyDocumentsChangeLink: `${marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW}?from=check-your-answers`,
       amount: FEE_ESTIMATE_AMOUNT,
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })
@@ -230,6 +241,8 @@ describe('#checkYourAnswersController', () => {
         marineLicenceRoutes.MARINE_LICENCE_REVIEW_SITE_DETAILS,
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       marinePlanPolicySections: [],
+      marinePlanPolicyDocuments: [],
+      marinePlanPolicyDocumentsChangeLink: `${marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW}?from=check-your-answers`,
       amount: FEE_ESTIMATE_AMOUNT,
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })

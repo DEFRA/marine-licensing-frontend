@@ -95,6 +95,20 @@ describe('Marine Licence Marine Plan Policy Documents Card Component', () => {
     expect($('.govuk-summary-card a')).toHaveLength(0)
   })
 
+  test('shows only a card Change link when read only with a change link', () => {
+    const $ = render({
+      documents: [document],
+      isReadOnly: true,
+      changeLink: '/documents-review'
+    })
+
+    const links = $('.govuk-summary-card a')
+    expect(links).toHaveLength(1)
+    expect(links.closest('.govuk-summary-card__actions')).toHaveLength(1)
+    expect(links.attr('href')).toBe('/documents-review')
+    expect(links.text()).toContain('Change')
+  })
+
   test('renders no cards when there are no documents', () => {
     const $ = render({ documents: [] })
 

@@ -15,24 +15,37 @@
     {% endif %}
   {% endset %}
 
+  {% if not params.isReadOnly %}
+    {% set cardActions = {
+      items: [{
+        href: document.deleteHref,
+        text: "Delete",
+        visuallyHiddenText: "document",
+        classes: "govuk-link--no-visited-state"
+      }]
+    } %}
+  {% elif params.changeLink %}
+    {% set cardActions = {
+      items: [{
+        href: params.changeLink,
+        text: "Change",
+        visuallyHiddenText: "supporting document",
+        classes: "govuk-link--no-visited-state"
+      }]
+    } %}
+  {% else %}
+    {% set cardActions = undefined %}
+  {% endif %}
+
   {{ govukSummaryList({
     card: {
       title: {
-        text: document.filename
+        text: (params.titlePrefix or "") + document.filename
       },
       attributes: {
         id: "document-card-" + loop.index
       },
-      actions: {
-        items: [
-          {
-            href: document.deleteHref,
-            text: "Delete",
-            visuallyHiddenText: "document",
-            classes: "govuk-link--no-visited-state"
-          }
-        ]
-      } if not params.isReadOnly
+      actions: cardActions
     },
     rows: [
       {

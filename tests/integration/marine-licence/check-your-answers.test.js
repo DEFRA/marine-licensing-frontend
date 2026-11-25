@@ -383,5 +383,34 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       expect(firstPolicyChangeLink).toBeTruthy()
       expect(firstPolicyChangeLink.textContent).toContain('Change')
     })
+
+    test('renders a supporting document card after the marine plan policies', () => {
+      const card = document.querySelector('#document-card-1')
+      expect(card).toBeTruthy()
+      expect(
+        card.querySelector('.govuk-summary-card__title').textContent.trim()
+      ).toBe(
+        `Supporting document - ${mockLinkedMarinePlanPolicyDocument.uploadedFile.filename}`
+      )
+      expect(card.textContent).toContain('Ecological Assessment')
+      expect(card.textContent).toContain(
+        'South Climate change 1 (S-CC-1) - Page 1'
+      )
+
+      const links = card.querySelectorAll('a')
+      expect(links).toHaveLength(1)
+      expect(links[0].closest('.govuk-summary-card__actions')).toBeTruthy()
+      expect(links[0].textContent).toContain('Change')
+      expect(links[0].getAttribute('href')).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW}?from=check-your-answers`
+      )
+
+      const cardIds = [...document.querySelectorAll('.govuk-summary-card')].map(
+        (el) => el.id
+      )
+      expect(cardIds.indexOf('document-card-1')).toBe(
+        cardIds.indexOf('marine-plan-policies-card-cross-cutting') + 1
+      )
+    })
   })
 })

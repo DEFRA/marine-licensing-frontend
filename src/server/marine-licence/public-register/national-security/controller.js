@@ -16,36 +16,37 @@ import {
 import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
   getNationalSecurityAnswers,
+  getPublicRegisterLink,
   getReasonPageLinks,
+  isChangeMode,
   isNationalSecurity
 } from '#src/server/marine-licence/public-register/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { WITHHOLD_REASON } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 
 export const PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE =
   'marine-licence/public-register/national-security/index'
 
-const redirectToPublicRegister = (request, h) =>
-  h.redirect(getReasonPageLinks(request).backLink)
-
-const withAnswers = (publicRegister, answers) => ({
-  withholdConsent: publicRegister?.withholdConsent,
-  withholdReason: publicRegister?.withholdReason,
-  ...answers
-})
+const canShowPage = (request, publicRegister) =>
+  isNationalSecurity(publicRegister) || isChangeMode(request, publicRegister)
 
 export const publicRegisterNationalSecurityController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
-    if (!isNationalSecurity(marineLicence.publicRegister)) {
-      return redirectToPublicRegister(request, h)
+    if (!canShowPage(request, marineLicence.publicRegister)) {
+      return h.redirect(getPublicRegisterLink(request))
     }
 
     return h.view(PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE, {
       ...marineLicencePublicRegisterNationalSecuritySettings,
       projectName: marineLicence.projectName,
       payload: getNationalSecurityAnswers(marineLicence.publicRegister),
-      ...getReasonPageLinks(request)
+      ...getReasonPageLinks(
+        request,
+        marineLicence.publicRegister,
+        WITHHOLD_REASON.NATIONAL_SECURITY
+      )
     })
   }
 }
@@ -55,8 +56,12 @@ export const publicRegisterNationalSecuritySubmitController = {
     validate: {
       payload: marineLicencePublicRegisterNationalSecuritySchema,
       failAction: (request, h, err) => {
-        const { projectName } = getMarineLicenceCache(request)
-        const { backLink, cancelLink } = getReasonPageLinks(request)
+        const { projectName, publicRegister } = getMarineLicenceCache(request)
+        const { backLink, cancelLink } = getReasonPageLinks(
+          request,
+          publicRegister,
+          WITHHOLD_REASON.NATIONAL_SECURITY
+        )
         return createFailAction({
           viewRoute: PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE,
           settings: marineLicencePublicRegisterNationalSecuritySettings,
@@ -74,8 +79,8 @@ export const publicRegisterNationalSecuritySubmitController = {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
 
-    if (!isNationalSecurity(marineLicence.publicRegister)) {
-      return redirectToPublicRegister(request, h)
+    if (!canShowPage(request, marineLicence.publicRegister)) {
+      return h.redirect(getPublicRegisterLink(request))
     }
 
     try {
@@ -86,7 +91,11 @@ export const publicRegisterNationalSecuritySubmitController = {
         })
       }
 
-      const publicRegister = withAnswers(marineLicence.publicRegister, answers)
+      const publicRegister = {
+        withholdConsent: 'yes',
+        withholdReason: WITHHOLD_REASON.NATIONAL_SECURITY,
+        ...answers
+      }
 
       await authenticatedPatchRequest(
         request,
@@ -121,7 +130,11 @@ export const publicRegisterNationalSecuritySubmitController = {
         ...marineLicencePublicRegisterNationalSecuritySettings,
         payload,
         projectName: marineLicence.projectName,
-        ...getReasonPageLinks(request),
+        ...getReasonPageLinks(
+          request,
+          marineLicence.publicRegister,
+          WITHHOLD_REASON.NATIONAL_SECURITY
+        ),
         errors: errorDescriptionByFieldName(errorSummary),
         errorSummary
       })

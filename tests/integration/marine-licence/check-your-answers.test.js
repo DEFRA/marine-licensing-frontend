@@ -192,7 +192,11 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
     test('Change link goes to the review withholding answers page when withholding', async () => {
       const document = await loadCyaPage({
         ...mockFileUploadMarineLicence,
-        publicRegister: publicRegisterCardScenarios[1].publicRegister
+        publicRegister: {
+          withholdConsent: 'yes',
+          withholdReason: 'commercialConfidentiality',
+          reason: 'Trestle method'
+        }
       })
 
       expect(

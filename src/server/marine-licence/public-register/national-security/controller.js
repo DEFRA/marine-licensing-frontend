@@ -13,15 +13,14 @@ import {
   marineLicencePublicRegisterNationalSecurityErrorMessages,
   marineLicencePublicRegisterNationalSecuritySettings
 } from '#src/server/common/validation/marine-licence-public-register-national-security/constants.js'
-import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
   getNationalSecurityAnswers,
   getPublicRegisterLink,
   getReasonPageLinks,
+  getSavedReasonRedirect,
   isChangeMode,
   isNationalSecurity
 } from '#src/server/marine-licence/public-register/utils.js'
-import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { WITHHOLD_REASON } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 
 export const PUBLIC_REGISTER_NATIONAL_SECURITY_VIEW_ROUTE =
@@ -109,10 +108,7 @@ export const publicRegisterNationalSecuritySubmitController = {
       })
 
       return h.redirect(
-        withCheckYourAnswersQuery(
-          request,
-          marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
-        )
+        getSavedReasonRedirect(request, marineLicence.publicRegister)
       )
     } catch (e) {
       const details = e.data?.payload?.validation?.details

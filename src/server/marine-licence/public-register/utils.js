@@ -116,6 +116,14 @@ export const getCheckAnswersLink = (request) =>
     marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
   )
 
+export const getSavedReasonRedirect = (request, publicRegister) =>
+  isChangeMode(request, publicRegister)
+    ? withChangeQuery(
+        request,
+        marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+      )
+    : getCheckAnswersLink(request)
+
 export const getPublicRegisterLinks = (request, publicRegister) => {
   if (isChangeMode(request, publicRegister)) {
     return { backLink: getCheckAnswersLink(request), cancelLink: null }

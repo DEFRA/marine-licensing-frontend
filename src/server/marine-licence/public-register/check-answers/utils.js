@@ -1,5 +1,6 @@
 import {
   getReasonPage,
+  isChangeMode,
   isNationalSecurity,
   withChangeQuery
 } from '#src/server/marine-licence/public-register/utils.js'
@@ -79,7 +80,9 @@ export const getContinueLink = (request) =>
 
 export const getBackLink = (request, publicRegister) => {
   if (isFromCheckYourAnswers(request)) {
-    return CHECK_YOUR_ANSWERS_CARD
+    return isChangeMode(request, publicRegister)
+      ? withChangeQuery(request, getReasonPage(publicRegister))
+      : CHECK_YOUR_ANSWERS_CARD
   }
   return extractReferrerPath(request.headers?.referer) ===
     marineLicenceRoutes.MARINE_LICENCE_TASK_LIST

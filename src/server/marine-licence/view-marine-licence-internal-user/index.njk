@@ -7,8 +7,8 @@
 {% from "marine-licence/activity-details-card/macro.njk" import appMarineLicenceActivityDetailsCard %}
 {% from "marine-licence/water-framework-directive-card/macro.njk" import appMarineLicenceWaterFrameworkDirectiveCard %}
 {% from "marine-licence/marine-plan-policies-card/macro.njk" import appMarineLicenceMarinePlanPoliciesCard %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "marine-licence/construction-drawing-card/macro.njk" import appMarineLicenceConstructionDrawingCard %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set rejectedReasonsOutput %}
 
@@ -34,6 +34,16 @@
         <span class="govuk-caption-l">{{ pageCaption }}</span>
       {% endif %}
       <h1 class="govuk-heading-l" id="view-details-heading">{{ pageTitle }}</h1>
+
+      {% set redactionPreviewHtml %}
+        <h2 class="govuk-heading-s">This application has been redacted</h2>
+        <p class="govuk-body">You can <a href="{{ redactionPreviewUrl }}" class="govuk-link" target="_blank" rel="noreferrer noopener">preview how it will appear on the public register (opens in new tab)</a>.</p>
+        <p class="govuk-body">If you make more changes and save them, they will replace the version you have saved.</p>
+      {% endset %}
+
+      <div id="redaction-preview"{% if not (redactions | length) %} hidden{% endif %}>
+        {{ govukInsetText({ html: redactionPreviewHtml }) }}
+      </div>
 
       <p class="govuk-body">Check each answer and redact anything that must not appear on the public register. Replace whatever you redact with <span class="app-redaction-label">***REDACTED***</span>.</p>
 
@@ -156,19 +166,6 @@
         redactionSaveUrl: redactionSaveUrl,
         csrfToken: csrfToken
       }) }}
-
-      <div id="redaction-preview"{% if not (redactions | length) %} hidden{% endif %}>
-        {{ govukButton({
-          text: "Preview with redactions",
-          href: redactionPreviewUrl,
-          classes: "govuk-button--secondary",
-            attributes: {
-              target: "_blank",
-              rel: "noreferrer noopener"
-            }
-        }) }}
-      </div>
-
 
     </div>
   </div>

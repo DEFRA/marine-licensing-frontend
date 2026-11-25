@@ -1,7 +1,7 @@
 {% extends 'layouts/page.njk' %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "marine-licence/marine-plan-policy-documents-card/macro.njk" import appMarineLicenceMarinePlanPolicyDocumentsCard %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% block beforeContent %}
@@ -27,22 +27,9 @@
         }) }}
       {% endif %}
 
-      {% for document in documents %}
-
-        {{ govukSummaryList({
-          card: {
-            title: {
-              text: document.title
-            },
-            attributes: {
-              id: "document-card-" + loop.index
-            },
-            actions: document.actions
-          },
-          rows: document.rows
-        }) }}
-
-      {% endfor %}
+      {{ appMarineLicenceMarinePlanPolicyDocumentsCard({
+        documents: documents
+      }) }}
 
       <div class="govuk-button-group">
         {{ govukButton({

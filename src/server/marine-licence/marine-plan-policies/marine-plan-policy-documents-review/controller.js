@@ -3,7 +3,7 @@ import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { getMarineLicenceCache } from '#src/server/common/helpers/marine-licence/session-cache/utils.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { getValidatedReferrerPath } from '#src/server/common/helpers/referrer-validation.js'
-import { createDocumentCards } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-documents-review/utils.js'
+import { buildMarinePlanPolicyDocumentsData } from '#src/server/common/helpers/marine-licence/marine-plan-policy-documents-data.js'
 import { outstandingPoliciesText } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
 
 export const MARINE_PLAN_POLICY_DOCUMENTS_REVIEW_VIEW_ROUTE =
@@ -21,20 +21,14 @@ export const marinePlanPolicyDocumentsReviewController = {
 
     const marineLicenceService = getMarineLicenceService(request)
 
-    const {
-      projectName,
-      marinePlanPolicySupportingDocuments,
-      marinePlanPolicies
-    } = await marineLicenceService.getMarineLicenceById(cached.id)
+    const marineLicence = await marineLicenceService.getMarineLicenceById(
+      cached.id
+    )
+    const { projectName, marinePlanPolicySupportingDocuments } = marineLicence
 
     if (!marinePlanPolicySupportingDocuments?.linkedDocuments?.length) {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
     }
-
-    const documents = createDocumentCards(
-      marinePlanPolicySupportingDocuments,
-      marinePlanPolicies
-    )
 
     return h.view(MARINE_PLAN_POLICY_DOCUMENTS_REVIEW_VIEW_ROUTE, {
       pageTitle: PAGE_TITLE,
@@ -44,7 +38,7 @@ export const marinePlanPolicyDocumentsReviewController = {
         getValidatedReferrerPath(request.headers?.referer) ??
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
       continueLink: marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
-      documents,
+      documents: buildMarinePlanPolicyDocumentsData(marineLicence),
       newUploadLink:
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,
       outstandingPoliciesText: outstandingPoliciesText(

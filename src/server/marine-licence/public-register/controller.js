@@ -18,11 +18,30 @@ import {
   withCheckYourAnswersQuery
 } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
+  getCheckAnswersLink,
+  getPublicRegisterAnswers,
+  getPublicRegisterLinks,
   getReasonPage,
-  keepReasonAnswers
+  isChangeMode,
+  isWithholdingFor,
+  keepReasonAnswers,
+  withChangeQuery
 } from '#src/server/marine-licence/public-register/utils.js'
 
 export const PUBLIC_REGISTER_VIEW_ROUTE = 'marine-licence/public-register/index'
+
+// Nothing is saved here in change mode: the reason page commits the new choice
+// with its answers, so Back from there leaves the saved answers untouched
+const getChangeModeRedirect = (request, publicRegister, existing) => {
+  if (!isChangeMode(request, existing)) {
+    return null
+  }
+  if (isWithholdingFor(publicRegister, existing.withholdReason)) {
+    return getCheckAnswersLink(request)
+  }
+  const reasonPage = getReasonPage(publicRegister)
+  return reasonPage ? withChangeQuery(request, reasonPage) : null
+}
 
 export const publicRegisterController = {
   async handler(request, h) {
@@ -31,8 +50,8 @@ export const publicRegisterController = {
     return h.view(PUBLIC_REGISTER_VIEW_ROUTE, {
       ...marineLicencePublicRegisterSettings,
       projectName: marineLicence.projectName,
-      payload: marineLicence.publicRegister ?? {},
-      backLink: getCommonRedirectLink(request)
+      payload: getPublicRegisterAnswers(request, marineLicence.publicRegister),
+      ...getPublicRegisterLinks(request, marineLicence.publicRegister)
     })
   }
 }
@@ -42,15 +61,19 @@ export const publicRegisterSubmitController = {
     validate: {
       payload: marineLicencePublicRegisterSchema,
       failAction: (request, h, err) => {
-        const { projectName } = getMarineLicenceCache(request)
-        const backLink = getCommonRedirectLink(request)
+        const { projectName, publicRegister } = getMarineLicenceCache(request)
+        const { backLink, cancelLink } = getPublicRegisterLinks(
+          request,
+          publicRegister
+        )
         return createFailAction({
           viewRoute: PUBLIC_REGISTER_VIEW_ROUTE,
           settings: marineLicencePublicRegisterSettings,
           errorMessages: marineLicencePublicRegisterErrorMessages,
           projectName,
           backLink,
-          payload: request.payload
+          payload: request.payload,
+          params: { cancelLink }
         })(request, h, err)
       }
     }
@@ -60,13 +83,22 @@ export const publicRegisterSubmitController = {
 
     const marineLicence = getMarineLicenceCache(request)
 
-    try {
-      const isWithholding = payload.withholdConsent === 'yes'
-      const publicRegister = {
-        withholdConsent: payload.withholdConsent,
-        ...(isWithholding && { withholdReason: payload.withholdReason })
-      }
+    const isWithholding = payload.withholdConsent === 'yes'
+    const publicRegister = {
+      withholdConsent: payload.withholdConsent,
+      ...(isWithholding && { withholdReason: payload.withholdReason })
+    }
 
+    const changeModeRedirect = getChangeModeRedirect(
+      request,
+      publicRegister,
+      marineLicence.publicRegister
+    )
+    if (changeModeRedirect) {
+      return h.redirect(changeModeRedirect)
+    }
+
+    try {
       const reasonPage = getReasonPage(publicRegister)
 
       // Saved by the reason page instead, so Cancel there discards this choice
@@ -113,7 +145,7 @@ export const publicRegisterSubmitController = {
         ...marineLicencePublicRegisterSettings,
         payload,
         projectName: marineLicence.projectName,
-        backLink: getCommonRedirectLink(request),
+        ...getPublicRegisterLinks(request, marineLicence.publicRegister),
         errors,
         errorSummary
       })

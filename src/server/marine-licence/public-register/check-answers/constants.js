@@ -22,6 +22,13 @@ export const publicRegisterCheckAnswersText = {
     yes: 'Yes',
     no: 'No – If you get approval later, you can come back and change your answer before you submit your application.'
   },
+  changeHiddenText: {
+    withhold:
+      'whether you want to withhold information from the public register',
+    approval:
+      'whether you have approval from the Secretary of State for Defence',
+    reason: 'what you want withheld and why'
+  },
   reasonQuestion: {
     [WITHHOLD_REASON.NATIONAL_SECURITY]: 'What you want withheld',
     [WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY]:

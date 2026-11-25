@@ -16,20 +16,23 @@
 {% block content %}
   {% set rows = [{
     key: { text: summary.withhold.key },
-    value: { text: summary.withhold.value }
+    value: { text: summary.withhold.value },
+    actions: summary.withhold.actions
   }] %}
 
   {% if summary.approval %}
     {% set _ = rows.push({
       key: { text: summary.approval.key },
-      value: { text: summary.approval.value }
+      value: { text: summary.approval.value },
+      actions: summary.approval.actions
     }) %}
   {% endif %}
 
   {% if summary.reason %}
     {% set _ = rows.push({
       key: { text: summary.reason.key },
-      value: { html: summary.reason.value | escape | nl2br }
+      value: { html: summary.reason.value | escape | nl2br },
+      actions: summary.reason.actions
     }) %}
   {% endif %}
 

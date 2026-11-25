@@ -57,7 +57,6 @@ describe('Public register: check answers', () => {
       'Test Marine Project'
     )
     getByRole(document, 'button', { name: 'Continue' })
-    expect(document.querySelector('.govuk-summary-list__actions')).toBeNull()
   })
 
   test.each([

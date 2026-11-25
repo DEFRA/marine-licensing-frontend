@@ -600,7 +600,7 @@ export const withReadyToSend = (marineLicence) => {
   const marinePlanPoliciesCount = marineLicence.marinePlanPoliciesCount ?? 1
   return {
     ...marineLicence,
-    taskList: { ...mockMarineLicenceTaskList, marinePlanPolicies: 'COMPLETED' },
+    taskList: { ...mockMarineLicenceTaskList },
     siteDetailsDataComplete: true,
     marinePlanPolicyJob: 'ready',
     marinePlanPoliciesCount,

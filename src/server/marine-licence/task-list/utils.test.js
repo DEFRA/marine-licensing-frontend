@@ -624,7 +624,7 @@ describe('taskList utils', () => {
     test('Should return "Completed" with "N of N completed" when all responses saved', () => {
       expect(
         transformMarinePlanPoliciesTaskList(
-          { siteDetails: 'COMPLETED' },
+          { siteDetails: 'COMPLETED', marinePlanPolicies: 'COMPLETED' },
           {
             marinePlanPolicyJob: 'ready',
             marinePlanPoliciesCount: 37,
@@ -641,6 +641,21 @@ describe('taskList utils', () => {
           status: { text: 'Completed' }
         }
       ])
+    })
+
+    test('Should return "In progress" when all responses saved but the backend task is not completed', () => {
+      const [task] = transformMarinePlanPoliciesTaskList(
+        { siteDetails: 'COMPLETED', marinePlanPolicies: 'IN_PROGRESS' },
+        {
+          marinePlanPolicyJob: 'ready',
+          marinePlanPoliciesCount: 37,
+          marinePlanPolicyResponseCount: 37
+        }
+      )
+
+      expect(task.status).toEqual({
+        tag: { text: 'In progress', classes: 'govuk-tag--teal' }
+      })
     })
 
     test('omits the count suffix when count is not a number', () => {
@@ -715,7 +730,7 @@ describe('taskList utils', () => {
       (siteDetails) => {
         expect(
           transformMarinePlanPoliciesTaskList(
-            { siteDetails },
+            { siteDetails, marinePlanPolicies: 'COMPLETED' },
             {
               siteDetailsDataComplete: false,
               marinePlanPolicyJob: 'ready',

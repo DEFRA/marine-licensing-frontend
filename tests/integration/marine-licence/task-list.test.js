@@ -87,6 +87,10 @@ describe('Task List', () => {
   test('should render review button when all tasks are completed', async () => {
     mockMarineLicence({
       ...mockMarineLicenceApplication,
+      taskList: {
+        ...mockMarineLicenceApplication.taskList,
+        marinePlanPolicies: 'COMPLETED'
+      },
       marinePlanPolicyJob: 'ready',
       marinePlanPoliciesCount: 3,
       marinePlanPolicyResponseCount: 3

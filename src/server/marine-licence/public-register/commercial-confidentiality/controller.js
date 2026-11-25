@@ -15,30 +15,41 @@ import {
 } from '#src/server/common/validation/marine-licence-public-register-commercial-confidentiality/constants.js'
 import { withCheckYourAnswersQuery } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import {
+  getCommercialConfidentialityAnswers,
+  getPublicRegisterLink,
   getReasonPageLinks,
+  isChangeMode,
   isCommercialConfidentiality
 } from '#src/server/marine-licence/public-register/utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { WITHHOLD_REASON } from '#src/server/common/validation/marine-licence-public-register/constants.js'
 
 export const PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE =
   'marine-licence/public-register/commercial-confidentiality/index'
 
-const redirectToPublicRegister = (request, h) =>
-  h.redirect(getReasonPageLinks(request).backLink)
+const canShowPage = (request, publicRegister) =>
+  isCommercialConfidentiality(publicRegister) ||
+  isChangeMode(request, publicRegister)
 
 export const publicRegisterCommercialConfidentialityController = {
   async handler(request, h) {
     const marineLicence = getMarineLicenceCache(request)
 
-    if (!isCommercialConfidentiality(marineLicence.publicRegister)) {
-      return redirectToPublicRegister(request, h)
+    if (!canShowPage(request, marineLicence.publicRegister)) {
+      return h.redirect(getPublicRegisterLink(request))
     }
 
     return h.view(PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE, {
       ...marineLicencePublicRegisterCommercialConfidentialitySettings,
       projectName: marineLicence.projectName,
-      payload: { reason: marineLicence.publicRegister.reason },
-      ...getReasonPageLinks(request)
+      payload: getCommercialConfidentialityAnswers(
+        marineLicence.publicRegister
+      ),
+      ...getReasonPageLinks(
+        request,
+        marineLicence.publicRegister,
+        WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY
+      )
     })
   }
 }
@@ -48,8 +59,12 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
     validate: {
       payload: marineLicencePublicRegisterCommercialConfidentialitySchema,
       failAction: (request, h, err) => {
-        const { projectName } = getMarineLicenceCache(request)
-        const { backLink, cancelLink } = getReasonPageLinks(request)
+        const { projectName, publicRegister } = getMarineLicenceCache(request)
+        const { backLink, cancelLink } = getReasonPageLinks(
+          request,
+          publicRegister,
+          WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY
+        )
         return createFailAction({
           viewRoute: PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY_VIEW_ROUTE,
           settings:
@@ -68,15 +83,14 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
     const { payload } = request
     const marineLicence = getMarineLicenceCache(request)
 
-    if (!isCommercialConfidentiality(marineLicence.publicRegister)) {
-      return redirectToPublicRegister(request, h)
+    if (!canShowPage(request, marineLicence.publicRegister)) {
+      return h.redirect(getPublicRegisterLink(request))
     }
 
     try {
-      const { withholdConsent, withholdReason } = marineLicence.publicRegister
       const publicRegister = {
-        withholdConsent,
-        withholdReason,
+        withholdConsent: 'yes',
+        withholdReason: WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY,
         reason: payload.reason
       }
 
@@ -113,7 +127,11 @@ export const publicRegisterCommercialConfidentialitySubmitController = {
         ...marineLicencePublicRegisterCommercialConfidentialitySettings,
         payload,
         projectName: marineLicence.projectName,
-        ...getReasonPageLinks(request),
+        ...getReasonPageLinks(
+          request,
+          marineLicence.publicRegister,
+          WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY
+        ),
         errors: errorDescriptionByFieldName(errorSummary),
         errorSummary
       })

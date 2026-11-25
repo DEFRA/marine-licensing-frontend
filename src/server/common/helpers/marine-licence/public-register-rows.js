@@ -66,19 +66,12 @@ const getNationalSecurityRows = ({ nationalSecurityApproval, reason }) => {
   ]
 }
 
-const isLegacyWithhold = (publicRegister) =>
-  publicRegister.withholdConsent === 'yes' && !publicRegister.withholdReason
-
 const getFollowUpRows = (publicRegister) => {
   if (isNationalSecurity(publicRegister)) {
     return getNationalSecurityRows(publicRegister)
   }
 
-  const showsCommercialReason =
-    isCommercialConfidentiality(publicRegister) ||
-    isLegacyWithhold(publicRegister)
-
-  return showsCommercialReason && publicRegister.reason
+  return isCommercialConfidentiality(publicRegister) && publicRegister.reason
     ? [
         getReasonRow(
           text.reasonQuestion[WITHHOLD_REASON.COMMERCIAL_CONFIDENTIALITY],

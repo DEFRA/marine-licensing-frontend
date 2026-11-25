@@ -123,35 +123,12 @@ describe('buildPublicRegisterRows', () => {
     )
   })
 
-  test.each([
-    { name: 'nothing is stored', publicRegister: undefined },
-    { name: 'a record predates the rename', publicRegister: { consent: 'yes' } }
-  ])('marks the withhold row incomplete when $name', ({ publicRegister }) => {
-    expect(buildPublicRegisterRows(publicRegister)).toEqual([
+  test('marks the withhold row incomplete when nothing is stored', () => {
+    expect(buildPublicRegisterRows(undefined)).toEqual([
       {
         key: { text: WITHHOLD_QUESTION },
         isIncomplete: true
       }
     ])
-  })
-
-  describe('withheld before a reason type was asked for', () => {
-    test('shows "Yes" and the details as "what and why"', () => {
-      expect(
-        buildPublicRegisterRows({ withholdConsent: 'yes', reason: 'Pricing' })
-      ).toEqual([
-        { key: { text: WITHHOLD_QUESTION }, value: { text: 'Yes' } },
-        {
-          key: { text: COMMERCIAL_REASON_LABEL },
-          value: { html: 'Pricing' }
-        }
-      ])
-    })
-
-    test('shows only "Yes" when there are no details', () => {
-      expect(buildPublicRegisterRows({ withholdConsent: 'yes' })).toEqual([
-        { key: { text: WITHHOLD_QUESTION }, value: { text: 'Yes' } }
-      ])
-    })
   })
 })

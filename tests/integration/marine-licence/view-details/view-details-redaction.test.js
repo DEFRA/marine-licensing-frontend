@@ -1,4 +1,4 @@
-import { getByRole, queryByRole } from '@testing-library/dom'
+import { getByRole } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -68,10 +68,7 @@ describe('Marine Licence View Details Redaction', () => {
     expect(document.querySelector('#public-register-card')).toBeFalsy()
   })
 
-  test('does not link to the preview when nothing has been redacted', () => {
-    expect(
-      queryByRole(document, 'button', { name: 'Preview with redactions' })
-    ).toBeNull()
+  test('hides the redacted inset when nothing has been redacted', () => {
     expect(document.querySelector('#redaction-preview').hidden).toBe(true)
   })
 
@@ -264,13 +261,25 @@ describe('Marine Licence View Details Redaction', () => {
         ).value
       ).toBe(redactedText)
 
-      const previewLink = getByRole(redactedDocument, 'button', {
-        name: 'Preview with redactions'
+      const $preview = redactedDocument.querySelector('#redaction-preview')
+      const $inset = $preview.querySelector('.govuk-inset-text')
+
+      expect($preview.hidden).toBe(false)
+      expect(
+        getByRole($inset, 'heading', {
+          level: 2,
+          name: 'This application has been redacted'
+        })
+      ).toBeTruthy()
+
+      const previewLink = getByRole($inset, 'link', {
+        name: 'preview how it will appear on the public register (opens in new tab)'
       })
 
       expect(previewLink.getAttribute('href')).toBe(`${viewUrl}/preview`)
-      expect(previewLink.classList.contains('govuk-button--secondary')).toBe(
-        true
+      expect(previewLink.getAttribute('target')).toBe('_blank')
+      expect($inset.textContent).toContain(
+        'If you make more changes and save them, they will replace the version you have saved.'
       )
     })
   })

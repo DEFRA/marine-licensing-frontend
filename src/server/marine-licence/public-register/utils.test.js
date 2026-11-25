@@ -1,9 +1,15 @@
 import {
   getCheckAnswersRedirect,
+  getCommercialConfidentialityAnswers,
   getNationalSecurityAnswers,
+  getPublicRegisterAnswers,
+  getPublicRegisterLinks,
   getReasonPage,
+  getReasonPageLinks,
+  isChangeMode,
   isNationalSecurity,
-  keepReasonAnswers
+  keepReasonAnswers,
+  withChangeQuery
 } from './utils.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
@@ -51,10 +57,152 @@ describe('getNationalSecurityAnswers', () => {
     ).toEqual({ nationalSecurityApproval: 'yes', reason: 'Details' })
   })
 
-  test('returns undefined answers when nothing is saved', () => {
-    expect(getNationalSecurityAnswers(undefined)).toEqual({
-      nationalSecurityApproval: undefined,
-      reason: undefined
+  test.each([
+    undefined,
+    {
+      withholdConsent: 'yes',
+      withholdReason: 'commercialConfidentiality',
+      reason: 'Pricing'
+    }
+  ])('returns no answers for %o', (publicRegister) => {
+    expect(getNationalSecurityAnswers(publicRegister)).toEqual({})
+  })
+})
+
+describe('getCommercialConfidentialityAnswers', () => {
+  test('returns the commercial reason', () => {
+    expect(
+      getCommercialConfidentialityAnswers({
+        withholdConsent: 'yes',
+        withholdReason: 'commercialConfidentiality',
+        reason: 'Pricing'
+      })
+    ).toEqual({ reason: 'Pricing' })
+  })
+
+  test('returns no answers for a national security reason', () => {
+    expect(
+      getCommercialConfidentialityAnswers({
+        withholdConsent: 'yes',
+        withholdReason: 'nationalSecurity',
+        nationalSecurityApproval: 'yes',
+        reason: 'Berth'
+      })
+    ).toEqual({})
+  })
+})
+
+describe('change mode', () => {
+  const complete = {
+    withholdConsent: 'yes',
+    withholdReason: 'commercialConfidentiality',
+    reason: 'Pricing'
+  }
+  const changeRequest = { query: { action: 'change' } }
+  const checkAnswers =
+    marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+
+  test.each([
+    { name: 'complete answers', publicRegister: complete, expected: true },
+    {
+      name: 'unfinished answers',
+      publicRegister: { ...complete, reason: undefined },
+      expected: false
+    },
+    {
+      name: 'a No answer',
+      publicRegister: { withholdConsent: 'no' },
+      expected: false
+    },
+    { name: 'no answers', publicRegister: undefined, expected: false }
+  ])('isChangeMode is $expected for $name', ({ publicRegister, expected }) => {
+    expect(isChangeMode(changeRequest, publicRegister)).toBe(expected)
+  })
+
+  test('isChangeMode is false without the change action', () => {
+    expect(isChangeMode({ query: {} }, complete)).toBe(false)
+  })
+
+  test('withChangeQuery drops any other from value', () => {
+    expect(withChangeQuery({ query: { from: 'elsewhere' } }, '/page')).toBe(
+      '/page?action=change'
+    )
+  })
+
+  test('withChangeQuery adds the pending withhold reason', () => {
+    expect(
+      withChangeQuery(
+        { query: { from: 'check-your-answers' } },
+        '/page',
+        'nationalSecurity'
+      )
+    ).toBe(
+      '/page?action=change&withholdReason=nationalSecurity&from=check-your-answers'
+    )
+  })
+
+  test('getPublicRegisterLinks goes back to the review page with no Cancel', () => {
+    expect(getPublicRegisterLinks(changeRequest, complete)).toEqual({
+      backLink: checkAnswers,
+      cancelLink: null
+    })
+  })
+
+  test.each([
+    {
+      name: 'the saved reason goes back to the review page',
+      withholdReason: 'commercialConfidentiality',
+      backLink: checkAnswers
+    },
+    {
+      name: 'a switched reason goes back to the withholding page, keeping the pending reason',
+      withholdReason: 'nationalSecurity',
+      backLink: `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?action=change&withholdReason=nationalSecurity`
+    }
+  ])(
+    'getReasonPageLinks for $name, with no Cancel',
+    ({ withholdReason, backLink }) => {
+      expect(
+        getReasonPageLinks(changeRequest, complete, withholdReason)
+      ).toEqual({ backLink, cancelLink: null })
+    }
+  )
+
+  test.each([
+    {
+      name: 'uses the pending reason in change mode',
+      request: {
+        query: { action: 'change', withholdReason: 'nationalSecurity' }
+      },
+      expected: { withholdConsent: 'yes', withholdReason: 'nationalSecurity' }
+    },
+    {
+      name: 'ignores an unknown pending reason',
+      request: { query: { action: 'change', withholdReason: 'other' } },
+      expected: complete
+    },
+    {
+      name: 'ignores the pending reason outside change mode',
+      request: { query: { withholdReason: 'nationalSecurity' } },
+      expected: complete
+    }
+  ])('getPublicRegisterAnswers $name', ({ request, expected }) => {
+    expect(getPublicRegisterAnswers(request, complete)).toEqual(expected)
+  })
+
+  test('getPublicRegisterLinks outside change mode uses the task list', () => {
+    expect(getPublicRegisterLinks({ query: {} }, complete)).toEqual({
+      backLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST,
+      cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+    })
+  })
+
+  test('getReasonPageLinks outside change mode goes back to the withholding page', () => {
+    expect(
+      getReasonPageLinks({ query: {} }, complete, 'commercialConfidentiality')
+    ).toEqual({
+      backLink: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
+      cancelLink: marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     })
   })
 })

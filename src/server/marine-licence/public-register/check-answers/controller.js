@@ -26,7 +26,7 @@ export const publicRegisterCheckAnswersController = {
     return h.view(PUBLIC_REGISTER_CHECK_ANSWERS_VIEW_ROUTE, {
       ...publicRegisterCheckAnswersSettings,
       projectName,
-      summary: getCheckAnswersSummary(publicRegister),
+      summary: getCheckAnswersSummary(request, publicRegister),
       backLink: getBackLink(request, publicRegister)
     })
   }

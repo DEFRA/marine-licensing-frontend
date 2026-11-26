@@ -322,7 +322,6 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
     let document
 
     beforeEach(async () => {
-      document = await loadCyaPage(mockFileUploadMarineLicence)
       document = await loadCyaPage({
         ...mockFileUploadMarineLicence,
         marinePlanPolicySupportingDocuments: {

@@ -72,7 +72,7 @@ describe('#marinePlanPolicyDocumentsReviewController', () => {
   describe('return links', () => {
     const CYA_CARD_LINK = `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#document-card-1`
 
-    const render = async ({ returnTo, documentsOutstanding } = {}) => {
+    const render = async ({ returnTo, documentsOutstanding, referer } = {}) => {
       vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
         getMarineLicenceById: vi.fn().mockResolvedValue({
           marinePlanPolicySupportingDocuments: {
@@ -82,7 +82,7 @@ describe('#marinePlanPolicyDocumentsReviewController', () => {
         })
       })
       const request = {
-        headers: {},
+        headers: { referer },
         yar: { get: vi.fn().mockReturnValue(returnTo) }
       }
       const h = { view: vi.fn() }
@@ -121,6 +121,22 @@ describe('#marinePlanPolicyDocumentsReviewController', () => {
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
       )
       expect(context.continueLink).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+      )
+    })
+
+    test('ignores a referrer from the delete page because that document no longer exists', async () => {
+      const deleteUrl =
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT.replace(
+          '{documentId}',
+          'doc-1'
+        )
+
+      const { context } = await render({
+        referer: `http://localhost${deleteUrl}`
+      })
+
+      expect(context.backLink).toBe(
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
       )
     })

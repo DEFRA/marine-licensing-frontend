@@ -14,6 +14,17 @@ const PAGE_TITLE = 'Supporting documents'
 
 const POLICIES_URL = marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
 
+const DELETE_DOCUMENT_PATH_PREFIX =
+  marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT.replace(
+    '{documentId}',
+    ''
+  )
+
+const getReferrerBackLink = (request) => {
+  const referrer = getValidatedReferrerPath(request.headers?.referer)
+  return referrer?.startsWith(DELETE_DOCUMENT_PATH_PREFIX) ? null : referrer
+}
+
 const withCardAnchor = (path) => (path ? `${path}#document-card-1` : undefined)
 
 const getCompletedReturnTo = (returnTo, supportingDocuments) =>
@@ -50,7 +61,7 @@ export const marinePlanPolicyDocumentsReviewController = {
       projectName,
       backLink:
         withCardAnchor(returnTo) ??
-        getValidatedReferrerPath(request.headers?.referer) ??
+        getReferrerBackLink(request) ??
         POLICIES_URL,
       continueLink: withCardAnchor(completedReturnTo) ?? POLICIES_URL,
       documents: buildMarinePlanPolicyDocumentsData(marineLicence),

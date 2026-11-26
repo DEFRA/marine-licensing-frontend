@@ -1,4 +1,7 @@
-import { MPP_DOCUMENT_TYPES } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-type/constants.js'
+import {
+  MPP_DOCUMENT_TYPES,
+  MPP_DOCUMENT_TYPE_OTHER
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-document-type/constants.js'
 import { formatPolicyTitle } from '#src/server/common/helpers/marine-licence/marine-plan-policy-title.js'
 import {
   getMarinePlanPolicyDeleteSupportingDocumentUrl,
@@ -20,7 +23,9 @@ export const buildMarinePlanPolicyDocumentsData = (marineLicence) => {
     filename: document.uploadedFile.filename,
     type: MPP_DOCUMENT_TYPES[document.documentType] ?? '',
     typeOther:
-      document.documentType === 'other' ? document.documentTypeOther : '',
+      document.documentType === MPP_DOCUMENT_TYPE_OTHER
+        ? document.documentTypeOther
+        : '',
     policies: (document.policyLinks ?? []).map((link) => ({
       title: getPolicyTitle(policies, link.policyCode),
       location: link.location

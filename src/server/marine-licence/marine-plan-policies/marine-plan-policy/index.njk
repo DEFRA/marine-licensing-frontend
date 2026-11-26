@@ -7,13 +7,6 @@
 {% from "marine-licence/policy-wording/macro.njk" import appMarineLicencePolicyWording %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
-{% set requiresDocumentationHtml %}
-<span class="govuk-body">My consideration refers to an assessment, report or other document</span>
-<span class="govuk-hint govuk-checkboxes__hint">
-  Only select this if your consideration relies on information in a document. You still need to explain your consideration in full in the text box. We’ll ask you to upload the document and tell us where the relevant information is at the bottom of the policy list page.
-</span>
-{% endset %}
-
 {% block beforeContent %}
 {{ super() }}
 <nav>
@@ -73,7 +66,10 @@
           items: [
             {
               value: "requiresDocumentation",
-              html: requiresDocumentationHtml,
+              text: "My consideration refers to an assessment, report or other document",
+              hint: {
+                text: "Only select this if your consideration relies on information in a document. You still need to explain your consideration in full in the text box. We’ll ask you to upload the document and tell us where the relevant information is at the bottom of the policy list page."
+              },
               checked: payload.documentationCheck
             }
           ]

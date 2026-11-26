@@ -17,6 +17,10 @@ import {
   getPolicySectionCardId,
   getPolicySectionSlug
 } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
+import {
+  clearPendingUnlink,
+  setPendingUnlink
+} from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-unlink-supporting-documents/pending-unlink.js'
 import { formatPolicyTitle } from '#src/server/common/helpers/marine-licence/marine-plan-policy-title.js'
 import {
   getDocumentsForPolicy,
@@ -118,6 +122,7 @@ const buildRenderModel = ({
 
 export const marinePlanPolicyController = {
   async handler(request, h) {
+    clearPendingUnlink(request)
     const context = await loadPolicyContext(request)
 
     return h.view(
@@ -187,17 +192,34 @@ export const marinePlanPolicySubmitController = {
     const { id, policyCode, policy, returnTo } =
       await loadPolicyContext(request)
 
-    await authenticatedPatchRequest(
+    const responsePayload = {
+      id,
+      policyCode,
+      response: request.payload.policyConsideration,
+      requiresDocumentation:
+        request.payload.documentationCheck === 'requiresDocumentation'
+    }
+
+    const { payload } = await authenticatedPatchRequest(
       request,
       apiRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_RESPONSE,
-      {
-        id,
-        policyCode,
-        response: request.payload.policyConsideration,
-        requiresDocumentation:
-          request.payload.documentationCheck === 'requiresDocumentation'
-      }
+      responsePayload
     )
+
+    if (payload?.value?.confirmationRequired) {
+      setPendingUnlink(request, {
+        body: responsePayload,
+        filenames: payload.value.orphanedDocuments.map(
+          ({ filename }) => filename
+        )
+      })
+      return h.redirect(
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_UNLINK_SUPPORTING_DOCUMENTS.replace(
+          '{policyCode}',
+          policyCode
+        )
+      )
+    }
 
     return h.redirect(getPolicyReturnLink(returnTo, policy))
   }

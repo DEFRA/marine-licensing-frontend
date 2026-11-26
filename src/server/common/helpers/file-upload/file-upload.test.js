@@ -1,4 +1,5 @@
 import {
+  createFileUploadErrorDisplay,
   getAllowedExtensions,
   getCdpErrorMessageFromCode,
   getFileTypeContent,
@@ -15,6 +16,7 @@ import {
   GEO_PARSER_ERROR_MESSAGES
 } from '#src/server/common/helpers/file-upload/error-messages.js'
 import { UPLOAD_A_FILE } from '#src/server/common/helpers/file-upload/constants.js'
+import { createMockRequest } from '#src/server/test-helpers/mocks/helpers.js'
 
 describe('#getFileTypeContent', () => {
   test('should return KML heading, accept attribute and site name guidance', () => {
@@ -131,4 +133,23 @@ describe('#getGeoParserErrorMessage', () => {
       expect(getGeoParserErrorMessage(errorCode)).toBe(expected)
     }
   )
+})
+
+describe('#createFileUploadErrorDisplay', () => {
+  test('links the error summary to the file upload control id', () => {
+    const { errorSummary, errors } = createFileUploadErrorDisplay(
+      { fieldName: 'file', message: 'Select a file to upload' },
+      createMockRequest()
+    )
+
+    expect(errorSummary).toEqual([
+      expect.objectContaining({
+        href: '#file',
+        text: 'Select a file to upload'
+      })
+    ])
+    expect(errors.file).toEqual(
+      expect.objectContaining({ text: 'Select a file to upload' })
+    )
+  })
 })

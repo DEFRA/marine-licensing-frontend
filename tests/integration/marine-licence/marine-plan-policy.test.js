@@ -12,6 +12,9 @@ import {
   mockMarineLicenceWithMarinePlanPolicies
 } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
 import { getMarinePlanPolicyLink } from '~/src/server/common/helpers/marine-licence/marine-plan-policy-link.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
+import { statusCodes } from '~/src/server/common/constants/status-codes.js'
+import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 
 describe('Marine plan policy (consideration) page', () => {
   const getServer = setupTestServer()
@@ -98,16 +101,79 @@ describe('Marine plan policy (consideration) page', () => {
     expect(getByRole(document, 'heading', { level: 1 })).toHaveTextContent(
       'South West Biodiversity 1 (SW-BIO-1)'
     )
-    expect(document.getElementById('policyConsideration')).not.toBeNull()
+    expect(document.getElementById('policyConsideration')).toHaveValue(
+      'My answer'
+    )
     expect(
-      document.querySelector('input[name="documentationCheck"]')
-    ).toBeChecked()
+      getByRole(document, 'link', {
+        name: 'Find out more detailed information about this policy (opens in a new tab)'
+      })
+    ).toHaveAttribute(
+      'href',
+      'https://environment.data.gov.uk/marine-plans-explorer/policy/SW-BIO-1'
+    )
+    expect(
+      getByRole(document, 'link', {
+        name: 'Get help with completing the Marine plan policies section (opens in a new tab)'
+      })
+    ).toHaveAttribute(
+      'href',
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_GUIDANCE
+    )
+    const documentationCheck = getByRole(document, 'checkbox', {
+      name: 'My consideration refers to an assessment, report or other document'
+    })
+    expect(documentationCheck).toBeChecked()
+    expect(documentationCheck).toHaveAccessibleDescription(
+      expect.stringContaining(
+        'Only select this if your consideration relies on information in a document.'
+      )
+    )
+  })
+
+  test.each([
+    ['the policy code is not in the licence', 'UNKNOWN-1', undefined],
+    ['the licence id is missing from the cache', 'SW-BIO-1', {}],
+    [
+      'the licence has no marine plan policies',
+      'SW-BIO-1',
+      { id: mockMarineLicenceWithMarinePlanPolicies.id }
+    ]
+  ])('returns 404 when %s', async (_, policyCode, cachedLicence) => {
+    if (cachedLicence) {
+      mockMarineLicence(cachedLicence)
+    }
+
+    const response = await makeGetRequest({
+      url: getMarinePlanPolicyLink(policyCode),
+      server: getServer()
+    })
+
+    expect(response.statusCode).toBe(statusCodes.notFound)
+  })
+
+  test('shows a required error when the consideration response is empty', async () => {
+    const document = await submitPolicyForm({ policyConsideration: '' })
+
+    validateErrors(
+      [
+        {
+          field: 'policyConsideration',
+          message: errorMessages.POLICY_CONSIDERATION_REQUIRED
+        }
+      ],
+      document
+    )
   })
 
   test('shows a min length error when the consideration response is under 70 characters', async () => {
     const document = await submitPolicyForm({
       policyConsideration: 'a'.repeat(69)
     })
+
+    expect(document.getElementById('policyConsideration')).toHaveValue(
+      'a'.repeat(69)
+    )
 
     validateErrors(
       [

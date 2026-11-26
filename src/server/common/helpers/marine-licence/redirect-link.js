@@ -1,6 +1,6 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 
-const isFromCheckYourAnswers = (request) =>
+export const isFromCheckYourAnswers = (request) =>
   request.query?.from === 'check-your-answers'
 
 export const withCheckYourAnswersQuery = (request, path) =>

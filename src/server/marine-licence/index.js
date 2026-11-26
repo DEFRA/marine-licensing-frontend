@@ -30,6 +30,7 @@ import { updateAndResubmitRoutes } from '#src/server/marine-licence/update-and-r
 import { consultationsRoutes } from '#src/server/marine-licence/consultations/index.js'
 import { consultationDetailsRoutes } from '#src/server/marine-licence/consultation-details/index.js'
 import { consultationResponseRoutes } from '#src/server/marine-licence/consultation-response/index.js'
+import { marinePlanPolicyUnlinkSupportingDocumentsRoutes } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-unlink-supporting-documents/index.js'
 
 export const marineLicence = {
   plugin: {
@@ -67,7 +68,8 @@ export const marineLicence = {
         ...updateAndResubmitRoutes,
         ...consultationsRoutes,
         ...consultationDetailsRoutes,
-        ...consultationResponseRoutes
+        ...consultationResponseRoutes,
+        ...marinePlanPolicyUnlinkSupportingDocumentsRoutes
       ])
     }
   }

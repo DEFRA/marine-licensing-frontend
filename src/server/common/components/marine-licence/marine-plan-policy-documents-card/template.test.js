@@ -109,6 +109,24 @@ describe('Marine Licence Marine Plan Policy Documents Card Component', () => {
     expect(links.text()).toContain('Change')
   })
 
+  test('gives each card Change link a unique accessible name', () => {
+    const $ = render({
+      documents: [document, { ...document, filename: 'second.pdf' }],
+      titlePrefix: 'Supporting document - ',
+      isReadOnly: true,
+      changeLink: '/documents-review'
+    })
+
+    expect(
+      $('.govuk-summary-card__actions a .govuk-visually-hidden')
+        .map((_, el) => $(el).text().trim())
+        .get()
+    ).toEqual([
+      'supporting document (Supporting document - survey.pdf)',
+      'supporting document (Supporting document - second.pdf)'
+    ])
+  })
+
   test('renders no cards when there are no documents', () => {
     const $ = render({ documents: [] })
 

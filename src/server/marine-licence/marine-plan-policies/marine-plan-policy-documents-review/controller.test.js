@@ -36,14 +36,48 @@ describe('#marinePlanPolicyDocumentsReviewController', () => {
     expect(h.view).not.toHaveBeenCalled()
   })
 
-  describe('return links', () => {
-    const CYA_CARD_LINK = `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#document-card-1`
+  describe('when there are no documents left', () => {
+    const CYA = marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
 
-    const render = async ({ returnTo } = {}) => {
+    const redirectFor = async ({ returnTo, documentsOutstanding }) => {
       vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
         getMarineLicenceById: vi.fn().mockResolvedValue({
           marinePlanPolicySupportingDocuments: {
-            linkedDocuments: [mockLinkedMarinePlanPolicyDocument]
+            linkedDocuments: [],
+            documentsOutstanding
+          }
+        })
+      })
+      const h = { redirect: vi.fn(), view: vi.fn() }
+      await marinePlanPolicyDocumentsReviewController.handler(
+        { yar: { get: vi.fn().mockReturnValue(returnTo) } },
+        h
+      )
+      return h.redirect.mock.calls[0][0]
+    }
+
+    test('returns to check your answers when nothing is outstanding', async () => {
+      expect(
+        await redirectFor({ returnTo: CYA, documentsOutstanding: [] })
+      ).toBe(CYA)
+    })
+
+    test('goes to the marine plan policies page when documents are outstanding', async () => {
+      expect(
+        await redirectFor({ returnTo: CYA, documentsOutstanding: ['GOV1'] })
+      ).toBe(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
+    })
+  })
+
+  describe('return links', () => {
+    const CYA_CARD_LINK = `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#document-card-1`
+
+    const render = async ({ returnTo, documentsOutstanding } = {}) => {
+      vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
+        getMarineLicenceById: vi.fn().mockResolvedValue({
+          marinePlanPolicySupportingDocuments: {
+            linkedDocuments: [mockLinkedMarinePlanPolicyDocument],
+            documentsOutstanding
           }
         })
       })
@@ -66,6 +100,18 @@ describe('#marinePlanPolicyDocumentsReviewController', () => {
       expect(request.yar.get).toHaveBeenCalledWith(RETURN_TO_CACHE_KEY)
       expect(context.backLink).toBe(CYA_CARD_LINK)
       expect(context.continueLink).toBe(CYA_CARD_LINK)
+    })
+
+    test('continues to the marine plan policies page when documents are outstanding', async () => {
+      const { context } = await render({
+        returnTo: marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS,
+        documentsOutstanding: ['GOV1']
+      })
+
+      expect(context.backLink).toBe(CYA_CARD_LINK)
+      expect(context.continueLink).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+      )
     })
 
     test('returns to the marine plan policies page when no return path is cached', async () => {

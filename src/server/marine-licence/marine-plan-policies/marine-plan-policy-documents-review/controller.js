@@ -12,11 +12,12 @@ export const MARINE_PLAN_POLICY_DOCUMENTS_REVIEW_VIEW_ROUTE =
 
 const PAGE_TITLE = 'Supporting documents'
 
-const getReturnLink = (request) => {
-  const returnTo = request.yar?.get(RETURN_TO_CACHE_KEY)
+const POLICIES_URL = marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
 
-  return returnTo ? `${returnTo}#document-card-1` : undefined
-}
+const withCardAnchor = (path) => (path ? `${path}#document-card-1` : undefined)
+
+const getCompletedReturnTo = (returnTo, supportingDocuments) =>
+  supportingDocuments?.documentsOutstanding?.length ? undefined : returnTo
 
 export const marinePlanPolicyDocumentsReviewController = {
   async handler(request, h) {
@@ -33,22 +34,25 @@ export const marinePlanPolicyDocumentsReviewController = {
     )
     const { projectName, marinePlanPolicySupportingDocuments } = marineLicence
 
-    if (!marinePlanPolicySupportingDocuments?.linkedDocuments?.length) {
-      return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
-    }
+    const returnTo = request.yar?.get(RETURN_TO_CACHE_KEY)
+    const completedReturnTo = getCompletedReturnTo(
+      returnTo,
+      marinePlanPolicySupportingDocuments
+    )
 
-    const returnLink = getReturnLink(request)
+    if (!marinePlanPolicySupportingDocuments?.linkedDocuments?.length) {
+      return h.redirect(completedReturnTo ?? POLICIES_URL)
+    }
 
     return h.view(MARINE_PLAN_POLICY_DOCUMENTS_REVIEW_VIEW_ROUTE, {
       pageTitle: PAGE_TITLE,
       heading: PAGE_TITLE,
       projectName,
       backLink:
-        returnLink ??
+        withCardAnchor(returnTo) ??
         getValidatedReferrerPath(request.headers?.referer) ??
-        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
-      continueLink:
-        returnLink ?? marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES,
+        POLICIES_URL,
+      continueLink: withCardAnchor(completedReturnTo) ?? POLICIES_URL,
       documents: buildMarinePlanPolicyDocumentsData(marineLicence),
       newUploadLink:
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_SUPPORTING_DOCUMENT,

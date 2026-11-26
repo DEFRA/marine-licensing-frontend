@@ -402,7 +402,7 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       expect(links[0].closest('.govuk-summary-card__actions')).toBeTruthy()
       expect(links[0].textContent).toContain('Change')
       expect(links[0].getAttribute('href')).toBe(
-        `${marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW}?from=check-your-answers`
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
       )
 
       const cardIds = [...document.querySelectorAll('.govuk-summary-card')].map(

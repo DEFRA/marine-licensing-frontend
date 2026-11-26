@@ -185,7 +185,8 @@ describe('#checkYourAnswersController', () => {
         marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
       marinePlanPolicySections: mockPolicies,
       marinePlanPolicyDocuments: mockDocuments,
-      marinePlanPolicyDocumentsChangeLink: `${marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW}?from=check-your-answers`,
+      marinePlanPolicyDocumentsChangeLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW,
       amount: FEE_ESTIMATE_AMOUNT,
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })
@@ -242,7 +243,8 @@ describe('#checkYourAnswersController', () => {
       publicRegisterRoute: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER,
       marinePlanPolicySections: [],
       marinePlanPolicyDocuments: [],
-      marinePlanPolicyDocumentsChangeLink: `${marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW}?from=check-your-answers`,
+      marinePlanPolicyDocumentsChangeLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW,
       amount: FEE_ESTIMATE_AMOUNT,
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })

@@ -5,8 +5,6 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { getValidatedReferrerPath } from '#src/server/common/helpers/referrer-validation.js'
 import { buildMarinePlanPolicyDocumentsData } from '#src/server/common/helpers/marine-licence/marine-plan-policy-documents-data.js'
 import { outstandingPoliciesText } from '#src/server/common/helpers/marine-licence/marine-plan-policy-sections.js'
-import { setReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
-import { isFromCheckYourAnswers } from '#src/server/common/helpers/marine-licence/redirect-link.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 
 export const MARINE_PLAN_POLICY_DOCUMENTS_REVIEW_VIEW_ROUTE =
@@ -14,15 +12,7 @@ export const MARINE_PLAN_POLICY_DOCUMENTS_REVIEW_VIEW_ROUTE =
 
 const PAGE_TITLE = 'Supporting documents'
 
-const getReturnLink = async (request, h) => {
-  if (isFromCheckYourAnswers(request)) {
-    await setReturnToCache(
-      request,
-      h,
-      marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-    )
-  }
-
+const getReturnLink = (request) => {
   const returnTo = request.yar?.get(RETURN_TO_CACHE_KEY)
 
   return returnTo ? `${returnTo}#document-card-1` : undefined
@@ -47,7 +37,7 @@ export const marinePlanPolicyDocumentsReviewController = {
       return h.redirect(marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES)
     }
 
-    const returnLink = await getReturnLink(request, h)
+    const returnLink = getReturnLink(request)
 
     return h.view(MARINE_PLAN_POLICY_DOCUMENTS_REVIEW_VIEW_ROUTE, {
       pageTitle: PAGE_TITLE,

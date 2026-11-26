@@ -3,15 +3,11 @@ import * as cacheUtils from '#src/server/common/helpers/marine-licence/session-c
 import * as marineLicenceService from '#src/services/marine-licence-service/index.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { marinePlanPolicyDocumentsReviewController } from '#src/server/marine-licence/marine-plan-policies/marine-plan-policy-documents-review/controller.js'
-import { setReturnToCache } from '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
 import { RETURN_TO_CACHE_KEY } from '#src/server/common/constants/cache.js'
 import { mockLinkedMarinePlanPolicyDocument } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('#src/server/common/helpers/marine-licence/session-cache/utils.js')
 vi.mock('#src/services/marine-licence-service/index.js')
-vi.mock(
-  '#src/server/common/helpers/marine-licence/session-cache/return-to-cache.js'
-)
 
 describe('#marinePlanPolicyDocumentsReviewController', () => {
   beforeEach(() => {
@@ -43,7 +39,7 @@ describe('#marinePlanPolicyDocumentsReviewController', () => {
   describe('return links', () => {
     const CYA_CARD_LINK = `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#document-card-1`
 
-    const render = async ({ query = {}, returnTo } = {}) => {
+    const render = async ({ returnTo } = {}) => {
       vi.mocked(marineLicenceService.getMarineLicenceService).mockReturnValue({
         getMarineLicenceById: vi.fn().mockResolvedValue({
           marinePlanPolicySupportingDocuments: {
@@ -52,7 +48,6 @@ describe('#marinePlanPolicyDocumentsReviewController', () => {
         })
       })
       const request = {
-        query,
         headers: {},
         yar: { get: vi.fn().mockReturnValue(returnTo) }
       }
@@ -60,20 +55,8 @@ describe('#marinePlanPolicyDocumentsReviewController', () => {
 
       await marinePlanPolicyDocumentsReviewController.handler(request, h)
 
-      return { request, h, context: h.view.mock.calls[0][1] }
+      return { request, context: h.view.mock.calls[0][1] }
     }
-
-    test('sets the return to cache when opened from check your answers', async () => {
-      const { request, h } = await render({
-        query: { from: 'check-your-answers' }
-      })
-
-      expect(setReturnToCache).toHaveBeenCalledWith(
-        request,
-        h,
-        marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS
-      )
-    })
 
     test('returns to the check your answers card when a return path is cached', async () => {
       const { request, context } = await render({
@@ -88,7 +71,6 @@ describe('#marinePlanPolicyDocumentsReviewController', () => {
     test('returns to the marine plan policies page when no return path is cached', async () => {
       const { context } = await render()
 
-      expect(setReturnToCache).not.toHaveBeenCalled()
       expect(context.backLink).toBe(
         marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
       )

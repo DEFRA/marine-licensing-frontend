@@ -114,7 +114,7 @@ describe('Marine plan policy delete supporting document page', () => {
     expect(statusCode).toBe(statusCodes.notFound)
   })
 
-  test('deletes the last document and returns to the marine plan policies page', async () => {
+  test('deletes the last document and returns to the review page to decide where to go next', async () => {
     const { response } = await submitDeleteForm()
 
     expect(authenticatedPatchRequest).toHaveBeenCalledWith(
@@ -127,7 +127,7 @@ describe('Marine plan policy delete supporting document page', () => {
     )
     expect(response.statusCode).toBe(statusCodes.redirect)
     expect(response.headers.location).toBe(
-      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICIES
+      marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
     )
   })
 

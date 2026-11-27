@@ -13,6 +13,7 @@ import { getMarineLicenceService } from '#src/services/marine-licence-service/in
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { getWaterFrameworkDirectiveChangeLink } from '#src/server/marine-licence/check-your-answers/utils.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
+import { buildMarinePlanPolicyDocumentsData } from '#src/server/common/helpers/marine-licence/marine-plan-policy-documents-data.js'
 import { isMarineLicenceReadyToSend } from '#src/server/marine-licence/task-list/ready-to-send.js'
 import { getUserSession } from '#src/server/common/plugins/auth/utils.js'
 import { USER_TYPES } from '#src/server/common/constants/user-types.js'
@@ -62,10 +63,14 @@ export const checkYourAnswersController = {
 
     let siteData = { coordinatesType: null, summaryData: [] }
     let marinePlanPolicySections = []
+    let marinePlanPolicyDocuments = []
 
     if (completeMarineLicence) {
       siteData = buildSiteData(completeMarineLicence)
       marinePlanPolicySections = buildMarinePlanPoliciesData(
+        completeMarineLicence
+      )
+      marinePlanPolicyDocuments = buildMarinePlanPolicyDocumentsData(
         completeMarineLicence
       )
 
@@ -105,6 +110,9 @@ export const checkYourAnswersController = {
         marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
       feeEstimateChangeLink: marineLicenceRoutes.MARINE_LICENCE_FEE_ESTIMATE,
       marinePlanPolicySections,
+      marinePlanPolicyDocuments,
+      marinePlanPolicyDocumentsChangeLink:
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW,
       amount: FEE_ESTIMATE_AMOUNT,
       monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT
     })

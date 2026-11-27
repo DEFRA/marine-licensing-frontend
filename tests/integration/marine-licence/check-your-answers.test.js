@@ -1,4 +1,4 @@
-import { getByRole } from '@testing-library/dom'
+import { getByRole, within } from '@testing-library/dom'
 import { marineLicenceRoutes } from '~/src/server/common/constants/routes.js'
 import {
   mockMarineLicence,
@@ -24,6 +24,7 @@ import {
   EXCLUDED_ACTIVITIES_HEADING,
   FILE_UPLOAD_HEADING
 } from '~/src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
+import { mockLinkedMarinePlanPolicyDocument } from '#src/server/test-helpers/mocks/marine-licence-mocks.js'
 
 vi.mock('~/src/services/marine-licence-service/index.js')
 
@@ -321,7 +322,13 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
     let document
 
     beforeEach(async () => {
-      document = await loadCyaPage(mockFileUploadMarineLicence)
+      document = await loadCyaPage({
+        ...mockFileUploadMarineLicence,
+        marinePlanPolicySupportingDocuments: {
+          ...mockFileUploadMarineLicence.marinePlanPolicySupportingDocuments,
+          linkedDocuments: [mockLinkedMarinePlanPolicyDocument]
+        }
+      })
     })
 
     test('renders the marine plan policies card with the correct title', () => {
@@ -347,6 +354,15 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       expect(card.textContent).toContain('Policy information')
       expect(card.textContent).toContain('Your consideration')
       expect(card.textContent).toContain('My first consideration.')
+      expect(card.textContent).toContain('Supporting documents')
+
+      const list = within(card).getByRole('list')
+      const listItems = within(list).queryByRole('listitem')
+      expect(listItems.textContent).toBe(
+        `${mockLinkedMarinePlanPolicyDocument.uploadedFile.filename} - Page 1`
+      )
+
+      expect(card.textContent).toContain('Supporting documents')
     })
 
     test('renders a Change link for each policy row', () => {
@@ -365,6 +381,35 @@ describe('Marine Licence Check Your Answers - site and activity cards', () => {
       )
       expect(firstPolicyChangeLink).toBeTruthy()
       expect(firstPolicyChangeLink.textContent).toContain('Change')
+    })
+
+    test('renders a supporting document card after the marine plan policies', () => {
+      const card = document.querySelector('#document-card-1')
+      expect(card).toBeTruthy()
+      expect(
+        card.querySelector('.govuk-summary-card__title').textContent.trim()
+      ).toBe(
+        `Supporting document - ${mockLinkedMarinePlanPolicyDocument.uploadedFile.filename}`
+      )
+      expect(card.textContent).toContain('Ecological Assessment')
+      expect(card.textContent).toContain(
+        'South Climate change 1 (S-CC-1) - Page 1'
+      )
+
+      const links = card.querySelectorAll('a')
+      expect(links).toHaveLength(1)
+      expect(links[0].closest('.govuk-summary-card__actions')).toBeTruthy()
+      expect(links[0].textContent).toContain('Change')
+      expect(links[0].getAttribute('href')).toBe(
+        marineLicenceRoutes.MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW
+      )
+
+      const cardIds = [...document.querySelectorAll('.govuk-summary-card')].map(
+        (el) => el.id
+      )
+      expect(cardIds.indexOf('document-card-1')).toBe(
+        cardIds.indexOf('marine-plan-policies-card-cross-cutting') + 1
+      )
     })
   })
 })

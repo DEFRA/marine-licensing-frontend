@@ -1,0 +1,89 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% for document in params.documents %}
+  {% set typeValue %}
+    {{ document.type }}{% if document.typeOther %}<br>{{ document.typeOther }}{% endif %}
+  {% endset %}
+
+  {% set policiesValue %}
+    {% if document.policies | length %}
+      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
+        {% for policy in document.policies %}
+          <li>{{ policy.title }} - {{ policy.location }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endset %}
+
+  {% if not params.isReadOnly %}
+    {% set cardActions = {
+      items: [{
+        href: document.deleteHref,
+        text: "Delete",
+        visuallyHiddenText: "document",
+        classes: "govuk-link--no-visited-state"
+      }]
+    } %}
+  {% elif params.changeLink %}
+    {% set cardActions = {
+      items: [{
+        href: params.changeLink,
+        text: "Change",
+        visuallyHiddenText: "supporting document",
+        classes: "govuk-link--no-visited-state"
+      }]
+    } %}
+  {% else %}
+    {% set cardActions = undefined %}
+  {% endif %}
+
+  {{ govukSummaryList({
+    card: {
+      title: {
+        text: (params.titlePrefix or "") + document.filename
+      },
+      attributes: {
+        id: "document-card-" + loop.index
+      },
+      actions: cardActions
+    },
+    rows: [
+      {
+        key: {
+          text: "Type"
+        },
+        value: {
+          html: typeValue
+        },
+        actions: {
+          items: [
+            {
+              href: document.changeTypeHref,
+              text: "Change",
+              visuallyHiddenText: "type",
+              classes: "govuk-link--no-visited-state"
+            }
+          ]
+        } if not params.isReadOnly
+      },
+      {
+        key: {
+          text: "Policies"
+        },
+        value: {
+          html: policiesValue
+        },
+        actions: {
+          items: [
+            {
+              href: document.changePoliciesHref,
+              text: "Change",
+              visuallyHiddenText: "policies",
+              classes: "govuk-link--no-visited-state"
+            }
+          ]
+        } if not params.isReadOnly
+      }
+    ]
+  }) }}
+{% endfor %}

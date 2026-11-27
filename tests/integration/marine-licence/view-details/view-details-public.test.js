@@ -207,4 +207,8 @@ describe('Marine Licence View Details', () => {
       }
     })
   })
+
+  test('does not render any supporting document cards', () => {
+    expect(document.querySelector('#document-card-1')).toBeNull()
+  })
 })

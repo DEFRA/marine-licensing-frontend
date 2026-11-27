@@ -449,4 +449,10 @@ describe('Marine licence redaction preview', () => {
       }
     )
   })
+
+  test('does not render any supporting document cards', async () => {
+    const document = await loadPreview(mockSubmittedMarineLicenceApplication)
+
+    expect(document.querySelector('#document-card-1')).toBeNull()
+  })
 })

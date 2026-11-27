@@ -6,3 +6,12 @@ export const getCardRow = (card, keyText) => {
       keyText
   )
 }
+
+export const expectReadOnlySupportingDocumentCard = (document, filename) => {
+  const card = document.querySelector('#document-card-1')
+  expect(
+    card.querySelector('.govuk-summary-card__title').textContent.trim()
+  ).toBe(`Supporting document - ${filename}`)
+  expect(card.textContent).toContain('Ecological Assessment')
+  expect(card.querySelectorAll('a')).toHaveLength(0)
+}

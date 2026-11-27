@@ -17,7 +17,7 @@ import {
   expectedSubmittedApplicationDetailsCard,
   expectedTransferredApplicationDetailsCard
 } from './fixtures.js'
-import { expectReadOnlySupportingDocumentCard, getCardRow } from './utils.js'
+import { getCardRow } from './utils.js'
 import { toApplicationReferenceUrlSegment } from '~/src/server/common/helpers/marine-licence/application-reference-url-segment.js'
 import { getAuthProvider } from '~/src/server/common/helpers/authenticated-requests.js'
 import { AUTH_STRATEGIES } from '~/src/server/common/constants/auth.js'
@@ -450,13 +450,9 @@ describe('Marine licence redaction preview', () => {
     )
   })
 
-  test('renders a read-only supporting document card', async () => {
+  test('does not render any supporting document cards', async () => {
     const document = await loadPreview(mockSubmittedMarineLicenceApplication)
 
-    expectReadOnlySupportingDocumentCard(
-      document,
-      mockSubmittedMarineLicenceApplication.marinePlanPolicySupportingDocuments
-        .linkedDocuments[0].uploadedFile.filename
-    )
+    expect(document.querySelector('#document-card-1')).toBeNull()
   })
 })

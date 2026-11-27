@@ -7,7 +7,6 @@ import { buildSummaryData } from '#src/server/common/helpers/marine-licence/summ
 import { buildSiteData } from '#src/server/common/helpers/marine-licence/site-data.js'
 import { waterFrameworkReviewData } from '#src/server/common/helpers/marine-licence/water-framework-directive/water-framework-review-data.js'
 import { buildMarinePlanPoliciesData } from '#src/server/common/helpers/marine-licence/marine-plan-policies-data.js'
-import { buildMarinePlanPolicyDocumentsData } from '#src/server/common/helpers/marine-licence/marine-plan-policy-documents-data.js'
 import {
   buildApplicationDetailsCardData,
   buildRedactionsForView
@@ -96,8 +95,6 @@ export const viewDetailsInternalUserController = {
         csrfToken: request.plugins.crumb,
         waterFrameworkDirectiveData,
         marinePlanPolicySections,
-        marinePlanPolicyDocuments:
-          buildMarinePlanPolicyDocumentsData(marineLicence),
         ...applicationDetailsCardData
       })
     } catch (error) {

@@ -79,7 +79,8 @@ const buildViewModel = async ({
   request,
   marineLicence,
   marineLicenceId,
-  isApplicantView
+  isApplicantView,
+  isPublicView
 }) => {
   const formattedMarineLicence = buildSummaryData(marineLicence)
   const { coordinatesType, summaryData } = buildSiteData(marineLicence)
@@ -117,8 +118,9 @@ const buildViewModel = async ({
     invoicingChangeLink:
       marineLicenceRoutes.MARINE_LICENCE_CHECK_INVOICING_DETAILS,
     marinePlanPolicySections: buildMarinePlanPoliciesData(marineLicence),
-    marinePlanPolicyDocuments:
-      buildMarinePlanPolicyDocumentsData(marineLicence),
+    marinePlanPolicyDocuments: isPublicView
+      ? []
+      : buildMarinePlanPolicyDocumentsData(marineLicence),
     applicationTasks,
     amount: FEE_ESTIMATE_AMOUNT,
     monitoringAmount: FEE_ESTIMATE_MONITORING_AMOUNT,
@@ -149,7 +151,8 @@ export const viewDetailsController = {
         request,
         marineLicence,
         marineLicenceId,
-        isApplicantView
+        isApplicantView,
+        isPublicView
       })
 
       return h.view(VIEW_DETAILS_VIEW_ROUTE, viewModel)

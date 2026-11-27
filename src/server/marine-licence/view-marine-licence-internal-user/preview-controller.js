@@ -1,5 +1,4 @@
 import Boom from '@hapi/boom'
-import { buildMarinePlanPolicyDocumentsData } from '#src/server/common/helpers/marine-licence/marine-plan-policy-documents-data.js'
 import { errorMessages } from '#src/server/common/constants/error-messages.js'
 import { getMarineLicenceService } from '#src/services/marine-licence-service/index.js'
 import { isProjectViewable } from '#src/server/common/helpers/view-details/utils.js'
@@ -58,8 +57,6 @@ export const previewController = {
         ...buildApplicationDetailsCardData(marineLicence),
         siteData,
         marinePlanPolicySections,
-        marinePlanPolicyDocuments:
-          buildMarinePlanPolicyDocumentsData(marineLicence),
         waterFrameworkDirectiveData,
         redactions: marineLicence.redactions
       })

@@ -11,7 +11,7 @@ import {
   expectedWaterFrameworkDirectiveCard
 } from './fixtures.js'
 import { validateWaterFrameworkDirective } from '#tests/integration/shared/summary-card-validators.js'
-import { expectReadOnlySupportingDocumentCard, getCardRow } from './utils.js'
+import { getCardRow } from './utils.js'
 
 vi.mock('~/src/server/common/helpers/authenticated-requests.js')
 
@@ -208,11 +208,7 @@ describe('Marine Licence View Details', () => {
     })
   })
 
-  test('renders a read-only supporting document card', () => {
-    expectReadOnlySupportingDocumentCard(
-      document,
-      mockSubmittedMarineLicenceApplication.marinePlanPolicySupportingDocuments
-        .linkedDocuments[0].uploadedFile.filename
-    )
+  test('does not render any supporting document cards', () => {
+    expect(document.querySelector('#document-card-1')).toBeNull()
   })
 })

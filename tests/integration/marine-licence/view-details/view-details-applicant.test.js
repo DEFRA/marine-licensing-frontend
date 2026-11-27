@@ -32,7 +32,7 @@ import {
   expectedApplicantActivityCards,
   expectedPublicRegisterCard
 } from './fixtures.js'
-import { getCardRow } from './utils.js'
+import { expectReadOnlySupportingDocumentCard, getCardRow } from './utils.js'
 import {
   validateInvoicingCard,
   validateWaterFrameworkDirective
@@ -543,6 +543,16 @@ describe('Marine Licence View Details', () => {
           row.querySelector('.govuk-summary-list__value').textContent.trim()
         ).toBe(value)
       }
+    )
+  })
+
+  test('renders a read-only supporting document card', async () => {
+    const document = await loadViewDetailsPage(getServer())
+
+    expectReadOnlySupportingDocumentCard(
+      document,
+      mockSubmittedMarineLicenceApplication.marinePlanPolicySupportingDocuments
+        .linkedDocuments[0].uploadedFile.filename
     )
   })
 })

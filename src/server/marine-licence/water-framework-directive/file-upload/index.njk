@@ -42,12 +42,12 @@
         <form action="{{ uploadUrl }}" method="post" enctype="multipart/form-data" novalidate>
 
           {{ govukFileUpload({
-              id: "file-id",
+              id: "file",
               name: "file",
               label: {
                 text: heading,
                 classes: "govuk-visually-hidden",
-                for: "file-id"
+                for: "file"
               },
               hint: {
                 text: "You can only upload a file that is a .docx or .odt."

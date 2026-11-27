@@ -202,7 +202,9 @@ export const marineLicenceRoutes = {
   MARINE_LICENCE_MARINE_PLAN_POLICY_DOCUMENTS_REVIEW:
     '/marine-licence/marine-plan-policy/supporting-documents-review',
   MARINE_LICENCE_MARINE_PLAN_POLICY_DELETE_SUPPORTING_DOCUMENT:
-    '/marine-licence/marine-plan-policy/delete-supporting-document/{documentId}'
+    '/marine-licence/marine-plan-policy/delete-supporting-document/{documentId}',
+  MARINE_LICENCE_MARINE_PLAN_POLICY_UNLINK_SUPPORTING_DOCUMENTS:
+    '/marine-licence/marine-plan-policy/delete-supporting-documents/{policyCode}'
 }
 
 export const marineLicenceConsultationDetailsRoutes = {

@@ -1,6 +1,9 @@
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
 import { waterFrameworkDirective } from '~/src/server/test-helpers/mocks/marine-licence-mocks.js'
-import { getWaterFrameworkDirectiveChangeLink } from '#src/server/marine-licence/check-your-answers/utils.js'
+import {
+  getPublicRegisterChangeLink,
+  getWaterFrameworkDirectiveChangeLink
+} from '#src/server/marine-licence/check-your-answers/utils.js'
 
 describe('getWaterFrameworkDirectiveChangeLink', () => {
   it('should return review answers route when nauticalMile is yes', () => {
@@ -37,5 +40,26 @@ describe('getWaterFrameworkDirectiveChangeLink', () => {
     const result = getWaterFrameworkDirectiveChangeLink()
 
     expect(result).toBe(undefined)
+  })
+})
+
+describe('getPublicRegisterChangeLink', () => {
+  it('links to the review withholding answers page when withholding', () => {
+    expect(
+      getPublicRegisterChangeLink({
+        withholdConsent: 'yes',
+        withholdReason: 'commercialConfidentiality',
+        reason: 'Pricing'
+      })
+    ).toBe(marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS)
+  })
+
+  it.each([
+    { name: 'not withholding', publicRegister: { withholdConsent: 'no' } },
+    { name: 'unanswered', publicRegister: undefined }
+  ])('links to the withholding question when $name', ({ publicRegister }) => {
+    expect(getPublicRegisterChangeLink(publicRegister)).toBe(
+      marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
+    )
   })
 })

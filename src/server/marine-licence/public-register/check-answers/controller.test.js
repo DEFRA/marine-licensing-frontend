@@ -20,6 +20,8 @@ describe('#publicRegisterCheckAnswers', () => {
   }
   const complete = { ...nationalSecurity, nationalSecurityApproval: 'no' }
 
+  const fromCya = { headers: {}, query: { from: 'check-your-answers' } }
+
   const createH = () => ({ redirect: vi.fn(), view: vi.fn() })
 
   const mockCache = (publicRegister) =>
@@ -64,6 +66,31 @@ describe('#publicRegisterCheckAnswers', () => {
           backLink:
             marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY
         })
+      )
+    })
+
+    test('back link goes to the card on check your answers when changing from there', () => {
+      mockCache(complete)
+      const h = createH()
+
+      publicRegisterCheckAnswersController.handler(fromCya, h)
+
+      expect(h.view).toHaveBeenCalledWith(
+        PUBLIC_REGISTER_CHECK_ANSWERS_VIEW_ROUTE,
+        expect.objectContaining({
+          backLink: `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#public-register-card`
+        })
+      )
+    })
+
+    test('unfinished answers redirect keeps from=check-your-answers', () => {
+      mockCache(nationalSecurity)
+      const h = createH()
+
+      publicRegisterCheckAnswersController.handler(fromCya, h)
+
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_NATIONAL_SECURITY}?from=check-your-answers`
       )
     })
 
@@ -116,6 +143,23 @@ describe('#publicRegisterCheckAnswers', () => {
       )
       expect(h.redirect).toHaveBeenCalledWith(
         marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
+      )
+    })
+
+    test('confirms the answers and returns to check your answers when changing from there', async () => {
+      mockCache(complete)
+      const h = createH()
+      const request = { query: { from: 'check-your-answers' } }
+
+      await publicRegisterCheckAnswersSubmitController.handler(request, h)
+
+      expect(authRequests.authenticatedPatchRequest).toHaveBeenCalledWith(
+        request,
+        apiRoutes.CONFIRM_PUBLIC_REGISTER,
+        { id: 'test-id' }
+      )
+      expect(h.redirect).toHaveBeenCalledWith(
+        `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#public-register-card`
       )
     })
   })

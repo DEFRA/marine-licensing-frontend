@@ -6,6 +6,7 @@ import {
   setupTestServer
 } from '~/tests/integration/shared/test-setup-helpers.js'
 import { loadPage, submitForm } from '~/tests/integration/shared/app-server.js'
+import { makeGetRequest } from '~/src/server/test-helpers/server-requests.js'
 
 const PAGE_URL =
   marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
@@ -131,5 +132,52 @@ describe('Public register: check answers', () => {
     expect(response.headers.location).toBe(
       marineLicenceRoutes.MARINE_LICENCE_TASK_LIST
     )
+  })
+
+  describe('when changing answers from check your answers', () => {
+    const FROM_CYA_URL = `${PAGE_URL}?from=check-your-answers`
+    const completeAnswers = { ...commercial, reason: 'Pricing details' }
+
+    test('Continue returns to check your answers', async () => {
+      mockMarineLicence({ ...marineLicence, publicRegister: completeAnswers })
+
+      const { response } = await submitForm({
+        requestUrl: FROM_CYA_URL,
+        server: getServer(),
+        formData: {}
+      })
+
+      expect(response.statusCode).toBe(statusCodes.redirect)
+      expect(response.headers.location).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#public-register-card`
+      )
+    })
+
+    test('Back goes to check your answers', async () => {
+      mockMarineLicence({ ...marineLicence, publicRegister: completeAnswers })
+
+      const document = await loadPage({
+        requestUrl: FROM_CYA_URL,
+        server: getServer()
+      })
+
+      expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+        'href',
+        `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#public-register-card`
+      )
+    })
+
+    test('unfinished answers redirect without losing the way back', async () => {
+      mockMarineLicence({ ...marineLicence, publicRegister: commercial })
+
+      const response = await makeGetRequest({
+        url: FROM_CYA_URL,
+        server: getServer()
+      })
+
+      expect(response.headers.location).toBe(
+        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_COMMERCIAL_CONFIDENTIALITY}?from=check-your-answers`
+      )
+    })
   })
 })

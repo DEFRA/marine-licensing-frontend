@@ -13,3 +13,8 @@ export const getWaterFrameworkDirectiveChangeLink = (
 
   return marineLicenceRoutes.MARINE_LICENCE_WATER_FRAMEWORK_DIRECTIVE_REVIEW_YOUR_ANSWERS
 }
+
+export const getPublicRegisterChangeLink = (publicRegister) =>
+  publicRegister?.withholdConsent === 'yes'
+    ? marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+    : marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER

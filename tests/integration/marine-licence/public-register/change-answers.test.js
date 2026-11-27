@@ -132,6 +132,52 @@ describe('Public register: change answers', () => {
     })
   })
 
+  describe('review page Back link from check your answers', () => {
+    const FROM_CYA = 'from=check-your-answers'
+
+    test('goes to check your answers before any change is saved', async () => {
+      givenAnswers(commercial)
+
+      const document = await load(`${CHECK_ANSWERS}?${FROM_CYA}`)
+
+      expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+        'href',
+        `${marineLicenceRoutes.MARINE_LICENCE_CHECK_YOUR_ANSWERS}#public-register-card`
+      )
+    })
+
+    test('saving a reason keeps change mode on the way back to the review page', async () => {
+      givenAnswers(commercial)
+
+      const { response } = await submit(`${change(COMMERCIAL)}&${FROM_CYA}`, {
+        reason: 'Contract terms'
+      })
+
+      expectRedirect(response, `${change(CHECK_ANSWERS)}&${FROM_CYA}`)
+    })
+
+    test.each([
+      { name: 'commercial', publicRegister: commercial, page: COMMERCIAL },
+      {
+        name: 'national security',
+        publicRegister: nationalSecurityApproved,
+        page: NATIONAL_SECURITY
+      }
+    ])(
+      'goes to the $name page after a change is saved',
+      async ({ publicRegister, page }) => {
+        givenAnswers(publicRegister)
+
+        const document = await load(`${change(CHECK_ANSWERS)}&${FROM_CYA}`)
+
+        expect(getByRole(document, 'link', { name: 'Back' })).toHaveAttribute(
+          'href',
+          `${change(page)}&${FROM_CYA}`
+        )
+      }
+    )
+  })
+
   describe('withholding information page', () => {
     test('keeps the pending reason when the user comes Back from a switched reason page', async () => {
       givenAnswers(nationalSecurityApproved)
@@ -259,7 +305,7 @@ describe('Public register: change answers', () => {
         nationalSecurityApproval: 'no'
       })
 
-      expectRedirect(response, CHECK_ANSWERS)
+      expectRedirect(response, change(CHECK_ANSWERS))
       expect(authenticatedPatchRequest).toHaveBeenCalledWith(
         expect.any(Object),
         '/marine-licence/public-register-national-security',
@@ -325,7 +371,7 @@ describe('Public register: change answers', () => {
         reason: 'Contract terms'
       })
 
-      expectRedirect(response, CHECK_ANSWERS)
+      expectRedirect(response, change(CHECK_ANSWERS))
       const publicRegister = {
         withholdConsent: 'yes',
         withholdReason: 'commercialConfidentiality',

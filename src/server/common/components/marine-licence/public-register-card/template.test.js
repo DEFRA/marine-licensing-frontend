@@ -2,125 +2,118 @@ import { renderComponentJSDOM } from '#src/server/test-helpers/component-helpers
 import { within } from '@testing-library/dom'
 import { validatePublicRegister } from '#tests/integration/shared/summary-card-validators.js'
 import { marineLicenceRoutes } from '#src/server/common/constants/routes.js'
+import { buildPublicRegisterRows } from '#src/server/common/helpers/marine-licence/public-register-rows.js'
 
 const COMPONENT = 'marine-licence/public-register-card'
-const CARD_TITLE = 'Sharing your application information publicly'
-const DETAILS_KEY = 'Details of information to be withheld and why'
+const CARD_TITLE = 'Information published on the public register'
+const WITHHOLD_QUESTION =
+  'Do you want to ask us to withhold any information from the public register?'
+const APPROVAL_QUESTION =
+  'Do you have approval from the Secretary of State for Defence to withhold information for national security reasons?'
+const CHANGE_LINK =
+  marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER_CHECK_ANSWERS
+
+const renderCard = (publicRegister, params = {}) =>
+  renderComponentJSDOM(COMPONENT, {
+    rows: buildPublicRegisterRows(publicRegister),
+    isReadOnly: true,
+    ...params
+  })
 
 describe('Marine Licence Public Register Card Component', () => {
   describe('Card title and change link', () => {
-    const renderComponent = (params) =>
-      renderComponentJSDOM(COMPONENT, {
-        publicRegister: { withholdConsent: 'no' },
-        isReadOnly: true,
-        ...params
-      })
-
-    test('Should have correct card title', () => {
-      const component = renderComponent()
+    test('has the card title', () => {
+      const component = renderCard({ withholdConsent: 'no' })
       expect(
         within(component).getByRole('heading', { level: 2 })
       ).toHaveTextContent(CARD_TITLE)
     })
 
-    test('should not show a change link when read-only', () => {
-      const component = renderComponent()
+    test('does not show a change link when read-only', () => {
+      const component = renderCard({ withholdConsent: 'no' })
       expect(
         within(component).queryByRole('link', { name: /Change/ })
       ).not.toBeInTheDocument()
     })
 
-    test('should show a change link when not read-only', () => {
-      const component = renderComponent({
-        isReadOnly: false,
-        changeLink: marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER
-      })
-      expect(
-        within(component).getByRole('link', { name: /Change/ })
-      ).toHaveAttribute(
-        'href',
-        `${marineLicenceRoutes.MARINE_LICENCE_PUBLIC_REGISTER}?from=check-your-answers`
+    test('shows a card-level change link back from check your answers when not read-only', () => {
+      const component = renderCard(
+        { withholdConsent: 'no' },
+        { isReadOnly: false, changeLink: CHANGE_LINK }
       )
+      const link = within(component).getByRole('link', { name: /Change/ })
+      expect(link).toHaveAttribute(
+        'href',
+        `${CHANGE_LINK}?from=check-your-answers`
+      )
+      expect(link).toHaveTextContent(
+        'Change information published on the public register'
+      )
+      expect(
+        component.querySelectorAll('.govuk-summary-list__actions')
+      ).toHaveLength(0)
     })
   })
 
-  describe('When no information is withheld', () => {
-    const renderComponent = () =>
-      renderComponentJSDOM(COMPONENT, {
-        publicRegister: { withholdConsent: 'no' },
-        isReadOnly: true
-      })
-
-    test('Should display "No" for the withhold request', () => {
-      const component = renderComponent()
-      validatePublicRegister(component, {
-        publicRegister: {
-          'Request that information is withheld': 'No'
-        }
-      })
-    })
-
-    test('Should not display the details row', () => {
-      const component = renderComponent()
-      expect(within(component).queryByText(DETAILS_KEY)).not.toBeInTheDocument()
+  test('shows "No"', () => {
+    validatePublicRegister(renderCard({ withholdConsent: 'no' }), {
+      publicRegister: { [WITHHOLD_QUESTION]: 'No' }
     })
   })
 
-  describe('When the question has not been answered', () => {
-    test.each([
-      { name: 'nothing is stored', publicRegister: undefined },
+  test('shows commercial confidentiality answers', () => {
+    validatePublicRegister(
+      renderCard({
+        withholdConsent: 'yes',
+        withholdReason: 'commercialConfidentiality',
+        reason: 'Trestle method'
+      }),
       {
-        name: 'a record predates the rename',
-        publicRegister: { consent: 'yes' }
-      }
-    ])(
-      'Should show the withhold request row as incomplete when $name',
-      ({ publicRegister }) => {
-        const component = renderComponentJSDOM(COMPONENT, {
-          publicRegister,
-          isReadOnly: true
-        })
-        validatePublicRegister(component, {
-          publicRegister: {
-            'Request that information is withheld': 'Incomplete'
-          }
-        })
+        publicRegister: {
+          [WITHHOLD_QUESTION]:
+            'Yes – Commercial or industrial confidentiality reasons',
+          'What you want withheld and why': 'Trestle method'
+        }
       }
     )
   })
 
-  describe('When information is withheld', () => {
-    const renderComponent = (params) =>
-      renderComponentJSDOM(COMPONENT, {
-        publicRegister: {
-          withholdConsent: 'yes',
-          reason: 'Commercial sensitivity - contains proprietary information'
-        },
-        isReadOnly: true,
-        ...params
-      })
-
-    test('Should display "Yes" for the withhold request, and the details', () => {
-      const component = renderComponent()
-      validatePublicRegister(component, {
-        publicRegister: {
-          'Request that information is withheld': 'Yes',
-          [DETAILS_KEY]:
-            'Commercial sensitivity - contains proprietary information'
-        }
-      })
+  test('shows national security answers with no border under the approval row', () => {
+    const component = renderCard({
+      withholdConsent: 'yes',
+      withholdReason: 'nationalSecurity',
+      nationalSecurityApproval: 'yes',
+      reason: 'Radar sites'
     })
 
-    test('should show nothing in the details field if none was provided', () => {
-      const component = renderComponent({
-        publicRegister: { withholdConsent: 'yes' }
-      })
-      validatePublicRegister(component, {
-        publicRegister: {
-          'Request that information is withheld': 'Yes',
-          [DETAILS_KEY]: ''
-        }
-      })
+    validatePublicRegister(component, {
+      publicRegister: {
+        [WITHHOLD_QUESTION]: 'Yes – National security reasons',
+        [APPROVAL_QUESTION]: 'Yes',
+        'What you want withheld': 'Radar sites'
+      }
+    })
+    const rows = component.querySelectorAll('.govuk-summary-list__row')
+    expect(rows[0]).not.toHaveClass('govuk-summary-list__row--no-border')
+    expect(rows[1]).toHaveClass('govuk-summary-list__row--no-border')
+  })
+
+  test('renders line breaks in user text without rendering its HTML', () => {
+    const component = renderCard({
+      withholdConsent: 'yes',
+      withholdReason: 'commercialConfidentiality',
+      reason: '<b>bold</b>\nSecond line'
+    })
+    const value = component.querySelectorAll('.govuk-summary-list__value')[1]
+
+    expect(value.querySelector('b')).toBeNull()
+    expect(value.querySelectorAll('br')).toHaveLength(1)
+    expect(value).toHaveTextContent('<b>bold</b>Second line')
+  })
+
+  test('shows the withhold row as incomplete when unanswered', () => {
+    validatePublicRegister(renderCard(undefined), {
+      publicRegister: { [WITHHOLD_QUESTION]: 'Incomplete' }
     })
   })
 })
